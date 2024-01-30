@@ -1,2 +1,21 @@
-# codereview
-Webtool that will allow for easy code review
+## Initialization
+### React
+With Node.js installed, move to the react directory folder and perform
+
+npm install 
+
+
+
+### Flask
+To Prepare for flask make sure to set up a python virtual environment
+
+python -m venv .venv
+
+To activate, type:
+
+    .venv/Scripts/activate
+(Make sure scripts are allowed on the machine)
+
+One the virtual environment is activated install the required libraries by performing 
+
+pip install -r requirements.txt
