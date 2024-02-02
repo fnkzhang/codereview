@@ -8,25 +8,33 @@ function App() {
   
   const [code, setCode] = useState('')
 
-  const handleClick = (e) => {
+  async function handleClick(e) {
     console.log(code)
 
-  }
-
-
-  async function handleChange(newValue) {
-    setCode(newValue)
-
+    let bodyData = {
+      "code": code
+    }
     let headers = {
-      method: "GET",
+      method: "POST",
       mode: "cors",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify()
+      body: JSON.stringify(bodyData)
     }
     
-    await fetch(`${API_URL}/sendCode`, headers)
+    await fetch(`${API_URL}/sendData`, headers)
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch((e) => {
+        console.log(e)
+      })
+  }
+
+
+  function handleChange(newValue) {
+    setCode(newValue)
+
   }
 
   return (
