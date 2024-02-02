@@ -4,9 +4,8 @@ import react, { useState } from 'react';
 
 function App() {
   //Temp Stuff
-  const API_URL = "http://127.0.0.1:5000"
-  
-  const [code, setCode] = useState('')
+  const initial_code = "print('Hello, world')"
+  const [code, setCode] = useState(initial_code)
 
   async function handleClick(e) {
     console.log(code)
@@ -23,7 +22,7 @@ function App() {
       body: JSON.stringify(bodyData)
     }
     
-    await fetch(`${API_URL}/sendData`, headers)
+    await fetch(`/sendData`, headers)
       .then(response => response.json())
       .then(data => console.log(data))
       .catch((e) => {
@@ -31,10 +30,8 @@ function App() {
       })
   }
 
-
   function handleChange(newValue) {
     setCode(newValue)
-
   }
 
   return (
@@ -47,7 +44,7 @@ function App() {
         <Editor 
           height="90vh"
           defaultLanguage="python"
-          defaultValue="print('Hello, world')"
+          defaultValue={initial_code}
           onChange={handleChange}
         />;
       </header>
