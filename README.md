@@ -9,6 +9,10 @@ npm install
 ### Flask
 To Prepare for flask make sure to set up a python virtual environment
 
+First go back to the root directory of the project
+
+create a python virtual environment if not already there:
+
 python -m venv .venv
 
 To activate, type:
