@@ -6,7 +6,7 @@ CORS(app)
 
 @app.route("/")
 def defaultRoute():
-    return "UR -" 
+    return "test" 
 
 
 
