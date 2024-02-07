@@ -5,5 +5,5 @@ COPY ./requirements.txt ./api-server-flask/api/flaskApi.py ./api-server-flask/ap
 RUN pip install -r ./requirements.txt
 ENV FLASK_ENV production
 
-EXPOSE 5000
-CMD ["gunicorn", "-b", ":5000", "flaskApi:app"]
+EXPOSE 3000
+CMD ["gunicorn", "-b", ":3000", "flaskApi:app"]
