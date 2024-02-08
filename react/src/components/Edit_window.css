@@ -1,0 +1,26 @@
+.Edit-window {
+    background-color: #282c34;
+    height: 90vh;
+    display: flex;
+    float: left;
+    clear: both;
+}
+
+.Code-view {
+    background-color: #4d4d4d;
+    height: 90vh;
+    width: 70vw;
+    border: 1px solid #000000;
+    display: inline-block;
+}
+
+.Monaco-editor {
+    height: 85vh;
+    width: 70%;
+}
+
+.Comment-view {
+    height: 85vh;
+    width: 30%;
+    display: inline-block;
+}
