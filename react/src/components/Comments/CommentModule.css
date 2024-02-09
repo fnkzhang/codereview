@@ -2,9 +2,10 @@
     font-size: calc(10px + 1vmin);
     color: white;
     margin-top: 0;
+    align-items: center;
 }
 
-.Comment-module-container {
+.Comment-list-container {
     overflow-y: scroll;
     height: 85vh;
 }

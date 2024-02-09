@@ -1,13 +1,15 @@
-import './App.css';
-import App_header from './components/App_header.js';
-import Edit_window from './components/Edit_window.js';
+import EditWindow from './components/EditWindow.js';
+import CommentDetail from './components/Comments/CommentDetail.js'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
-    <div className="App">
-      <App_header />
-      <Edit_window />
-    </div>
+    <Router>
+      <Routes>
+        <Route exact path="/" element={<EditWindow/>} />
+        <Route path="/comment/:commentId" element={<CommentDetail/>} />
+      </Routes>
+    </Router>
   );
 }
 

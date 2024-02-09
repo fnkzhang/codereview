@@ -1,9 +1,11 @@
 .Edit-window {
     background-color: #282c34;
     height: 90vh;
+    width: 100vw;
     display: flex;
     float: left;
     clear: both;
+    text-align: center;
 }
 
 .Code-view {
