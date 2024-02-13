@@ -1,0 +1,33 @@
+.Comment-container {
+    border: 2px solid #5c5c5c;
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background-color: #282c34;
+    color: white;
+    font-size: 12px;
+    text-align: left;
+    border-radius: 10px;
+    white-space: pre-wrap;
+}
+
+.Comment-author {
+    font-size: 14px;
+    margin-left: 10px;
+    width: 100px;
+}
+
+.Comment-text {
+    margin-top: 5px;
+}
+
+.Comment-details-button {
+    margin-top: 10px;
+}
+
+.Sub-comment-list-container {
+    margin-left: 20px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+}
