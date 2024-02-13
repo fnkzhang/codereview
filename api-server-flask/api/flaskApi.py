@@ -6,14 +6,13 @@ CORS(app)
 
 @app.route("/")
 def defaultRoute():
-    return "UR -" 
+    #print('what', file=sys.stderr)
+    return "test" 
 
 
 
 # Takes in json with "code" section
-@app.route("/sendData", methods=["POST"])
+@app.route('/api/sendData', methods=["POST"])
 def sendData():
     inputBody = request.get_json()
-
     return {"receivedData": inputBody}
-    pass

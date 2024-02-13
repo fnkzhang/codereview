@@ -22,12 +22,13 @@ function App() {
       body: JSON.stringify(bodyData)
     }
     
-    await fetch(`/sendData`, headers)
+    await fetch(`/api/sendData`, headers)
       .then(response => response.json())
       .then(data => console.log(data))
       .catch((e) => {
         console.log(e)
       })
+
   }
 
   function handleChange(newValue) {
