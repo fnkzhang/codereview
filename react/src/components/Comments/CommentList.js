@@ -1,7 +1,7 @@
 import React from 'react';
 import Comment from './Comments.js';
 
-function CommentList ({ comments }) {
+function CommentList ({ comments, listLineJump }) {
   return(
     <div>
       {comments.map((comment, index) => (
@@ -10,7 +10,10 @@ function CommentList ({ comments }) {
           commentID={comment.commentID}
           author={comment.author}
           text={comment.text} 
-          subcomments={comment.subcomments}/>
+          subcomments={comment.subcomments}
+          line={comment.line}
+          commentLineJump={listLineJump}
+        />
       ))}
     </div>
   )
