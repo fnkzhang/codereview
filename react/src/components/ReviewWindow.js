@@ -1,16 +1,32 @@
 import './ReviewWindow.css';
-import AppHeader from "./AppHeader.js"
-import CommentModule from "./Comments/CommentModule.js"
-import { sendData } from "../api/APIUtils.js";
-import { getCode, getNewCode } from "../dev/getCode.js";
-import { DiffEditor, useMonaco } from '@monaco-editor/react';
-import { useState } from 'react';
+import AppHeader from './AppHeader.js';
+import CommentModule from './Comments/CommentModule.js';
+import { sendData } from '../api/APIUtils.js';
+import { getCode, getNewCode } from '../dev/getCode.js';
+import { DiffEditor } from '@monaco-editor/react';
+import React, { useState, useRef, useEffect} from 'react';
 
 function ReviewWindow() {
-  //Temp Stuff
+
+  const monacoRef = useRef(null)
+  const editorRef = useRef(null)
   const initialCode = getCode()
   const [updatedCode, setCode] = useState(getNewCode)
   const [currentLine, setLine] = useState(1)
+  const decorationIdsRef = useRef([]);
+
+  useEffect(() => {
+
+    if (editorRef.current && monacoRef.current) {
+      const modifiedEditor = editorRef.current.getModifiedEditor();
+
+      const lineNumber = 4;
+      const range = new monacoRef.current.Range(lineNumber, 24, lineNumber, 29);
+      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
+
+      decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
+    }
+  }, [monacoRef, editorRef, currentLine, updatedCode]);
 
   async function handleClick() {
     console.log(updatedCode)
@@ -28,6 +44,11 @@ function ReviewWindow() {
 
   function lineJump(newLine) {
     setLine(newLine)
+
+    if (editorRef.current && editorRef.current.getModifiedEditor) {
+
+      editorRef.current.getModifiedEditor().revealLine(newLine);
+    }
   }
 
   return (
@@ -43,7 +64,10 @@ function ReviewWindow() {
             originalLanguage="python"
             modifiedLanguage='python'
             onChange={handleChange}
-            line={currentLine}
+            onMount={(editor, monaco) => {
+              editorRef.current = editor
+              monacoRef.current = monaco
+            }}
           />
         </div>
         <div className="Comment-view">
