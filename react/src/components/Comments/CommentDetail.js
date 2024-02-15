@@ -1,8 +1,8 @@
 import './CommentDetail.css';
-import {DiffEditor} from '@monaco-editor/react'
+import { DiffEditor } from '@monaco-editor/react'
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import {getCode, getNewCode} from './../../dev/getCode.js'
+import { getCode, getNewCode } from './../../dev/getCode.js'
 
 const CommentDetail = () => {
   const { commentId } = useParams()
