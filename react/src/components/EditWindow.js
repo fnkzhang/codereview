@@ -6,8 +6,8 @@ import { getCode } from "../dev/getCode.js";
 import Editor from '@monaco-editor/react';
 import { useState } from 'react';
 
-import  { GoogleLogin } from '@react-oauth/google';
 
+import Oauth from './Oauth.js';
 function EditWindow() {
   //Temp Stuff
   const initial_code = getCode()
@@ -30,11 +30,7 @@ function EditWindow() {
   return (
     <div>
       <AppHeader />
-      <GoogleLogin
-        onSuccess={credentialResponse => {console.log(credentialResponse)}}
-        onError={() => {console.log("Failed To login")}}
-      />
-      <h3>HELLO</h3>
+      <Oauth/>
       <div className="Edit-window">
         <div className="Code-view">
           <button onClick={handleClick}>Submit Code</button>

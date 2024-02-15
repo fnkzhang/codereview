@@ -12,6 +12,6 @@ export async function sendData(bodyType, bodyContents) {
     body: JSON.stringify(bodyData)
   }
 
-  return await fetch(`/sendData`, headers)
+  return await fetch(`/api/sendData`, headers)
     .then(response => response.json())
 }

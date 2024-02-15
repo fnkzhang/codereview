@@ -1,0 +1,1 @@
+configURL = "mysql+pymysql://root:#SQ351tp@localhost/mockdatabase"
