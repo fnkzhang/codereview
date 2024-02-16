@@ -27,9 +27,11 @@ export default function Oauth(){
         await fetch('/api/user/authenticate', headers)
         .then(response => response.json())
         .then(data => {
-            setUserData(data.resultID)
+            setUserData(data.body)
             console.log(data)
             setIsLoggedIn(true)
+            // Save to Cookie
+            document.cookie = `cr_id_token=${credentialResponse.credential}`;
         })
         .catch(e => console.log(e))
 
@@ -50,7 +52,8 @@ export default function Oauth(){
                 console.log(credentialResponse)
                 
                 verifyLogin(credentialResponse)
-                }}
+                
+            }}
                 onError={() => {console.log("Failed To login")}}
             />
             <h3>HELLO</h3>
