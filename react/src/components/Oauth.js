@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 
 
@@ -9,25 +9,8 @@ import { jwtDecode } from 'jwt-decode';
 
 export default function Oauth(){
 
-    const login = useGoogleLogin({
-        onSuccess: async tokenResponse => {
-            console.log(tokenResponse)
-            let headers= {
-                method: "POST",
-                mode: "cors",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify(tokenResponse)
-            }
-            await fetch('/api/user/authenticate', headers)
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(e => console.log(e))
-
-        },
-        //flow: 'auth-code',
-    })
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [userData, setUserData] = useState(null)
 
     async function verifyLogin(credentialResponse) {
         let data = credentialResponse
@@ -43,26 +26,39 @@ export default function Oauth(){
 
         await fetch('/api/user/authenticate', headers)
         .then(response => response.json())
-        .then(data => console.log(data))
+        .then(data => {
+            setUserData(data.resultID)
+            console.log(data)
+            setIsLoggedIn(true)
+        })
         .catch(e => console.log(e))
+
     }
 
-    return(
-        <div>
-            <button onClick={() => login()}>Login With Google</button>
+    function DisplayLoginButton() {
+        if (isLoggedIn) {
+            return (<h3>Logged IN to {userData.email}</h3>)
+        }
+
+        return (
+            <div>
+        
             <GoogleLogin
                 onSuccess={credentialResponse => {
                 let decodedResponse = jwtDecode(credentialResponse.credential)
                 console.log(decodedResponse)
                 console.log(credentialResponse)
-                credentialResponse["credential"] = credentialResponse["credential"] + "fjarg"
                 
-                console.log(credentialResponse)
                 verifyLogin(credentialResponse)
                 }}
                 onError={() => {console.log("Failed To login")}}
             />
             <h3>HELLO</h3>
         </div>
+        )
+    }
+
+    return(
+        <DisplayLoginButton/>
     )
 }
