@@ -1,8 +1,7 @@
 import './ReviewWindow.css';
 import AppHeader from './AppHeader.js';
 import CommentModule from './Comments/CommentModule.js';
-import { sendData } from '../api/APIUtils.js';
-import { getCode, getNewCode } from '../dev/getCode.js';
+import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 
@@ -10,10 +9,28 @@ function ReviewWindow() {
 
   const monacoRef = useRef(null)
   const editorRef = useRef(null)
-  const initialCode = getCode()
-  const [updatedCode, setCode] = useState(getNewCode)
+  const [initialCode, setInit] = useState(null)
+  const [updatedCode, setCode] = useState(null)
   const [currentLine, setLine] = useState(1)
-  const decorationIdsRef = useRef([]);
+  const decorationIdsRef = useRef([])
+
+  useEffect(() => {
+    getDoc('projectid', 'documentid')
+    .then(data => {
+      setInit(data.blobContents)
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+
+    getDiff('projectid', 'documentid', 'diffid')
+    .then(data => {
+      setCode(data.diffResult)
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+  }, [])
 
   useEffect(() => {
 
@@ -26,20 +43,16 @@ function ReviewWindow() {
 
       decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
     }
-  }, [monacoRef, editorRef, currentLine, updatedCode]);
+  }, [monacoRef, editorRef, currentLine, updatedCode])
 
   async function handleClick() {
     console.log(updatedCode)
 
-    await sendData('updatedCode', updatedCode)
+    await createDiff('projectid', 'documentid', 'diffid', initialCode, updatedCode)
       .then(data => console.log(data))
       .catch((e) => {
         console.log(e)
       })
-  }
-
-  function handleChange(newValue) {
-    setCode(newValue)
   }
 
   function lineJump(newLine) {
@@ -63,10 +76,17 @@ function ReviewWindow() {
             modified={updatedCode}
             originalLanguage="python"
             modifiedLanguage='python'
-            onChange={handleChange}
             onMount={(editor, monaco) => {
               editorRef.current = editor
               monacoRef.current = monaco
+
+              // Add the onChange event listener to the editor instance
+              const onChangeHandler = () => {
+                const updatedCode = editor.getModifiedEditor().getValue();
+                setCode(updatedCode);
+              };
+
+              editor.onDidUpdateDiff(onChangeHandler);
             }}
           />
         </div>
