@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 
 
@@ -6,12 +6,29 @@ import  { useGoogleLogin } from '@react-oauth/google';
 import { GoogleLogin } from "@react-oauth/google";
 
 import { jwtDecode } from 'jwt-decode';
+import getCookie from "../utils/utils";
 
 export default function Oauth(){
 
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(null)
 
+    // Check If the user token is valid
+    useEffect(() => {
+        let credentialToken = getCookie("cr_id_token")
+        if (credentialToken == null) {
+            setIsLoggedIn(false)
+            setUserData(null)
+            return
+        }
+
+        let credentialObject = {
+            "credential": credentialToken
+        }
+
+        verifyLogin(credentialObject)
+
+    }, [])
     async function verifyLogin(credentialResponse) {
         let data = credentialResponse
         let headers= {

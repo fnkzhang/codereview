@@ -1,6 +1,6 @@
 export default function getCookie(name) {
     let cookieArray = document.cookie.split(";");
-    
+    console.log(cookieArray)
     // Loop through the array elements
     for(let i = 0; i < cookieArray.length; i++) {
         let cookiePair = cookieArray[i].split("=");

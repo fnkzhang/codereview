@@ -21,7 +21,8 @@ def defaultRoute():
 @app.route('/api/sendData', methods=["POST"])
 def sendData():
     inputBody = request.get_json()
-    
+
+    # Check valid request json
     if "credential" not in inputBody or "code" not in inputBody:
         return { "success": False,
                 "reason": "Invalid JSON Provided",
@@ -35,7 +36,9 @@ def sendData():
                     }
     
     return { "success": True,
-        "body": inputBody}
+            "reason": "N/A",
+            "body": inputBody
+            }
 
 @app.route('/api/user/authenticate', methods=["POST"])
 def authenticate():
@@ -67,6 +70,7 @@ def authenticate():
 # Call Func every api func call to make sure that user is Authenticated before running
 def IsValidCredential(credentialToken):
     try:
+        print("Valid ID_TOKEN supplied")
         id_token.verify_oauth2_token(credentialToken, requests.Request(), CLIENT_ID)
         return True
     except ValueError:
