@@ -66,13 +66,26 @@ def grabData():
         stmt = select(table).where(table.c.email == "testEmail@gmail.com")
 
         result = conn.execute(stmt)
+        result = result.mappings().all()
 
+        retArray = []
+        # Recreate Dict from SQLAlchemy Row and return
+        # Can't Find any alternatives that worked rn maybe in future
         for row in result:
-            print(row, type(row))
+            d = {}
+            d["id"] = row.id
+            d["name"] = row.name
+            d["email"] = row.email
 
-    list_of_dicts = [row._asdict() for row in result]
-    print(list_of_dicts)
-    return list_of_dicts
+            retArray.append(d)
+
+    returnArray = {
+        "success": True,
+        "reason": "",
+        "body": retArray,
+    }
+    
+    return returnArray
 
 
 # Comment Post, Delete, GET,
@@ -81,7 +94,12 @@ def createComment():
     requestedData = request.get_json()
 
     # Error Check
-
+    if "credential" not in requestedData:
+        return { "success": False,
+                "reason": "Invalid JSON Provided",
+                "body": {}
+            }
+    
     # Authentication
     credential = requestedData["credential"]
     if not IsValidCredential(credential):
@@ -97,7 +115,7 @@ def createComment():
 
     with engine.connect() as conn:
         stmt = insert(models.Comment).values(
-            comment_id=requestedData["comment_id"],
+           # comment_id=requestedData["comment_id"],
             diff_id=requestedData["diff_id"],
             author_id=requestedData["author_id"],
             reply_to_id=requestedData["reply_to_id"],
@@ -114,7 +132,6 @@ def createComment():
     }
 
     return jsonify(retData) 
-    pass
 
 # Return All Comments for a dig
 @app.route('/api/comment', methods=["GET"])
@@ -123,6 +140,12 @@ def getComment():
 
     # Error Check
 
+    if "credential" not in requestedData:
+        return { "success": False,
+                "reason": "Invalid JSON Provided",
+                "body": {}
+            }
+    
     # Authentication
     credential = requestedData["credential"]
     if not IsValidCredential(credential):
@@ -138,15 +161,30 @@ def getComment():
 
     diff_id = requestedData["diff_id"]
 
-    returnObj = {}
-
     with engine.connect() as conn:
-        stmt = select(models.Comment).where(models.Comment.c.diff_id == diff_id)
-    
+        stmt = select(models.Comment).where(models.Comment.diff_id == diff_id)
+
+        retArray = []
         for row in conn.execute(stmt):
+            d ={}
+
+            d["comment_id"] = row.comment_id
+            d["diff_id"] = row.diff_id
+            d["author_id"] = row.author_id
+            d["reply_to_id"] = row.reply_to_id
+            d["date_created"] = row.date_created
+            d["date_modified"] = row.date_modified
+            d["content"] = row.content
             print(row)
-            
+            retArray.append(d)        
+
+    returnArray = {
+        "success": True,
+        "reason": "",
+        "body": retArray,
+    }
     
+    return returnArray   
 
     
 
