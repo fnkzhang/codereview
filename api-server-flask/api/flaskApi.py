@@ -1,17 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-
-from google.cloud.sql.connector import Connector, IPTypes
-
-# from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select
 import pymysql
+
+import models
+from cloudSql import connectCloudSql
 
 #Todo hide later
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
@@ -26,37 +24,10 @@ class User():
     name = Column(String(50))
     email = Column(String(50))
 
-def connectCloudSql() -> sqlalchemy.engine.base.Engine:
-    instance_connection_name = "codereview-413200:us-central1:cr-cloudsql-db"
-    db_user = "root"
-    db_pass = "Q$mXxb?_io-#<-_0"
-    db_name = "test"
 
-    ip_type = IPTypes.PUBLIC
-
-    connector = Connector(ip_type)
-
-    def getconn() -> pymysql.connections.Connection:
-        conn: pymysql.connections.Connection = connector.connect(
-            instance_connection_name,
-            "pymysql",
-            user=db_user,
-            password=db_pass,
-            db=db_name,
-        )
-        
-        return conn;
-
-    pool = sqlalchemy.create_engine(
-        "mysql+pymysql://",
-        creator=getconn,
-        echo = True
-    )
-    print("Finished")
-    return pool
 
 metaData = MetaData()
-data = Table('testTable', metaData,
+table = Table('testTable', metaData,
             Column('id', Integer(), primary_key=True),
             Column('name', String(50), nullable=False),
             Column('email', String(50), nullable=False),
@@ -67,7 +38,11 @@ data = Table('testTable', metaData,
 def createTable():
     engine = connectCloudSql()
     
-    metaData.create_all(engine)
+    models.Comment.metadata = models.Base.metadata
+
+    models.Comment.metadata.create_all(engine)
+
+    #metaData.create_all(engine)
     print("Table was created")
     return "Created Table"
 
@@ -76,18 +51,105 @@ def createTable():
 def testInsert():
     engine = connectCloudSql()
     with engine.connect() as conn:
-        stmt = insert(data).values(name="PungeBob", email="testEmail@gmail.com")
+        stmt = insert(table).values(name="PungeBob", email="testEmail@gmail.com")
 
         conn.execute(stmt)
         conn.commit()
-        
+
     return "tested"
+
+@app.route('/testGrabData')
+def grabData():
+    engine = connectCloudSql()
+
+    with engine.connect() as conn:
+        stmt = select(table).where(table.c.email == "testEmail@gmail.com")
+
+        result = conn.execute(stmt)
+
+        for row in result:
+            print(row, type(row))
+
+    list_of_dicts = [row._asdict() for row in result]
+    print(list_of_dicts)
+    return list_of_dicts
+
 
 # Comment Post, Delete, GET,
 @app.route('/api/comment', methods=["POST"])
 def createComment():
+    requestedData = request.get_json()
+
+    # Error Check
+
+    # Authentication
+    credential = requestedData["credential"]
+    if not IsValidCredential(credential):
+        retData = {
+            "success": False,
+            "reason": "Invalid Token Provided",
+            "body": {}
+        }
+        return jsonify(retData) 
     
+    # Query
+    engine = connectCloudSql()
+
+    with engine.connect() as conn:
+        stmt = insert(models.Comment).values(
+            comment_id=requestedData["comment_id"],
+            diff_id=requestedData["diff_id"],
+            author_id=requestedData["author_id"],
+            reply_to_id=requestedData["reply_to_id"],
+            content=requestedData["content"],
+        )
+
+        conn.execute(stmt)
+        conn.commit()
+
+    retData = {
+        "success": True,
+        "reason": "",
+        "body": {}
+    }
+
+    return jsonify(retData) 
     pass
+
+# Return All Comments for a dig
+@app.route('/api/comment', methods=["GET"])
+def getComment():
+    requestedData = request.get_json()
+
+    # Error Check
+
+    # Authentication
+    credential = requestedData["credential"]
+    if not IsValidCredential(credential):
+        retData = {
+            "success": False,
+            "reason": "Invalid Token Provided",
+            "body": {}
+        }
+        return jsonify(retData) 
+    
+     # Query
+    engine = connectCloudSql()
+
+    diff_id = requestedData["diff_id"]
+
+    returnObj = {}
+
+    with engine.connect() as conn:
+        stmt = select(models.Comment).where(models.Comment.c.diff_id == diff_id)
+    
+        for row in conn.execute(stmt):
+            print(row)
+            
+    
+
+    
+
 
 @app.route("/")
 def defaultRoute():
