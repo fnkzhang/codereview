@@ -18,13 +18,14 @@ app = Flask(__name__)
 
 
 CORS(app)
+engine = connectCloudSql()
 
+
+# Remove Later
 class User():
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
     email = Column(String(50))
-
-
 
 metaData = MetaData()
 table = Table('testTable', metaData,
@@ -49,7 +50,7 @@ def createTable():
 
 @app.route('/insert')
 def testInsert():
-    engine = connectCloudSql()
+    #engine = connectCloudSql()
     with engine.connect() as conn:
         stmt = insert(table).values(name="PungeBob", email="testEmail@gmail.com")
 
@@ -60,7 +61,7 @@ def testInsert():
 
 @app.route('/testGrabData')
 def grabData():
-    engine = connectCloudSql()
+    #engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(table).where(table.c.email == "testEmail@gmail.com")
@@ -86,7 +87,7 @@ def grabData():
     }
     
     return returnArray
-
+# End Remove later
 
 # Comment Post, Delete, GET,
 @app.route('/api/comment', methods=["POST"])
