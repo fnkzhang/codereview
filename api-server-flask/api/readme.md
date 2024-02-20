@@ -9,7 +9,7 @@ Download the cloud sql proxy file given and place it in a folder you can access 
 Make sure you have Application Default Credentials set up so you can run the program: https://cloud.google.com/docs/authentication/provide-credentials-adc 
 
 
-To run the program, you will type 
+To run the program, you will type:
 
 .\cloud-sql-proxy.exe --address 0.0.0.0 --port 5000 codereview-413200:us-central1:cr-cloudsql-db
 
@@ -26,12 +26,12 @@ For all API calls, you must provide an authentication token from google oauth to
 ### '/api/comment'
 #### GET
 
-In the GET call to api/comment, the command should return all comments for the diff_id.
+In the GET call to api/comment, the command will return all comments for the diff_id.
 
-You must pass in 
+You must pass in the body of the headers:
 
-"credentials": user authentication
-"diff_id": id of the diff file session to grab comments.
+"credentials": STRING (oauth authentication) 
+"diff_id": INT
 
 The data response will be in json the format:
 {
@@ -44,8 +44,9 @@ The data response will be in json the format:
 
 In the POST call, the command will create a new comment in the database
 
-You must pass in
+You must pass in the body of the headers:
 
+"credentials": STRING (oauth authentication) 
 "diff_id": INT
 "author_id": INT
 "reply_to_id": INT (0 for root comment)
