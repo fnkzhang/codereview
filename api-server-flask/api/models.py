@@ -20,3 +20,28 @@ class Comment(Base):
     def _repr__(self) -> str:
       
          return f"Comment(comment_id={self.comment_id!r}, diff_id={self.diff_id!r}, author_id={self.author_id!r}, reply_to_id={self.reply_to_id}, date_created={self.date_created}, date_modified={self.date_modified}, content={self.content})"
+
+
+class User():
+    ___tablename__ = "users"
+    user_email = Column(String(50), primary_key=True)
+    name = Column(String(50))
+    username = Column(String(50)) #unsure if user_id is necessary if username is already unique
+    email = Column(String(50))
+    date_joined = Column(DateTime(timezone=True), server_default=func.now())
+
+class Project():
+    __tablename__ = "projects"
+    
+    proj_id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    author_email = Column(String(50))
+    date_created = Column(DateTime(timezone=True), server_default=func.now())
+    date_modified = Column(DateTime(timezone=True), server_default=func.now())
+
+class UserProjectRelation():
+    __tablename__ = "userprojrelation"
+    user_email = Column(Integer)
+    proj_id = Column(Integer)
+    role = Column(String)
+    permissions = Column(Integer)

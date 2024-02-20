@@ -10,6 +10,7 @@ import pymysql
 
 import models
 from cloudSql import connectCloudSql
+from utils import *
 
 #Todo hide later
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
@@ -18,12 +19,7 @@ app = Flask(__name__)
 
 
 CORS(app)
-
-class User():
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    email = Column(String(50))
-
+engine = connectCloudSql()
 
 
 metaData = MetaData()
@@ -49,7 +45,6 @@ def createTable():
 
 @app.route('/insert')
 def testInsert():
-    engine = connectCloudSql()
     with engine.connect() as conn:
         stmt = insert(table).values(name="PungeBob", email="testEmail@gmail.com")
 
@@ -66,14 +61,26 @@ def grabData():
         stmt = select(table).where(table.c.email == "testEmail@gmail.com")
 
         result = conn.execute(stmt)
+        result = result.mappings().all()
 
+        retArray = []
+        # Recreate Dict from SQLAlchemy Row and return
+        # Can't Find any alternatives that worked rn maybe in future
         for row in result:
-            print(row, type(row))
+            d = {}
+            d["id"] = row.id
+            d["name"] = row.name
+            d["email"] = row.email
 
-    list_of_dicts = [row._asdict() for row in result]
-    print(list_of_dicts)
-    return list_of_dicts
+            retArray.append(d)
 
+    returnArray = {
+        "success": True,
+        "reason": "",
+        "body": retArray,
+    }
+    
+    return returnArray
 
 # Comment Post, Delete, GET,
 @app.route('/api/comment', methods=["POST"])
@@ -81,6 +88,11 @@ def createComment():
     requestedData = request.get_json()
 
     # Error Check
+    if "credential" not in requestedData:
+        return { "success": False,
+                "reason": "Invalid JSON Provided",
+                "body": {}
+            }
 
     # Authentication
     credential = requestedData["credential"]
@@ -90,14 +102,14 @@ def createComment():
             "reason": "Invalid Token Provided",
             "body": {}
         }
-        return jsonify(retData) 
-    
+        return jsonify(retData)
+
     # Query
     engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = insert(models.Comment).values(
-            comment_id=requestedData["comment_id"],
+           # comment_id=requestedData["comment_id"],
             diff_id=requestedData["diff_id"],
             author_id=requestedData["author_id"],
             reply_to_id=requestedData["reply_to_id"],
@@ -113,16 +125,20 @@ def createComment():
         "body": {}
     }
 
-    return jsonify(retData) 
-    pass
+    return jsonify(retData)
 
-# Return All Comments for a dig
 @app.route('/api/comment', methods=["GET"])
 def getComment():
     requestedData = request.get_json()
 
     # Error Check
 
+    if "credential" not in requestedData:
+        return { "success": False,
+                "reason": "Invalid JSON Provided",
+                "body": {}
+            }
+    
     # Authentication
     credential = requestedData["credential"]
     if not IsValidCredential(credential):
@@ -138,23 +154,30 @@ def getComment():
 
     diff_id = requestedData["diff_id"]
 
-    returnObj = {}
-
     with engine.connect() as conn:
-        stmt = select(models.Comment).where(models.Comment.c.diff_id == diff_id)
-    
+        stmt = select(models.Comment).where(models.Comment.diff_id == diff_id)
+
+        retArray = []
         for row in conn.execute(stmt):
+            d ={}
+
+            d["comment_id"] = row.comment_id
+            d["diff_id"] = row.diff_id
+            d["author_id"] = row.author_id
+            d["reply_to_id"] = row.reply_to_id
+            d["date_created"] = row.date_created
+            d["date_modified"] = row.date_modified
+            d["content"] = row.content
             print(row)
-            
+            retArray.append(d)        
+
+    returnArray = {
+        "success": True,
+        "reason": "",
+        "body": retArray,
+    }
     
-
-    
-
-
-@app.route("/")
-def defaultRoute():
-    #print('what', file=sys.stderr)
-    return "test" 
+    return returnArray   
 
 # Takes in json with "code" section
 @app.route('/api/sendData', methods=["POST"])
@@ -181,7 +204,7 @@ def sendData():
 
 @app.route('/api/user/authenticate', methods=["POST"])
 def authenticate():
-    print("Hello")
+    #print("Hello")
     inputToken = request.get_json()
 
     try:
@@ -215,3 +238,84 @@ def IsValidCredential(credentialToken):
     except ValueError:
         print("FAILED INVALID TOKEN")
         return False
+
+
+@app.route("/")
+def defaultRoute():
+    #print('what', file=sys.stderr)
+    return "test"
+
+
+
+# Takes in json with "code" section
+@app.route('/api/sendData', methods=["POST"])
+def sendData():
+    inputBody = request.get_json()
+    return {"receivedData": inputBody}
+
+@app.route('api/Document/<proj_name>/', methods = ["POST"])
+def createProject(proj_name):
+    with engine.connect() as conn:
+        inputBody = request.get_json()
+        validity = isValidRequest(inputBody)
+        if validity != None:
+            return validity
+        pid = createID()
+        projstmt = insert(models.Project).values(
+                proj_id = pid,
+                name = proj_name,
+                author_email = inputBody["credential"]["email"]
+        )
+        #permissions is a placeholder value for owner because we only have 1 perm rn
+        relationstmt = insert(models.UserProjectRelation).values(
+                user_email = inputBody["credential"]["email"],
+                proj_id = pid,
+                role = "Owner",
+                permissions = 15
+        )
+        conn.execute(projstmt)
+        conn.execute(relationstmt)
+        conn.commit()
+    return True
+
+@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["POST"])
+def createDocument(proj_id, doc_id):
+    inputBody = request.get_json()
+    validity = isValidRequest(inputBody)
+    if validity != None:
+        return validity
+
+    uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
+    return {"posted": inputBody}
+
+
+@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
+def getDocument(proj_id, doc_id):
+    inputBody = request.get_json()
+    validity = isValidRequest(inputBody)
+    if(getUserProjPermissions(inputBody["credential"]["email"], proj_id) == False):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+    blob = getBlob(proj_id + '/' + doc_id)
+    return {"blobContents": blob}
+
+@app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/create', methods=["POST"])
+def createDiff(proj_id, doc_id, diff_id):
+    inputBody = request.get_json()
+    dmp = diff_match_patch()
+    diffText = dmp.patch_toText(dmp.patch_make(dmp.diff_main(inputBody["original"], inputBody["updated"])))
+    uploadBlob(proj_id + '/' + doc_id + '/' + diff_id, diffText)
+    return {"diffText": diffText}
+
+@app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/get', methods=["GET"])
+def getDiff(proj_id, doc_id, diff_id):
+    document = getBlob(proj_id + '/' + doc_id)
+    diffText = getBlob(proj_id + '/' + doc_id + '/' + diff_id)
+    dmp = diff_match_patch()
+    output, _ = dmp.patch_apply(dmp.patch_fromText(diffText), document)
+    return {"diffResult": output}
+
+@app.route('/api/Document/<proj_id>/<doc_id>/test', methods=["GET"])
+def testDocument(proj_id, doc_id):
+    return uploadBlob(proj_id + '/'+ doc_id, {'ok':'hey'})
+                                                                 

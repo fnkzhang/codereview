@@ -1,9 +1,10 @@
 FROM python:3.9
 WORKDIR /app
 
-COPY ./requirements.txt ./api-server-flask/api/flaskApi.py ./api-server-flask/api/.flaskenv ./
+COPY ./requirements.txt ./api-server-flask/api/flaskApi.py ./api-server-flask/api/.flaskenv ./api-server-flask/api/utils.py gAuth.py ./
 RUN pip install -r ./requirements.txt
 ENV FLASK_ENV production
+COPY ./googlecreds.json ./googlecreds.json
 
 EXPOSE 5000
 CMD ["gunicorn", "-b", ":5000", "flaskApi:app"]
