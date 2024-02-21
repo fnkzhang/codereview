@@ -214,7 +214,6 @@ def authenticate():
             "success": True,
             "reason": "N/A",
             "body": idInfo,
-            "exists": exists
         }
         print("Success?")
         # RETURN User Data back
@@ -234,7 +233,7 @@ def defaultRoute():
     #print('what', file=sys.stderr)
     return "test"
 
-#up to frontend to send correct data, i assume there's going to be a signup page or smthn and people enter in data
+#literally just authenticate but it adds a user to the database.
 #needs sections:
     #credentials
 @app.route('/api/user/signup', methods = ["POST"])
