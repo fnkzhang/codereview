@@ -27,6 +27,7 @@ class User():
     name = Column(String(50))
     email = Column(String(50))
 
+
 metaData = MetaData()
 table = Table('testTable', metaData,
             Column('id', Integer(), primary_key=True),
