@@ -1,13 +1,11 @@
-import EditWindow from './components/EditWindow.js';
-import CommentDetail from './components/Comments/CommentDetail.js'
+import ReviewWindow from './components/ReviewWindow.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route exact path="/" element={<EditWindow/>} />
-        <Route path="/comment/:commentId" element={<CommentDetail/>} />
+        <Route exact path="/" element={<ReviewWindow/>} />
       </Routes>
     </Router>
   );

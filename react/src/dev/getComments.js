@@ -1,25 +1,34 @@
 export function getComments() {
   return ([
-    {commentID: 0, author: "Luke", text: `4c4
+    {commentID: 0, line: 4, author: "Luke", text: `I recommend the following change:
+4c4
 <       self.choices = choices
 ---
->       self.choices = choic
+>       self.choices = choic`, 
+      subcomments: [
+        {author: "Simon", text: "These are terrible changes.\nI will not accept this!"},
+        {author: "Luke", text: "I disagree, these changes will improve your code"}
+      ]
+    },
+    {commentID: 1, line: 13, author: "Luke", text: `I reccomend the following change:
 13c13
 <       self.questions = questions
 ---
->       self.questions = estions
-23c23
-<           user_answer = input("Your answer: ")
----
->           user_answer = input("Yr answer: ")`, 
-        subcomments: [
-        {author: "Simon", text: "These are terrible changes.\nDo not approve these."},
-        {author: "Frank", text: "I love these changes"}
-        ]
+>       self.questions = estions`, 
+      subcomments: [
+        {author: "Simon", text: "These are terrible changes.\nI will not accept this!"},
+        {author: "Luke", text: "I disagree, these changes will improve your code"}
+      ]
     },
-    {commentID: 1, author: "Simon", text: "Change 2", subcomments: null},
-    {commentID: 2, author: "Frank", text: "Change 3", subcomments: null},
-    {commentID: 3, author: "Hai", text: "Change 4", subcomments: null}
-    ]
-  )
+    {commentID: 2, line: 23, author: "Luke", text: `I recommend the following change:
+23c23
+<           user_answer = input("Yr answer: ")
+---
+>           user_answer = input("Your answer: ")`,
+      subcomments: [
+        {author: "Simon", text: "These are terrible changes.\nI will not accept this!"},
+        {author: "Luke", text: "I disagree, these changes will improve your code"}
+      ]
+    }
+  ])
 }

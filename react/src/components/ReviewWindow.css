@@ -1,6 +1,6 @@
-.Edit-window {
+.Review-window {
     background-color: #282c34;
-    height: 90vh;
+    height: 95vh;
     width: 100vw;
     display: flex;
     float: left;
@@ -17,12 +17,15 @@
 }
 
 .Monaco-editor {
-    height: 85vh;
+    height: 100%;
     width: 70%;
 }
 
 .Comment-view {
-    height: 85vh;
     width: 30%;
     display: inline-block;
+}
+
+.highlight-line {
+    background-color: yellow;
 }
