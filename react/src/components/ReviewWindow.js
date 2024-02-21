@@ -1,5 +1,6 @@
 import './ReviewWindow.css';
 import AppHeader from './AppHeader.js';
+import Oauth from './Oauth.js';
 import CommentModule from './Comments/CommentModule.js';
 import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
@@ -67,6 +68,7 @@ function ReviewWindow() {
   return (
     <div>
       <AppHeader />
+      <Oauth/>
       <div className="Review-window">
         <div className="Code-view">
           <button onClick={handleClick}>Submit Code</button>
