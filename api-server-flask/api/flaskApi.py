@@ -252,6 +252,7 @@ def signUp():
                 "body":{}
         }
         return jsonify(retData)
+
     with engine.connect() as conn:
         stmt = insert(models.User).values(
             user_email = idInfo["email"],
@@ -263,7 +264,7 @@ def signUp():
     retData = {
             "success":True,
             "reason": "N/A",
-            "body": {}
+            "body": {idInfo}
     }
     return jsonify(retData)
 
