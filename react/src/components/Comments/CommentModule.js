@@ -2,11 +2,14 @@ import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
 import { getComments } from './../../dev/getComments.js'
+import { useEffect} from 'react';
 
-function CommentModule ({ moduleLineJump }) {
-  const initial_data = getComments()
+function CommentModule ({ moduleLineJump, diffComments }) {
+  const [comments, setComments] = useState(getComments());
 
-  const [comments, setComments] = useState(initial_data);
+  useEffect(() => {
+    console.log(diffComments)
+  }, [diffComments])
 
   return (
     <div>

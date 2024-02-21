@@ -1,3 +1,10 @@
+.Loading-data {
+    color: white;
+    text-align: center;
+    margin-top: 25vh;
+    font-size: 16;
+}
+
 .Review-window {
     background-color: #282c34;
     height: 95vh;

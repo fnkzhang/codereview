@@ -13,24 +13,26 @@ function ReviewWindow() {
   const [initialCode, setInit] = useState(null)
   const [updatedCode, setCode] = useState(null)
   const [currentLine, setLine] = useState(1)
+  const [editorLoading, setEditorLoading] = useState(true);
   const decorationIdsRef = useRef([])
 
   useEffect(() => {
-    getDoc('projectid', 'newdocument')
-    .then(data => {
-      setInit(data.blobContents)
-    })
-    .catch((e) => {
-      console.log(e)
-    })
+    const fetchData = async () => {
+      try {
+        const [doc, diff] = await Promise.all([
+          getDoc('projectid', 'documentid'),
+          getDiff('projectid', 'documentid', 'diffid')
+        ]);
+        setInit(doc.blobContents)
+        setCode(diff.diffResult)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setEditorLoading(false)
+      }
+    }
 
-    getDiff('projectid', 'newdocument', 'diffid')
-    .then(data => {
-      setCode(data.diffResult)
-    })
-    .catch((e) => {
-      console.log(e)
-    })
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -49,7 +51,7 @@ function ReviewWindow() {
   async function handleClick() {
     console.log(updatedCode)
 
-    await createDiff('projectid', 'newdocument', 'diffid', initialCode, updatedCode)
+    await createDiff('projectid', 'documentid', 'diffid', initialCode, updatedCode)
       .then(data => console.log(data))
       .catch((e) => {
         console.log(e)
@@ -63,6 +65,29 @@ function ReviewWindow() {
 
       editorRef.current.getModifiedEditor().revealLine(newLine);
     }
+  }
+
+  if (editorLoading) {
+    return (
+      <div>
+        <AppHeader />
+        <Oauth/>
+        <div className="Review-window">
+          <div className="Code-view">
+            <div
+              className="Loading-data"
+            >
+              Loading...
+            </div>
+          </div>
+          <div className="Comment-view">
+            <CommentModule 
+              moduleLineJump={lineJump}
+            />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from "react";
-
-
-
-import  { useGoogleLogin } from '@react-oauth/google';
 import { GoogleLogin } from "@react-oauth/google";
 
 import { jwtDecode } from 'jwt-decode';
@@ -73,7 +69,6 @@ export default function Oauth(){
             }}
                 onError={() => {console.log("Failed To login")}}
             />
-            <h3>HELLO</h3>
         </div>
         )
     }
