@@ -19,8 +19,8 @@ app = Flask(__name__)
 
 
 CORS(app)
-engine = connectCloudSql()
 
+from utils import engine
 
 metaData = MetaData()
 table = Table('testTable', metaData,
@@ -37,8 +37,9 @@ def createTable():
     models.Comment.metadata = models.Base.metadata
 
     models.Comment.metadata.create_all(engine)
-
-    #metaData.create_all(engine)
+    models.User.metadata = models.Base.metadata
+    models.User.metadata.create_all(engine)
+    metaData.create_all(engine)
     print("Table was created")
     return "Created Table"
 
@@ -209,13 +210,12 @@ def authenticate():
 
     try:
         idInfo = id_token.verify_oauth2_token(inputToken["credential"], requests.Request(), CLIENT_ID)
-
         retData = {
             "success": True,
             "reason": "N/A",
-            "body": idInfo
+            "body": idInfo,
+            "exists": exists
         }
-
         print("Success?")
         # RETURN User Data back
         return jsonify(retData)
@@ -229,46 +229,70 @@ def authenticate():
         }
         return jsonify(retData) 
 
-# Call Func every api func call to make sure that user is Authenticated before running
-def IsValidCredential(credentialToken):
-    try:
-        print("Valid ID_TOKEN supplied")
-        id_token.verify_oauth2_token(credentialToken, requests.Request(), CLIENT_ID)
-        return True
-    except ValueError:
-        print("FAILED INVALID TOKEN")
-        return False
-
-
 @app.route("/")
 def defaultRoute():
     #print('what', file=sys.stderr)
     return "test"
 
-
-
-# Takes in json with "code" section
-@app.route('/api/sendData', methods=["POST"])
-def sendData():
+#up to frontend to send correct data, i assume there's going to be a signup page or smthn and people enter in data
+#needs sections:
+    #credentials
+@app.route('/api/user/signup', methods = ["POST"])
+def signUp():
     inputBody = request.get_json()
-    return {"receivedData": inputBody}
+    validity = isValidRequest(inputBody)
+    if validity != None:
+        return validity
 
-@app.route('api/Document/<proj_name>/', methods = ["POST"])
-def createProject(proj_name):
+    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+
+    if userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account already exists",
+                "body":{}
+        }
+        return jsonify(retData)
     with engine.connect() as conn:
-        inputBody = request.get_json()
-        validity = isValidRequest(inputBody)
-        if validity != None:
-            return validity
+        stmt = insert(models.User).values(
+            user_email = idInfo["email"],
+            name = idInfo["name"]
+        )
+        conn.execute(stmt)
+        conn.commit()
+
+    retData = {
+            "success":True,
+            "reason": "N/A",
+            "body": {}
+    }
+    return jsonify(retData)
+
+@app.route('/api/Project/<proj_name>/', methods = ["POST"])
+def createProject(proj_name):
+    inputBody = request.get_json()
+    validity = isValidRequest(inputBody)
+    if validity != None:
+        return validity
+    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+
+    if not userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+        return jsonify(retData)
+    with engine.connect() as conn:
         pid = createID()
         projstmt = insert(models.Project).values(
                 proj_id = pid,
                 name = proj_name,
-                author_email = inputBody["credential"]["email"]
+                author_email = idInfo["email"]
         )
-        #permissions is a placeholder value for owner because we only have 1 perm rn
+    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
         relationstmt = insert(models.UserProjectRelation).values(
-                user_email = inputBody["credential"]["email"],
+                user_email = idInfo["email"],
                 proj_id = pid,
                 role = "Owner",
                 permissions = 15
@@ -278,13 +302,80 @@ def createProject(proj_name):
         conn.commit()
     return True
 
+#needs sections in body
+    #credentials (of user that already has access to project)
+    #email (user to add to project)
+    #role (role name)
+    #permissions (integer that represents perms, so far anything greater than 0 is everything)
+@app.route('/api/Project/<proj_id>/addUser/', methods=["POST"])
+def addUser(proj_id):
+    inputBody = request.get_json()
+    validity = isValidRequest(inputBody)
+    if validity != None:
+        return validity
+    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    if not userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+        return jsonify(retData)
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    with engine.connect() as conn:
+    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
+        relationstmt = insert(models.UserProjectRelation).values(
+                user_email = inputBody["email"],
+                proj_id = proj_id,
+                role = inputBody["role"],
+                permissions = inputBody["permissions"]
+        )
+        conn.execute(relationstmt)
+        conn.commit()
+    return {"success": True, "reason":"N/A", "body": {}}
+
+#just addUser but you don't need to be a valid user lol, test function remove later
+#still needs:
+    #email (user to add to project)
+    #role (role name)
+    #permissions( integer that represents perms, so far anything greater than 0 is everything)
+@app.route('/api/Project/<proj_id>/addUserAdmin/', methods=["POST"])
+def addUserAdmin(proj_id):
+    inputBody = request.get_json()
+    with engine.connect() as conn:
+    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
+        relationstmt = insert(models.UserProjectRelation).values(
+                rid = createID(),
+                user_email = inputBody["email"],
+                proj_id = proj_id,
+                role = inputBody["role"],
+                permissions = inputBody["permissions"]
+        )
+        conn.execute(relationstmt)
+        conn.commit()
+    return {"success": True, "reason":"N/A", "body": {}}
+
 @app.route('/api/Document/<proj_id>/<doc_id>/', methods=["POST"])
 def createDocument(proj_id, doc_id):
     inputBody = request.get_json()
     validity = isValidRequest(inputBody)
     if validity != None:
         return validity
+    #todo:make this a function
+    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    if not userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+        return jsonify(retData)
 
+    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    ##########################
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
     return {"posted": inputBody}
 
@@ -293,12 +384,24 @@ def createDocument(proj_id, doc_id):
 def getDocument(proj_id, doc_id):
     inputBody = request.get_json()
     validity = isValidRequest(inputBody)
-    if(getUserProjPermissions(inputBody["credential"]["email"], proj_id) == False):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if validity != None:
+        return validity
+    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
 
+    if not userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+        return jsonify(retData)
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     blob = getBlob(proj_id + '/' + doc_id)
     return {"blobContents": blob}
 
+#not gonna mess with diff stuff for now because again, i'm only going to focus on document permissions
 @app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/create', methods=["POST"])
 def createDiff(proj_id, doc_id, diff_id):
     inputBody = request.get_json()

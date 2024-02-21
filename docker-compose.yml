@@ -4,6 +4,8 @@ services:
             context: .
             dockerfile: Dockerfile.api
         image: react-flask-app-api
+        environment:
+            - GOOGLE_APPLICATION_CREDENTIALS=googlecreds.json
     client:
         build:
             context: .
