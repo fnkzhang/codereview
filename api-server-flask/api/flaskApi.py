@@ -327,6 +327,7 @@ def addUser(proj_id):
     with engine.connect() as conn:
     #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
         relationstmt = insert(models.UserProjectRelation).values(
+                rid = createID(),
                 user_email = inputBody["email"],
                 proj_id = proj_id,
                 role = inputBody["role"],
