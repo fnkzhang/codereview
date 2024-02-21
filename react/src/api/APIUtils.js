@@ -1,8 +1,13 @@
+import getCookie from "../utils/utils"
+
 export async function sendData(bodyContents) {
 
+  let credentialToken = getCookie("cr_id_token")
   let bodyData = {
+    "credential": credentialToken,
     data: bodyContents
   }
+  console.log(bodyData)
   let headers = {
     method: "POST",
     mode: "cors",

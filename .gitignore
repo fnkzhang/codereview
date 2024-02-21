@@ -1,2 +1,5 @@
 /.venv
 api-server-flask/api/__pycache__
+
+api-server-flask/api/dbEnv.py
+api-server-flask/api/googlecreds.json

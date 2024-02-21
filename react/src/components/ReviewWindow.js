@@ -1,5 +1,6 @@
 import './ReviewWindow.css';
 import AppHeader from './AppHeader.js';
+import Oauth from './Oauth.js';
 import CommentModule from './Comments/CommentModule.js';
 import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
@@ -15,7 +16,7 @@ function ReviewWindow() {
   const decorationIdsRef = useRef([])
 
   useEffect(() => {
-    getDoc('projectid', 'documentid')
+    getDoc('projectid', 'newdocument')
     .then(data => {
       setInit(data.blobContents)
     })
@@ -23,7 +24,7 @@ function ReviewWindow() {
       console.log(e)
     })
 
-    getDiff('projectid', 'documentid', 'diffid')
+    getDiff('projectid', 'newdocument', 'diffid')
     .then(data => {
       setCode(data.diffResult)
     })
@@ -48,7 +49,7 @@ function ReviewWindow() {
   async function handleClick() {
     console.log(updatedCode)
 
-    await createDiff('projectid', 'documentid', 'diffid', initialCode, updatedCode)
+    await createDiff('projectid', 'newdocument', 'diffid', initialCode, updatedCode)
       .then(data => console.log(data))
       .catch((e) => {
         console.log(e)
@@ -67,6 +68,7 @@ function ReviewWindow() {
   return (
     <div>
       <AppHeader />
+      <Oauth/>
       <div className="Review-window">
         <div className="Code-view">
           <button onClick={handleClick}>Submit Code</button>
