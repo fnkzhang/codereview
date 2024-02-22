@@ -87,6 +87,11 @@ export async function getDiff(proj_id, doc_id, diff_id) {
     .then(response => response.json())
 }
 
+// diff_id: int
+// author_id: int
+// reply_to_id: int
+// content: string
+// creates a comment and (temporarily) generates an id between 0 and 2^31 - 1
 export async function createComment(diff_id, author_id, reply_to_id, content) {
   let oAuthToken = "fake oauth token"
   let headers = {
@@ -108,6 +113,8 @@ export async function createComment(diff_id, author_id, reply_to_id, content) {
     .then(response => response.json())
 }
 
+// diff_id: int
+// returns all comments (temporarily including subcomments) that match the diff_id
 export async function getCommentsOnDiff(diff_id) {
   let oAuthToken = "fake oauth token"
   let headers = {
@@ -153,6 +160,9 @@ export async function editComment(comment_id) {
     .then(response => response.json())
 }
 
+// temporary; ignore for now
+// supposed to delete 1 comment, but deletes all comments in db for debugging purposes
+// comment_id doesn't do anything
 export async function deleteComment(comment_id) {
   let oAuthToken = "fake oauth token"
   let headers = {
