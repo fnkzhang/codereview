@@ -5,7 +5,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 
 import sqlalchemy
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete
 import pymysql
 
 import models
@@ -331,13 +331,21 @@ def addUser(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) == False):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     with engine.connect() as conn:
-    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
-        relationstmt = insert(models.UserProjectRelation).values(
-                user_email = inputBody["email"],
-                proj_id = proj_id,
+        if(getUserProjPermissions(inputBody["email"], proj_id)) == False:
+            relationstmt = insert(models.UserProjectRelation).values(
+                    user_email = inputBody["email"],
+                    proj_id = proj_id,
+                    role = inputBody["role"],
+                    permissions = inputBody["permissions"]
+            )
+        else:
+            relationstmt = update(models.UserProjectRelation).where(
+                models.UserProjectRelation.user_email == inputBody["email"],
+                proj_id == proj_id
+            ).values(
                 role = inputBody["role"],
                 permissions = inputBody["permissions"]
-        )
+            )
         conn.execute(relationstmt)
         conn.commit()
     return {"success": True, "reason":"N/A", "body": {}}
@@ -351,12 +359,37 @@ def addUser(proj_id):
 def addUserAdmin(proj_id):
     inputBody = request.get_json()
     with engine.connect() as conn:
-    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
         relationstmt = insert(models.UserProjectRelation).values(
                 user_email = inputBody["email"],
                 proj_id = proj_id,
                 role = inputBody["role"],
                 permissions = inputBody["permissions"]
+        )
+        conn.execute(relationstmt)
+        conn.commit()
+    return {"success": True, "reason":"N/A", "body": {}}
+
+@app.route('/api/Project/<proj_id>/removeUser/', methods=["POST"])
+def removeUser(proj_id):
+    inputBody = request.get_json()
+    validity = isValidRequest(inputBody)
+    if validity != None:
+        return validity
+    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    if not userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+        return jsonify(retData)
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    with engine.connect() as conn:
+        relationstmt = delete(models.UserProjectRelation).where(
+            models.UserProjectRelation.user_email == inputBody["email"],
+            proj_id == proj_id
         )
         conn.execute(relationstmt)
         conn.commit()

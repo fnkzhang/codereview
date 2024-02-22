@@ -59,7 +59,7 @@ def getUserProjPermissions(user_email, proj_id):
         
         #needs to happen because you can only call result.first() once
         first = result.first()
-        if first == None or first.permissions == 0:
+        if first == None:
             return False
         return True
 
