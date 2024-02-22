@@ -41,8 +41,7 @@ class Project(Base):
 
 class UserProjectRelation(Base):
     __tablename__ = "userprojrelation"
-    rid = Column(String(100), primary_key=True)
-    user_email = Column(String(50))
-    proj_id = Column(String(50))
+    user_email = Column(String(50), primary_key=True)
+    proj_id = Column(String(50), primary_key=True)
     role = Column(String(50))
     permissions = Column(Integer)

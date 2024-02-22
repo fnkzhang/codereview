@@ -39,10 +39,16 @@ def createTable():
     models.Comment.metadata.create_all(engine)
     models.User.metadata = models.Base.metadata
     models.User.metadata.create_all(engine)
-    metaData.create_all(engine)
+    models.UserProjectRelation.metadata = models.Base.metadata
+    models.UserProjectRelation.metadata.create_all(engine)
+    #metaData.create_all(engine)
     print("Table was created")
     return "Created Table"
 
+@app.route('/dropUserProjectRelationTable')
+def dropUserProjectRelationTable():
+    models.UserProjectRelation.__table__.drop(engine)
+    return True
 
 @app.route('/insert')
 def testInsert():
@@ -327,7 +333,6 @@ def addUser(proj_id):
     with engine.connect() as conn:
     #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
         relationstmt = insert(models.UserProjectRelation).values(
-                rid = createID(),
                 user_email = inputBody["email"],
                 proj_id = proj_id,
                 role = inputBody["role"],
@@ -348,7 +353,6 @@ def addUserAdmin(proj_id):
     with engine.connect() as conn:
     #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
         relationstmt = insert(models.UserProjectRelation).values(
-                rid = createID(),
                 user_email = inputBody["email"],
                 proj_id = proj_id,
                 role = inputBody["role"],
