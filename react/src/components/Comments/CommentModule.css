@@ -5,6 +5,12 @@
     align-items: center;
 }
 
+.Comment-loading {
+    color: white;
+    align-items: center;
+    margin-top: 10vh;
+}
+
 .Comment-list-container {
     overflow-y: scroll;
     height: 90vh;

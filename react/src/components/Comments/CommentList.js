@@ -7,11 +7,11 @@ function CommentList ({ comments, listLineJump }) {
       {comments.map((comment, index) => (
         <Comment 
           key={index}
-          commentID={comment.commentID}
-          author={comment.author}
-          text={comment.text} 
+          commentID={comment.comment_id}
+          author={comment.author_id}
+          text={comment.content} 
           subcomments={comment.subcomments}
-          line={comment.line}
+          line={1}
           commentLineJump={listLineJump}
         />
       ))}

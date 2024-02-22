@@ -81,8 +81,9 @@ function ReviewWindow() {
             </div>
           </div>
           <div className="Comment-view">
-            <CommentModule 
+            <CommentModule
               moduleLineJump={lineJump}
+              diffID="diffid"
             />
           </div>
         </div>
@@ -102,7 +103,7 @@ function ReviewWindow() {
             original={initialCode}
             modified={updatedCode}
             originalLanguage="python"
-            modifiedLanguage='python'
+            modifiedLanguage="python"
             onMount={(editor, monaco) => {
               editorRef.current = editor
               monacoRef.current = monaco
