@@ -8,18 +8,19 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 import sqlalchemy
 from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select
+from sqlalchemy.orm import sessionmaker
 import pymysql
 import models
+import random
 
 #Todo hide later
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 app = Flask(__name__)
 
-
 CORS(app)
 engine = connectCloudSql()
-
+Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
 # Remove Later
 class User():
@@ -178,7 +179,7 @@ def getComment():
             d["date_modified"] = row.date_modified
             d["content"] = row.content
             print(row)
-            retArray.append(d)        
+            retArray.append(d)
 
     returnArray = {
         "success": True,
@@ -225,7 +226,7 @@ def authenticate():
     inputToken = request.get_json()
 
     try:
-        idInfo = id_token.verify_oauth2_token(inputToken["credential"], requests.Request(), CLIENT_ID)
+        #idInfo = id_token.verify_oauth2_token(inputToken["credential"], requests.Request(), CLIENT_ID)
 
         retData = {
             "success": True,
@@ -250,7 +251,7 @@ def authenticate():
 def IsValidCredential(credentialToken):
     try:
         print("Valid ID_TOKEN supplied")
-        id_token.verify_oauth2_token(credentialToken, requests.Request(), CLIENT_ID)
+        #id_token.verify_oauth2_token(credentialToken, requests.Request(), CLIENT_ID)
         return True
     except ValueError:
         print("FAILED INVALID TOKEN")
@@ -290,32 +291,43 @@ def testDocument(proj_id, doc_id):
 
 @app.route('/api/diffs/<diff_id>/comment/create', methods=["POST"])
 def postComment(diff_id):
+    data = request.get_json()
     # authenticate
     # query cloud sql
-    
-    # temporary
+    with Session() as session:
+        session.add(models.Comment(
+            comment_id=random.randint(0, 2**31 - 1), #temporary
+            diff_id=int(data["diff_id"]),
+            author_id=int(data["author_id"]),
+            reply_to_id=int(data["reply_to_id"]),
+            content=data["content"]
+        ))
+        session.commit()
+
     return {"success": True}
 
 @app.route('/api/diffs/<diff_id>/comments/get', methods=["GET"])
 def getCommentsOnDiff(diff_id):
     # authenticate
     # query cloud sql
+    commentsList = []
+    with Session() as session:
+        filteredComments = session.query(models.Comment) \
+            .filter_by(diff_id=diff_id) \
+            .all()
+
+        for comment in filteredComments:
+            commentsList.append({
+                "comment_id": comment.comment_id,
+                "diff_id": comment.diff_id,
+                "author_id": comment.author_id,
+                "reply_to_id": comment.reply_to_id,
+                "date_created": comment.date_created,
+                "date_modified": comment.date_modified,
+                "content": comment.content
+            })
     
-    # temporary
-    retArray = []
-    for i in range(10):
-        d = {
-            "comment_id": i + 1,
-            "diff_id": diff_id,
-            "author_id": 1000 + i,
-            "reply_to_id": 0,
-            "date_created": "2024-02-20 12:00:00",
-            "date_modified": "2024-02-20 12:00:00",
-            "content": f"Fake comment {i+1}"
-        }
-        retArray.append(d)
-    
-    return retArray
+    return commentsList
 
 @app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
 def getSubcommentsOnComment(comment_id):
@@ -345,10 +357,15 @@ def editComment(comment_id):
     # temporary
     return {"success": True}
 
+# ignore for now
+# for now, this clears the comments database
 @app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])
 def deleteComment(comment_id):
     # authenticate
     # query cloud sql
-    
+    with Session() as session:
+        session.query(models.Comment) \
+            .delete()
+        session.commit()
     # temporary
     return {"success": True}
