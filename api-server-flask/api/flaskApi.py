@@ -11,7 +11,6 @@ from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData,
 from sqlalchemy.orm import sessionmaker
 import pymysql
 import models
-import random
 
 #Todo hide later
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
@@ -105,13 +104,13 @@ def createComment():
     
     # Authentication
     credential = requestedData["credential"]
-    if not IsValidCredential(credential):
+    if not isValidCredential(credential):
         retData = {
             "success": False,
             "reason": "Invalid Token Provided",
             "body": {}
         }
-        return jsonify(retData) 
+        return jsonify(retData)
     
     # Query
     engine = connectCloudSql()
@@ -151,7 +150,7 @@ def getComment():
     
     # Authentication
     credential = requestedData["credential"]
-    if not IsValidCredential(credential):
+    if not isValidCredential(credential):
         retData = {
             "success": False,
             "reason": "Invalid Token Provided",
@@ -209,7 +208,7 @@ def sendData():
                 "body": {}
                     }
     
-    if not IsValidCredential(inputBody["credential"]):
+    if not isValidCredential(inputBody["credential"]):
         return { "success": False,
                 "reason": "Invalid Token Provided",
                 "body": {}
@@ -248,7 +247,7 @@ def authenticate():
         return jsonify(retData) 
 
 # Call Func every api func call to make sure that user is Authenticated before running
-def IsValidCredential(credentialToken):
+def isValidCredential(credentialToken):
     try:
         print("Valid ID_TOKEN supplied")
         #id_token.verify_oauth2_token(credentialToken, requests.Request(), CLIENT_ID)
@@ -291,41 +290,79 @@ def testDocument(proj_id, doc_id):
 
 @app.route('/api/diffs/<diff_id>/comment/create', methods=["POST"])
 def postComment(diff_id):
-    data = request.get_json()
-    # authenticate
-    # query cloud sql
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    body = request.get_json()
+    if not isValidRequest(body, ["diff_id", "author_id", "reply_to_id", "content"]):
+        return {
+            "success": False,
+            "reason": "Invalid Request"
+        }
+
+    # Query
     with Session() as session:
-        session.add(models.Comment(
-            comment_id=random.randint(0, 2**31 - 1), #temporary
-            diff_id=int(data["diff_id"]),
-            author_id=int(data["author_id"]),
-            reply_to_id=int(data["reply_to_id"]),
-            content=data["content"]
-        ))
-        session.commit()
+        try:
+            session.add(models.Comment(
+                diff_id=int(body["diff_id"]),
+                author_id=int(body["author_id"]),
+                reply_to_id=int(body["reply_to_id"]),
+                content=body["content"]
+            ))
+            session.commit()
+        except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
 
-    return {"success": True}
+    print("Successful Write")
+    return {
+        "success": True,
+        "reason": "Successful Write"
+    }
 
+# look into pagination
+# https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/diffs/<diff_id>/comments/get', methods=["GET"])
 def getCommentsOnDiff(diff_id):
-    # authenticate
-    # query cloud sql
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    # Query
     commentsList = []
     with Session() as session:
-        filteredComments = session.query(models.Comment) \
-            .filter_by(diff_id=diff_id) \
-            .all()
+        try:
+            filteredComments = session.query(models.Comment) \
+                .filter_by(diff_id=diff_id) \
+                .all()
 
-        for comment in filteredComments:
-            commentsList.append({
-                "comment_id": comment.comment_id,
-                "diff_id": comment.diff_id,
-                "author_id": comment.author_id,
-                "reply_to_id": comment.reply_to_id,
-                "date_created": comment.date_created,
-                "date_modified": comment.date_modified,
-                "content": comment.content
-            })
+            for comment in filteredComments:
+                commentsList.append({
+                    "comment_id": comment.comment_id,
+                    "diff_id": comment.diff_id,
+                    "author_id": comment.author_id,
+                    "reply_to_id": comment.reply_to_id,
+                    "date_created": comment.date_created,
+                    "date_modified": comment.date_modified,
+                    "content": comment.content
+                })
+        except Exception as e:
+            print("Error: ", e)
+            return []
     
     return commentsList
 
