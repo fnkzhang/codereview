@@ -1,6 +1,7 @@
 from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
+import uuid
 
 class Base(DeclarativeBase):
      pass
@@ -8,7 +9,7 @@ class Base(DeclarativeBase):
 class Comment(Base):
     __tablename__ = "comments"
 
-    comment_id = Column(Integer, primary_key=True)
+    comment_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31)) # https://stackoverflow.com/questions/38754816/sqlalchemy-random-unique-integer
     diff_id = Column(Integer, nullable=False)
     author_id = Column(Integer, nullable=False)
     reply_to_id = Column(Integer, nullable=False)
