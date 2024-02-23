@@ -8,13 +8,14 @@ import React, { useState, useRef, useEffect} from 'react';
 
 function ReviewWindow() {
 
-  const monacoRef = useRef(null)
-  const editorRef = useRef(null)
-  const [initialCode, setInit] = useState(null)
-  const [updatedCode, setCode] = useState(null)
-  const [currentLine, setLine] = useState(1)
+  const monacoRef = useRef(null);
+  const editorRef = useRef(null);
+  const [initialCode, setInit] = useState(null);
+  const [updatedCode, setCode] = useState(null);
+  const [currentLine, setLine] = useState(1);
   const [editorLoading, setEditorLoading] = useState(true);
-  const decorationIdsRef = useRef([])
+  const decorationIdsRef = useRef([]);
+  const diffID = 2;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +84,7 @@ function ReviewWindow() {
           <div className="Comment-view">
             <CommentModule
               moduleLineJump={lineJump}
-              diffID="diffid"
+              diffID={diffID}
             />
           </div>
         </div>

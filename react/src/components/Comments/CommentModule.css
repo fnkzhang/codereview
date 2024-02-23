@@ -8,10 +8,15 @@
 .Comment-loading {
     color: white;
     align-items: center;
-    margin-top: 10vh;
+    padding-top: 10vh;
+    height: 60vh;
 }
 
 .Comment-list-container {
     overflow-y: scroll;
-    height: 90vh;
+    height: 70vh;
+}
+
+.Comment-submit-section {
+    color: white;
 }

@@ -1,3 +1,4 @@
+import "./Oauth.css"
 import React, { useEffect, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -52,7 +53,7 @@ export default function Oauth(){
 
     function DisplayLoginButton() {
         if (isLoggedIn) {
-            return (<h3>Logged IN to {userData.email}</h3>)
+            return (<div className="Login-true">Logged IN to {userData.email}</div>)
         }
 
         return (

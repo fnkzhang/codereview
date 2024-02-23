@@ -1,17 +1,20 @@
 import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
-import { getCommentsOnDiff } from '../../api/APIUtils.js';
-import { useEffect} from 'react';
+import { createComment, getCommentsOnDiff } from '../../api/APIUtils.js';
+import { useEffect } from 'react';
 
-function CommentModule ({ moduleLineJump, diffID }) {
+function CommentModule ({ moduleLineJump , diffID }) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [comments, setComments] = useState(null);
+  const [newComment, setNewComment] = useState('');
+  const [diffId] = useState(diffID) 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const commentData = await getCommentsOnDiff(diffID)
+        console.log(diffId)
+        const commentData = await getCommentsOnDiff(diffId)
         console.log(commentData)
         setComments(commentData)
       } catch (error) {
@@ -24,7 +27,24 @@ function CommentModule ({ moduleLineJump, diffID }) {
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, diffID])
+  }, [commentsLoading, diffId])
+
+  function handleNewCommentChange (event) {
+    setNewComment(event.target.value);
+  };
+
+  async function handleNewCommentSubmit (event) {
+    event.preventDefault();
+
+    try {
+      await createComment(diffId, 1, 0, newComment);
+      setCommentsLoading(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setNewComment('')
+    }
+  };
 
   if (commentsLoading) {
     return (
@@ -33,6 +53,17 @@ function CommentModule ({ moduleLineJump, diffID }) {
         <div className="Comment-loading">
           Loading...
         </div>
+        <form className="Comment-submit-section" onSubmit={handleNewCommentSubmit}>
+        <label>Add a new comment:</label>
+        <textarea
+          rows="4"
+          cols="50"
+          value={newComment}
+          onChange={handleNewCommentChange}
+        ></textarea>
+        <br />
+        <button type="submit">Submit Comment</button>
+      </form>
       </div>
     )
   }
@@ -46,6 +77,17 @@ function CommentModule ({ moduleLineJump, diffID }) {
           listLineJump={moduleLineJump}
         />
       </div>
+      <form className="Comment-submit-section" onSubmit={handleNewCommentSubmit}>
+        <label>Add a new comment:</label>
+        <textarea
+          rows="4"
+          cols="50"
+          value={newComment}
+          onChange={handleNewCommentChange}
+        ></textarea>
+        <br />
+        <button type="submit">Submit Comment</button>
+      </form>
     </div>
   );
 }
