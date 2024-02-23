@@ -299,6 +299,9 @@ def postComment(diff_id):
             "reason": "Invalid Token Provided"
         }
 
+    print(headers["Authorization"])
+    return
+
     body = request.get_json()
     if not isValidRequest(body, ["diff_id", "author_id", "reply_to_id", "content"]):
         return {
@@ -364,6 +367,7 @@ def getCommentsOnDiff(diff_id):
             print("Error: ", e)
             return []
     
+    print("Successful Read")
     return commentsList
 
 @app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
@@ -388,21 +392,74 @@ def getSubcommentsOnComment(comment_id):
 
 @app.route('/api/comments/<comment_id>/edit', methods=["PUT"])
 def editComment(comment_id):
-    # authenticate
-    # query cloud sql
-    
-    # temporary
-    return {"success": True}
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
 
-# ignore for now
-# for now, this clears the comments database
+    body = request.get_json()
+    if not isValidRequest(body, ["content"]):
+        return {
+            "success": False,
+            "reason": "Invalid Request"
+        }
+    
+    # Query
+    try:
+        with Session() as session:
+            session.query(models.Comment) \
+                .filter_by(comment_id=comment_id) \
+                .update({
+                    "date_modified": getTime(),
+                    "content": body["content"]
+                })
+
+            session.commit()
+    except Exception as e:
+        print("Error: ", e)
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+    
+    print("Successful Edit")
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }
+
 @app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])
 def deleteComment(comment_id):
-    # authenticate
-    # query cloud sql
-    with Session() as session:
-        session.query(models.Comment) \
-            .delete()
-        session.commit()
-    # temporary
-    return {"success": True}
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+    
+    # Query
+    try:
+        with Session() as session:
+            session.query(models.Comment) \
+                .filter_by(comment_id=comment_id) \
+                .delete()
+
+            session.commit()
+    except Exception as e:
+        print("Error: ", e)
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+    
+    print("Successful Delete")
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }
