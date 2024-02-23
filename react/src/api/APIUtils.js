@@ -145,7 +145,7 @@ export async function getSubcommentsOnComment(comment_id) {
     .then(response => response.json())
 }
 
-export async function editComment(comment_id) {
+export async function editComment(comment_id, content) {
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "PUT",
@@ -153,16 +153,16 @@ export async function editComment(comment_id) {
     headers: {
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
-    }
+    },
+    body: JSON.stringify({
+      "content": content
+    })
   };
 
   return await fetch(`/api/comments/${comment_id}/edit`, headers)
     .then(response => response.json())
 }
 
-// temporary; ignore for now
-// supposed to delete 1 comment, but deletes all comments in db for debugging purposes
-// comment_id doesn't do anything
 export async function deleteComment(comment_id) {
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
