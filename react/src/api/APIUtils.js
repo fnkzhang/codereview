@@ -93,12 +93,12 @@ export async function getDiff(proj_id, doc_id, diff_id) {
 // content: string
 // creates a comment and (temporarily) generates an id between 0 and 2^31 - 1
 export async function createComment(diff_id, author_id, reply_to_id, content) {
-  let oAuthToken = "fake oauth token"
+  let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "POST",
     mode: "cors",
     headers: {
-      "Authorization": `Bearer ${oAuthToken}`,
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -116,12 +116,12 @@ export async function createComment(diff_id, author_id, reply_to_id, content) {
 // diff_id: int
 // returns all comments (temporarily including subcomments) that match the diff_id
 export async function getCommentsOnDiff(diff_id) {
-  let oAuthToken = "fake oauth token"
+  let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "GET",
     mode: "cors",
     headers: {
-      "Authorization": `Bearer ${oAuthToken}`,
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   };
@@ -131,12 +131,12 @@ export async function getCommentsOnDiff(diff_id) {
 }
 
 export async function getSubcommentsOnComment(comment_id) {
-  let oAuthToken = "fake oauth token"
+  let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "GET",
     mode: "cors",
     headers: {
-      "Authorization": `Bearer ${oAuthToken}`,
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   };
@@ -146,12 +146,12 @@ export async function getSubcommentsOnComment(comment_id) {
 }
 
 export async function editComment(comment_id) {
-  let oAuthToken = "fake oauth token"
+  let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "PUT",
     mode: "cors",
     headers: {
-      "Authorization": `Bearer ${oAuthToken}`,
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   };
@@ -164,16 +164,16 @@ export async function editComment(comment_id) {
 // supposed to delete 1 comment, but deletes all comments in db for debugging purposes
 // comment_id doesn't do anything
 export async function deleteComment(comment_id) {
-  let oAuthToken = "fake oauth token"
+  let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "DELETE",
     mode: "cors",
     headers: {
-      "Authorization": `Bearer ${oAuthToken}`,
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   };
-
+  
   return await fetch(`/api/comments/${comment_id}/delete`, headers)
     .then(response => response.json())
 }
