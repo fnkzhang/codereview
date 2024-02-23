@@ -22,3 +22,10 @@ def getBlob(blobName):
 #for eventual use when i decide to actually put in the time
 def getTime():
     return datetime.now()
+
+def isValidRequest(parameters, requiredKeys):
+    for key in requiredKeys:
+        if key not in parameters:
+            return False
+
+    return True
