@@ -60,9 +60,9 @@ def getUserProjPermissions(user_email, proj_id):
         #needs to happen because you can only call result.first() once
         first = result.first()
         if first == None:
-            return False
-        return True
-
+            return -1
+        return first.permissions
+    
 def userExists(user_email):
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)

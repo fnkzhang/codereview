@@ -328,10 +328,10 @@ def addUser(proj_id):
         }
         return jsonify(retData)
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     with engine.connect() as conn:
-        if(getUserProjPermissions(inputBody["email"], proj_id)) == False:
+        if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
             relationstmt = insert(models.UserProjectRelation).values(
                     user_email = inputBody["email"],
                     proj_id = proj_id,
@@ -359,12 +359,22 @@ def addUser(proj_id):
 def addUserAdmin(proj_id):
     inputBody = request.get_json()
     with engine.connect() as conn:
-        relationstmt = insert(models.UserProjectRelation).values(
-                user_email = inputBody["email"],
-                proj_id = proj_id,
+        if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
+            relationstmt = insert(models.UserProjectRelation).values(
+                    user_email = inputBody["email"],
+                    proj_id = proj_id,
+                    role = inputBody["role"],
+                    permissions = inputBody["permissions"]
+            )
+        else:
+            relationstmt = update(models.UserProjectRelation).where(
+                models.UserProjectRelation.user_email == inputBody["email"],
+                proj_id == proj_id
+            ).values(
                 role = inputBody["role"],
                 permissions = inputBody["permissions"]
-        )
+            )
+
         conn.execute(relationstmt)
         conn.commit()
     return {"success": True, "reason":"N/A", "body": {}}
@@ -383,8 +393,8 @@ def removeUser(proj_id):
                 "body":{}
         }
         return jsonify(retData)
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+    #3 is placeholder value since we only have read permission
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     with engine.connect() as conn:
         relationstmt = delete(models.UserProjectRelation).where(
@@ -411,7 +421,7 @@ def createDocument(proj_id, doc_id):
         }
         return jsonify(retData)
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
@@ -434,7 +444,7 @@ def getDocument(proj_id, doc_id):
         }
         return jsonify(retData)
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) == False):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     blob = getBlob(proj_id + '/' + doc_id)
     return {"blobContents": blob}
