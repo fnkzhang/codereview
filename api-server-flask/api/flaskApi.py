@@ -225,10 +225,10 @@ def sendData():
 @app.route('/api/user/authenticate', methods=["POST"])
 def authenticate():
     #print("Hello")
-    inputToken = request.get_json()
+    inputToken = request.headers()
 
     try:
-        idInfo = id_token.verify_oauth2_token(inputToken["credential"], requests.Request(), CLIENT_ID)
+        idInfo = id_token.verify_oauth2_token(inputToken["Authorization"], requests.Request(), CLIENT_ID)
         retData = {
             "success": True,
             "reason": "N/A",
@@ -257,12 +257,14 @@ def defaultRoute():
     #credentials
 @app.route('/api/user/signup', methods = ["POST"])
 def signUp():
-    inputBody = request.get_json()
-    validity = isValidRequest(inputBody)
-    if validity != None:
-        return validity
-
-    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    idInfo = id_token.verify_oauth2_token(headers["Authorization"], requests.Request(), CLIENT_ID)
 
     if userExists(idInfo["email"]):
         retData = {
@@ -289,11 +291,14 @@ def signUp():
 
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
-    inputBody = request.get_json()
-    validity = isValidRequest(inputBody)
-    if validity != None:
-        return validity
-    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    idInfo = id_token.verify_oauth2_token(headers["Authorization"], requests.Request(), CLIENT_ID)
 
     if not userExists(idInfo["email"]):
         retData = {
@@ -329,10 +334,15 @@ def createProject(proj_name):
 @app.route('/api/Project/<proj_id>/addUser/', methods=["POST"])
 def addUser(proj_id):
     inputBody = request.get_json()
-    validity = isValidRequest(inputBody)
-    if validity != None:
-        return validity
-    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    idInfo = id_token.verify_oauth2_token(headers["Authorization"], requests.Request(), CLIENT_ID)
+
     if not userExists(idInfo["email"]):
         retData = {
                 "success": False,
@@ -395,10 +405,15 @@ def addUserAdmin(proj_id):
 @app.route('/api/Project/<proj_id>/removeUser/', methods=["POST"])
 def removeUser(proj_id):
     inputBody = request.get_json()
-    validity = isValidRequest(inputBody)
-    if validity != None:
-        return validity
-    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    idInfo = id_token.verify_oauth2_token(headers["Authorization"], requests.Request(), CLIENT_ID)
+
     if not userExists(idInfo["email"]):
         retData = {
                 "success": False,
@@ -421,11 +436,16 @@ def removeUser(proj_id):
 @app.route('/api/Document/<proj_id>/<doc_id>/', methods=["POST"])
 def createDocument(proj_id, doc_id):
     inputBody = request.get_json()
-    validity = isValidRequest(inputBody)
-    if validity != None:
-        return validity
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    idInfo = id_token.verify_oauth2_token(headers["Authorization"], requests.Request(), CLIENT_ID)
+
     #todo:make this a function
-    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
     if not userExists(idInfo["email"]):
         retData = {
                 "success": False,
@@ -443,11 +463,14 @@ def createDocument(proj_id, doc_id):
 
 @app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id):
-    inputBody = request.get_json()
-    validity = isValidRequest(inputBody)
-    if validity != None:
-        return validity
-    idInfo = id_token.verify_oauth2_token(inputBody["credential"], requests.Request(), CLIENT_ID)
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    idInfo = id_token.verify_oauth2_token(headers["Authorization"], requests.Request(), CLIENT_ID)
 
     if not userExists(idInfo["email"]):
         retData = {

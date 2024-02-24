@@ -73,7 +73,7 @@ def createID():
     return uuid.uuid4()
 
 # Call Func every api func call to make sure that user is Authenticated before running
-def IsValidCredential(credentialToken):
+def isValidCredential(credentialToken):
     try:
         print("Valid ID_TOKEN supplied")
         id_token.verify_oauth2_token(credentialToken, requests.Request(), CLIENT_ID)
