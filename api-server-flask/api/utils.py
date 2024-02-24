@@ -71,16 +71,6 @@ def userExists(user_email):
 
 def createID():
     return uuid.uuid4()
-
-# Call Func every api func call to make sure that user is Authenticated before running
-def isValidCredential(credentialToken):
-    try:
-        print("Valid ID_TOKEN supplied")
-        id_token.verify_oauth2_token(credentialToken, requests.Request(), CLIENT_ID)
-        return True
-    except ValueError:
-        print("FAILED INVALID TOKEN")
-        return False
       
 def isValidRequest(parameters, requiredKeys):
     for key in requiredKeys:
