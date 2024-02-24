@@ -27,14 +27,14 @@ export default function Oauth(){
 
     }, [])
     async function verifyLogin(credentialResponse) {
-        let data = credentialResponse
+        let oAuthToken = getCookie("cr_id_token")
         let headers= {
             method: "POST",
             mode: "cors",
             headers: {
+              "Authorization": oAuthToken,
               "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+            }
         }
         console.log("FETCHING")
 
