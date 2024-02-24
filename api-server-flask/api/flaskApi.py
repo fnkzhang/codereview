@@ -232,7 +232,7 @@ def authenticate():
         retData = {
             "success": True,
             "reason": "N/A",
-            "body": idInfo,
+            "body": idInfo
         }
         print("Success?")
         # RETURN User Data back
