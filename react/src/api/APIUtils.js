@@ -23,6 +23,7 @@ export async function sendData(bodyContents) {
 
 export async function createDoc(bodyContents, proj_id, doc_id) {
 
+  let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
     data: bodyContents
   }
@@ -30,6 +31,7 @@ export async function createDoc(bodyContents, proj_id, doc_id) {
     method: "POST",
     mode: "cors",
     headers: {
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     },
     body: JSON.stringify(bodyData)
@@ -40,10 +42,12 @@ export async function createDoc(bodyContents, proj_id, doc_id) {
 
 export async function getDoc(proj_id, doc_id) {
 
+  let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "GET",
     mode: "cors",
     headers: {
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   }
@@ -54,6 +58,7 @@ export async function getDoc(proj_id, doc_id) {
 
 export async function createDiff(proj_id, doc_id, diff_id, originalCode, updatedCode) {
 
+  let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
     original: originalCode,
     updated: updatedCode
@@ -62,6 +67,7 @@ export async function createDiff(proj_id, doc_id, diff_id, originalCode, updated
     method: "POST",
     mode: "cors",
     headers: {
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     },
     body: JSON.stringify(bodyData)
@@ -73,11 +79,13 @@ export async function createDiff(proj_id, doc_id, diff_id, originalCode, updated
 }
 
 export async function getDiff(proj_id, doc_id, diff_id) {
-
+  
+  let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "GET",
     mode: "cors",
     headers: {
+      "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   }
@@ -93,6 +101,7 @@ export async function getDiff(proj_id, doc_id, diff_id) {
 // content: string
 // creates a comment and (temporarily) generates an id between 0 and 2^31 - 1
 export async function createComment(diff_id, author_id, reply_to_id, content) {
+  
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "POST",
@@ -116,7 +125,9 @@ export async function createComment(diff_id, author_id, reply_to_id, content) {
 // diff_id: int
 // returns all comments (temporarily including subcomments) that match the diff_id
 export async function getCommentsOnDiff(diff_id) {
+  
   let oAuthToken = getCookie("cr_id_token")
+  console.log(oAuthToken)
   let headers = {
     method: "GET",
     mode: "cors",
@@ -131,6 +142,7 @@ export async function getCommentsOnDiff(diff_id) {
 }
 
 export async function getSubcommentsOnComment(comment_id) {
+  
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "GET",
@@ -146,6 +158,7 @@ export async function getSubcommentsOnComment(comment_id) {
 }
 
 export async function editComment(comment_id, content) {
+  
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "PUT",
@@ -164,6 +177,7 @@ export async function editComment(comment_id, content) {
 }
 
 export async function deleteComment(comment_id) {
+  
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "DELETE",
