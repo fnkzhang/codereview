@@ -12,17 +12,26 @@
     white-space: pre-wrap;
 }
 
+.Comment-name-date-container {
+    display: flex;
+}
+
 .Comment-author {
     font-size: 14px;
     margin-left: 10px;
-    width: 100px;
+}
+
+.Comment-date {
+    color: rgb(186, 186, 186);
+    align-items: right;
+    margin-left: 10px;
 }
 
 .Comment-text {
     margin-top: 5px;
 }
 
-.Comment-details-button {
+.Comment-linejump-button {
     margin-top: 10px;
 }
 

@@ -1,26 +1,37 @@
+from cloudSql import connectCloudSql
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
+from google.cloud import storage
+from utils import *
+from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
 from google.auth.transport import requests
-
 import sqlalchemy
 from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete
+from sqlalchemy.orm import sessionmaker
 import pymysql
-
 import models
 from cloudSql import connectCloudSql
-from utils import *
+
+from utils import engine
 
 #Todo hide later
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 app = Flask(__name__)
 
-
 CORS(app)
+engine = connectCloudSql()
+Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
-from utils import engine
+
+
+# Remove Later
+class User():
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    email = Column(String(50))
+
 
 metaData = MetaData()
 table = Table('testTable', metaData,
@@ -52,6 +63,7 @@ def dropUserProjectRelationTable():
 
 @app.route('/insert')
 def testInsert():
+    #engine = connectCloudSql()
     with engine.connect() as conn:
         stmt = insert(table).values(name="PungeBob", email="testEmail@gmail.com")
 
@@ -62,7 +74,7 @@ def testInsert():
 
 @app.route('/testGrabData')
 def grabData():
-    engine = connectCloudSql()
+    #engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(table).where(table.c.email == "testEmail@gmail.com")
@@ -88,6 +100,7 @@ def grabData():
     }
     
     return returnArray
+# End Remove later
 
 # Comment Post, Delete, GET,
 @app.route('/api/comment', methods=["POST"])
@@ -100,17 +113,17 @@ def createComment():
                 "reason": "Invalid JSON Provided",
                 "body": {}
             }
-
+      
     # Authentication
     credential = requestedData["credential"]
-    if not IsValidCredential(credential):
+    if not isValidCredential(credential):
         retData = {
             "success": False,
             "reason": "Invalid Token Provided",
             "body": {}
         }
         return jsonify(retData)
-
+      
     # Query
     engine = connectCloudSql()
 
@@ -148,7 +161,7 @@ def getComment():
     
     # Authentication
     credential = requestedData["credential"]
-    if not IsValidCredential(credential):
+    if not isValidCredential(credential):
         retData = {
             "success": False,
             "reason": "Invalid Token Provided",
@@ -176,7 +189,7 @@ def getComment():
             d["date_modified"] = row.date_modified
             d["content"] = row.content
             print(row)
-            retArray.append(d)        
+            retArray.append(d)
 
     returnArray = {
         "success": True,
@@ -198,7 +211,7 @@ def sendData():
                 "body": {}
                     }
     
-    if not IsValidCredential(inputBody["credential"]):
+    if not isValidCredential(inputBody["credential"]):
         return { "success": False,
                 "reason": "Invalid Token Provided",
                 "body": {}
@@ -469,4 +482,179 @@ def getDiff(proj_id, doc_id, diff_id):
 @app.route('/api/Document/<proj_id>/<doc_id>/test', methods=["GET"])
 def testDocument(proj_id, doc_id):
     return uploadBlob(proj_id + '/'+ doc_id, {'ok':'hey'})
-                                                                 
+
+@app.route('/api/diffs/<diff_id>/comment/create', methods=["POST"])
+def postComment(diff_id):
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    print(headers["Authorization"])
+    return
+
+    body = request.get_json()
+    if not isValidRequest(body, ["diff_id", "author_id", "reply_to_id", "content"]):
+        return {
+            "success": False,
+            "reason": "Invalid Request"
+        }
+
+    # Query
+    with Session() as session:
+        try:
+            session.add(models.Comment(
+                diff_id=int(body["diff_id"]),
+                author_id=int(body["author_id"]),
+                reply_to_id=int(body["reply_to_id"]),
+                content=body["content"]
+            ))
+            session.commit()
+        except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
+
+    print("Successful Write")
+    return {
+        "success": True,
+        "reason": "Successful Write"
+    }
+
+# look into pagination
+# https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
+@app.route('/api/diffs/<diff_id>/comments/get', methods=["GET"])
+def getCommentsOnDiff(diff_id):
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    # Query
+    commentsList = []
+    with Session() as session:
+        try:
+            filteredComments = session.query(models.Comment) \
+                .filter_by(diff_id=diff_id) \
+                .all()
+
+            for comment in filteredComments:
+                commentsList.append({
+                    "comment_id": comment.comment_id,
+                    "diff_id": comment.diff_id,
+                    "author_id": comment.author_id,
+                    "reply_to_id": comment.reply_to_id,
+                    "date_created": comment.date_created,
+                    "date_modified": comment.date_modified,
+                    "content": comment.content
+                })
+        except Exception as e:
+            print("Error: ", e)
+            return []
+    
+    print("Successful Read")
+    return commentsList
+
+@app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
+def getSubcommentsOnComment(comment_id):
+    # authenticate
+    # query cloud sql
+    
+    # temporary
+    retArray = []
+    for i in range(5):
+        d = {
+            "subcomment_id": i + 1,
+            "comment_id": comment_id,
+            "author_id": 2000 + i,
+            "date_created": "2024-02-20 12:00:00",
+            "date_modified": "2024-02-20 12:00:00",
+            "content": f"Fake subcomment {i+1} on comment {comment_id}"
+        }
+        retArray.append(d)
+    
+    return retArray
+
+@app.route('/api/comments/<comment_id>/edit', methods=["PUT"])
+def editComment(comment_id):
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    body = request.get_json()
+    if not isValidRequest(body, ["content"]):
+        return {
+            "success": False,
+            "reason": "Invalid Request"
+        }
+    
+    # Query
+    try:
+        with Session() as session:
+            session.query(models.Comment) \
+                .filter_by(comment_id=comment_id) \
+                .update({
+                    "date_modified": getTime(),
+                    "content": body["content"]
+                })
+
+            session.commit()
+    except Exception as e:
+        print("Error: ", e)
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+    
+    print("Successful Edit")
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }
+
+@app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])
+def deleteComment(comment_id):
+    # Authentication
+    headers = request.headers
+    if (not isValidRequest(headers, ["Authorization"]) or
+        not isValidCredential(headers["Authorization"])):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+    
+    # Query
+    try:
+        with Session() as session:
+            session.query(models.Comment) \
+                .filter_by(comment_id=comment_id) \
+                .delete()
+
+            session.commit()
+    except Exception as e:
+        print("Error: ", e)
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+    
+    print("Successful Delete")
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }

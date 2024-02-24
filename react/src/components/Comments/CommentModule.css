@@ -5,7 +5,18 @@
     align-items: center;
 }
 
+.Comment-loading {
+    color: white;
+    align-items: center;
+    padding-top: 10vh;
+    height: 60vh;
+}
+
 .Comment-list-container {
     overflow-y: scroll;
-    height: 85vh;
+    height: 70vh;
+}
+
+.Comment-submit-section {
+    color: white;
 }

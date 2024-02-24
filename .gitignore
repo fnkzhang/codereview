@@ -4,3 +4,5 @@ api-server-flask/api/__pycache__
 api-server-flask/api/dbEnv.py
 
 googlecreds.json
+
+api-server-flask/api/googlecreds.json

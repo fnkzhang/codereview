@@ -1,5 +1,5 @@
-from flask import Flask, request, jsonify
 
+from flask import Flask, request, jsonify
 from google.cloud import storage
 import google.auth
 from datetime import datetime
@@ -69,22 +69,6 @@ def userExists(user_email):
         result = conn.execute(stmt)
         return result.first() != None
 
-def isValidRequest(requestedData):
-    if "credential" not in requestedData:
-        return {"success": False, "reason": "Invalid JSON Provided",
-                "body":{}
-                }
-    credential = requestedData["credential"]
-    print(credential)
-    if not IsValidCredential(credential):
-        retData = {
-            "success": False,
-            "reason": "Invalid Token Provided",
-            "body": {}
-        }
-        return jsonify(retData)
-    return None
-
 def createID():
     return uuid.uuid4()
 
@@ -97,3 +81,10 @@ def IsValidCredential(credentialToken):
     except ValueError:
         print("FAILED INVALID TOKEN")
         return False
+      
+def isValidRequest(parameters, requiredKeys):
+    for key in requiredKeys:
+        if key not in parameters:
+            return False
+
+    return True
