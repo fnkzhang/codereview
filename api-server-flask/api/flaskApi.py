@@ -359,7 +359,7 @@ def removeUser(proj_id):
         conn.commit()
     return {"success": True, "reason":"N/A", "body": {}}
 
-@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["POST"])
+@app.route('/api/Document/<proj_id>/<doc_id>/create', methods=["POST"])
 def createDocument(proj_id, doc_id):
     inputBody = request.get_json()
     headers = request.headers
@@ -392,9 +392,8 @@ def createDocument(proj_id, doc_id):
     return {"posted": inputBody}
 
 
-@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
+@app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
 def getDocument(proj_id, doc_id):
-    printf("hello test")
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
