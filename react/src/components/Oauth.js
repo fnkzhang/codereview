@@ -38,7 +38,7 @@ export default function Oauth(){
         }
         console.log("FETCHING")
 
-        await fetch('/api/user/signup', headers)
+        await fetch('/api/user/authenticate', headers)
         .then(response => response.json())
         .then(data => {
             setUserData(data.body)
