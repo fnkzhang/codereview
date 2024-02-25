@@ -408,6 +408,10 @@ def getDocument(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
+    # remove these later
+    # the left document is empty for me - Hai
+    blob = getBlob(proj_id + '/' + doc_id)
+    return {"blobContents": blob}
     if not userExists(idInfo["email"]):
         retData = {
                 "success": False,
