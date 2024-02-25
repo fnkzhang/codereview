@@ -4,10 +4,9 @@ import Oauth from './Oauth.js';
 import CommentModule from './Comments/CommentModule.js';
 import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
-import React, { useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 function ReviewWindow() {
-
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
   const [initialCode, setInit] = useState(null);
@@ -20,24 +19,48 @@ function ReviewWindow() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [doc, diff] = await Promise.all([
-          getDoc('projectid', 'documentid'),
-          getDiff('projectid', 'documentid', 'diffid')
-        ]);
+        const storedInitialCode = localStorage.getItem('initialCode');
+        const storedUpdatedCode = localStorage.getItem('updatedCode');
+
+        if (storedInitialCode && storedUpdatedCode) {
+          setInit(storedInitialCode);
+          setCode(storedUpdatedCode);
+          setEditorLoading(false);
+
+          getLatestDocAndDiff();
+        } else {
+          await getLatestDocAndDiff();
+        }
+      } catch (error) {
+        console.log(error);
+        setEditorLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const getLatestDocAndDiff = async () => {
+    try {
+      const [doc, diff] = await Promise.all([
+        getDoc('projectid', 'documentid'),
+        getDiff('projectid', 'documentid', 'diffid')
+      ])
+
+      if (doc.blobContents !== initialCode || diff.diffResult !== updatedCode) {
         setInit(doc.blobContents)
         setCode(diff.diffResult)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        setEditorLoading(false)
+        localStorage.setItem('initialCode', doc.blobContents)
+        localStorage.setItem('updatedCode', diff.diffResult)
       }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setEditorLoading(false)
     }
-
-    fetchData()
-  }, [])
+  }
 
   useEffect(() => {
-
     if (editorRef.current && monacoRef.current) {
       const modifiedEditor = editorRef.current.getModifiedEditor();
 
@@ -63,7 +86,6 @@ function ReviewWindow() {
     setLine(newLine)
 
     if (editorRef.current && editorRef.current.getModifiedEditor) {
-
       editorRef.current.getModifiedEditor().revealLine(newLine);
     }
   }
