@@ -1,6 +1,13 @@
+.Loading-data {
+    color: white;
+    text-align: center;
+    margin-top: 25vh;
+    font-size: 16;
+}
+
 .Review-window {
     background-color: #282c34;
-    height: 95vh;
+    height: 90vh;
     width: 100vw;
     display: flex;
     float: left;
@@ -10,7 +17,7 @@
 
 .Code-view {
     background-color: #4d4d4d;
-    height: 90vh;
+    height: 88vh;
     width: 70vw;
     border: 1px solid #000000;
     display: inline-block;
@@ -24,4 +31,8 @@
 .Comment-view {
     width: 30%;
     display: inline-block;
+}
+
+.highlight-line {
+    background-color: yellow;
 }
