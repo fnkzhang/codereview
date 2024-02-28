@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text, ARRAY
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 import uuid
@@ -46,3 +46,24 @@ class UserProjectRelation(Base):
     proj_id = Column(String(50), primary_key=True)
     role = Column(String(50))
     permissions = Column(Integer)
+
+class Snapshot(Base):
+    __tablename__ = "snapshots"
+    snapshot_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
+    name = Column(String(50))
+    date_created = Column(DateTime(timezone=True), server_default=func.now())
+    date_modified = Column(DateTime(timezone=True), server_default=func.now())
+
+class DiffSnapshotRelation(Base):
+    __tablename__ = "diffsnapshotrelation"
+    snapshot_id = Column(Integer, primary_key=True)
+    diff_id = Column(Integer, primary_key=True)
+    
+class Document(Base):
+    __tablename__ = "documents"
+    doc_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
+    name = Column(String(50))
+    date_created = Column(DateTime(timezone=True), server_default=func.now())
+    date_modified = Column(DateTime(timezone=True), server_default=func.now())
+    snapshots = Column(ARRAY(Integer))
+

@@ -62,7 +62,41 @@ def getUserProjPermissions(user_email, proj_id):
         if first == None:
             return -1
         return first.permissions
-    
+
+def getDocumentInfo(doc_id):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.doc_id == doc_id)
+        first = conn.execute(stmt).first()
+        if first == None:
+            return -1
+        return first
+
+#puts documentname as snapshot name until that changes
+def createNewSnapshot(proj_id, doc_id, item):
+    with engine.connect() as conn:
+        
+        stmt = select(models.Document).where(
+            models.Documet.doc_id == doc_id)
+        doc = conn.execute(stmt).first
+        doc_name = doc.name
+        currentsnapshotlist = doc.snapshots
+        
+        snapshot_id = createID()
+        stmt = insert(models.Snapshot).values(
+            snapshot_id = snapshot_id,
+            name = doc_name
+        )
+        conn.execute(stmt)
+
+        stmt = update(models.Document).where(
+                    models.Document.doc_id == doc_id
+                ).values(
+                    snapshots = currentsnapshotlist + [snapshot_id]
+                )
+        conn.execute(stmt)
+        conn.commit()
+        uploadBlob(proj_id + '/' + doc_id + '/' + snapshot_id, item)
+
 def userExists(user_email):
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)
@@ -70,7 +104,7 @@ def userExists(user_email):
         return result.first() != None
 
 def createID():
-    return uuid.uuid4()
+    return uuid.uuid4().int >> (128 - 31)
       
 def isValidRequest(parameters, requiredKeys):
     for key in requiredKeys:
