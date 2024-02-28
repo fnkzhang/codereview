@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import getCookie from "../utils/utils";
+import utils from "../utils/utils";
 import { useNavigate } from "react-router";
 
 export default function UserHomePage() {
@@ -10,7 +10,7 @@ export default function UserHomePage() {
 
     // Validate User or Send to Login
     useEffect(() => {
-      let credentialToken = getCookie("cr_id_token")
+      let credentialToken = utils.getCookie("cr_id_token")
 
       if (credentialToken === null)
         return
@@ -20,9 +20,18 @@ export default function UserHomePage() {
       }
 
       verifyLogin(credentialObject)
-
+      // After Setting userData, use email to grab user related documents from API
 
     }, [])
+
+    useEffect(() => {
+      if (userData === null)  
+        return
+
+      // todo GRAB USER DATA FROM API
+
+      
+    }, [userData])
     async function verifyLogin(credentialResponse) {
       let oAuthToken = credentialResponse.credential
 
@@ -52,5 +61,11 @@ export default function UserHomePage() {
       })
       .catch(e => console.log(e))
 
-  }
+    }
+
+    return (
+      <div>
+
+      </div>
+    )
 }
