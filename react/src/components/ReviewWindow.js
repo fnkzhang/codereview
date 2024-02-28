@@ -75,9 +75,7 @@ function ReviewWindow() {
         <Oauth/>
         <div className="Review-window">
           <div className="Code-view">
-            <div
-              className="Loading-data"
-            >
+            <div className="Loading-data">
               Loading...
             </div>
           </div>

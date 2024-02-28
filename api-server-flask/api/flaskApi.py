@@ -1,15 +1,17 @@
 from cloudSql import connectCloudSql
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from google.cloud import storage
+
 from utils import *
 from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
 from google.auth.transport import requests
-import sqlalchemy
+
 from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete
 from sqlalchemy.orm import sessionmaker
+
 import pymysql
+
 import models
 from cloudSql import connectCloudSql
 
