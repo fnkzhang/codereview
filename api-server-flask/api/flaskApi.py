@@ -391,42 +391,28 @@ def createDocument(proj_id, doc_id):
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
     return {"posted": inputBody}
 
-last_updated = None
-cached_blob = None
+from flask_caching import Cache
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
 @app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
 def getDocument(proj_id, doc_id):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-
-    # remove these later
-    # the left document is empty for me - Hai
     start_time = time.time()
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(proj_id + '/' + doc_id)
-    global last_updated, cached_blob
-    if cached_blob is not None and last_updated is not None:
-        if blob.updated == last_updated:
-            end_time = time.time()
-            print(f"Execution time (cached): {end_time - start_time} seconds\n\n")
-            return {"blobContents": cached_blob}
 
-    last_updated = blob.updated
-    cached_blob = blob.download_as_text()
+    cached_metadata = cache.get(doc_id)
+    if cached_metadata and cached_metadata.get("updated") == blob.updated:
+        end_time = time.time()
+        print(f"Execution time (cached): {end_time - start_time} seconds\n\n")
+        return {"blobContents": cached_metadata.get("blob_contents")}
+
+    blob_contents = blob.download_as_text()
+    cache.set(doc_id, {"updated": blob.updated, "blob_contents": blob_contents}, timeout=3600)
+
     end_time = time.time()
     print(f"Execution time (uncached): {end_time - start_time} seconds\n\n")
-    return {"blobContents": cached_blob}
+    return {"blobContents": blob_contents}
     if not userExists(idInfo["email"]):
         retData = {
                 "success": False,
