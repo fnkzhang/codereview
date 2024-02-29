@@ -391,7 +391,8 @@ def createDocument(proj_id, doc_id):
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
     return {"posted": inputBody}
 
-
+last_updated = None
+cached_blob = None
 @app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
 def getDocument(proj_id, doc_id):
     headers = request.headers
@@ -410,8 +411,22 @@ def getDocument(proj_id, doc_id):
 
     # remove these later
     # the left document is empty for me - Hai
-    blob = getBlob(proj_id + '/' + doc_id)
-    return {"blobContents": blob}
+    start_time = time.time()
+    storage_client = storage.Client()
+    bucket = storage_client.bucket('cr_storage')
+    blob = bucket.get_blob(proj_id + '/' + doc_id)
+    global last_updated, cached_blob
+    if cached_blob is not None and last_updated is not None:
+        if blob.updated == last_updated:
+            end_time = time.time()
+            print(f"Execution time (cached): {end_time - start_time} seconds\n\n")
+            return {"blobContents": cached_blob}
+
+    last_updated = blob.updated
+    cached_blob = blob.download_as_text()
+    end_time = time.time()
+    print(f"Execution time (uncached): {end_time - start_time} seconds\n\n")
+    return {"blobContents": cached_blob}
     if not userExists(idInfo["email"]):
         retData = {
                 "success": False,
