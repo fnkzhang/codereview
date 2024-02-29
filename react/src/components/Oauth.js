@@ -41,6 +41,11 @@ export default function Oauth(){
         await fetch('/api/user/authenticate', headers)
         .then(response => response.json())
         .then(data => {
+            if (data.success === false) {
+                console.log("Failed to validate token")
+                return
+            }
+            
             setUserData(data.body)
             console.log(data)
             setIsLoggedIn(true)
