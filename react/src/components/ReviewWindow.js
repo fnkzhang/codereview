@@ -15,8 +15,9 @@ function ReviewWindow() {
   const [currentEditor, setEditor ] = useState(null); 
   const [currentHighlightStart, setStart] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
-  const decorationIdsRef = useRef([]);
-  const diffID = 2;
+  const decorationIdsRefOrig = useRef([]);
+  const decorationIdsRefModif = useRef([]);
+  const snapshotId = 2;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,17 +48,24 @@ function ReviewWindow() {
       })
   }
 
-  function lineJump(newLine) {
+  function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
     if (editorRef.current && editorRef.current.getModifiedEditor) {
-      const modifiedEditor = editorRef.current.getModifiedEditor();
 
-      const lineNumber = 4;
-      const range = new monacoRef.current.Range(lineNumber, 24, lineNumber, 29);
+      const range = new monacoRef.current.Range(highlightStartY, highlightStartX, highlightEndY, highlightEndX);
       const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
+      const modifiedEditor = editorRef.current.getModifiedEditor();
+      const originalEditor = editorRef.current.getOriginalEditor();
 
-      decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
-      editorRef.current.getModifiedEditor().revealLine(newLine);
+      if (snapshotID === snapshotId) {
+        decorationIdsRefOrig.current = originalEditor.deltaDecorations(decorationIdsRefOrig.current, [])
+        decorationIdsRefModif.current = modifiedEditor.deltaDecorations(decorationIdsRefModif.current, [decoration]);
+        editorRef.current.getModifiedEditor().revealLine(highlightStartY);
+      } else {
+        decorationIdsRefModif.current = modifiedEditor.deltaDecorations(decorationIdsRefModif.current, []);
+        decorationIdsRefOrig.current = originalEditor.deltaDecorations(decorationIdsRefOrig.current, [decoration]);
+        editorRef.current.getOriginalEditor().revealLine(highlightStartY);
+      }
     }
   }
 
@@ -77,7 +85,7 @@ function ReviewWindow() {
           <div className="Comment-view">
             <CommentModule
               moduleLineJump={lineJump}
-              diffID={diffID}
+              snapshotId={snapshotId}
             />
           </div>
         </div>

@@ -6,17 +6,17 @@ import { useEffect } from 'react';
 
 import { getComments } from '../../dev/getComments.js'
 
-function CommentModule ({ moduleLineJump , diffID }) {
+function CommentModule ({ moduleLineJump , snapshotId }) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   //const [comments, setComments] = useState(null);
   const [comments, setComments] = useState(getComments())
   const [newComment, setNewComment] = useState('');
-  const [diffId] = useState(diffID) 
+  const [snapshotID] = useState(snapshotId) 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //const commentData = await getCommentsOnDiff(diffId)
+        //const commentData = await getCommentsOnDiff(snapshotID)
         let commentData = comments
         console.log(commentData)
         setComments(commentData)
@@ -30,7 +30,7 @@ function CommentModule ({ moduleLineJump , diffID }) {
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, diffId])
+  }, [commentsLoading, snapshotID])
 
   function handleNewCommentChange (event) {
     setNewComment(event.target.value);
@@ -40,14 +40,14 @@ function CommentModule ({ moduleLineJump , diffID }) {
     event.preventDefault();
 
     try {
-      //await createComment(diffId, 1, 0, newComment);
+      //await createComment(snapshotId, 1, 0, newComment);
       setComments([...comments,{
         author_id: 1,
         comment_id: 1000,
         content: newComment,
         date_created: "time",
         date_modified: "time",
-        diff_id: diffID,
+        snapshot_id: snapshotID,
         reply_to_id: 0
       }])
       setCommentsLoading(true);
