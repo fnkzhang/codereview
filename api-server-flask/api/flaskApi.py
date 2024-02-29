@@ -143,7 +143,7 @@ def authenticate():
     headers = request.headers
     if (not isValidRequest(headers, ["Authorization"])):
         return None
-    
+
     try:
         idInfo = id_token.verify_oauth2_token(
             headers["Authorization"],
@@ -287,7 +287,7 @@ def addUser(proj_id):
         else:
             relationstmt = update(models.UserProjectRelation).where(
                 models.UserProjectRelation.user_email == inputBody["email"],
-                proj_id == proj_id
+                models.UserProjectRelation.proj_id == proj_id
             ).values(
                 role = inputBody["role"],
                 permissions = inputBody["permissions"]
@@ -361,8 +361,8 @@ def removeUser(proj_id):
         conn.commit()
     return {"success": True, "reason":"N/A", "body": {}}
 
-@app.route('/api/Document/<proj_id>/<doc_id>/create', methods=["POST"])
-def createDocument(proj_id, doc_id):
+@app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
+def createSnapshot(proj_id, doc_id):
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -390,11 +390,74 @@ def createDocument(proj_id, doc_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
-    uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
+    createNewSnapshot(proj_id, doc_id, inputBody["data"])
+    return {"posted": inputBody}
+
+@app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>', methods=["GET"])
+def getSnapshot(proj_id, doc_id, snapshot_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if not userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+        return jsonify(retData)
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    blob = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id)
+    return {"blobContents": blob}
+
+@app.route('/api/Document/<proj_id>/', methods=["POST"])
+def createDocument(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    #todo:make this a function
+    if not userExists(idInfo["email"]):
+        retData = {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+        return jsonify(retData)
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    ##########################
+    doc_id = createID()
+    createNewSnapshot(proj_id, doc_id, inputBody["data"])
     return {"posted": inputBody}
 
 
-@app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
+
+@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -420,29 +483,25 @@ def getDocument(proj_id, doc_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    blob = getBlob(proj_id + '/' + doc_id)
-    return {"blobContents": blob}
+    info = getDocumentInfo(doc_id)
+    return {"doc_info": info}
 
 #not gonna mess with diff stuff for now because again, i'm only going to focus on document permissions
-@app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/create', methods=["POST"])
-def createDiff(proj_id, doc_id, diff_id):
+@app.route('/api/Document/<proj_id>/<doc_id>/<snapshot_id>/<diff_id>/', methods=["POST"])
+def createDiff(proj_id, doc_id, snap_shot_id, diff_id):
     inputBody = request.get_json()
     dmp = diff_match_patch()
     diffText = dmp.patch_toText(dmp.patch_make(dmp.diff_main(inputBody["original"], inputBody["updated"])))
-    uploadBlob(proj_id + '/' + doc_id + '/' + diff_id, diffText)
+    uploadBlob(proj_id + '/' + doc_id + '/' +snapshot_id + '/' + diff_id, diffText)
     return {"diffText": diffText}
 
-@app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/get', methods=["GET"])
+@app.route('/api/Document/<proj_id>/<doc_id>/<snapshot_id>/<diff_id>/', methods=["GET"])
 def getDiff(proj_id, doc_id, diff_id):
-    document = getBlob(proj_id + '/' + doc_id)
-    diffText = getBlob(proj_id + '/' + doc_id + '/' + diff_id)
+    document = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id)
+    diffText = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id + '/' + diff_id)
     dmp = diff_match_patch()
     output, _ = dmp.patch_apply(dmp.patch_fromText(diffText), document)
     return {"diffResult": output}
-
-@app.route('/api/Document/<proj_id>/<doc_id>/test', methods=["GET"])
-def testDocument(proj_id, doc_id):
-    return uploadBlob(proj_id + '/'+ doc_id, {'ok':'hey'})
 
 # Comment POST, GET, PUT, DELETE
 @app.route('/api/diffs/<diff_id>/comment/create', methods=["POST"])
