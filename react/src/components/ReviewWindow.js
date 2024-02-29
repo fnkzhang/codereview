@@ -12,7 +12,8 @@ function ReviewWindow() {
   const editorRef = useRef(null);
   const [initialCode, setInit] = useState(null);
   const [updatedCode, setCode] = useState(null);
-  const [currentLine, setLine] = useState(1);
+  const [currentEditor, setEditor ] = useState(null); 
+  const [currentHighlightStart, setStart] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
   const decorationIdsRef = useRef([]);
   const diffID = 2;
@@ -36,19 +37,6 @@ function ReviewWindow() {
     fetchData()
   }, [])
 
-  useEffect(() => {
-
-    if (editorRef.current && monacoRef.current) {
-      const modifiedEditor = editorRef.current.getModifiedEditor();
-
-      const lineNumber = 4;
-      const range = new monacoRef.current.Range(lineNumber, 24, lineNumber, 29);
-      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
-
-      decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
-    }
-  }, [monacoRef, editorRef, currentLine, updatedCode])
-
   async function handleClick() {
     console.log(updatedCode)
 
@@ -60,10 +48,15 @@ function ReviewWindow() {
   }
 
   function lineJump(newLine) {
-    setLine(newLine)
 
     if (editorRef.current && editorRef.current.getModifiedEditor) {
+      const modifiedEditor = editorRef.current.getModifiedEditor();
 
+      const lineNumber = 4;
+      const range = new monacoRef.current.Range(lineNumber, 24, lineNumber, 29);
+      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
+
+      decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
       editorRef.current.getModifiedEditor().revealLine(newLine);
     }
   }
@@ -108,6 +101,9 @@ function ReviewWindow() {
             onMount={(editor, monaco) => {
               editorRef.current = editor
               monacoRef.current = monaco
+              editor.getModifiedEditor().updateOptions({
+                readOnly: true
+              })
 
               // Add the onChange event listener to the editor instance
               const onChangeHandler = () => {

@@ -27,7 +27,8 @@ export default function Oauth(){
 
     }, [])
     async function verifyLogin(credentialResponse) {
-        let oAuthToken = getCookie("cr_id_token")
+        let oAuthToken = credentialResponse.credential
+        
         let headers= {
             method: "POST",
             mode: "cors",

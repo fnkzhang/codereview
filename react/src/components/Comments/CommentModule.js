@@ -4,17 +4,20 @@ import CommentList  from './CommentList';
 import { createComment, getCommentsOnDiff } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
 
+import { getComments } from '../../dev/getComments.js'
+
 function CommentModule ({ moduleLineJump , diffID }) {
   const [commentsLoading, setCommentsLoading] = useState(true);
-  const [comments, setComments] = useState(null);
+  //const [comments, setComments] = useState(null);
+  const [comments, setComments] = useState(getComments())
   const [newComment, setNewComment] = useState('');
   const [diffId] = useState(diffID) 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(diffId)
-        const commentData = await getCommentsOnDiff(diffId)
+        //const commentData = await getCommentsOnDiff(diffId)
+        let commentData = comments
         console.log(commentData)
         setComments(commentData)
       } catch (error) {
@@ -37,7 +40,16 @@ function CommentModule ({ moduleLineJump , diffID }) {
     event.preventDefault();
 
     try {
-      await createComment(diffId, 1, 0, newComment);
+      //await createComment(diffId, 1, 0, newComment);
+      setComments([...comments,{
+        author_id: 1,
+        comment_id: 1000,
+        content: newComment,
+        date_created: "time",
+        date_modified: "time",
+        diff_id: diffID,
+        reply_to_id: 0
+      }])
       setCommentsLoading(true);
     } catch (error) {
       console.log(error);
