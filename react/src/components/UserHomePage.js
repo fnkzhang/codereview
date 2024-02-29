@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import utils from "../utils/utils";
+import getCookie from "../utils/utils";
 import { useNavigate } from "react-router";
 
 export default function UserHomePage() {
@@ -10,7 +10,7 @@ export default function UserHomePage() {
 
     // Validate User or Send to Login
     useEffect(() => {
-      let credentialToken = utils.getCookie("cr_id_token")
+      let credentialToken = getCookie("cr_id_token")
 
       if (credentialToken === null)
         return
