@@ -391,8 +391,7 @@ def createDocument(proj_id, doc_id):
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
     return {"posted": inputBody}
 
-from flask_caching import Cache
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+from cacheUtils import *
 
 @app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
 def getDocument(proj_id, doc_id):
@@ -401,14 +400,14 @@ def getDocument(proj_id, doc_id):
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(proj_id + '/' + doc_id)
 
-    cached_metadata = cache.get(doc_id)
+    cached_metadata = getValueFromCache(doc_id)
     if cached_metadata and cached_metadata.get("updated") == blob.updated:
         end_time = time.time()
         print(f"Execution time (cached): {end_time - start_time} seconds\n\n")
         return {"blobContents": cached_metadata.get("blob_contents")}
 
     blob_contents = blob.download_as_text()
-    cache.set(doc_id, {"updated": blob.updated, "blob_contents": blob_contents}, timeout=3600)
+    addToCacheWithTimeout(doc_id, {"updated": blob.updated, "blob_contents": blob_contents}, 3600)
 
     end_time = time.time()
     print(f"Execution time (uncached): {end_time - start_time} seconds\n\n")
@@ -437,8 +436,27 @@ def createDiff(proj_id, doc_id, diff_id):
 
 @app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/get', methods=["GET"])
 def getDiff(proj_id, doc_id, diff_id):
-    document = getBlob(proj_id + '/' + doc_id)
-    diffText = getBlob(proj_id + '/' + doc_id + '/' + diff_id)
+    storage_client = storage.Client()
+    bucket = storage_client.bucket('cr_storage')
+
+    document = None
+    blob = bucket.get_blob(f"{proj_id}/{doc_id}")
+    cached_metadata = getValueFromCache(doc_id)
+    if cached_metadata and cached_metadata.get("updated") == blob.updated:
+        document = cached_metadata.get("blob_contents")
+    else:
+        document = blob.download_as_text()
+        addToCacheWithTimeout(doc_id, {"updated": blob.updated, "blob_contents": document}, 3600)
+
+    diffText = None
+    blob = bucket.get_blob(f"{proj_id}/{doc_id}/{diff_id}")
+    cached_metadata = getValueFromCache(diff_id)
+    if cached_metadata and cached_metadata.get("updated") == blob.updated:
+        diffText = cached_metadata.get("blob_contents")
+    else:
+        diffText = blob.download_as_text()
+        addToCacheWithTimeout(diff_id, {"updated": blob.updated, "blob_contents": diffText}, 3600)
+    
     dmp = diff_match_patch()
     output, _ = dmp.patch_apply(dmp.patch_fromText(diffText), document)
     return {"diffResult": output}
