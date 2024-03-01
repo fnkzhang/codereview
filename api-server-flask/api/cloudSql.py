@@ -24,7 +24,7 @@ def connectCloudSql() -> sqlalchemy.engine.base.Engine:
             db=db_name,
         )
         
-        return conn;
+        return conn
 
     pool = sqlalchemy.create_engine(
         "mysql+pymysql://",

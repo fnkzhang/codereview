@@ -6,18 +6,19 @@ import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 
-function ReviewWindow() {
+function ReviewWindow( { originalID, modifiedID } ) {
 
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
+  const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
-  const [updatedCode, setCode] = useState(null);
-  const [currentEditor, setEditor ] = useState(null); 
+  const [updatedCode, setCode] = useState(null); 
   const [currentHighlightStart, setStart] = useState(null);
+  const [currentHighlightEnd, setEnd] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
+  const [snapshotId, setSnapshotID] = useState(null);
   const decorationIdsRefOrig = useRef([]);
   const decorationIdsRefModif = useRef([]);
-  const snapshotId = 2;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +39,25 @@ function ReviewWindow() {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (editorRef.current) {
+      const originalEditor = editorRef.current.getOriginalEditor();
+      const modifiedEditor = editorRef.current.getModifiedEditor();
+  
+      const handleSelectionChange = (editor, snapshotID) => (e) => {
+        const selection = e.selection;
+        const startPosition = selection.getStartPosition();
+        const endPosition = selection.getEndPosition();
+  
+        setSnapshotID(snapshotID);
+        setStart(startPosition);
+        setEnd(endPosition);
+      };
+      originalEditor.onDidChangeCursorSelection(handleSelectionChange(originalEditor, originalID));
+      modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, modifiedID));
+    }
+  }, [ editorRef, modifiedID, originalID, editorReady ])
+
   async function handleClick() {
     console.log(updatedCode)
 
@@ -50,14 +70,14 @@ function ReviewWindow() {
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
-    if (editorRef.current && editorRef.current.getModifiedEditor) {
+    if (editorRef.current) {
 
       const range = new monacoRef.current.Range(highlightStartY, highlightStartX, highlightEndY, highlightEndX);
       const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
       const modifiedEditor = editorRef.current.getModifiedEditor();
       const originalEditor = editorRef.current.getOriginalEditor();
 
-      if (snapshotID === snapshotId) {
+      if (snapshotID === modifiedID) {
         decorationIdsRefOrig.current = originalEditor.deltaDecorations(decorationIdsRefOrig.current, [])
         decorationIdsRefModif.current = modifiedEditor.deltaDecorations(decorationIdsRefModif.current, [decoration]);
         editorRef.current.getModifiedEditor().revealLine(highlightStartY);
@@ -86,6 +106,8 @@ function ReviewWindow() {
             <CommentModule
               moduleLineJump={lineJump}
               snapshotId={snapshotId}
+              start={currentHighlightStart}
+              end={currentHighlightEnd}
             />
           </div>
         </div>
@@ -110,7 +132,10 @@ function ReviewWindow() {
               editorRef.current = editor
               monacoRef.current = monaco
               editor.getModifiedEditor().updateOptions({
-                readOnly: true
+                readOnly: false
+              })
+              editor.getOriginalEditor().updateOptions({
+                readOnly: false
               })
 
               // Add the onChange event listener to the editor instance
@@ -120,11 +145,18 @@ function ReviewWindow() {
               };
 
               editor.onDidUpdateDiff(onChangeHandler);
+
+              setEditorReady(true)
             }}
           />
         </div>
         <div className="Comment-view">
-          <CommentModule moduleLineJump={lineJump} />
+          <CommentModule 
+            moduleLineJump={lineJump}
+            snapshotId={snapshotId}
+            start={currentHighlightStart}
+            end={currentHighlightEnd}
+          />
         </div>
       </div>
     </div>

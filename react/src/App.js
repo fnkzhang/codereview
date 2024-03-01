@@ -5,7 +5,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route exact path="/" element={<ReviewWindow/>} />
+        <Route exact path="/" element={<ReviewWindow originalID={0} modifiedID={2}/>} />
       </Routes>
     </Router>
   );

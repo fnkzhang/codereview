@@ -37,7 +37,6 @@ export default function Oauth(){
               "Content-Type": "application/json"
             }
         }
-        console.log("FETCHING")
 
         await fetch('/api/user/authenticate', headers)
         .then(response => response.json())

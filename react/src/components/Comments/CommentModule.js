@@ -6,12 +6,11 @@ import { useEffect } from 'react';
 
 import { getComments } from '../../dev/getComments.js'
 
-function CommentModule ({ moduleLineJump , snapshotId }) {
+function CommentModule ({ moduleLineJump , snapshotId , start , end}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   //const [comments, setComments] = useState(null);
   const [comments, setComments] = useState(getComments())
   const [newComment, setNewComment] = useState('');
-  const [snapshotID] = useState(snapshotId) 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,7 +29,7 @@ function CommentModule ({ moduleLineJump , snapshotId }) {
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, snapshotID])
+  }, [commentsLoading])
 
   function handleNewCommentChange (event) {
     setNewComment(event.target.value);
@@ -47,8 +46,12 @@ function CommentModule ({ moduleLineJump , snapshotId }) {
         content: newComment,
         date_created: "time",
         date_modified: "time",
-        snapshot_id: snapshotID,
-        reply_to_id: 0
+        snapshot_id: snapshotId,
+        reply_to_id: 0,
+        highlight_start_x: start.column,
+        highlight_start_y: start.lineNumber,
+        highlight_end_x: end.column,
+        highlight_end_y: end.lineNumber
       }])
       setCommentsLoading(true);
     } catch (error) {
