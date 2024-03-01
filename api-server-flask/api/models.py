@@ -39,6 +39,7 @@ class Project(Base):
     author_email = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
+    root_folder = Column(Integer)
 
 class UserProjectRelation(Base):
     __tablename__ = "userprojrelation"
@@ -66,4 +67,13 @@ class Document(Base):
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
     snapshots = Column(ARRAY(Integer))
+    parent_folder = Column(Integer)
 
+class Folder(Base):
+    __tablename__ = "folders"
+    folder_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
+    name = Column(String(50))
+    date_created = Column(DateTime(timezone=True), server_default=func.now())
+    date_modified = Column(DateTime(timezone=True), server_default=func.now())
+    contents = Column(ARRAY(Integer, dimensions=2), default = [])
+    parent_folder = Column(Integer)
