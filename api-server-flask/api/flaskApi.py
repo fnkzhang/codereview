@@ -2,8 +2,8 @@ from cloudSql import connectCloudSql
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google.cloud import storage
-from utils import *
 from cacheUtils import *
+from utils import *
 from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -20,6 +20,7 @@ from utils import engine
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 app = Flask(__name__)
+initCache(app)
 
 CORS(app)
 engine = connectCloudSql()
