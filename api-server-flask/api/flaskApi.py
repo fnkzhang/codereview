@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google.cloud import storage
 from utils import *
+from cacheUtils import *
 from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -390,8 +391,6 @@ def createDocument(proj_id, doc_id):
     ##########################
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
     return {"posted": inputBody}
-
-from cacheUtils import *
 
 @app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
 def getDocument(proj_id, doc_id):
