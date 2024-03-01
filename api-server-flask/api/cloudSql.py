@@ -29,7 +29,7 @@ def connectCloudSql() -> sqlalchemy.engine.base.Engine:
     pool = sqlalchemy.create_engine(
         "mysql+pymysql://",
         creator=getconn,
-        echo = True
+        echo = False
     )
     print("Finished Connecting")
     return pool
