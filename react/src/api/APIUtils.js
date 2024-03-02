@@ -192,20 +192,22 @@ export async function deleteComment(comment_id) {
     .then(response => response.json())
 }
 
-export async function getSnapshotsFromDocument(document_id, snapshot_id) {
-
+export async function getAllSnapshotsFromDocument(document_id) {
   let oAuthToken = getCookie("cr_id_token")
-  
+
   let headers = {
     method: "GET",
     mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
     headers: {
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
-    }
+    },
+
   };
 
-  return await fetch(`/api/Document/${document_id}/${snapshot_id}/`, headers)
+  return await fetch(`/api/Document/${1231234141}/${document_id}/getSnapshotId/`, headers)
     .then(response => response.json())
     //.then(data => data.snapshots)
     .catch(e => console.log("ERROR", e))

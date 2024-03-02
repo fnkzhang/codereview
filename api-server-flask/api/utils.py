@@ -67,10 +67,10 @@ def getUserProjPermissions(user_email, proj_id):
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
-        first = conn.execute(stmt).first()
-        if first == None:
+        foundDocument = conn.execute(stmt).first()
+        if foundDocument == None:
             return -1
-        return first
+        return foundDocument._asdict()
 
 
 def createNewDocument(proj_id, document_id, doc_name):
@@ -107,6 +107,19 @@ def createNewSnapshot(proj_id, doc_id, item):
         conn.commit()
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
+
+# Returns Array of Dictionaries
+def getAllDocumentSnapshotsInOrder(doc_id):
+    with engine.connect() as conn:
+        stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id).order_by(models.Snapshot.date_created.asc())
+        foundDocuments = conn.execute(stmt)
+        
+        listOfDocuments = []
+        
+        for row in foundDocuments:
+            listOfDocuments.append(row._asdict())
+        
+        return listOfDocuments
 
 def userExists(user_email):
     with engine.connect() as conn:

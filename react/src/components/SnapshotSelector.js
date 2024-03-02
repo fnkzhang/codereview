@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import { useParams } from "react-router";
-import { getSnapshotsFromDocument } from "../api/APIUtils";
+import { getAllSnapshotsFromDocument } from "../api/APIUtils";
 import getCookie from "../utils/utils";
 
 // todo testing remove later
@@ -12,10 +12,11 @@ export default function SnapshotSelector() {
     const {document_id, snapshot_id} = useParams()
     // Get snapshots for document
     useEffect(() => {
+      console.log(document_id, snapshot_id)
         const grabSnapshots = async () => {
-            let result = await getSnapshotsFromDocument(document_id, snapshot_id)
+            let result = await getAllSnapshotsFromDocument(document_id)
             console.log(result)
-
+            console.log("test")
             //setSnapshots(result)
         }
 

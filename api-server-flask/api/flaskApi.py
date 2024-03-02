@@ -462,6 +462,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 def createDocument(proj_id):
     inputBody = request.get_json()
     headers = request.headers
+
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
@@ -495,6 +496,33 @@ def createDocument(proj_id):
     return {"posted": inputBody}
 
 
+@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
+def getAllDocumentSnapshots(proj_id, doc_id):
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if not userExists(idInfo["email"]):
+        return {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+    
+    foundSnapshots = getAllDocumentSnapshotsInOrder(doc_id)
+    
+    return {"success": True, "reason":"", "body": foundSnapshots}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id):
@@ -513,17 +541,16 @@ def getDocument(proj_id, doc_id):
         }
 
     if not userExists(idInfo["email"]):
-        retData = {
+        return {
                 "success": False,
                 "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
                 "body":{}
         }
-        return jsonify(retData)
 
     # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
     #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
     info = getDocumentInfo(doc_id)
-    return {"doc_info": info}
+    return {"success": True, "reason":"", "body": info}
 
 #not gonna mess with diff stuff for now because again, i'm only going to focus on document permissions
 @app.route('/api/Document/<proj_id>/<doc_id>/<snapshot_id>/<diff_id>/', methods=["POST"])
