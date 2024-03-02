@@ -191,3 +191,22 @@ export async function deleteComment(comment_id) {
   return await fetch(`/api/comments/${comment_id}/delete`, headers)
     .then(response => response.json())
 }
+
+export async function getSnapshotsFromDocument(document_id, snapshot_id) {
+
+  let oAuthToken = getCookie("cr_id_token")
+  
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+  return await fetch(`/api/Document/${document_id}/${snapshot_id}/`, headers)
+    .then(response => response.json())
+    //.then(data => data.snapshots)
+    .catch(e => console.log("ERROR", e))
+}

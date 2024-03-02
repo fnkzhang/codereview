@@ -160,6 +160,38 @@ def defaultRoute():
     #print('what', file=sys.stderr)
     return "test"
 
+# Might need to reformat this function
+@app.route('/api/user/isValidUser', methods=["POST"])
+def checkIsValidUser():
+    headers = request.headers
+
+    if (not isValidRequest(headers, ["Authorization"])):
+        return {
+                "success": False,
+                "reason": "Invalid Token Provided"
+        }
+    
+    if (not isValidRequest(headers, ["Email"])):
+        return {
+            "success": False,
+            "reason": "Invalid Header Provided"
+        }
+    
+    user = userExists(headers["Email"])
+
+    if (not user):
+        return {
+            "success": False,
+            "reason": "User Does not exist"
+        }
+    
+    return {
+        "success": True,
+        "reason": "",
+        "body": {}
+    }
+
+    pass
 #literally just authenticate but it adds a user to the database.
 #needs sections:
     #credentials

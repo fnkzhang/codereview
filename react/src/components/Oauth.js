@@ -24,8 +24,35 @@ export default function Oauth(){
         }
 
         verifyLogin(credentialObject)
+        
+
+        // Check If user exists and create one if not
+
 
     }, [])
+
+    // Check if user is valid when userData is returned
+    useEffect(() => {
+        if(userData === null)
+            return
+
+        console.log("CHECKING SINGUP USER")
+
+        
+        const x = async () => {
+            console.log("CHECKING if user exists")
+            // Singup user if they are not in database
+            let result = await checkIfUserExists(userData["email"])
+
+            if(!result) {
+                console.log("Signing up user because they do not exist in database")
+                singupUser(userData["email"])            
+            }
+        }
+        x()
+
+    }, [userData])
+
     async function verifyLogin(credentialResponse) {
         let oAuthToken = credentialResponse.credential
         
@@ -52,6 +79,48 @@ export default function Oauth(){
             setIsLoggedIn(true)
             // Save to Cookie
             document.cookie = `cr_id_token=${credentialResponse.credential}`;
+        })
+        .catch(e => console.log(e))
+    }
+
+    
+    async function checkIfUserExists(email) {
+        let credential = getCookie("cr_id_token")
+
+        let headers= {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Authorization": credential,
+              "Email": email,
+              "Content-Type": "application/json"
+            }
+        }
+
+        return await fetch('/api/user/isValidUser', headers)
+        .then(response => response.json())
+        .then(data => data.success)
+        .catch(e => console.log(e))
+    }
+    
+    async function singupUser(email) {
+        let credential = getCookie("cr_id_token")
+
+        let headers= {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Authorization": credential,
+              "Email": email,
+              "Content-Type": "application/json"
+            }
+        }
+
+        await fetch('/api/user/signup', headers)
+        .then(response => response.json())
+        .then(data => {
+            console.log("SINGED UP USER")
+            console.log(data)
         })
         .catch(e => console.log(e))
 
