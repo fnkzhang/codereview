@@ -24,10 +24,6 @@ export default function Oauth(){
         }
 
         verifyLogin(credentialObject)
-        
-
-        // Check If user exists and create one if not
-
 
     }, [])
 
@@ -36,11 +32,7 @@ export default function Oauth(){
         if(userData === null)
             return
 
-        console.log("CHECKING SINGUP USER")
-
-        
         const x = async () => {
-            console.log("CHECKING if user exists")
             // Singup user if they are not in database
             let result = await checkIfUserExists(userData["email"])
 
@@ -62,7 +54,7 @@ export default function Oauth(){
             headers: {
               "Authorization": oAuthToken,
               "Content-Type": "application/json"
-            }
+            },
         }
         console.log("FETCHING")
 
@@ -75,7 +67,7 @@ export default function Oauth(){
             }
             
             setUserData(data.body)
-            console.log(data)
+            console.log("Valid Token In Cookies")
             setIsLoggedIn(true)
             // Save to Cookie
             document.cookie = `cr_id_token=${credentialResponse.credential}`;

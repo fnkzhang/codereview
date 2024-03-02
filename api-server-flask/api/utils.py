@@ -72,31 +72,41 @@ def getDocumentInfo(doc_id):
             return -1
         return first
 
+
+def createNewDocument(proj_id, document_id, doc_name):
+    with engine.connect() as conn:
+
+        stmt = insert(models.Document).values(
+            doc_id = document_id,
+            name = doc_name,
+            associated_proj_id = proj_id,
+        )
+
+        conn.execute(stmt)
+        conn.commit()
+
+
 #puts documentname as snapshot name until that changes
 def createNewSnapshot(proj_id, doc_id, item):
     with engine.connect() as conn:
         
         stmt = select(models.Document).where(
-            models.Documet.doc_id == doc_id)
-        doc = conn.execute(stmt).first
+            models.Document.doc_id == doc_id)
+
+        doc = conn.execute(stmt).first()
+
         doc_name = doc.name
-        currentsnapshotlist = doc.snapshots
-        
+            
         snapshot_id = createID()
         stmt = insert(models.Snapshot).values(
             snapshot_id = snapshot_id,
+            associated_document_id = doc_id,
             name = doc_name
         )
         conn.execute(stmt)
-
-        stmt = update(models.Document).where(
-                    models.Document.doc_id == doc_id
-                ).values(
-                    snapshots = currentsnapshotlist + [snapshot_id]
-                )
-        conn.execute(stmt)
         conn.commit()
-        uploadBlob(proj_id + '/' + doc_id + '/' + snapshot_id, item)
+
+        uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
 
 def userExists(user_email):
     with engine.connect() as conn:

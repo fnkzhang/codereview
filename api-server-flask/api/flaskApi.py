@@ -274,7 +274,11 @@ def createProject(proj_name):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
-    return True
+    return {
+        "success": True,
+        "reason": "",
+        "body": {}
+    }
 
 #needs sections in body
     #credentials (of user that already has access to project)
@@ -484,7 +488,10 @@ def createDocument(proj_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
     doc_id = createID()
+
+    createNewDocument(proj_id, doc_id, inputBody["name"])
     createNewSnapshot(proj_id, doc_id, inputBody["data"])
+
     return {"posted": inputBody}
 
 
@@ -513,8 +520,8 @@ def getDocument(proj_id, doc_id):
         }
         return jsonify(retData)
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
     info = getDocumentInfo(doc_id)
     return {"doc_info": info}
 

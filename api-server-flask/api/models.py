@@ -50,6 +50,8 @@ class UserProjectRelation(Base):
 class Snapshot(Base):
     __tablename__ = "snapshots"
     snapshot_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
+    # Allow us to find snapshots associated with document
+    associated_document_id = Column(Integer) 
     name = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
@@ -62,8 +64,10 @@ class DiffSnapshotRelation(Base):
 class Document(Base):
     __tablename__ = "documents"
     doc_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
+    # Allow us to find project the document is associated with
+    associated_proj_id = Column(Integer)
     name = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    snapshots = Column(ARRAY(Integer))
+    #snapshots = Column(ARRAY(Integer))
 

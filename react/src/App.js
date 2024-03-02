@@ -2,6 +2,7 @@ import ReviewWindow from './components/ReviewWindow.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import UserHomePage from './components/UserHomePage.js';
 import SnapshotSelector from './components/SnapshotSelector.js';
+import MainWindow from './components/MainWindow.js';
 
 
 function App() {
