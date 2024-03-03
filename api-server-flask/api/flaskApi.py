@@ -423,13 +423,13 @@ def createSnapshot(proj_id, doc_id):
         }
         return jsonify(retData)
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    # if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
     createNewSnapshot(proj_id, doc_id, inputBody["data"])
     return {"posted": inputBody}
 
-@app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>', methods=["GET"])
+@app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
 def getSnapshot(proj_id, doc_id, snapshot_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
