@@ -2,19 +2,22 @@ import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
 import getCookie from "../utils/utils";
+import './SnapshotSelector.css'
 
 // todo testing remove later
 import Oauth from "./Oauth.js";
 
 export default function SnapshotSelector() { 
     const [snapshots, setSnapshots] = useState([])
+    const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
 
     const navivate = useNavigate()
 
-    const {document_id, snapshot_id} = useParams()
+    const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
     // Get snapshots for document
     useEffect(() => {
-      console.log(document_id, snapshot_id)
+      console.log(document_id, left_snapshot_id, right_snapshot_id)
+
         const grabSnapshots = async () => {
             let result = await getAllSnapshotsFromDocument(document_id)
 
@@ -25,9 +28,16 @@ export default function SnapshotSelector() {
         grabSnapshots()
     }, [])
 
-    async function handleClick(selectedSnapshot) {
-      console.log(selectedSnapshot)
-      navivate(`/Document/${document_id}/${selectedSnapshot}/`)
+    async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
+      console.log(selectedSnapshot, selectedIndex)
+      setSelectedLeftSnapshotIndex(selectedIndex)
+      navivate(`/Document/${document_id}/${selectedSnapshot}/${selectedSnapshot}`)
+      
+
+    }
+    async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
+      console.log(selectedSnapshot, selectedIndex)
+      navivate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
 
     }
     async function createProj() {
@@ -97,15 +107,19 @@ export default function SnapshotSelector() {
     }
 
 
-    function DisplaySnapshots() {
+    function DisplayLeftSnapshots() {
         console.log(snapshots)
         if(snapshots.length !== 0) {
             return (
               <div>
                 <p>ALIVE</p>
-                {snapshots.map((snapshot) => { 
+                {snapshots.map((snapshot, index) => { 
                     console.log(snapshot)
-                    return <button onClick={() => handleClick(snapshot.snapshot_id)}>test</button>
+                    return (
+                      <button id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
+                              onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}>
+                        Left Snap test
+                      </button>)
                 })}              
               </div>
           )
@@ -114,12 +128,41 @@ export default function SnapshotSelector() {
             return <div>EMPTY</div>
          }
     }
+    
+    function DisplayRightSnapshots() {
+      console.log(snapshots)
+      if(snapshots.length !== 0) {
+          return (
+            <div>
+              <p>ALIVE</p>
+              {snapshots.map((snapshot, index) => { 
+                  console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
+                  
+                  return (index >= selectedLeftSnapshotIndex) ? (
+                    <button id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
+                            onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}>
+                      Righttest
+                    </button>
+                  ) : null
+              })}              
+            </div>
+        )
+       } 
+       else {
+          return <div>EMPTY</div>
+       }
+  }
+
     return (
         <div>
             <button onClick={createProj}>CreateProject</button>
-            <button onClick={createSnapshot}>createDocument</button>
+            <button onClick={createSnapshot}>createSnapshot</button>
             <Oauth/>
-            <DisplaySnapshots/>
+            <div>
+              <DisplayLeftSnapshots/>
+              <DisplayRightSnapshots/>              
+            </div>
+
         </div>
     )
 }

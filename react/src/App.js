@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route exact path="/" element={<ReviewWindow/>} />
         <Route path="/HomePage" element={<UserHomePage/>} />
-        <Route path="/Document/:document_id/:snapshot_id" element={<SnapshotSelector/>}/>
+        <Route path="/Document/:document_id/:left_snapshot_id/:right_snapshot_id" element={<SnapshotSelector/>}/>
       </Routes>
     </Router>
   );

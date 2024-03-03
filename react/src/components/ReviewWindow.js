@@ -5,8 +5,9 @@ import CommentModule from './Comments/CommentModule.js';
 import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
+import { useParams } from 'react-router';
 
-function ReviewWindow() {
+export default function ReviewWindow() {
 
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
@@ -17,6 +18,8 @@ function ReviewWindow() {
   const decorationIdsRef = useRef([]);
   const diffID = 2;
 
+  const {document_id, snapshot_id} = useParams()
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -124,5 +127,3 @@ function ReviewWindow() {
     </div>
   )
 }
-
-export default ReviewWindow

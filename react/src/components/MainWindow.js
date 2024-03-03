@@ -1,5 +1,7 @@
 import React from "react";
 import { useParams } from "react-router";
+import ReviewWindow from "./ReviewWindow";
+import SnapshotSelector from "./SnapshotSelector";
 
 export default function MainWindow() {
 
@@ -7,6 +9,8 @@ export default function MainWindow() {
 
   return(
     <div>
+      <SnapshotSelector/>
+      <ReviewWindow/>
     </div>
   )
 }
