@@ -30,6 +30,8 @@ export async function createDoc(bodyContents, proj_id, doc_id) {
   let headers = {
     method: "POST",
     mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
     headers: {
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
@@ -40,19 +42,21 @@ export async function createDoc(bodyContents, proj_id, doc_id) {
     .then(response => response.json())
 }
 
-export async function getDoc(proj_id, doc_id) {
+export async function getDocSnapshot(proj_id, doc_id, snap_id) {
 
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "GET",
     mode: "cors",
+    credentials: 'include',
     headers: {
+      "Access-Control-Allow-Credentials": true,
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   }
 
-  return await fetch((`/api/Document/`).concat(proj_id).concat('/').concat(doc_id).concat('/get'), headers)
+  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}/`), headers)
     .then(response => response.json())
 }
 
@@ -78,20 +82,22 @@ export async function createDiff(proj_id, doc_id, diff_id, originalCode, updated
     .then(response => response.json())
 }
 
-export async function getDiff(proj_id, doc_id, diff_id) {
+export async function getDiffSnapshot(proj_id, doc_id, diff_id) {
   
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
+
     method: "GET",
     mode: "cors",
+    credentials: 'include',
     headers: {
+      "Access-Control-Allow-Credentials": true,
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
   }
 
-  return await fetch((`/api/Document/`).concat(proj_id).concat('/').concat(doc_id).concat('/')
-    .concat(diff_id).concat('/get'), headers)
+  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${diff_id}/`), headers)
     .then(response => response.json())
 }
 

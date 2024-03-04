@@ -2,7 +2,7 @@ import './ReviewWindow.css';
 import AppHeader from './AppHeader.js';
 import Oauth from './Oauth.js';
 import CommentModule from './Comments/CommentModule.js';
-import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
+import { getDocSnapshot, createDiff, getDiffSnapshot } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
@@ -18,17 +18,19 @@ export default function ReviewWindow() {
   const decorationIdsRef = useRef([]);
   const diffID = 2;
 
-  const {document_id, snapshot_id} = useParams()
-  
+  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [doc, diff] = await Promise.all([
-          getDoc('projectid', 'documentid'),
-          getDiff('projectid', 'documentid', 'diffid')
+          getDocSnapshot('684153597', document_id, left_snapshot_id),
+          getDiffSnapshot('684153597', document_id, right_snapshot_id)
         ]);
+
+        console.log(doc, diff)
         setInit(doc.blobContents)
-        setCode(diff.diffResult)
+        setCode(diff.blobContents)
       } catch (error) {
         console.log(error)
       } finally {

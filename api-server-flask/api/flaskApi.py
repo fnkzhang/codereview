@@ -27,6 +27,10 @@ engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
 
+@app.after_request
+def afterRequest(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 # Remove Later
 class User():

@@ -32,12 +32,13 @@ export default function SnapshotSelector() {
       console.log(selectedSnapshot, selectedIndex)
       setSelectedLeftSnapshotIndex(selectedIndex)
       navivate(`/Document/${document_id}/${selectedSnapshot}/${selectedSnapshot}`)
-      
+      navivate(0)
 
     }
     async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
       console.log(selectedSnapshot, selectedIndex)
       navivate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
+      navivate(0)
 
     }
     async function createProj() {
@@ -114,7 +115,7 @@ export default function SnapshotSelector() {
               <div>
                 <p>ALIVE</p>
                 {snapshots.map((snapshot, index) => { 
-                    console.log(snapshot)
+                    //console.log(snapshot)
                     return (
                       <button id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
                               onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}>
@@ -136,7 +137,7 @@ export default function SnapshotSelector() {
             <div>
               <p>ALIVE</p>
               {snapshots.map((snapshot, index) => { 
-                  console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
+                  //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
                   
                   return (index >= selectedLeftSnapshotIndex) ? (
                     <button id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}

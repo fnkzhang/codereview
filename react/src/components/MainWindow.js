@@ -5,8 +5,9 @@ import SnapshotSelector from "./SnapshotSelector";
 
 export default function MainWindow() {
 
-  const {document_id, snapshot_id} = useParams()
 
+  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+  
   return(
     <div>
       <SnapshotSelector/>

@@ -30,6 +30,7 @@ def uploadBlob(blobName, item):
     return True
 
 def getBlob(blobName):
+    print(blobName)
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
