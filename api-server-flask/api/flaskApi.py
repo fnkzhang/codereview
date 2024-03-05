@@ -1,5 +1,5 @@
 from cloudSql import connectCloudSql
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, after_this_request
 from flask_cors import CORS
 from google.cloud import storage
 from cacheUtils import *
@@ -7,10 +7,8 @@ from utils import *
 from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
 from google.auth.transport import requests
-import sqlalchemy
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete
+from sqlalchemy import Table, Column, String, Integer, MetaData, insert, select, update, delete
 from sqlalchemy.orm import sessionmaker
-import pymysql
 import models
 from cloudSql import connectCloudSql
 
@@ -20,11 +18,11 @@ from utils import engine
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 app = Flask(__name__)
+CORS(app)
 initCache(app)
 
-CORS(app)
 engine = connectCloudSql()
-Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
+Session = sessionmaker(engine)
 
 
 
@@ -391,39 +389,39 @@ def createDocument(proj_id, doc_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
+    # publishDocumentUpdate(doc_id)
     return {"posted": inputBody}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
 def getDocument(proj_id, doc_id):
-    start_time = time.time()
-    storage_client = storage.Client()
-    bucket = storage_client.bucket('cr_storage')
-    blob = bucket.get_blob(proj_id + '/' + doc_id)
-
-    cached_metadata = getValueFromCache(doc_id)
-    if cached_metadata and cached_metadata.get("updated") == blob.updated:
-        end_time = time.time()
-        print(f"Execution time (cached): {end_time - start_time} seconds\n\n")
-        return {"blobContents": cached_metadata.get("blob_contents")}
-
-    blob_contents = blob.download_as_text()
-    addToCacheWithTimeout(doc_id, {"updated": blob.updated, "blob_contents": blob_contents}, 3600)
-
-    end_time = time.time()
-    print(f"Execution time (uncached): {end_time - start_time} seconds\n\n")
-    return {"blobContents": blob_contents}
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
         }
-        return jsonify(retData)
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    blob = getBlob(proj_id + '/' + doc_id)
-    return {"blobContents": blob}
+    
+    #if not userExists(idInfo["email"]):
+    #    retData = {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
+    #    return jsonify(retData)
+    
+    #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    # send the cached document if available
+    documentBlob = getValueFromCache(doc_id)
+    if documentBlob is not None:
+        return {"blobContents": documentBlob.get("blobContents")}
+    
+    # make request to Cloud Storage if not cached
+    document = getBlob(f"{proj_id}/{doc_id}")
+    addToCacheWithTimeout(doc_id, {"blobContents": document}, None)
+    
+    return {"blobContents": document}
 
 #not gonna mess with diff stuff for now because again, i'm only going to focus on document permissions
 @app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/create', methods=["POST"])
@@ -436,29 +434,35 @@ def createDiff(proj_id, doc_id, diff_id):
 
 @app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/get', methods=["GET"])
 def getDiff(proj_id, doc_id, diff_id):
-    storage_client = storage.Client()
-    bucket = storage_client.bucket('cr_storage')
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    diff = None
+    diffBlob = getValueFromCache(diff_id)
+    if diffBlob is not None:
+        # get the cached diff if available
+        diff = diffBlob.get("blobContents")
+    else:
+        # make request to Google Storage if not cached
+        diff = getBlob(f"{proj_id}/{doc_id}/{diff_id}")
+        addToCacheWithTimeout(diff_id, {"blobContents": diff}, None)
 
     document = None
-    blob = bucket.get_blob(f"{proj_id}/{doc_id}")
-    cached_metadata = getValueFromCache(doc_id)
-    if cached_metadata and cached_metadata.get("updated") == blob.updated:
-        document = cached_metadata.get("blob_contents")
+    documentBlob = getValueFromCache(doc_id)
+    if documentBlob is not None:
+        # get the cached document if available
+        document = documentBlob.get("blobContents")
     else:
-        document = blob.download_as_text()
-        addToCacheWithTimeout(doc_id, {"updated": blob.updated, "blob_contents": document}, 3600)
-
-    diffText = None
-    blob = bucket.get_blob(f"{proj_id}/{doc_id}/{diff_id}")
-    cached_metadata = getValueFromCache(diff_id)
-    if cached_metadata and cached_metadata.get("updated") == blob.updated:
-        diffText = cached_metadata.get("blob_contents")
-    else:
-        diffText = blob.download_as_text()
-        addToCacheWithTimeout(diff_id, {"updated": blob.updated, "blob_contents": diffText}, 3600)
+        # make request to Google Storage if not cached
+        document = getBlob(f"{proj_id}/{doc_id}")
+        addToCacheWithTimeout(doc_id, {"blobContents": document}, None)
     
     dmp = diff_match_patch()
-    output, _ = dmp.patch_apply(dmp.patch_fromText(diffText), document)
+    output, _ = dmp.patch_apply(dmp.patch_fromText(diff), document)
     return {"diffResult": output}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/test', methods=["GET"])
@@ -512,8 +516,6 @@ def createComment(diff_id):
         "reason": "Successful Write"
     }
 
-# look into pagination
-# https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/diffs/<diff_id>/comments/get', methods=["GET"])
 def getCommentsOnDiff(diff_id):
     # Authentication
