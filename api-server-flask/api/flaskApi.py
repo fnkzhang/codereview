@@ -1,8 +1,7 @@
 from cloudSql import connectCloudSql
-from flask import Flask, request, jsonify, after_this_request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from google.cloud import storage
-from cacheUtils import *
+from cacheUtils import initCaches, publishTopicUpdate, documentCache, diffCache, commentsCache
 from utils import *
 from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
@@ -19,7 +18,8 @@ CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleuserconten
 
 app = Flask(__name__)
 CORS(app)
-initCache(app)
+initCaches(app)
+print(documentCache, diffCache, commentsCache)
 
 engine = connectCloudSql()
 Session = sessionmaker(engine)
@@ -389,7 +389,8 @@ def createDocument(proj_id, doc_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
-    # publishDocumentUpdate(doc_id)
+    #publishTopicUpdate("document-updates", doc_id)
+
     return {"posted": inputBody}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
@@ -413,13 +414,13 @@ def getDocument(proj_id, doc_id):
     #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
     # send the cached document if available
-    documentBlob = getValueFromCache(doc_id)
+    documentBlob = documentCache.get(doc_id)
     if documentBlob is not None:
         return {"blobContents": documentBlob.get("blobContents")}
     
     # make request to Cloud Storage if not cached
     document = getBlob(f"{proj_id}/{doc_id}")
-    addToCacheWithTimeout(doc_id, {"blobContents": document}, None)
+    documentCache.set(doc_id, {"blobContents": document}, 3600)
     
     return {"blobContents": document}
 
@@ -430,6 +431,7 @@ def createDiff(proj_id, doc_id, diff_id):
     dmp = diff_match_patch()
     diffText = dmp.patch_toText(dmp.patch_make(dmp.diff_main(inputBody["original"], inputBody["updated"])))
     uploadBlob(proj_id + '/' + doc_id + '/' + diff_id, diffText)
+    #publishTopicUpdate("diff-updates", diff_id)
     return {"diffText": diffText}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/get', methods=["GET"])
@@ -442,24 +444,24 @@ def getDiff(proj_id, doc_id, diff_id):
         }
 
     diff = None
-    diffBlob = getValueFromCache(diff_id)
+    diffBlob = diffCache.get(doc_id)
     if diffBlob is not None:
         # get the cached diff if available
         diff = diffBlob.get("blobContents")
     else:
         # make request to Google Storage if not cached
         diff = getBlob(f"{proj_id}/{doc_id}/{diff_id}")
-        addToCacheWithTimeout(diff_id, {"blobContents": diff}, None)
+        diffCache.set(diff_id, {"blobContents": diff}, 3600)
 
     document = None
-    documentBlob = getValueFromCache(doc_id)
+    documentBlob = documentCache.get(doc_id)
     if documentBlob is not None:
         # get the cached document if available
         document = documentBlob.get("blobContents")
     else:
         # make request to Google Storage if not cached
         document = getBlob(f"{proj_id}/{doc_id}")
-        addToCacheWithTimeout(doc_id, {"blobContents": document}, None)
+        documentCache.set(doc_id, {"blobContents": document}, 3600)
     
     dmp = diff_match_patch()
     output, _ = dmp.patch_apply(dmp.patch_fromText(diff), document)
@@ -510,6 +512,7 @@ def createComment(diff_id):
                 "reason": str(e)
             }
 
+    #publishTopicUpdate("comment-updates", diff_id)
     print("Successful Write")
     return {
         "success": True,
@@ -531,6 +534,10 @@ def getCommentsOnDiff(diff_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+
+    comments = commentsCache.get(diff_id)
+    if comments is not None:
+        return comments.get("commentsList")
 
     # Query
     commentsList = []
@@ -554,6 +561,8 @@ def getCommentsOnDiff(diff_id):
             print("Error: ", e)
             return []
     
+    commentsCache.set(diff_id, {"commentsList": commentsList}, 3600)
+
     print("Successful Read")
     return commentsList
 
