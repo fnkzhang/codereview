@@ -11,7 +11,6 @@ except:
     pass
 
 from cloudSql import connectCloudSql
-from cacheUtils import publishTopicUpdate, documentCache, diffCache, commentsCache
 from utils import *
 from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
@@ -298,7 +297,6 @@ def createDocument(proj_id, doc_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
     uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
-    #publishTopicUpdate("document-updates", doc_id)
 
     return {"posted": inputBody}
 
@@ -322,15 +320,8 @@ def getDocument(proj_id, doc_id):
     #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
     #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    # send the cached document if available
-    documentBlob = documentCache.get(doc_id)
-    if documentBlob is not None:
-        return {"blobContents": documentBlob.get("blobContents")}
-    
-    # make request to Cloud Storage if not cached
-    document = getBlob(f"{proj_id}/{doc_id}")
-    documentCache.set(doc_id, {"blobContents": document}, 3600)
-    
+    document = fetchFromCloudStorage(f"{proj_id}/{doc_id}")
+
     return {"blobContents": document}
 
 #not gonna mess with diff stuff for now because again, i'm only going to focus on document permissions
@@ -340,7 +331,6 @@ def createDiff(proj_id, doc_id, diff_id):
     dmp = diff_match_patch()
     diffText = dmp.patch_toText(dmp.patch_make(dmp.diff_main(inputBody["original"], inputBody["updated"])))
     uploadBlob(proj_id + '/' + doc_id + '/' + diff_id, diffText)
-    #publishTopicUpdate("diff-updates", diff_id)
     return {"diffText": diffText}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/get', methods=["GET"])
@@ -352,25 +342,8 @@ def getDiff(proj_id, doc_id, diff_id):
             "reason": "Failed to Authenticate"
         }
 
-    diff = None
-    diffBlob = diffCache.get(doc_id)
-    if diffBlob is not None:
-        # get the cached diff if available
-        diff = diffBlob.get("blobContents")
-    else:
-        # make request to Google Storage if not cached
-        diff = getBlob(f"{proj_id}/{doc_id}/{diff_id}")
-        diffCache.set(diff_id, {"blobContents": diff}, 3600)
-
-    document = None
-    documentBlob = documentCache.get(doc_id)
-    if documentBlob is not None:
-        # get the cached document if available
-        document = documentBlob.get("blobContents")
-    else:
-        # make request to Google Storage if not cached
-        document = getBlob(f"{proj_id}/{doc_id}")
-        documentCache.set(doc_id, {"blobContents": document}, 3600)
+    diff = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{diff_id}")
+    document = fetchFromCloudStorage(f"{proj_id}/{doc_id}")
     
     dmp = diff_match_patch()
     output, _ = dmp.patch_apply(dmp.patch_fromText(diff), document)
@@ -421,7 +394,6 @@ def createComment(diff_id):
                 "reason": str(e)
             }
 
-    #publishTopicUpdate("comment-updates", diff_id)
     print("Successful Write")
     return {
         "success": True,
@@ -444,10 +416,6 @@ def getCommentsOnDiff(diff_id):
             "reason": "Failed to Authenticate"
         }
 
-    comments = commentsCache.get(diff_id)
-    if comments is not None:
-        return comments.get("commentsList")
-
     # Query
     commentsList = []
     with Session() as session:
@@ -469,8 +437,6 @@ def getCommentsOnDiff(diff_id):
         except Exception as e:
             print("Error: ", e)
             return []
-    
-    commentsCache.set(diff_id, {"commentsList": commentsList}, 3600)
 
     print("Successful Read")
     return commentsList

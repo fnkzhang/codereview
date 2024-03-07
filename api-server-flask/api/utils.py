@@ -13,6 +13,7 @@ from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData,
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 from cloudSql import connectCloudSql
+from cacheUtils import cloudStorageCache, publishTopicUpdate
 
 import models
 engine = connectCloudSql()
@@ -79,3 +80,23 @@ def isValidRequest(parameters, requiredKeys):
             return False
 
     return True
+
+import time
+def fetchFromCloudStorage(blobName:str):
+    startTime = time.time()
+    blobContents = cloudStorageCache.get(blobName)
+    if blobContents is None:
+        blobContents = getBlob(blobName)
+        print("not found in cache: ", blobName)
+    else:
+        print("found in cache: ", blobName)
+    
+    if blobContents is not None:
+        cloudStorageCache.set(blobName, blobContents)
+    
+    print(f"Time to fetch: {time.time() - startTime}\n\n")
+    return blobContents
+
+def publishCloudStorageUpdate(blobName: str):
+    publishTopicUpdate("cloud-storage-updates", blobName)
+    return

@@ -75,22 +75,17 @@ def publishTopicUpdate(topic_id: str,
 CACHE_ROOT = "./../cr_cache"
 PROJECT_ID = "codereview-413200"
 
-DOCUMENT_CACHE_CONFIG = {
-    "CACHE_TYPE": "FileSystemCache",
-    "CACHE_DIR": f"{CACHE_ROOT}/documents",
-    "CACHE_THRESHOLD": 200
-}
-
-DIFF_CACHE_CONFIG = {
-    "CACHE_TYPE": "FileSystemCache",
-    "CACHE_DIR": f"{CACHE_ROOT}/diffs",
-    "CACHE_THRESHOLD": 200
-}
-
 COMMENTS_CACHE_CONFIG = {
     "CACHE_TYPE": "FileSystemCache",
-    "CACHE_DIR": f"{CACHE_ROOT}/comments",
+    "CACHE_DIR": f"{CACHE_ROOT}/Comments",
     "CACHE_THRESHOLD": 200
+}
+
+GCLOUD_STORAGE_CACHE_CONFIG = {
+    "CACHE_TYPE": "FileSystemCache",
+    "CACHE_DEFAULT_TIMEOUT": 60,
+    "CACHE_THRESHOLD": 500,
+    "CACHE_DIR": f"{CACHE_ROOT}/GCloud_Storage"
 }
 
 #------------------------------------------------------------------------------
@@ -118,6 +113,5 @@ def initSharedCache(topic_id: str,
     
     return cache
 
-documentCache = initSharedCache("document-updates", DOCUMENT_CACHE_CONFIG)
-diffCache = initSharedCache("diff-updates", DIFF_CACHE_CONFIG)
-commentsCache = initSharedCache("comment-updates", COMMENTS_CACHE_CONFIG)
+#commentsCache = initSharedCache("comment-updates", COMMENTS_CACHE_CONFIG)
+cloudStorageCache = initSharedCache("cloud-storage-updates", GCLOUD_STORAGE_CACHE_CONFIG)
