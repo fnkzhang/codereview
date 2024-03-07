@@ -316,6 +316,8 @@ def addUser(proj_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    print(inputBody)
+    
     with engine.connect() as conn:
         if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
             relationstmt = insert(models.UserProjectRelation).values(

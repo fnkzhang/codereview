@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
+import getCookie from "../utils/utils.js";
 import './SnapshotSelector.css'
 
 // todo testing remove later
@@ -39,6 +40,35 @@ export default function SnapshotSelector() {
       navivate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
       navivate(0)
 
+    }
+
+    //Hardcoded to add Luke
+    async function helperAddUserToProject() {
+      let oAuthToken = getCookie("cr_id_token")
+
+      let data = {
+        "email": "ltbrenner@ucdavis.edu",
+        "role": "God",
+        "permissions": 15,
+      }
+
+      let headers = {
+        method: "POST",
+        mode: "cors",
+        withCredentials: true,
+        credentials: 'include',
+        headers: {
+          "Authorization": oAuthToken,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    
+      };
+
+      return await fetch(`/api/Project/${684153597}/addUser/`, headers)
+      .then(response => response.json())
+      //.then(data => data.snapshots)
+      .catch(e => console.log("ERROR", e))
     }
 
     function DisplayLeftSnapshots() {
@@ -87,6 +117,7 @@ export default function SnapshotSelector() {
 
     return (
         <div>
+          <button onClick={helperAddUserToProject}>Add Luke As GOD</button>
             <Oauth/>
             <div>
               <DisplayLeftSnapshots/>
