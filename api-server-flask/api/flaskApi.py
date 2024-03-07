@@ -556,23 +556,6 @@ def getDocument(proj_id, doc_id):
     info = getDocumentInfo(doc_id)
     return {"success": True, "reason":"", "body": info}
 
-#not gonna mess with diff stuff for now because again, i'm only going to focus on document permissions
-@app.route('/api/Document/<proj_id>/<doc_id>/<snapshot_id>/<diff_id>/', methods=["POST"])
-def createDiff(proj_id, doc_id, snap_shot_id, diff_id):
-    inputBody = request.get_json()
-    dmp = diff_match_patch()
-    diffText = dmp.patch_toText(dmp.patch_make(dmp.diff_main(inputBody["original"], inputBody["updated"])))
-    uploadBlob(proj_id + '/' + doc_id + '/' +snapshot_id + '/' + diff_id, diffText)
-    return {"diffText": diffText}
-
-@app.route('/api/Document/<proj_id>/<doc_id>/<snapshot_id>/<diff_id>/', methods=["GET"])
-def getDiff(proj_id, doc_id, diff_id):
-    document = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id)
-    diffText = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id + '/' + diff_id)
-    dmp = diff_match_patch()
-    output, _ = dmp.patch_apply(dmp.patch_fromText(diffText), document)
-    return {"diffResult": output}
-
 # Comment POST, GET, PUT, DELETE
 @app.route('/api/diffs/<diff_id>/comment/create', methods=["POST"])
 def createComment(diff_id):

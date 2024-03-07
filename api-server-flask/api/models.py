@@ -9,13 +9,18 @@ class Base(DeclarativeBase):
 class Comment(Base):
     __tablename__ = "comments"
 
-    comment_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31)) # https://stackoverflow.com/questions/38754816/sqlalchemy-random-unique-integer
-    diff_id = Column(Integer, nullable=False)
     author_id = Column(Integer, nullable=False)
+    comment_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31)) # https://stackoverflow.com/questions/38754816/sqlalchemy-random-unique-integer
+    snapshot_id = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)
     reply_to_id = Column(Integer, nullable=False)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
     content = Column(Text, nullable=False)
+    highlight_start_x = Column(Integer, nullable=False)
+    highlight_start_y = Column(Integer, nullable=False)
+    highlight_end_x = Column(Integer, nullable=False)
+    highlight_end_y = Column(Integer, nullable=False)
 
     # For Debugging
     def _repr__(self) -> str:
