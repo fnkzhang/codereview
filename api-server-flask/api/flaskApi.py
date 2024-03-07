@@ -39,13 +39,6 @@ class User():
     email = Column(String(50))
 
 
-metaData = MetaData()
-table = Table('testTable', metaData,
-            Column('id', Integer(), primary_key=True),
-            Column('name', String(50), nullable=False),
-            Column('email', String(50), nullable=False),
-            )
-
 # Remove Later for testing
 @app.route('/createTable')
 def createTable():
@@ -61,52 +54,6 @@ def createTable():
     #metaData.create_all(engine)
     print("Table was created")
     return "Created Table"
-
-@app.route('/dropUserProjectRelationTable')
-def dropUserProjectRelationTable():
-    models.UserProjectRelation.__table__.drop(engine)
-    return True
-
-@app.route('/insert')
-def testInsert():
-    #engine = connectCloudSql()
-    with engine.connect() as conn:
-        stmt = insert(table).values(name="PungeBob", email="testEmail@gmail.com")
-
-        conn.execute(stmt)
-        conn.commit()
-
-    return "tested"
-
-@app.route('/testGrabData')
-def grabData():
-    #engine = connectCloudSql()
-
-    with engine.connect() as conn:
-        stmt = select(table).where(table.c.email == "testEmail@gmail.com")
-
-        result = conn.execute(stmt)
-        result = result.mappings().all()
-
-        retArray = []
-        # Recreate Dict from SQLAlchemy Row and return
-        # Can't Find any alternatives that worked rn maybe in future
-        for row in result:
-            d = {}
-            d["id"] = row.id
-            d["name"] = row.name
-            d["email"] = row.email
-
-            retArray.append(d)
-
-    returnArray = {
-        "success": True,
-        "reason": "",
-        "body": retArray,
-    }
-    
-    return returnArray
-# End Remove later
 
 # Takes in json with "code" section
 @app.route('/api/sendData', methods=["POST"])
@@ -557,8 +504,8 @@ def getDocument(proj_id, doc_id):
     return {"success": True, "reason":"", "body": info}
 
 # Comment POST, GET, PUT, DELETE
-@app.route('/api/diffs/<diff_id>/comment/create', methods=["POST"])
-def createComment(diff_id):
+@app.route('/api/snapshots/<snapshot_id>/comment/create', methods=["POST"])
+def createComment(snapshot_id):
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -584,10 +531,15 @@ def createComment(diff_id):
     with Session() as session:
         try:
             session.add(models.Comment(
-                diff_id=int(body["diff_id"]),
+                snapshot_id=int(body["snapshot_id"]),
                 author_id=int(body["author_id"]),
                 reply_to_id=int(body["reply_to_id"]),
-                content=body["content"]
+                content=body["content"],
+                highlight_start_x = int(body["highlight_start_x"]),
+                highlight_start_y = int(body["highlight_start_y"]),
+                highlight_end_x = int(body["highlight_end_x"]),
+                highlight_end_y = int(body["highlight_end_y"]),
+
             ))
             session.commit()
         except Exception as e:
@@ -605,8 +557,8 @@ def createComment(diff_id):
 
 # look into pagination
 # https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
-@app.route('/api/diffs/<diff_id>/comments/get', methods=["GET"])
-def getCommentsOnDiff(diff_id):
+@app.route('/api/snapshots/<snapshot_id>/comments/get', methods=["GET"])
+def getCommentsOnSnapshot(snapshot_id):
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -626,13 +578,13 @@ def getCommentsOnDiff(diff_id):
     with Session() as session:
         try:
             filteredComments = session.query(models.Comment) \
-                .filter_by(diff_id=diff_id) \
+                .filter_by(snapshot_id=snapshot_id) \
                 .all()
 
             for comment in filteredComments:
                 commentsList.append({
                     "comment_id": comment.comment_id,
-                    "diff_id": comment.diff_id,
+                    "snapshot_id": comment.snapshot_id,
                     "author_id": comment.author_id,
                     "reply_to_id": comment.reply_to_id,
                     "date_created": comment.date_created,
@@ -710,7 +662,7 @@ def editComment(comment_id):
     print("Successful Edit")
     return {
         "success": True,
-        "reason": "Successful Delete"
+        "reason": "Successful Edit"
     }
 
 @app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])

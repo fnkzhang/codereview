@@ -60,10 +60,10 @@ def getUserProjPermissions(user_email, proj_id):
         #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
         
         #needs to happen because you can only call result.first() once
-        first = result.first()
-        if first == None:
+        relation = result.first()
+        if relation == None:
             return -1
-        return first.permissions
+        return relation.permissions
 
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
