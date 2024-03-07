@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
-import getCookie from "../utils/utils";
 import './SnapshotSelector.css'
 
 // todo testing remove later
@@ -41,83 +40,16 @@ export default function SnapshotSelector() {
       navivate(0)
 
     }
-    async function createProj() {
-        let oAuthToken = getCookie("cr_id_token")
-  
-        let headers = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          }
-        };
-      
-        await fetch(`/api/Project/testProject/`, headers)
-          .then(response => response.json())
-          //.then(data => data.snapshots)
-          .catch(e => console.log("ERROR", e))
-    }
-    async function createSnapshot() {
-      let oAuthToken = getCookie("cr_id_token")
-        
-        let bodyData = {
-            name: "TestDocument",
-            data: "TESTFILECODE WITH CHANGE"
-        }
-        let headers = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(bodyData)
-          
-          
-        };
-
-        return await fetch(`/api/Snapshot/684153597/386854791/`, headers)
-          .then(response => response.json())
-          .then(data => console.log(data))
-          .catch(e => console.log("ERROR", e))
-        // Create Snapshot for testing
-    }
-    async function createDocument() {
-        let oAuthToken = getCookie("cr_id_token")
-        
-        let bodyData = {
-            name: "TestDocument",
-            data: "TESTFILECODE"
-        }
-        let headers = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(bodyData)
-          
-        };
-      
-        return await fetch(`/api/Document/684153597/`, headers)
-          .then(response => response.json())
-          .then(data => console.log(data))
-          .catch(e => console.log("ERROR", e))
-    }
-
 
     function DisplayLeftSnapshots() {
         console.log(snapshots)
         if(snapshots.length !== 0) {
             return (
               <div>
-                <p>ALIVE</p>
                 {snapshots.map((snapshot, index) => { 
                     //console.log(snapshot)
                     return (
-                      <button id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
+                      <button key={index} id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
                               onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}>
                         Left Snap test
                       </button>)
@@ -126,7 +58,7 @@ export default function SnapshotSelector() {
           )
          } 
          else {
-            return <div>EMPTY</div>
+            return null
          }
     }
     
@@ -135,12 +67,11 @@ export default function SnapshotSelector() {
       if(snapshots.length !== 0) {
           return (
             <div>
-              <p>ALIVE</p>
               {snapshots.map((snapshot, index) => { 
                   //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
                   
                   return (index >= selectedLeftSnapshotIndex) ? (
-                    <button id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
+                    <button key={index} id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
                             onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}>
                       Righttest
                     </button>
@@ -150,14 +81,12 @@ export default function SnapshotSelector() {
         )
        } 
        else {
-          return <div>EMPTY</div>
+          return null
        }
   }
 
     return (
         <div>
-            <button onClick={createProj}>CreateProject</button>
-            <button onClick={createSnapshot}>createSnapshot</button>
             <Oauth/>
             <div>
               <DisplayLeftSnapshots/>

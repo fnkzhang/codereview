@@ -1,6 +1,5 @@
 import './ReviewWindow.css';
 import AppHeader from './AppHeader.js';
-import Oauth from './Oauth.js';
 import CommentModule from './Comments/CommentModule.js';
 import { getDocSnapshot, createDiff, getDiffSnapshot } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
@@ -77,7 +76,6 @@ export default function ReviewWindow() {
     return (
       <div>
         <AppHeader />
-        <Oauth/>
         <div className="Review-window">
           <div className="Code-view">
             <div className="Loading-data">
@@ -98,7 +96,6 @@ export default function ReviewWindow() {
   return (
     <div>
       <AppHeader />
-      <Oauth/>
       <div className="Review-window">
         <div className="Code-view">
           <button onClick={handleClick}>Submit Code</button>
