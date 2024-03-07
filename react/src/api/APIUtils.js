@@ -141,22 +141,6 @@ export async function getCommentsOnDiff(diff_id) {
     .then(response => response.json())
 }
 
-export async function getSubcommentsOnComment(comment_id) {
-  
-  let oAuthToken = getCookie("cr_id_token")
-  let headers = {
-    method: "GET",
-    mode: "cors",
-    headers: {
-      "Authorization": oAuthToken,
-      "Content-Type": "application/json"
-    }
-  };
-
-  return await fetch(`/api/comments/${comment_id}/subcomments/get`, headers)
-    .then(response => response.json())
-}
-
 export async function editComment(comment_id, content) {
   
   let oAuthToken = getCookie("cr_id_token")

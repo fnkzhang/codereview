@@ -475,26 +475,6 @@ def getCommentsOnDiff(diff_id):
     print("Successful Read")
     return commentsList
 
-@app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
-def getSubcommentsOnComment(comment_id):
-    # authenticate
-    # query cloud sql
-    
-    # temporary
-    retArray = []
-    for i in range(5):
-        d = {
-            "subcomment_id": i + 1,
-            "comment_id": comment_id,
-            "author_id": 2000 + i,
-            "date_created": "2024-02-20 12:00:00",
-            "date_modified": "2024-02-20 12:00:00",
-            "content": f"Fake subcomment {i+1} on comment {comment_id}"
-        }
-        retArray.append(d)
-    
-    return retArray
-
 @app.route('/api/comments/<comment_id>/edit', methods=["PUT"])
 def editComment(comment_id):
     # Authentication
