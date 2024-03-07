@@ -1,6 +1,6 @@
 export default function getCookie(name) {
     let cookieArray = document.cookie.split(";");
-    console.log(cookieArray)
+    //console.log(cookieArray)
     // Loop through the array elements
     for(let i = 0; i < cookieArray.length; i++) {
         let cookiePair = cookieArray[i].split("=");
@@ -9,7 +9,7 @@ export default function getCookie(name) {
         and compare it with the given string */
         if(name === cookiePair[0].trim()) {
             // Decode the cookie value and return
-            console.log("Found Cookie", cookiePair[1])
+            //console.log("Found Cookie", cookiePair[1])
             return decodeURIComponent(cookiePair[1]);
         }
     }

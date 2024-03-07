@@ -27,7 +27,7 @@ export default function Oauth(){
 
     }, [])
     async function verifyLogin(credentialResponse) {
-        let oAuthToken = getCookie("cr_id_token")
+        let oAuthToken = credentialResponse.credential
         let headers= {
             method: "POST",
             mode: "cors",
@@ -47,7 +47,7 @@ export default function Oauth(){
             }
             
             setUserData(data.body)
-            console.log(data)
+            console.log("Valid Token Provided, Saving to cookies")
             setIsLoggedIn(true)
             // Save to Cookie
             document.cookie = `cr_id_token=${credentialResponse.credential}`;

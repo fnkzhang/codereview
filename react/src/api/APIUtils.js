@@ -127,7 +127,6 @@ export async function createComment(diff_id, author_id, reply_to_id, content) {
 export async function getCommentsOnDiff(diff_id) {
   
   let oAuthToken = getCookie("cr_id_token")
-  console.log(oAuthToken)
   let headers = {
     method: "GET",
     mode: "cors",
