@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
 import getCookie from "../utils/utils";
+import { getCode, getNewCode } from "../dev/getCode.js"
 import './SnapshotSelector.css'
 
 // todo testing remove later
@@ -10,8 +11,9 @@ import Oauth from "./Oauth.js";
 export default function SnapshotSelector() { 
     const [snapshots, setSnapshots] = useState([])
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
+    const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
 
-    const navivate = useNavigate()
+    const navigate = useNavigate()
 
     const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
     // Get snapshots for document
@@ -31,16 +33,15 @@ export default function SnapshotSelector() {
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       console.log(selectedSnapshot, selectedIndex)
       setSelectedLeftSnapshotIndex(selectedIndex)
-      navivate(`/Document/${document_id}/${selectedSnapshot}/${selectedSnapshot}`)
-      navivate(0)
-
+      navigate(`/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`)
     }
+
     async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
       console.log(selectedSnapshot, selectedIndex)
-      navivate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
-      navivate(0)
-
+      setSelectedRightSnapshotIndex(selectedIndex)
+      navigate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
     }
+
     async function createProj() {
         let oAuthToken = getCookie("cr_id_token")
   
@@ -62,8 +63,8 @@ export default function SnapshotSelector() {
       let oAuthToken = getCookie("cr_id_token")
         
         let bodyData = {
-            name: "TestDocument",
-            data: "TESTFILECODE WITH CHANGE"
+            name: "Modified Code",
+            data: getNewCode()
         }
         let headers = {
           method: "POST",
@@ -113,14 +114,15 @@ export default function SnapshotSelector() {
         if(snapshots.length !== 0) {
             return (
               <div>
-                <p>ALIVE</p>
+                <div>Dsiplay on Left</div>
                 {snapshots.map((snapshot, index) => { 
                     //console.log(snapshot)
-                    return (
+                    return (index <= selectedRightSnapshotIndex) ? (
                       <button id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
                               onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}>
-                        Left Snap test
-                      </button>)
+                        {snapshot.date_modified}
+                      </button>
+                    ) : null
                 })}              
               </div>
           )
@@ -135,14 +137,14 @@ export default function SnapshotSelector() {
       if(snapshots.length !== 0) {
           return (
             <div>
-              <p>ALIVE</p>
+              <div>Dsiplay on Right</div>
               {snapshots.map((snapshot, index) => { 
                   //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
                   
                   return (index >= selectedLeftSnapshotIndex) ? (
                     <button id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
                             onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}>
-                      Righttest
+                      {snapshot.date_modified}
                     </button>
                   ) : null
               })}              
@@ -155,10 +157,7 @@ export default function SnapshotSelector() {
   }
 
     return (
-        <div>
-            <button onClick={createProj}>CreateProject</button>
-            <button onClick={createSnapshot}>createSnapshot</button>
-            <Oauth/>
+        <div className="Snapshot-selector">
             <div>
               <DisplayLeftSnapshots/>
               <DisplayRightSnapshots/>              

@@ -82,25 +82,6 @@ export async function createDiff(proj_id, doc_id, diff_id, originalCode, updated
     .then(response => response.json())
 }
 
-export async function getDiffSnapshot(proj_id, doc_id, diff_id) {
-  
-  let oAuthToken = getCookie("cr_id_token")
-  let headers = {
-
-    method: "GET",
-    mode: "cors",
-    credentials: 'include',
-    headers: {
-      "Access-Control-Allow-Credentials": true,
-      "Authorization": oAuthToken,
-      "Content-Type": "application/json"
-    }
-  }
-
-  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${diff_id}/`), headers)
-    .then(response => response.json())
-}
-
 // diff_id: int
 // author_id: int
 // reply_to_id: int

@@ -1,8 +1,6 @@
 import './ReviewWindow.css';
-import AppHeader from './AppHeader.js';
-import Oauth from './Oauth.js';
 import CommentModule from './Comments/CommentModule.js';
-import { getDocSnapshot, createDiff, getDiffSnapshot } from '../api/APIUtils.js';
+import { getDocSnapshot, createDiff } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
@@ -23,14 +21,14 @@ export default function ReviewWindow() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [doc, diff] = await Promise.all([
+        const [left_doc, right_doc] = await Promise.all([
           getDocSnapshot('684153597', document_id, left_snapshot_id),
-          getDiffSnapshot('684153597', document_id, right_snapshot_id)
+          getDocSnapshot('684153597', document_id, right_snapshot_id)
         ]);
 
-        console.log(doc, diff)
-        setInit(doc.blobContents)
-        setCode(diff.blobContents)
+        console.log(left_doc, right_doc)
+        setInit(left_doc.blobContents)
+        setCode(right_doc.blobContents)
       } catch (error) {
         console.log(error)
       } finally {
@@ -39,7 +37,7 @@ export default function ReviewWindow() {
     }
 
     fetchData()
-  }, [])
+  }, [document_id, left_snapshot_id, right_snapshot_id])
 
   useEffect(() => {
 
@@ -76,8 +74,6 @@ export default function ReviewWindow() {
   if (editorLoading) {
     return (
       <div>
-        <AppHeader />
-        <Oauth/>
         <div className="Review-window">
           <div className="Code-view">
             <div className="Loading-data">
@@ -97,8 +93,6 @@ export default function ReviewWindow() {
 
   return (
     <div>
-      <AppHeader />
-      <Oauth/>
       <div className="Review-window">
         <div className="Code-view">
           <button onClick={handleClick}>Submit Code</button>
