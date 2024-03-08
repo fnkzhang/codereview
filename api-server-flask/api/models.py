@@ -9,13 +9,18 @@ class Base(DeclarativeBase):
 class Comment(Base):
     __tablename__ = "comments"
 
-    comment_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31)) # https://stackoverflow.com/questions/38754816/sqlalchemy-random-unique-integer
-    diff_id = Column(Integer, nullable=False)
     author_id = Column(Integer, nullable=False)
+    comment_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31)) # https://stackoverflow.com/questions/38754816/sqlalchemy-random-unique-integer
+    snapshot_id = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)
     reply_to_id = Column(Integer, nullable=False)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
     content = Column(Text, nullable=False)
+    highlight_start_x = Column(Integer, nullable=False)
+    highlight_start_y = Column(Integer, nullable=False)
+    highlight_end_x = Column(Integer, nullable=False)
+    highlight_end_y = Column(Integer, nullable=False)
 
     # For Debugging
     def _repr__(self) -> str:
@@ -39,6 +44,7 @@ class Project(Base):
     author_email = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
+    root_folder = Column(Integer)
 
 class UserProjectRelation(Base):
     __tablename__ = "userprojrelation"
@@ -69,5 +75,14 @@ class Document(Base):
     name = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    #snapshots = Column(ARRAY(Integer))
+    snapshots = Column(ARRAY(Integer))
+    parent_folder = Column(Integer)
 
+class Folder(Base):
+    __tablename__ = "folders"
+    folder_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
+    name = Column(String(50))
+    date_created = Column(DateTime(timezone=True), server_default=func.now())
+    date_modified = Column(DateTime(timezone=True), server_default=func.now())
+    contents = Column(ARRAY(Integer, dimensions=2), default = [])
+    parent_folder = Column(Integer)
