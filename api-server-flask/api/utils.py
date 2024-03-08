@@ -153,7 +153,7 @@ def getAllChildDocuments(folder_id):
             for content in folder.content:
                 if content[2] == 0:
                     documents.append(content[0])
-                else
+                else:
                     documents = documents + getAllChildDocuments(content[0])
             return documents
 
