@@ -87,6 +87,18 @@ def createNewDocument(proj_id, document_id, doc_name):
         conn.commit()
 
 
+def createNewFolder(folder_name, parent_folder):
+    folder_id = createID()
+    with engine.connect() as conn:
+        stmt = insert(models.Folders).values(
+            folder_id = folder_id,
+            name = folder_name,
+            parent_folder = parent_folder
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return folder_id
+
 #puts documentname as snapshot name until that changes
 def createNewSnapshot(proj_id, doc_id, item):
     with engine.connect() as conn:

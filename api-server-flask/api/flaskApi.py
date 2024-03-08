@@ -200,20 +200,14 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
+    root_folder_id = createNewFolder('root', 0)
     with engine.connect() as conn:
         pid = createID()
         projstmt = insert(models.Project).values(
                 proj_id = pid,
                 name = proj_name,
-                author_email = idInfo["email"]
+                author_email = idInfo["email"],
+                root_folder = root_folder_id
         )
     #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
         relationstmt = insert(models.UserProjectRelation).values(
@@ -230,6 +224,75 @@ def createProject(proj_name):
         "reason": "",
         "body": {}
     }
+
+#requires
+    #authentication stuff
+#needs in body
+    #folder name
+    #parent_folder
+@app.route('/api/Folder/<proj_id>/', methods=["POST"])
+def createFolder(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+    folder_id = createID()
+
+    with engine.connect() as conn:
+        stmt = insert(models.Folder).values(
+            folder_id = folder_id,
+            name = inputBody["name"],
+            parent_folder = inputBody["folder"]
+        )
+        conn.execute(stmt)
+        foldercontentstmt = select(models.Folder).where(
+                models.Folder.folder_id == inputBody["folder"]
+                )
+        contents = conn.execute(stmt).first.contents
+        contents.append([folder_id, 0])
+        stmt = update(models.Folder).where(
+                models.Folder.folder_id == inputBody["folder"]
+                ).values(
+                contents = contents
+                )
+        conn.commit()
+
+    createNewSnapshot(proj_id, doc_id, inputBody["data"])
+    return {"posted": inputBody}
+@app.route('/api/Folder/<proj_id>/<folder_id>/', methods=["GET"])
+def getFolder(proj_id, doc_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    info = getFolderInfo(folder_id)
+    return {"folder_info": info}
 
 #needs sections in body
     #credentials (of user that already has access to project)
@@ -252,14 +315,6 @@ def addUser(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
@@ -329,13 +384,6 @@ def removeUser(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
     #3 is placeholder value since we only have read permission
     if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
@@ -366,13 +414,13 @@ def createSnapshot(proj_id, doc_id):
         }
 
     #todo:make this a function
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
+    #if not userExists(idInfo["email"]):
+    #    retData = {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
+    #    return jsonify(retData)
 
     # if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
     #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
@@ -396,19 +444,18 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
             "reason": "Failed to Authenticate"
         }
 
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
-
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     blob = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id)
     return {"blobContents": blob}
 
+#requires
+    #credentials in headers
+
+    #In body:
+    #data (text you want in the document)
+    #name (name of document)
+    #folder_id (folder you're making it in)
 @app.route('/api/Document/<proj_id>/', methods=["POST"])
 def createDocument(proj_id):
     inputBody = request.get_json()
@@ -419,29 +466,38 @@ def createDocument(proj_id):
                 "success":False,
                 "reason": "Invalid Token Provided"
         }
-
+    
     idInfo = authenticate()
     if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    #todo:make this a function
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
-
+    
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    ##########################
+    
     doc_id = createID()
 
-    createNewDocument(proj_id, doc_id, inputBody["name"])
+    with engine.connect() as conn:
+        stmt = insert(models.Document).values(
+            doc_id = doc_id,
+            name = inputBody["name"],
+            parent_folder = inputBody["folder"]
+        )
+        conn.execute(stmt)
+        foldercontentstmt = select(models.Folder).where(
+                models.Folder.folder_id == inputBody["folder"]
+                )
+        contents = conn.execute(stmt).first.contents
+        contents.append([doc_id, 0])
+        stmt = update(models.Folder).where(
+                models.Folder.folder_id == inputBody["folder"]
+                ).values(
+                contents = contents
+                )
+        conn.commit()
+        
     createNewSnapshot(proj_id, doc_id, inputBody["data"])
 
     return {"posted": inputBody}
@@ -491,15 +547,16 @@ def getDocument(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    if not userExists(idInfo["email"]):
-        return {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
+    #if not userExists(idInfo["email"]):
+    #    return {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
 
     # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
     #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
     info = getDocumentInfo(doc_id)
     return {"success": True, "reason":"", "body": info}
 
