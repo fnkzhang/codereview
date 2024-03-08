@@ -14,7 +14,6 @@ export default function ReviewWindow() {
   const [currentLine, setLine] = useState(1);
   const [editorLoading, setEditorLoading] = useState(true);
   const decorationIdsRef = useRef([]);
-  const diffID = 2;
 
   const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
@@ -26,7 +25,6 @@ export default function ReviewWindow() {
           getDocSnapshot('684153597', document_id, left_snapshot_id),
           getDocSnapshot('684153597', document_id, right_snapshot_id)
         ]);
-
         setInit(left_doc.blobContents)
         setCode(right_doc.blobContents)
       } catch (error) {
@@ -73,7 +71,11 @@ export default function ReviewWindow() {
           <div className="Comment-view">
             <CommentModule
               moduleLineJump={lineJump}
-              diffID={diffID}
+              snapshotId={left_snapshot_id}
+              leftSnapshotId={left_snapshot_id}
+              rightSnapshotId={right_snapshot_id}
+              start={0}
+              end={0}
             />
           </div>
         </div>
@@ -106,7 +108,14 @@ export default function ReviewWindow() {
           />
         </div>
         <div className="Comment-view">
-          <CommentModule moduleLineJump={lineJump} />
+          <CommentModule 
+            moduleLineJump={lineJump}
+            snapshotId={left_snapshot_id}
+            leftSnapshotId={left_snapshot_id}
+            rightSnapshotId={right_snapshot_id}
+            start={0}
+            end={0}
+          />
         </div>
       </div>
     </div>

@@ -15,10 +15,10 @@ export default function SnapshotSelector() {
     useEffect(() => {
 
         const grabSnapshots = async () => {
-            let result = await getAllSnapshotsFromDocument(document_id)
+          let result = await getAllSnapshotsFromDocument(document_id)
 
-            if (result.success)
-              setSnapshots(result.body)
+          if (result.success)
+            setSnapshots(result.body)
         }
 
         grabSnapshots()
