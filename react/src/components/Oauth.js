@@ -1,14 +1,42 @@
 import "./Oauth.css"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
 import { jwtDecode } from 'jwt-decode';
 import getCookie from "../utils/utils";
 
-export default function Oauth(){
+export default function Oauth( { isLoggedIn, setIsLoggedIn } ){
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(null)
+
+    const verifyLogin = useCallback(async (credentialResponse) => {
+        let oAuthToken = credentialResponse.credential
+        
+        let headers= {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Authorization": oAuthToken,
+              "Content-Type": "application/json"
+            },
+        }
+
+        await fetch('/api/user/authenticate', headers)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success === false) {
+                console.log("Failed to validate token")
+                return
+            }
+            
+            setUserData(data.body)
+            console.log("Valid Token Provided, Saving to cookies")
+            setIsLoggedIn(true)
+            // Save to Cookie
+            document.cookie = `cr_id_token=${credentialResponse.credential}; domain=; path=/`;
+        })
+        .catch(e => console.log(e))
+    }, [setIsLoggedIn])
 
     // Check If the user token is valid
     useEffect(() => {
@@ -25,7 +53,7 @@ export default function Oauth(){
 
         verifyLogin(credentialObject)
 
-    }, [])
+    }, [verifyLogin, setIsLoggedIn])
 
     // Check if user is valid when userData is returned
     useEffect(() => {
@@ -45,37 +73,6 @@ export default function Oauth(){
 
     }, [userData])
 
-    async function verifyLogin(credentialResponse) {
-        let oAuthToken = credentialResponse.credential
-        
-        let headers= {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              "Authorization": oAuthToken,
-              "Content-Type": "application/json"
-            },
-        }
-        console.log("FETCHING")
-
-        await fetch('/api/user/authenticate', headers)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success === false) {
-                console.log("Failed to validate token")
-                return
-            }
-            
-            setUserData(data.body)
-            console.log("Valid Token Provided, Saving to cookies")
-            setIsLoggedIn(true)
-            // Save to Cookie
-            document.cookie = `cr_id_token=${credentialResponse.credential}`;
-        })
-        .catch(e => console.log(e))
-    }
-
-    
     async function checkIfUserExists(email) {
         let credential = getCookie("cr_id_token")
 

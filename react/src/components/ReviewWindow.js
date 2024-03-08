@@ -1,6 +1,6 @@
 import './ReviewWindow.css';
 import CommentModule from './Comments/CommentModule.js';
-import { getDocSnapshot, createDiff } from '../api/APIUtils.js';
+import { getDocSnapshot } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
@@ -20,13 +20,13 @@ export default function ReviewWindow() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setEditorLoading(true)
       try {
         const [left_doc, right_doc] = await Promise.all([
           getDocSnapshot('684153597', document_id, left_snapshot_id),
           getDocSnapshot('684153597', document_id, right_snapshot_id)
         ]);
 
-        console.log(left_doc, right_doc)
         setInit(left_doc.blobContents)
         setCode(right_doc.blobContents)
       } catch (error) {
@@ -51,16 +51,6 @@ export default function ReviewWindow() {
       decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
     }
   }, [monacoRef, editorRef, currentLine, updatedCode])
-
-  async function handleClick() {
-    console.log(updatedCode)
-
-    await createDiff('projectid', 'documentid', 'diffid', initialCode, updatedCode)
-      .then(data => console.log(data))
-      .catch((e) => {
-        console.log(e)
-      })
-  }
 
   function lineJump(newLine) {
     setLine(newLine)
@@ -95,7 +85,6 @@ export default function ReviewWindow() {
     <div>
       <div className="Review-window">
         <div className="Code-view">
-          <button onClick={handleClick}>Submit Code</button>
           <DiffEditor 
             className="Monaco-editor"
             original={initialCode}

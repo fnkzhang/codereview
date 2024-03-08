@@ -13,9 +13,7 @@ function CommentModule ({ moduleLineJump , diffID }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(diffId)
         const commentData = await getCommentsOnDiff(diffId)
-        console.log(commentData)
         setComments(commentData)
       } catch (error) {
         console.log(error)

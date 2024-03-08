@@ -1,5 +1,4 @@
-import React from "react";
-import { useParams } from "react-router";
+import React, { useState } from "react";
 import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
 import Oauth from "./Oauth"
@@ -7,15 +6,27 @@ import AppHeader from "./AppHeader"
 
 export default function MainWindow() {
 
-
-  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   
-  return(
-    <div>
-      <Oauth/>
-      <AppHeader/>
-      <SnapshotSelector/>
-      <ReviewWindow/>
-    </div>
-  )
+  if (isLoggedIn) {
+    return(
+      <div>
+        <Oauth
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}/>
+        <AppHeader/>
+        <SnapshotSelector/>
+        <ReviewWindow/>
+      </div>
+    )
+  } else {
+    return(
+      <div>
+        <Oauth
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}/>
+        <AppHeader/>
+      </div>
+    )
+  }
 }
