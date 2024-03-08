@@ -56,7 +56,7 @@ export async function getDocSnapshot(proj_id, doc_id, snap_id) {
     }
   }
 
-  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}`), headers)
+  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}/`), headers)
     .then(response => response.json())
 }
 
@@ -172,7 +172,7 @@ export async function getAllSnapshotsFromDocument(document_id) {
 
   };
 
-    return await fetch((`/api/Document/${1231234141}/${document_id}/getSnapshotId`), headers)
+    return await fetch((`/api/Document/${1231234141}/${document_id}/getSnapshotId/`), headers)
       .then(response => response.json()
       .then(data => {
         console.log(data)

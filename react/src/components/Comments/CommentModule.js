@@ -29,7 +29,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading])
+  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
   function handleNewCommentChange (event) {
     setNewComment(event.target.value);
@@ -39,21 +39,24 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     event.preventDefault();
 
     try {
-      //await createComment(snapshotId, 1, 0, newComment);
-      setComments([...comments,{
-        author_id: 1,
-        comment_id: 1000,
-        content: newComment,
-        date_created: "time",
-        date_modified: "time",
-        snapshot_id: snapshotId,
-        reply_to_id: 0,
-        highlight_start_x: start.column,
-        highlight_start_y: start.lineNumber,
-        highlight_end_x: end.column,
-        highlight_end_y: end.lineNumber
-      }])
-      setCommentsLoading(true);
+      console.log(snapshotId)
+      if (snapshotId != null) {
+        console.log("adding comment ...")
+        setComments([...comments,{
+          author_id: 1,
+          comment_id: 1000,
+          content: newComment,
+          date_created: "time",
+          date_modified: "time",
+          snapshot_id: snapshotId,
+          reply_to_id: 0,
+          highlight_start_x: start.column,
+          highlight_start_y: start.lineNumber,
+          highlight_end_x: end.column,
+          highlight_end_y: end.lineNumber
+        }])
+        setCommentsLoading(true);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -88,7 +91,9 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       <p className="Comment-title">Comment Section</p>
       <div className="Comment-list-container">
         <CommentList 
-          comments={comments}
+          comments={comments.filter(function(comment) {
+            return (comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)
+          })}
           listLineJump={moduleLineJump}
         />
       </div>

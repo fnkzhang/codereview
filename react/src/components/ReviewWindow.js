@@ -9,16 +9,21 @@ export default function ReviewWindow() {
 
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
+  const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
-  const [updatedCode, setCode] = useState(null);
-  const [currentLine, setLine] = useState(1);
+  const [updatedCode, setCode] = useState(null); 
+  const [currentHighlightStart, setStart] = useState(null);
+  const [currentHighlightEnd, setEnd] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
-  const decorationIdsRef = useRef([]);
+  const [snapshotId, setSnapshotID] = useState(null);
+  const decorationIdsRefOrig = useRef([]);
+  const decorationIdsRefModif = useRef([]);
 
   const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
   useEffect(() => {
     const fetchData = async () => {
+      setEditorReady(false)
       setEditorLoading(true)
       try {
         const [left_doc, right_doc] = await Promise.all([
@@ -38,24 +43,44 @@ export default function ReviewWindow() {
   }, [document_id, left_snapshot_id, right_snapshot_id])
 
   useEffect(() => {
-
-    if (editorRef.current && monacoRef.current) {
+    if (editorRef.current) {
+      const originalEditor = editorRef.current.getOriginalEditor();
       const modifiedEditor = editorRef.current.getModifiedEditor();
-
-      const lineNumber = 4;
-      const range = new monacoRef.current.Range(lineNumber, 24, lineNumber, 29);
-      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
-
-      decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
+  
+      const handleSelectionChange = (editor, snapshotID) => (e) => {
+        const selection = e.selection;
+        const startPosition = selection.getStartPosition();
+        const endPosition = selection.getEndPosition();
+  
+        setSnapshotID(Number(snapshotID));
+        setStart(startPosition);
+        setEnd(endPosition);
+        console.log(snapshotID);
+      };
+      originalEditor.onDidChangeCursorSelection(handleSelectionChange(originalEditor, left_snapshot_id));
+      modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
     }
-  }, [monacoRef, editorRef, currentLine, updatedCode])
+  }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady ])
 
-  function lineJump(newLine) {
-    setLine(newLine)
+  function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
-    if (editorRef.current && editorRef.current.getModifiedEditor) {
+    if (editorRef.current) {
 
-      editorRef.current.getModifiedEditor().revealLine(newLine);
+      const range = new monacoRef.current.Range(highlightStartY, highlightStartX, highlightEndY, highlightEndX);
+      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
+      const modifiedEditor = editorRef.current.getModifiedEditor();
+      const originalEditor = editorRef.current.getOriginalEditor();
+
+      if (snapshotID === Number(right_snapshot_id)) {
+        decorationIdsRefOrig.current = originalEditor.deltaDecorations(decorationIdsRefOrig.current, [])
+        decorationIdsRefModif.current = modifiedEditor.deltaDecorations(decorationIdsRefModif.current, [decoration]);
+        editorRef.current.getModifiedEditor().revealLine(highlightStartY);
+      } 
+      if (snapshotID === Number(left_snapshot_id)) {
+        decorationIdsRefModif.current = modifiedEditor.deltaDecorations(decorationIdsRefModif.current, []);
+        decorationIdsRefOrig.current = originalEditor.deltaDecorations(decorationIdsRefOrig.current, [decoration]);
+        editorRef.current.getOriginalEditor().revealLine(highlightStartY);
+      }
     }
   }
 
@@ -71,11 +96,11 @@ export default function ReviewWindow() {
           <div className="Comment-view">
             <CommentModule
               moduleLineJump={lineJump}
-              snapshotId={left_snapshot_id}
-              leftSnapshotId={left_snapshot_id}
-              rightSnapshotId={right_snapshot_id}
-              start={0}
-              end={0}
+              snapshotId={snapshotId}
+              leftSnapshotId={Number(left_snapshot_id)}
+              rightSnapshotId={Number(right_snapshot_id)}
+              start={currentHighlightStart}
+              end={currentHighlightEnd}
             />
           </div>
         </div>
@@ -96,6 +121,12 @@ export default function ReviewWindow() {
             onMount={(editor, monaco) => {
               editorRef.current = editor
               monacoRef.current = monaco
+              editor.getModifiedEditor().updateOptions({
+                readOnly: true
+              })
+              editor.getOriginalEditor().updateOptions({
+                readOnly: true
+              })
 
               // Add the onChange event listener to the editor instance
               const onChangeHandler = () => {
@@ -104,17 +135,19 @@ export default function ReviewWindow() {
               };
 
               editor.onDidUpdateDiff(onChangeHandler);
+
+              setEditorReady(true)
             }}
           />
         </div>
         <div className="Comment-view">
           <CommentModule 
             moduleLineJump={lineJump}
-            snapshotId={left_snapshot_id}
-            leftSnapshotId={left_snapshot_id}
-            rightSnapshotId={right_snapshot_id}
-            start={0}
-            end={0}
+            snapshotId={snapshotId}
+            leftSnapshotId={Number(left_snapshot_id)}
+            rightSnapshotId={Number(right_snapshot_id)}
+            start={currentHighlightStart}
+            end={currentHighlightEnd}
           />
         </div>
       </div>
