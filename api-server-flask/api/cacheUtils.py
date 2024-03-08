@@ -113,5 +113,5 @@ def initSharedCache(topic_id: str,
     
     return cache
 
-#commentsCache = initSharedCache("comment-updates", COMMENTS_CACHE_CONFIG)
+commentsCache = initSharedCache("comment-updates", COMMENTS_CACHE_CONFIG)
 cloudStorageCache = initSharedCache("cloud-storage-updates", GCLOUD_STORAGE_CACHE_CONFIG)

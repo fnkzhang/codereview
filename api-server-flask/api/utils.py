@@ -87,14 +87,14 @@ def fetchFromCloudStorage(blobName:str):
     blobContents = cloudStorageCache.get(blobName)
     if blobContents is None:
         blobContents = getBlob(blobName)
-        print("not found in cache: ", blobName)
+        print("not found in cache: ", blobName, flush=True)
     else:
-        print("found in cache: ", blobName)
+        print("found in cache: ", blobName, flush=True)
     
     if blobContents is not None:
         cloudStorageCache.set(blobName, blobContents)
     
-    print(f"Time to fetch: {time.time() - startTime}\n\n")
+    print(f"Time to fetch: {time.time() - startTime}\n\n", flush=True)
     return blobContents
 
 def publishCloudStorageUpdate(blobName: str):
