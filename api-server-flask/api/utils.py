@@ -19,6 +19,7 @@ engine = connectCloudSql()
 
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
+os.environ["GCLOUD_PROJECT"] = "codereview-413200"
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 def uploadBlob(blobName, item):
@@ -29,6 +30,7 @@ def uploadBlob(blobName, item):
     return True
 
 def getBlob(blobName):
+    print(blobName)
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
@@ -58,18 +60,32 @@ def getUserProjPermissions(user_email, proj_id):
         #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
         
         #needs to happen because you can only call result.first() once
-        first = result.first()
-        if first == None:
+        relation = result.first()
+        if relation == None:
             return -1
-        return first.permissions
+        return relation.permissions
 
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
-        first = conn.execute(stmt).first()
-        if first == None:
+        foundDocument = conn.execute(stmt).first()
+        if foundDocument == None:
             return -1
-        return first
+        return foundDocument._asdict()
+
+
+def createNewDocument(proj_id, document_id, doc_name):
+    with engine.connect() as conn:
+
+        stmt = insert(models.Document).values(
+            doc_id = document_id,
+            name = doc_name,
+            associated_proj_id = proj_id,
+        )
+
+        conn.execute(stmt)
+        conn.commit()
+
 
 def createNewFolder(folder_name, parent_folder):
     folder_id = createID()
@@ -88,26 +104,35 @@ def createNewSnapshot(proj_id, doc_id, item):
     with engine.connect() as conn:
         
         stmt = select(models.Document).where(
-            models.Documet.doc_id == doc_id)
-        doc = conn.execute(stmt).first
+            models.Document.doc_id == doc_id)
+
+        doc = conn.execute(stmt).first()
+
         doc_name = doc.name
-        currentsnapshotlist = doc.snapshots
-        
+            
         snapshot_id = createID()
         stmt = insert(models.Snapshot).values(
             snapshot_id = snapshot_id,
+            associated_document_id = doc_id,
             name = doc_name
         )
         conn.execute(stmt)
-
-        stmt = update(models.Document).where(
-                    models.Document.doc_id == doc_id
-                ).values(
-                    snapshots = currentsnapshotlist + [snapshot_id]
-                )
-        conn.execute(stmt)
         conn.commit()
-        uploadBlob(proj_id + '/' + doc_id + '/' + snapshot_id, item)
+
+        uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
+
+# Returns Array of Dictionaries
+def getAllDocumentSnapshotsInOrder(doc_id):
+    with engine.connect() as conn:
+        stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id).order_by(models.Snapshot.date_created.asc())
+        foundDocuments = conn.execute(stmt)
+        
+        listOfDocuments = []
+        
+        for row in foundDocuments:
+            listOfDocuments.append(row._asdict())
+        
+        return listOfDocuments
 
 def userExists(user_email):
     with engine.connect() as conn:
