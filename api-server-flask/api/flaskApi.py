@@ -32,13 +32,6 @@ def afterRequest(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-# Remove Later
-class User():
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    email = Column(String(50))
-
-
 # Remove Later for testing
 @app.route('/createTable')
 def createTable():
@@ -185,6 +178,31 @@ def signUp():
     }
     return jsonify(retData)
 
+@app.route('/api/User/<user_email>/Project/', methods = ["GET"])
+def getUserProjects(user_email):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    allPermissions = getUserProjPermissions(user_email)
+    if allPermissions == -1:
+        return {"projects": "None"}
+    projects = []
+    for permission in allPermissions:
+        projects.append(getProjectInfo(permission.proj_id))
+    info = json.dumps(projects)
+    return {"proj_info": info}
+
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
     headers = request.headers
@@ -225,6 +243,50 @@ def createProject(proj_name):
         "body": {}
     }
 
+@app.route('/api/Project/<proj_id>/', methods = ["GET"])
+def getProject(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    info = json.dumps(getProjectInfo(proj_id))
+    return {"proj_info": info}
+
+@app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
+def getProjectDocuments(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    proj_info = getProjectInfo(proj_id)
+    documents = json.dumps(getAllChildDocuments(proj_info.root_folder))
+    return {"documents": documents}
+
+
 #requires
     #authentication stuff
 #needs in body
@@ -250,31 +312,11 @@ def createFolder(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    folder_id = createID()
+    folder_id = createNewFolder(inputBody["folder_name"], inputBody["parent_folder"])
+    return {"posted": folder_id}
 
-    with engine.connect() as conn:
-        stmt = insert(models.Folder).values(
-            folder_id = folder_id,
-            name = inputBody["name"],
-            parent_folder = inputBody["folder"]
-        )
-        conn.execute(stmt)
-        foldercontentstmt = select(models.Folder).where(
-                models.Folder.folder_id == inputBody["folder"]
-                )
-        contents = conn.execute(stmt).first.contents
-        contents.append([folder_id, 0])
-        stmt = update(models.Folder).where(
-                models.Folder.folder_id == inputBody["folder"]
-                ).values(
-                contents = contents
-                )
-        conn.commit()
-
-    createNewSnapshot(proj_id, doc_id, inputBody["data"])
-    return {"posted": inputBody}
 @app.route('/api/Folder/<proj_id>/<folder_id>/', methods=["GET"])
-def getFolder(proj_id, doc_id):
+def getFolder(proj_id, folder_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -291,7 +333,7 @@ def getFolder(proj_id, doc_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    info = getFolderInfo(folder_id)
+    info = json.dumps(getFolderInfo(folder_id))
     return {"folder_info": info}
 
 #needs sections in body
@@ -454,8 +496,8 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 
     #In body:
     #data (text you want in the document)
-    #name (name of document)
-    #folder_id (folder you're making it in)
+    #doc_name (name of document)
+    #parent_folder (folder you're making it in)
 @app.route('/api/Document/<proj_id>/', methods=["POST"])
 def createDocument(proj_id):
     inputBody = request.get_json()
@@ -477,27 +519,8 @@ def createDocument(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    doc_id = createID()
+    doc_id = createNewDocument(inputBody["doc_name"], inputBody["parent_folder"])
 
-    with engine.connect() as conn:
-        stmt = insert(models.Document).values(
-            doc_id = doc_id,
-            name = inputBody["name"],
-            parent_folder = inputBody["folder"]
-        )
-        conn.execute(stmt)
-        foldercontentstmt = select(models.Folder).where(
-                models.Folder.folder_id == inputBody["folder"]
-                )
-        contents = conn.execute(stmt).first.contents
-        contents.append([doc_id, 0])
-        stmt = update(models.Folder).where(
-                models.Folder.folder_id == inputBody["folder"]
-                ).values(
-                contents = contents
-                )
-        conn.commit()
-        
     createNewSnapshot(proj_id, doc_id, inputBody["data"])
 
     return {"posted": inputBody}
@@ -557,7 +580,7 @@ def getDocument(proj_id, doc_id):
     # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
     #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    info = getDocumentInfo(doc_id)
+    info = json.dumps(getDocumentInfo(doc_id))
     return {"success": True, "reason":"", "body": info}
 
 # Comment POST, GET, PUT, DELETE
@@ -578,7 +601,7 @@ def createComment(snapshot_id):
         }
 
     body = request.get_json()
-    if not isValidRequest(body, ["diff_id", "author_id", "reply_to_id", "content"]):
+    if not isValidRequest(body, ["snapshot_id", "author_id", "reply_to_id", "content"]):
         return {
             "success": False,
             "reason": "Invalid Request"
