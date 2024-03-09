@@ -9,14 +9,17 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text
+from sqlalchemy import ColumnExpressionArgument, Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 from cloudSql import connectCloudSql
-from cacheUtils import cloudStorageCache, publishTopicUpdate
+from cacheUtils import cloudStorageCache, commentsCache, publishTopicUpdate
 
 import models
 engine = connectCloudSql()
+
+from sqlalchemy.orm import sessionmaker
+Session = sessionmaker(engine)
 
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
@@ -81,22 +84,86 @@ def isValidRequest(parameters, requiredKeys):
 
     return True
 
-import time
 def fetchFromCloudStorage(blobName:str):
-    startTime = time.time()
+    '''
+    If cached, returns the blob in cache.
+    If uncached, makes a request for the blob in Google Buckets
+    and returns the blob.
+
+    Args
+      blobName:
+        Name of the blob to retrieve.
+    '''
     blobContents = cloudStorageCache.get(blobName)
     if blobContents is None:
         blobContents = getBlob(blobName)
-        print("not found in cache: ", blobName, flush=True)
-    else:
-        print("found in cache: ", blobName, flush=True)
     
     if blobContents is not None:
         cloudStorageCache.set(blobName, blobContents)
     
-    print(f"Time to fetch: {time.time() - startTime}\n\n", flush=True)
     return blobContents
 
 def publishCloudStorageUpdate(blobName: str):
+    '''
+    Publishes a message with the blobName as the key to indicate that the
+    specified blob has been updated. The key is used to delete the blob
+    from cache.
+
+    Args
+      blobName:
+        Name of the blob that was updated (created, edited, deleted)
+    '''
     publishTopicUpdate("cloud-storage-updates", blobName)
     return
+
+def fetchCommentsOnDiff(diff_id: int):
+    '''
+    If cached, returns all comments associated with the diff in cache.
+    If uncached, makes a request to query the comments database
+    in Cloud SQL and returns all comments associated with the diff.
+
+    Args
+      diff_id:
+        Unique identifier of the diff to retrieve comments from.
+    '''
+    commentsList = commentsCache.get(diff_id)
+    if commentsList is None:
+        commentsList = filterCommentsByPredicate(
+            models.Comment.diff_id == diff_id)
+    
+    if commentsList is not None:
+        commentsCache.set(diff_id, commentsList)
+
+    return commentsList
+
+def filterCommentsByPredicate(predicate: ColumnExpressionArgument[bool]):
+    '''
+    Filters the comments database for all comments that satisfy the
+    given predicate and returns the comments as a list.
+
+    Args
+      predicate:
+        An SQL column expression that either returns True or False.
+    '''
+    commentsList = []
+    with Session() as session:
+        try:
+            filteredComments = session.query(models.Comment) \
+                .filter(predicate) \
+                .all()
+            
+            for comment in filteredComments:
+                commentsList.append({
+                    "comment_id": comment.comment_id,
+                    "diff_id": comment.diff_id,
+                    "author_id": comment.author_id,
+                    "reply_to_id": comment.reply_to_id,
+                    "date_created": comment.date_created,
+                    "date_modified": comment.date_modified,
+                    "content": comment.content
+                })
+
+        except Exception as e:
+            commentsList = None
+    
+    return commentsList

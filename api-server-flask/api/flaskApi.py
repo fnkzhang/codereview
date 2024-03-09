@@ -18,7 +18,6 @@ from google.auth.transport import requests
 from sqlalchemy import insert, update, delete
 from sqlalchemy.orm import sessionmaker
 import models
-from cacheUtils import commentsCache
 
 from utils import engine
 
@@ -418,37 +417,8 @@ def getCommentsOnDiff(diff_id):
         }
 
     # Query
-    startTime = time.time()
-    commentsList = commentsCache.get(diff_id)
-    if commentsList is not None:
-        print(f"cached comments time: {time.time() - startTime}", flush=True)
-        return commentsList
-    
-    startTime = time.time()
-    commentsList = []
-    with Session() as session:
-        try:
-            filteredComments = session.query(models.Comment) \
-                .filter_by(diff_id=diff_id) \
-                .all()
+    commentsList = fetchCommentsOnDiff(diff_id)
 
-            for comment in filteredComments:
-                commentsList.append({
-                    "comment_id": comment.comment_id,
-                    "diff_id": comment.diff_id,
-                    "author_id": comment.author_id,
-                    "reply_to_id": comment.reply_to_id,
-                    "date_created": comment.date_created,
-                    "date_modified": comment.date_modified,
-                    "content": comment.content
-                })
-        except Exception as e:
-            print("Error: ", e)
-            return []
-
-    commentsCache.set(diff_id, commentsList)
-    print(f"uncached comments time: {time.time() - startTime}", flush=True)
-    print("Successful Read")
     return commentsList
 
 @app.route('/api/comments/<comment_id>/edit', methods=["PUT"])

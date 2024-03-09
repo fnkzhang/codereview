@@ -77,8 +77,9 @@ PROJECT_ID = "codereview-413200"
 
 COMMENTS_CACHE_CONFIG = {
     "CACHE_TYPE": "FileSystemCache",
-    "CACHE_DIR": f"{CACHE_ROOT}/Comments",
-    "CACHE_THRESHOLD": 200
+    "CACHE_DEFAULT_TIMEOUT": 60,
+    "CACHE_THRESHOLD": 200,
+    "CACHE_DIR": f"{CACHE_ROOT}/Comments"
 }
 
 GCLOUD_STORAGE_CACHE_CONFIG = {
