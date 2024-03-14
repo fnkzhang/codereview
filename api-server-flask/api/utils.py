@@ -82,7 +82,20 @@ def getProjectInfo(proj_id):
             return -1
         
         return foundProject._asdict()
+    
+def getAllDocumentsForProject(proj_id):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
 
+        results = conn.execute(stmt)
+
+        arrayOfDocuments = []
+
+        for row in results:
+            arrayOfDocuments.append(row._asdict())
+        
+        return arrayOfDocuments
+    
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
@@ -90,7 +103,7 @@ def getDocumentInfo(doc_id):
         if foundDocument == None:
             return -1
         return foundDocument
-
+  
 def createNewDocument(document_name, parent_folder):
     doc_id = createID()
     with engine.connect() as conn:

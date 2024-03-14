@@ -206,5 +206,31 @@ export async function getUserProjects(userEmail) {
 
     return data.body
 }))
+}
 
+export async function getProjectDocuments(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Document/${proj_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+
+    return data.body
+  })
 }

@@ -75,8 +75,8 @@ class Document(Base):
     name = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    snapshots = Column(ARRAY(Integer))
-    parent_folder = Column(Integer)
+    #snapshots = Column(ARRAY(Integer))
+    #parent_folder = Column(Integer)
 
 class Folder(Base):
     __tablename__ = "folders"
