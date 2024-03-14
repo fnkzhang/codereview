@@ -1,13 +1,11 @@
 import "./Oauth.css"
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
 import { jwtDecode } from 'jwt-decode';
 import getCookie from "../utils/utils";
 
-export default function Oauth( { isLoggedIn, setIsLoggedIn } ){
-
-    const [userData, setUserData] = useState(null)
+export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData } ){
 
     const verifyLogin = useCallback(async (credentialResponse) => {
         let oAuthToken = credentialResponse.credential
@@ -36,7 +34,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn } ){
             document.cookie = `cr_id_token=${credentialResponse.credential}; domain=; path=/`;
         })
         .catch(e => console.log(e))
-    }, [setIsLoggedIn])
+    }, [setIsLoggedIn, setUserData])
 
     // Check If the user token is valid
     useEffect(() => {
@@ -53,7 +51,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn } ){
 
         verifyLogin(credentialObject)
 
-    }, [verifyLogin, setIsLoggedIn])
+    }, [verifyLogin, setIsLoggedIn, setUserData])
 
     // Check if user is valid when userData is returned
     useEffect(() => {

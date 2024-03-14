@@ -16,7 +16,7 @@ from cloudSql import connectCloudSql
 
 import models
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../../googlecreds.json"
 os.environ["GCLOUD_PROJECT"] = "codereview-413200"
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
@@ -47,18 +47,19 @@ def setUserProjPermissions(email, pid, r, perms):
         conn.execute(stmt)
         conn.commit()
     return True
-def getUserProjPermissions(user_email):
+
+# Find all project relationship models for user email
+def getAllUserProjPermissions(user_email):
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email)
-        #idk if this works :) change later
-        result = conn.execute(stmt)
-        #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
 
-        #needs to happen because you can only call result.first() once
-        relationfirst = result.first()
-        if relationfirst == None:
-            return -1
-        return result
+        result = conn.execute(stmt)
+
+        returnList = []
+        for row in result:
+            returnList.append(row._asdict())
+
+        return returnList
 
 def getUserProjPermissions(user_email, proj_id):
     with engine.connect() as conn:
@@ -79,7 +80,8 @@ def getProjectInfo(proj_id):
         foundProject = conn.execute(stmt).first()
         if foundProject == None:
             return -1
-        return foundProject
+        
+        return foundProject._asdict()
 
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:

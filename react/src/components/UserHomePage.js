@@ -1,71 +1,98 @@
 import React, {useState, useEffect} from "react";
+import Oauth from "./Oauth";
+
 import getCookie from "../utils/utils";
 import { useNavigate } from "react-router";
-
+import { getUserProjects } from "../api/APIUtils";
 export default function UserHomePage() {
+
     const [isLoggedIn, setIsLoggedIn] = useState(false)
+
     const [userData, setUserData] = useState(null)
 
+    const [userProjects, setUserProjects] = useState([])
+
     const navigate = useNavigate()
-
-    // Validate User or Send to Login
+  
     useEffect(() => {
-      let credentialToken = getCookie("cr_id_token")
-
-      if (credentialToken === null)
+      if (!isLoggedIn)
         return
-
-      let credentialObject = {
-          "credential": credentialToken
-      }
-
-      verifyLogin(credentialObject)
-      // After Setting userData, use email to grab user related documents from API
-
-    }, [])
-
-    useEffect(() => {
-      if (userData === null)  
+      if (userData.length > 0)
         return
+      console.log(userData)
 
-      // todo GRAB USER DATA FROM API
+      // Grab User Data
+      async function grahProjectData() {
+        let projArray = await getUserProjects(userData["email"])
+        console.log(projArray)
+        setUserProjects(projArray)
+      } 
 
-      
-    }, [userData])
-    async function verifyLogin(credentialResponse) {
-      let oAuthToken = credentialResponse.credential
+      grahProjectData()
 
-      let headers= {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          }
-      }
-      console.log("FETCHING")
+    }, [isLoggedIn, userData])
 
-      await fetch('/api/user/authenticate', headers)
-      .then(response => response.json())
-      .then(data => {
-          if (data.success === false) {
-              console.log("Failed to validate token")
-              return
-          }
-          
-          setUserData(data.body)
-          console.log(data)
-          setIsLoggedIn(true)
-          // Save to Cookie
-          document.cookie = `cr_id_token=${credentialResponse.credential}`;
-      })
-      .catch(e => console.log(e))
-
+    // Clicking on project will redirect to project page to select documents
+    const handleProjectClick = (id, name) => {
+      navigate(`/Project/${id}`)
     }
 
-    return (
-      <div>
+    function ProjectDisplayBox({id, name}) {
+      console.log(id, name)
+      return (
+        <div onClick={() => handleProjectClick(id, name)} style={{display: "flex", border: "solid white 2px", justifyContent: "center"}}>
+          <h4 style={{color: "white", margin:"5px"}}>{id}</h4>
+          <h4 style={{color: "white", margin:"5px"}}>{name}</h4>
+        </div>
+      )
+    }
+    function DisplayProjects() {
+      console.log(userProjects)
 
+      if(userProjects.length > 0) {
+        return ( 
+          <div>
+            {
+              userProjects.map( (project,index) => {
+                if(project === -1)
+                  return
+
+                console.log(project)
+                return(<ProjectDisplayBox id={project["proj_id"]} name={project["name"]}/>)
+              })
+            }
+          </div>
+        )
+      }
+
+      return <p>FAILED</p>
+    }
+    if (isLoggedIn) {
+      return (
+      <div>
+        <Oauth
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        userData={userData}
+        setUserData={setUserData}
+        />
+
+        <div>
+          <h3>Your Projects</h3>
+
+           <DisplayProjects/>
+        </div>
       </div>
-    )
+      )
+    } else {
+      return (
+        <div>
+            <Oauth
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+            userData={userData}
+            setUserData={setUserData}/>
+        </div>
+      )
+    }
 }

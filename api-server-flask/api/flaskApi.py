@@ -177,30 +177,37 @@ def signUp():
     }
     return jsonify(retData)
 
+# Return body has array of project Data
+# Array can contain -1 value indicating missing references
 @app.route('/api/User/<user_email>/Project/', methods = ["GET"])
-def getUserProjects(user_email):
+def getAllUserProjects(user_email):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
-                "success":False,
+                "success": False,
                 "reason": "Invalid Token Provided"
         }
 
     idInfo = authenticate()
     if idInfo is None:
         return {
-            "success":False,
+            "success": False,
             "reason": "Failed to Authenticate"
         }
 
-    allPermissions = getUserProjPermissions(user_email)
+    allPermissions = getAllUserProjPermissions(user_email)
     if allPermissions == -1:
         return {"projects": "None"}
     projects = []
+
     for permission in allPermissions:
-        projects.append(getProjectInfo(permission.proj_id))
-    info = json.dumps(projects)
-    return {"proj_info": info}
+        projects.append(getProjectInfo(permission["proj_id"]))
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": projects
+        }
 
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
@@ -625,7 +632,6 @@ def createDocument(proj_id):
 
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
 def getAllDocumentSnapshots(proj_id, doc_id):
-    print("Request:", request.headers)
     headers = request.headers
  
     if not isValidRequest(headers, ["Authorization"]):
