@@ -43,7 +43,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       if (snapshotId != null) {
         console.log("adding comment ...")
         setComments([...comments,{
-          author_id: 1,
+          author_id: 2,
           comment_id: 1000,
           content: newComment,
           date_created: "time",
