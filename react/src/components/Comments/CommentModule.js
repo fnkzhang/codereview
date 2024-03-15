@@ -1,15 +1,13 @@
 import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
-import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
+// import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
 
-import { getComments } from '../../dev/getComments.js'
-
-function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, start , end}) {
+function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
+  start , end, comments, setComments}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   //const [comments, setComments] = useState(null);
-  const [comments, setComments] = useState(getComments())
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
@@ -29,7 +27,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
+  }, [commentsLoading])
 
   function handleNewCommentChange (event) {
     setNewComment(event.target.value);

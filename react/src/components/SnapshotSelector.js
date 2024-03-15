@@ -5,7 +5,7 @@ import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 import './SnapshotSelector.css'
 
-export default function SnapshotSelector() { 
+export default function SnapshotSelector({ comments }) { 
     const [snapshots, setSnapshots] = useState([])
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
     const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
@@ -41,7 +41,6 @@ export default function SnapshotSelector() {
             return (
               <div>
                 <div>Dsiplay on Left</div>
-
                 <div style={{"display": "flex"}}>
                   {snapshots.map((snapshot, index) => { 
                       //console.log(snapshot)
@@ -53,16 +52,25 @@ export default function SnapshotSelector() {
                             data-tooltip-id={`tooltipleft${index}`}>
                               Snapshot {index}
                           </button>
-                          <Tooltip 
+                          <Tooltip
+                            className="Tooltip" 
                             id={`tooltipleft${index}`}
-                            place="bottom"
-                            content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
+                            place="top"
+                            content={
+                              <div>
+                                <p>
+                                  Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
+                                </p>
+                                <p>
+                                  Open Comments: {comments.filter(item => item.snapshot_id === snapshot.snapshot_id).length}
+                                </p>
+                              </div>
+                            }
                           />
                         </div>
                       ) : null
                   })} 
                 </div> 
-                            
               </div>
           )
          } 
@@ -79,7 +87,6 @@ export default function SnapshotSelector() {
               <div style={{"display": "flex"}}>
                 {snapshots.map((snapshot, index) => { 
                     //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
-                    
                     return (index >= selectedLeftSnapshotIndex) ? (
                       <div key={index}>
                         <button 
@@ -88,10 +95,20 @@ export default function SnapshotSelector() {
                           data-tooltip-id={`tooltipright${index}`}>
                             Snapshot {index}
                         </button>
-                        <Tooltip 
+                        <Tooltip
+                          className="Tooltip" 
                           id={`tooltipright${index}`}
-                          place="bottom"
-                          content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
+                          place="top"
+                          content={
+                            <div>
+                              <p>
+                                Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
+                              </p>
+                              <p>
+                                Open Comments: {comments.filter(item => item.snapshot_id === snapshot.snapshot_id).length}
+                              </p>
+                            </div>
+                          }
                         />
                       </div>
                     ) : null

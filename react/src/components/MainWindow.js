@@ -5,11 +5,14 @@ import Oauth from "./Oauth"
 import AppHeader from "./AppHeader"
 import "./MainWindow.css"
 
+import { getComments } from '../dev/getComments.js'
+
 export default function MainWindow() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userData, setUserData] = useState(null)
-  
+  const [comments, setComments] = useState(getComments())
+
   if (isLoggedIn) {
     return(
       <div>
@@ -19,8 +22,11 @@ export default function MainWindow() {
         userData={userData}
         setUserData={setUserData}/>
         <AppHeader/>
-        <SnapshotSelector/>
-        <ReviewWindow/>
+        <SnapshotSelector
+          comments={comments}/>
+        <ReviewWindow
+          comments={comments}
+          setComments={setComments}/>
       </div>
     )
   } else {
