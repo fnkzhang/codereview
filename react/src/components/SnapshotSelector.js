@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'
 import './SnapshotSelector.css'
 
 export default function SnapshotSelector() { 
@@ -16,7 +18,7 @@ export default function SnapshotSelector() {
 
         const grabSnapshots = async () => {
           let result = await getAllSnapshotsFromDocument(document_id)
-
+          console.log(result)
           if (result.success)
             setSnapshots(result.body)
         }
@@ -42,11 +44,19 @@ export default function SnapshotSelector() {
                 {snapshots.map((snapshot, index) => { 
                     //console.log(snapshot)
                     return (index <= selectedRightSnapshotIndex) ? (
-                      <button id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
-                              onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
-                              key={index}>
-                        {snapshot.date_modified}
-                      </button>
+                      <div key={index}>
+                        <button 
+                          id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
+                          onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
+                          data-tooltip-id={`tooltipleft${index}`}>
+                            Snapshot {index}
+                        </button>
+                        <Tooltip 
+                          id={`tooltipleft${index}`}
+                          place="bottom"
+                          content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
+                        />
+                      </div>
                     ) : null
                 })}              
               </div>
@@ -66,11 +76,19 @@ export default function SnapshotSelector() {
                   //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
                   
                   return (index >= selectedLeftSnapshotIndex) ? (
-                    <button id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
-                            onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
-                            key={index}>
-                      {snapshot.date_modified}
-                    </button>
+                    <div key={index}>
+                      <button 
+                        id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
+                        onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
+                        data-tooltip-id={`tooltipright${index}`}>
+                          Snapshot {index}
+                      </button>
+                      <Tooltip 
+                        id={`tooltipright${index}`}
+                        place="bottom"
+                        content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
+                      />
+                    </div>
                   ) : null
               })}              
             </div>

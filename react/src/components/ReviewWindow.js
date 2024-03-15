@@ -55,7 +55,6 @@ export default function ReviewWindow() {
         setSnapshotID(Number(snapshotID));
         setStart(startPosition);
         setEnd(endPosition);
-        console.log(snapshotID);
       };
       originalEditor.onDidChangeCursorSelection(handleSelectionChange(originalEditor, left_snapshot_id));
       modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
