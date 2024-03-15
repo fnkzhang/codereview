@@ -72,25 +72,27 @@ export default function SnapshotSelector() {
           return (
             <div>
               <div>Dsiplay on Right</div>
-              {snapshots.map((snapshot, index) => { 
-                  //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
-                  
-                  return (index >= selectedLeftSnapshotIndex) ? (
-                    <div key={index}>
-                      <button 
-                        id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
-                        onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
-                        data-tooltip-id={`tooltipright${index}`}>
-                          Snapshot {index}
-                      </button>
-                      <Tooltip 
-                        id={`tooltipright${index}`}
-                        place="bottom"
-                        content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
-                      />
-                    </div>
-                  ) : null
-              })}              
+              <div style={{"display": "flex"}}>
+                {snapshots.map((snapshot, index) => { 
+                    //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
+                    
+                    return (index >= selectedLeftSnapshotIndex) ? (
+                      <div key={index}>
+                        <button 
+                          id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
+                          onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
+                          data-tooltip-id={`tooltipright${index}`}>
+                            Snapshot {index}
+                        </button>
+                        <Tooltip 
+                          id={`tooltipright${index}`}
+                          place="bottom"
+                          content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
+                        />
+                      </div>
+                    ) : null
+                })} 
+              </div>             
             </div>
         )
        } 
