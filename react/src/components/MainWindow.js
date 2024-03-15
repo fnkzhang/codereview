@@ -3,7 +3,7 @@ import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
 import Oauth from "./Oauth"
 import AppHeader from "./AppHeader"
-import "./MainWindow.css"
+import "./Logged-out.css"
 
 import { getComments } from '../dev/getComments.js'
 

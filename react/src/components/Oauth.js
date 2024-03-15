@@ -38,20 +38,22 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
 
     // Check If the user token is valid
     useEffect(() => {
-        let credentialToken = getCookie("cr_id_token")
-        if (credentialToken == null) {
-            setIsLoggedIn(false)
-            setUserData(null)
-            return
+        if (isLoggedIn === false) {
+            let credentialToken = getCookie("cr_id_token")
+            if (credentialToken == null) {
+                setIsLoggedIn(false)
+                setUserData(null)
+                return
+            }
+
+            let credentialObject = {
+                "credential": credentialToken
+            }
+
+            verifyLogin(credentialObject)
         }
 
-        let credentialObject = {
-            "credential": credentialToken
-        }
-
-        verifyLogin(credentialObject)
-
-    }, [verifyLogin, setIsLoggedIn, setUserData])
+    }, [verifyLogin, isLoggedIn, setIsLoggedIn, setUserData])
 
     // Check if user is valid when userData is returned
     useEffect(() => {

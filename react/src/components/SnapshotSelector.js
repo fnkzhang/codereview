@@ -43,6 +43,10 @@ export default function SnapshotSelector({ comments }) {
                 <div>Dsiplay on Left</div>
                 <div style={{"display": "flex"}}>
                   {snapshots.map((snapshot, index) => { 
+                      const value = comments.filter(item => item.snapshot_id === snapshot.snapshot_id).length
+                      let str = ""
+                      if (value !== 0)
+                        str = `(${value})`
                       //console.log(snapshot)
                       return (index <= selectedRightSnapshotIndex) ? (
                         <div key={index}>
@@ -50,19 +54,19 @@ export default function SnapshotSelector({ comments }) {
                             id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
                             onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
                             data-tooltip-id={`tooltipleft${index}`}>
-                              Snapshot {index}
+                              Snapshot {index} {str}
                           </button>
                           <Tooltip
                             className="Tooltip" 
                             id={`tooltipleft${index}`}
-                            place="top"
+                            place="bottom"
                             content={
                               <div>
                                 <p>
                                   Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
                                 </p>
                                 <p>
-                                  Open Comments: {comments.filter(item => item.snapshot_id === snapshot.snapshot_id).length}
+                                  Open Comments: {value}
                                 </p>
                               </div>
                             }
@@ -86,6 +90,10 @@ export default function SnapshotSelector({ comments }) {
               <div>Dsiplay on Right</div>
               <div style={{"display": "flex"}}>
                 {snapshots.map((snapshot, index) => { 
+                    const value = comments.filter(item => item.snapshot_id === snapshot.snapshot_id).length
+                    let str = ""
+                    if (value !== 0)
+                      str = `(${value})`
                     //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
                     return (index >= selectedLeftSnapshotIndex) ? (
                       <div key={index}>
@@ -93,19 +101,19 @@ export default function SnapshotSelector({ comments }) {
                           id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
                           onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
                           data-tooltip-id={`tooltipright${index}`}>
-                            Snapshot {index}
+                            Snapshot {index} {str}
                         </button>
                         <Tooltip
                           className="Tooltip" 
                           id={`tooltipright${index}`}
-                          place="top"
+                          place="bottom"
                           content={
                             <div>
                               <p>
                                 Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
                               </p>
                               <p>
-                                Open Comments: {comments.filter(item => item.snapshot_id === snapshot.snapshot_id).length}
+                                Open Comments: {value}
                               </p>
                             </div>
                           }
