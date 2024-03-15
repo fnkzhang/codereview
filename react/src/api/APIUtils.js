@@ -172,12 +172,8 @@ export async function getAllSnapshotsFromDocument(document_id) {
 
   };
 
-    return await fetch((`/api/Document/${1231234141}/${document_id}/getSnapshotId/`), headers)
-      .then(response => response.json()
-      .then(data => {
-        console.log(data)
-        return data
-    }))
+    return await fetch((`/api/Document/0/${document_id}/getSnapshotId/`), headers)
+      .then(response => response.json())
 }
 
 export async function getUserProjects(userEmail) {

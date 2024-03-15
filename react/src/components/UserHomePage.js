@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from "react";
 import Oauth from "./Oauth";
 
-import getCookie from "../utils/utils";
 import { useNavigate } from "react-router";
 import { getUserProjects } from "../api/APIUtils";
 export default function UserHomePage() {
@@ -19,12 +18,10 @@ export default function UserHomePage() {
         return
       if (userData.length > 0)
         return
-      console.log(userData)
 
       // Grab User Data
       async function grahProjectData() {
         let projArray = await getUserProjects(userData["email"])
-        console.log(projArray)
         setUserProjects(projArray)
       } 
 
@@ -47,25 +44,23 @@ export default function UserHomePage() {
       )
     }
     function DisplayProjects() {
-      console.log(userProjects)
 
       if(userProjects.length > 0) {
         return ( 
           <div>
             {
-              userProjects.map( (project,index) => {
+              userProjects.map( (project, index) => {
                 if(project === -1)
                   return
 
-                console.log(project)
-                return(<ProjectDisplayBox id={project["proj_id"]} name={project["name"]}/>)
+                return(<ProjectDisplayBox key={index} id={project["proj_id"]} name={project["name"]}/>)
               })
             }
           </div>
         )
       }
 
-      return <p>FAILED</p>
+      return <p>No Project Available</p>
     }
     if (isLoggedIn) {
       return (

@@ -1,12 +1,8 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
-import { getProjectDocuments } from "../api/APIUtils"
+import { getProjectDocuments, getAllSnapshotsFromDocument } from "../api/APIUtils"
 
 export default function ProjectPage() {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  const [userData, setUserData] = useState(null)
 
   const [projectDocuments, setProjectDocuments] = useState([])
   const { project_id } = useParams()
@@ -14,22 +10,22 @@ export default function ProjectPage() {
 
   // Grab Documents if logged in and userdata
   useEffect(() => {
-    console.log(userData)
 
     // Grab User Data
-    async function grahProjectData() {
-      let docArray = await getProjectDocuments(project_id)
+    async function grabProjectData() {
+      const docArray = await getProjectDocuments(project_id)
       console.log(docArray)
       setProjectDocuments(docArray)
     } 
-    console.log(project_id, typeof(project_id))
-    grahProjectData()
+    grabProjectData()
 
   }, [])
 
   // Clicking on project will redirect to project page to select documents
-  const handleDocumentClick = (id, name) => {
-    navigate(`/Document/${id}`)
+  async function handleDocumentClick (id, name) {
+    const result = await getAllSnapshotsFromDocument(id)
+    if (result.success)
+      navigate(`/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
   }
   function DocumentDisplayBox({id, name}) {
     console.log(id, name)
@@ -47,7 +43,7 @@ export default function ProjectPage() {
         <div>
           {
             projectDocuments.map((document, index) => {
-              return (< DocumentDisplayBox id={document["doc_id"]} name={document["name"]}/> )
+              return (< DocumentDisplayBox key={index} id={document["doc_id"]} name={document["name"]}/> )
             })
           }
         </div>
