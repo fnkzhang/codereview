@@ -178,30 +178,41 @@ def signUp():
     }
     return jsonify(retData)
 
+# Return body has array of project Data
+# Array can contain -1 value indicating missing references
 @app.route('/api/User/<user_email>/Project/', methods = ["GET"])
-def getUserProjects(user_email):
+def getAllUserProjects(user_email):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
-                "success":False,
+                "success": False,
                 "reason": "Invalid Token Provided"
         }
 
     idInfo = authenticate()
     if idInfo is None:
         return {
-            "success":False,
+            "success": False,
             "reason": "Failed to Authenticate"
         }
-
-    allPermissions = getUserProjPermissions(user_email)
+    if idInfo["email"] != user_email:
+        return {
+            "success": False,
+            "reason": "User does not match email"
+            }
+    allPermissions = getAllUserProjPermissions(user_email)
     if allPermissions == -1:
         return {"projects": "None"}
     projects = []
+
     for permission in allPermissions:
-        projects.append(getProjectInfo(permission.proj_id))
-    info = json.dumps(projects)
-    return {"proj_info": info}
+        projects.append(getProjectInfo(permission["proj_id"]))
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": projects
+        }
 
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
@@ -218,9 +229,9 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    root_folder_id = createNewFolder('root', 0)
+    pid = createID()
+    root_folder_id = createNewFolder('root', 0, pid)
     with engine.connect() as conn:
-        pid = createID()
         projstmt = insert(models.Project).values(
                 proj_id = pid,
                 name = proj_name,
@@ -240,7 +251,7 @@ def createProject(proj_name):
     return {
         "success": True,
         "reason": "",
-        "body": {}
+        "body": pid
     }
 
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
@@ -261,16 +272,22 @@ def getProject(proj_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    info = json.dumps(getProjectInfo(proj_id))
-    return {"proj_info": info}
+    info = getProjectInfo(proj_id)
+    return {
+        "success": True,
+        "reason": "",
+        "body": info
+        }
 
-@app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
-def getProjectDocuments(proj_id):
+
+@app.route('/api/Document/<proj_id>/', methods=["GET"])
+def getAllDocumentsFromProject(proj_id):
     headers = request.headers
+
     if not isValidRequest(headers, ["Authorization"]):
         return {
-                "success":False,
-                "reason": "Invalid Token Provided"
+            "success":False,
+            "reason": "Invalid Token Provided"
         }
 
     idInfo = authenticate()
@@ -280,12 +297,23 @@ def getProjectDocuments(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    proj_info = getProjectInfo(proj_id)
-    documents = json.dumps(getAllChildDocuments(proj_info.root_folder))
-    return {"documents": documents}
+    #if not userExists(idInfo["email"]):
+    #    return {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
 
+    # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+
+    arrayOfDocuments = getAllDocumentsForProject(proj_id)
+    return {
+        "success": True,
+        "reason": "",
+        "body": arrayOfDocuments
+    }
 
 #requires
     #authentication stuff
@@ -312,8 +340,12 @@ def createFolder(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    folder_id = createNewFolder(inputBody["folder_name"], inputBody["parent_folder"])
-    return {"posted": folder_id}
+    folder_id = createNewFolder(inputBody["folder_name"], inputBody["parent_folder"], proj_id)
+    return {
+        "success": True,
+        "reason": "",
+        "body": folder_id
+    }
 
 @app.route('/api/Folder/<proj_id>/<folder_id>/', methods=["GET"])
 def getFolder(proj_id, folder_id):
@@ -333,8 +365,12 @@ def getFolder(proj_id, folder_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    info = json.dumps(getFolderInfo(folder_id))
-    return {"folder_info": info}
+    info = getFolderInfo(folder_id)
+    return {
+        "success": True,
+        "reason": "",
+        "body": info
+        }
 
 #needs sections in body
     #credentials (of user that already has access to project)
@@ -467,8 +503,12 @@ def createSnapshot(proj_id, doc_id):
     # if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
     #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
-    createNewSnapshot(proj_id, doc_id, inputBody["data"])
-    return {"posted": inputBody}
+    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"])
+    return {
+        "success": True,
+        "reason": "",
+        "body": snapshot_id
+    }
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
 def getSnapshot(proj_id, doc_id, snapshot_id):
@@ -489,7 +529,12 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     blob = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id)
-    return {"blobContents": blob}
+    return {
+        "success": True,
+        "reason": "",
+        "body": blob
+    }
+
 
 #requires
     #credentials in headers
@@ -497,7 +542,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     #In body:
     #data (text you want in the document)
     #doc_name (name of document)
-    #parent_folder (folder you're making it in)
+    #parent_folder (folder you're making it in), if not in request will put in root folder
 @app.route('/api/Document/<proj_id>/', methods=["POST"])
 def createDocument(proj_id):
     inputBody = request.get_json()
@@ -518,12 +563,19 @@ def createDocument(proj_id):
     
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    
-    doc_id = createNewDocument(inputBody["doc_name"], inputBody["parent_folder"])
+    if "parent_folder" not in inputBody:
+        folder = getProjectInfo(proj_id)["root_folder"]
+    else:
+        folder = inputBody["parent_folder"]
+    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id)
 
     createNewSnapshot(proj_id, doc_id, inputBody["data"])
 
-    return {"posted": inputBody}
+    return {
+        "success": True,
+        "reason": "",
+        "body": doc_id
+    }
 
 
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
@@ -543,13 +595,15 @@ def getAllDocumentSnapshots(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    if not userExists(idInfo["email"]):
-        return {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-    
+    #if not userExists(idInfo["email"]):
+    #    return {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     foundSnapshots = getAllDocumentSnapshotsInOrder(doc_id)
     
     return {"success": True, "reason":"", "body": foundSnapshots}
@@ -577,10 +631,10 @@ def getDocument(proj_id, doc_id):
     #            "body":{}
     #    }
 
-    # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    info = json.dumps(getDocumentInfo(doc_id))
+    info = getDocumentInfo(doc_id)
     return {"success": True, "reason":"", "body": info}
 
 # Comment POST, GET, PUT, DELETE
@@ -781,3 +835,4 @@ def deleteComment(comment_id):
         "success": True,
         "reason": "Successful Delete"
     }
+

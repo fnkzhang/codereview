@@ -30,7 +30,6 @@ def uploadBlob(blobName, item):
     return True
 
 def getBlob(blobName):
-    print(blobName)
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
@@ -47,18 +46,19 @@ def setUserProjPermissions(email, pid, r, perms):
         conn.execute(stmt)
         conn.commit()
     return True
-def getUserProjPermissions(user_email):
+
+# Find all project relationship models for user email
+def getAllUserProjPermissions(user_email):
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email)
-        #idk if this works :) change later
-        result = conn.execute(stmt)
-        #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
 
-        #needs to happen because you can only call result.first() once
-        relationfirst = result.first()
-        if relationfirst == None:
-            return -1
-        return result
+        result = conn.execute(stmt)
+
+        returnList = []
+        for row in result:
+            returnList.append(row._asdict())
+
+        return returnList
 
 def getUserProjPermissions(user_email, proj_id):
     with engine.connect() as conn:
@@ -79,7 +79,20 @@ def getProjectInfo(proj_id):
         foundProject = conn.execute(stmt).first()
         if foundProject == None:
             return -1
-        return foundProject
+        return foundProject._asdict()
+
+def getAllDocumentsForProject(proj_id):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
+
+        results = conn.execute(stmt)
+
+        arrayOfDocuments = []
+
+        for row in results:
+            arrayOfDocuments.append(row._asdict())
+
+        return arrayOfDocuments
 
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
@@ -87,27 +100,18 @@ def getDocumentInfo(doc_id):
         foundDocument = conn.execute(stmt).first()
         if foundDocument == None:
             return -1
-        return foundDocument
+        return foundDocument._asdict()
 
-def createNewDocument(document_name, parent_folder):
+def createNewDocument(document_name, parent_folder, proj_id):
     doc_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
             doc_id = doc_id,
             name = document_name,
-            parent_folder = parent_folder
+            parent_folder = parent_folder,
+            associated_proj_id = proj_id
         )
         conn.execute(stmt)
-        foldercontentstmt = select(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                )
-        contents = conn.execute(stmt).first().contents
-        contents.append([doc_id, 0])
-        stmt = update(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                ).values(
-                contents = contents
-                )
         conn.commit()
     return doc_id
 
@@ -118,27 +122,18 @@ def getFolderInfo(folder_id):
         foundFolder = conn.execute(stmt).first()
         if foundFolder == None:
             return -1
-        return foundFolder
+        return foundFolder._asdict()
 
-def createNewFolder(folder_name, parent_folder):
+def createNewFolder(folder_name, parent_folder, proj_id):
     folder_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Folder).values(
             folder_id = folder_id,
             name = folder_name,
-            parent_folder = parent_folder
+            parent_folder = parent_folder,
+            associated_proj_id = proj_id
         )
         conn.execute(stmt)
-        foldercontentstmt = select(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                )
-        contents = conn.execute(stmt).first().contents
-        contents.append([folder_id, 1])
-        stmt = update(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                ).values(
-                contents = contents
-                )
         conn.commit()
     return folder_id
 
@@ -164,9 +159,9 @@ def createNewSnapshot(proj_id, doc_id, item):
         stmt = select(models.Document).where(
             models.Document.doc_id == doc_id)
 
-        doc = conn.execute(stmt).first()
+        doc = conn.execute(stmt)#.first()
 
-        doc_name = doc.name
+        doc_name = doc.first().name
             
         snapshot_id = createID()
         stmt = insert(models.Snapshot).values(
@@ -178,19 +173,20 @@ def createNewSnapshot(proj_id, doc_id, item):
         conn.commit()
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
+        return snapshot_id
 
 # Returns Array of Dictionaries
 def getAllDocumentSnapshotsInOrder(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id).order_by(models.Snapshot.date_created.asc())
-        foundDocuments = conn.execute(stmt)
+        foundSnapshots = conn.execute(stmt)
         
-        listOfDocuments = []
+        listOfSnapshots = []
         
-        for row in foundDocuments:
-            listOfDocuments.append(row._asdict())
+        for row in foundSnapshots:
+            listOfSnapshots.append(row._asdict())
         
-        return listOfDocuments
+        return listOfSnapshots
 
 def userExists(user_email):
     with engine.connect() as conn:
