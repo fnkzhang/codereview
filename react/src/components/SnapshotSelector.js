@@ -41,24 +41,28 @@ export default function SnapshotSelector() {
             return (
               <div>
                 <div>Dsiplay on Left</div>
-                {snapshots.map((snapshot, index) => { 
-                    //console.log(snapshot)
-                    return (index <= selectedRightSnapshotIndex) ? (
-                      <div key={index}>
-                        <button 
-                          id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
-                          onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
-                          data-tooltip-id={`tooltipleft${index}`}>
-                            Snapshot {index}
-                        </button>
-                        <Tooltip 
-                          id={`tooltipleft${index}`}
-                          place="bottom"
-                          content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
-                        />
-                      </div>
-                    ) : null
-                })}              
+
+                <div style={{"display": "flex"}}>
+                  {snapshots.map((snapshot, index) => { 
+                      //console.log(snapshot)
+                      return (index <= selectedRightSnapshotIndex) ? (
+                        <div key={index}>
+                          <button 
+                            id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
+                            onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
+                            data-tooltip-id={`tooltipleft${index}`}>
+                              Snapshot {index}
+                          </button>
+                          <Tooltip 
+                            id={`tooltipleft${index}`}
+                            place="bottom"
+                            content={`Last Modified: ${new Date(snapshot.date_modified).toLocaleString()}`}
+                          />
+                        </div>
+                      ) : null
+                  })} 
+                </div> 
+                            
               </div>
           )
          } 
