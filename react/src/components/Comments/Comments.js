@@ -2,7 +2,8 @@ import './Comments.css';
 import SubCommentList from './SubCommentList';
 import React from 'react';
 
-function Comment ({ commentID, author, text, subcomments, date, line, commentLineJump }) {
+function Comment ({ commentID, author, text, subcomments, date, commentLineJump, snapshotID, 
+  highlightStartX, highlightStartY, highlightEndX, highlightEndY }) {
   return (
     <div>
       <div className="Comment-container">
@@ -12,7 +13,7 @@ function Comment ({ commentID, author, text, subcomments, date, line, commentLin
         </div>
         <div className="Comment-text">{text}</div>
         <div className="Comment-linejump-button">
-          <button onClick={() => commentLineJump(line)}>
+          <button onClick={() => commentLineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY)}>
             Jump to Line
           </button>
         </div>

@@ -1,15 +1,17 @@
 from cloudSql import connectCloudSql
-from flask import Flask, request, jsonify
+from flask import Flask, request, make_response, jsonify
 from flask_cors import CORS
-from google.cloud import storage
+
 from utils import *
 from diff_match_patch import diff_match_patch
 from google.oauth2 import id_token
 from google.auth.transport import requests
-import sqlalchemy
+
 from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete
 from sqlalchemy.orm import sessionmaker
+
 import pymysql
+
 import models
 from cloudSql import connectCloudSql
 
@@ -20,25 +22,14 @@ CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleuserconten
 
 app = Flask(__name__)
 
-CORS(app)
+CORS(app, headers=["Content-Type", "Authorization"])
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
-
-
-# Remove Later
-class User():
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    email = Column(String(50))
-
-
-metaData = MetaData()
-table = Table('testTable', metaData,
-            Column('id', Integer(), primary_key=True),
-            Column('name', String(50), nullable=False),
-            Column('email', String(50), nullable=False),
-            )
+@app.after_request
+def afterRequest(response):
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 # Remove Later for testing
 @app.route('/createTable')
@@ -55,52 +46,6 @@ def createTable():
     #metaData.create_all(engine)
     print("Table was created")
     return "Created Table"
-
-@app.route('/dropUserProjectRelationTable')
-def dropUserProjectRelationTable():
-    models.UserProjectRelation.__table__.drop(engine)
-    return True
-
-@app.route('/insert')
-def testInsert():
-    #engine = connectCloudSql()
-    with engine.connect() as conn:
-        stmt = insert(table).values(name="PungeBob", email="testEmail@gmail.com")
-
-        conn.execute(stmt)
-        conn.commit()
-
-    return "tested"
-
-@app.route('/testGrabData')
-def grabData():
-    #engine = connectCloudSql()
-
-    with engine.connect() as conn:
-        stmt = select(table).where(table.c.email == "testEmail@gmail.com")
-
-        result = conn.execute(stmt)
-        result = result.mappings().all()
-
-        retArray = []
-        # Recreate Dict from SQLAlchemy Row and return
-        # Can't Find any alternatives that worked rn maybe in future
-        for row in result:
-            d = {}
-            d["id"] = row.id
-            d["name"] = row.name
-            d["email"] = row.email
-
-            retArray.append(d)
-
-    returnArray = {
-        "success": True,
-        "reason": "",
-        "body": retArray,
-    }
-    
-    return returnArray
-# End Remove later
 
 # Takes in json with "code" section
 @app.route('/api/sendData', methods=["POST"])
@@ -141,7 +86,7 @@ def authenticate():
     headers = request.headers
     if (not isValidRequest(headers, ["Authorization"])):
         return None
-    
+
     try:
         idInfo = id_token.verify_oauth2_token(
             headers["Authorization"],
@@ -158,6 +103,38 @@ def defaultRoute():
     #print('what', file=sys.stderr)
     return "test"
 
+# Might need to reformat this function
+@app.route('/api/user/isValidUser', methods=["POST"])
+def checkIsValidUser():
+    headers = request.headers
+
+    if (not isValidRequest(headers, ["Authorization"])):
+        return {
+                "success": False,
+                "reason": "Invalid Token Provided"
+        }
+    
+    if (not isValidRequest(headers, ["Email"])):
+        return {
+            "success": False,
+            "reason": "Invalid Header Provided"
+        }
+    
+    user = userExists(headers["Email"])
+
+    if (not user):
+        return {
+            "success": False,
+            "reason": "User Does not exist"
+        }
+    
+    return {
+        "success": True,
+        "reason": "",
+        "body": {}
+    }
+
+    pass
 #literally just authenticate but it adds a user to the database.
 #needs sections:
     #credentials
@@ -200,6 +177,31 @@ def signUp():
     }
     return jsonify(retData)
 
+@app.route('/api/User/<user_email>/Project/', methods = ["GET"])
+def getUserProjects(user_email):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    allPermissions = getUserProjPermissions(user_email)
+    if allPermissions == -1:
+        return {"projects": "None"}
+    projects = []
+    for permission in allPermissions:
+        projects.append(getProjectInfo(permission.proj_id))
+    info = json.dumps(projects)
+    return {"proj_info": info}
+
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
     headers = request.headers
@@ -215,20 +217,14 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
+    root_folder_id = createNewFolder('root', 0)
     with engine.connect() as conn:
         pid = createID()
         projstmt = insert(models.Project).values(
                 proj_id = pid,
                 name = proj_name,
-                author_email = idInfo["email"]
+                author_email = idInfo["email"],
+                root_folder = root_folder_id
         )
     #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
         relationstmt = insert(models.UserProjectRelation).values(
@@ -240,7 +236,104 @@ def createProject(proj_name):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
-    return True
+    return {
+        "success": True,
+        "reason": "",
+        "body": {}
+    }
+
+@app.route('/api/Project/<proj_id>/', methods = ["GET"])
+def getProject(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    info = json.dumps(getProjectInfo(proj_id))
+    return {"proj_info": info}
+
+@app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
+def getProjectDocuments(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    proj_info = getProjectInfo(proj_id)
+    documents = json.dumps(getAllChildDocuments(proj_info.root_folder))
+    return {"documents": documents}
+
+
+#requires
+    #authentication stuff
+#needs in body
+    #folder name
+    #parent_folder
+@app.route('/api/Folder/<proj_id>/', methods=["POST"])
+def createFolder(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+    folder_id = createNewFolder(inputBody["folder_name"], inputBody["parent_folder"])
+    return {"posted": folder_id}
+
+@app.route('/api/Folder/<proj_id>/<folder_id>/', methods=["GET"])
+def getFolder(proj_id, folder_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    info = json.dumps(getFolderInfo(folder_id))
+    return {"folder_info": info}
 
 #needs sections in body
     #credentials (of user that already has access to project)
@@ -264,14 +357,6 @@ def addUser(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
-
     if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     with engine.connect() as conn:
@@ -285,7 +370,7 @@ def addUser(proj_id):
         else:
             relationstmt = update(models.UserProjectRelation).where(
                 models.UserProjectRelation.user_email == inputBody["email"],
-                proj_id == proj_id
+                models.UserProjectRelation.proj_id == proj_id
             ).values(
                 role = inputBody["role"],
                 permissions = inputBody["permissions"]
@@ -340,13 +425,6 @@ def removeUser(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
     #3 is placeholder value since we only have read permission
     if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
@@ -359,8 +437,8 @@ def removeUser(proj_id):
         conn.commit()
     return {"success": True, "reason":"N/A", "body": {}}
 
-@app.route('/api/Document/<proj_id>/<doc_id>/create', methods=["POST"])
-def createDocument(proj_id, doc_id):
+@app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
+def createSnapshot(proj_id, doc_id):
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -377,23 +455,22 @@ def createDocument(proj_id, doc_id):
         }
 
     #todo:make this a function
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
+    #if not userExists(idInfo["email"]):
+    #    retData = {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
+    #    return jsonify(retData)
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    # if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
     ##########################
-    uploadBlob(proj_id + '/' + doc_id,  inputBody["data"])
+    createNewSnapshot(proj_id, doc_id, inputBody["data"])
     return {"posted": inputBody}
 
-
-@app.route('/api/Document/<proj_id>/<doc_id>/get', methods=["GET"])
-def getDocument(proj_id, doc_id):
+@app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
+def getSnapshot(proj_id, doc_id, snapshot_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -408,43 +485,13 @@ def getDocument(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    if not userExists(idInfo["email"]):
-        retData = {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
-        }
-        return jsonify(retData)
-
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    blob = getBlob(proj_id + '/' + doc_id)
+    blob = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id)
     return {"blobContents": blob}
 
-#not gonna mess with diff stuff for now because again, i'm only going to focus on document permissions
-@app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/create', methods=["POST"])
-def createDiff(proj_id, doc_id, diff_id):
-    inputBody = request.get_json()
-    dmp = diff_match_patch()
-    diffText = dmp.patch_toText(dmp.patch_make(dmp.diff_main(inputBody["original"], inputBody["updated"])))
-    uploadBlob(proj_id + '/' + doc_id + '/' + diff_id, diffText)
-    return {"diffText": diffText}
-
-@app.route('/api/Document/<proj_id>/<doc_id>/<diff_id>/get', methods=["GET"])
-def getDiff(proj_id, doc_id, diff_id):
-    document = getBlob(proj_id + '/' + doc_id)
-    diffText = getBlob(proj_id + '/' + doc_id + '/' + diff_id)
-    dmp = diff_match_patch()
-    output, _ = dmp.patch_apply(dmp.patch_fromText(diffText), document)
-    return {"diffResult": output}
-
-@app.route('/api/Document/<proj_id>/<doc_id>/test', methods=["GET"])
-def testDocument(proj_id, doc_id):
-    return uploadBlob(proj_id + '/'+ doc_id, {'ok':'hey'})
-
-# Comment POST, GET, PUT, DELETE
-@app.route('/api/diffs/<diff_id>/comment/create', methods=["POST"])
-def createComment(diff_id):
+@app.route('/api/Snapshot/<snapshot_id>/comment/create', methods=["POST"])
+def createComment(snapshot_id):
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -460,7 +507,7 @@ def createComment(diff_id):
         }
 
     body = request.get_json()
-    if not isValidRequest(body, ["diff_id", "author_id", "reply_to_id", "content"]):
+    if not isValidRequest(body, ["snapshot_id", "author_id", "reply_to_id", "content"]):
         return {
             "success": False,
             "reason": "Invalid Request"
@@ -470,10 +517,15 @@ def createComment(diff_id):
     with Session() as session:
         try:
             session.add(models.Comment(
-                diff_id=int(body["diff_id"]),
+                snapshot_id=int(body["snapshot_id"]),
                 author_id=int(body["author_id"]),
                 reply_to_id=int(body["reply_to_id"]),
-                content=body["content"]
+                content=body["content"],
+                highlight_start_x = int(body["highlight_start_x"]),
+                highlight_start_y = int(body["highlight_start_y"]),
+                highlight_end_x = int(body["highlight_end_x"]),
+                highlight_end_y = int(body["highlight_end_y"]),
+
             ))
             session.commit()
         except Exception as e:
@@ -491,8 +543,9 @@ def createComment(diff_id):
 
 # look into pagination
 # https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
-@app.route('/api/diffs/<diff_id>/comments/get', methods=["GET"])
-def getCommentsOnDiff(diff_id):
+@app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
+def getCommentsOnSnapshot(snapshot_id):
+
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -512,18 +565,22 @@ def getCommentsOnDiff(diff_id):
     with Session() as session:
         try:
             filteredComments = session.query(models.Comment) \
-                .filter_by(diff_id=diff_id) \
+                .filter_by(snapshot_id=snapshot_id) \
                 .all()
 
             for comment in filteredComments:
                 commentsList.append({
                     "comment_id": comment.comment_id,
-                    "diff_id": comment.diff_id,
+                    "snapshot_id": comment.snapshot_id,
                     "author_id": comment.author_id,
                     "reply_to_id": comment.reply_to_id,
                     "date_created": comment.date_created,
                     "date_modified": comment.date_modified,
-                    "content": comment.content
+                    "content": comment.content,
+                    "highlight_start_x": comment.highlight_start_x,
+                    "highlight_start_y": comment.highlight_start_y,
+                    "highlight_end_x": comment.highlight_end_x,
+                    "highlight_end_y": comment.highlight_end_y
                 })
         except Exception as e:
             print("Error: ", e)
@@ -531,6 +588,100 @@ def getCommentsOnDiff(diff_id):
     
     print("Successful Read")
     return commentsList
+
+#requires
+    #credentials in headers
+
+    #In body:
+    #data (text you want in the document)
+    #doc_name (name of document)
+    #parent_folder (folder you're making it in)
+@app.route('/api/Document/<proj_id>/', methods=["POST"])
+def createDocument(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    doc_id = createNewDocument(inputBody["doc_name"], inputBody["parent_folder"])
+
+    createNewSnapshot(proj_id, doc_id, inputBody["data"])
+
+    return {"posted": inputBody}
+
+@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
+def getAllDocumentSnapshots(proj_id, doc_id):
+    print("Request:", request.headers)
+    headers = request.headers
+ 
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if not userExists(idInfo["email"]):
+        return {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+    
+    foundSnapshots = getAllDocumentSnapshotsInOrder(doc_id)
+    
+    return {"success": True, "reason":"", "body": foundSnapshots}
+
+@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
+def getDocument(proj_id, doc_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    #if not userExists(idInfo["email"]):
+    #    return {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
+
+    # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    info = json.dumps(getDocumentInfo(doc_id))
+    return {"success": True, "reason":"", "body": info}
+
+# Comment POST, GET, PUT, DELETE
 
 @app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
 def getSubcommentsOnComment(comment_id):
@@ -596,7 +747,7 @@ def editComment(comment_id):
     print("Successful Edit")
     return {
         "success": True,
-        "reason": "Successful Delete"
+        "reason": "Successful Edit"
     }
 
 @app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])
