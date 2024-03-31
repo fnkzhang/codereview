@@ -1,20 +1,22 @@
 import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
-import { createComment, getCommentsOnDiff } from '../../api/APIUtils.js';
+import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
 
-function CommentModule ({ moduleLineJump , diffID }) {
+import { getComments } from '../../dev/getComments.js'
+
+function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, start , end}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
-  const [comments, setComments] = useState(null);
+  //const [comments, setComments] = useState(null);
+  const [comments, setComments] = useState(getComments())
   const [newComment, setNewComment] = useState('');
-  const [diffId] = useState(diffID) 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(diffId)
-        const commentData = await getCommentsOnDiff(diffId)
+        //const commentData = await getCommentsOnDiff(snapshotID)
+        let commentData = comments
         console.log(commentData)
         setComments(commentData)
       } catch (error) {
@@ -27,7 +29,7 @@ function CommentModule ({ moduleLineJump , diffID }) {
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, diffId])
+  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
   function handleNewCommentChange (event) {
     setNewComment(event.target.value);
@@ -37,8 +39,24 @@ function CommentModule ({ moduleLineJump , diffID }) {
     event.preventDefault();
 
     try {
-      await createComment(diffId, 1, 0, newComment);
-      setCommentsLoading(true);
+      console.log(snapshotId)
+      if (snapshotId != null) {
+        console.log("adding comment ...")
+        setComments([...comments,{
+          author_id: 2,
+          comment_id: 1000,
+          content: newComment,
+          date_created: "time",
+          date_modified: "time",
+          snapshot_id: snapshotId,
+          reply_to_id: 0,
+          highlight_start_x: start.column,
+          highlight_start_y: start.lineNumber,
+          highlight_end_x: end.column,
+          highlight_end_y: end.lineNumber
+        }])
+        setCommentsLoading(true);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -73,7 +91,9 @@ function CommentModule ({ moduleLineJump , diffID }) {
       <p className="Comment-title">Comment Section</p>
       <div className="Comment-list-container">
         <CommentList 
-          comments={comments}
+          comments={comments.filter(function(comment) {
+            return (comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)
+          })}
           listLineJump={moduleLineJump}
         />
       </div>

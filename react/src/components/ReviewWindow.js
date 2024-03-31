@@ -1,31 +1,37 @@
 import './ReviewWindow.css';
-import AppHeader from './AppHeader.js';
-import Oauth from './Oauth.js';
 import CommentModule from './Comments/CommentModule.js';
-import { getDoc, createDiff, getDiff } from '../api/APIUtils.js';
+import { getDocSnapshot } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
+import { useParams } from 'react-router';
 
-function ReviewWindow() {
+export default function ReviewWindow() {
 
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
+  const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
-  const [updatedCode, setCode] = useState(null);
-  const [currentLine, setLine] = useState(1);
+  const [updatedCode, setCode] = useState(null); 
+  const [currentHighlightStart, setStart] = useState(null);
+  const [currentHighlightEnd, setEnd] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
-  const decorationIdsRef = useRef([]);
-  const diffID = 2;
+  const [snapshotId, setSnapshotID] = useState(null);
+  const decorationIdsRefOrig = useRef([]);
+  const decorationIdsRefModif = useRef([]);
+
+  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
   useEffect(() => {
     const fetchData = async () => {
+      setEditorReady(false)
+      setEditorLoading(true)
       try {
-        const [doc, diff] = await Promise.all([
-          getDoc('projectid', 'documentid'),
-          getDiff('projectid', 'documentid', 'diffid')
+        const [left_doc, right_doc] = await Promise.all([
+          getDocSnapshot('684153597', document_id, left_snapshot_id),
+          getDocSnapshot('684153597', document_id, right_snapshot_id)
         ]);
-        setInit(doc.blobContents)
-        setCode(diff.diffResult)
+        setInit(left_doc.blobContents)
+        setCode(right_doc.blobContents)
       } catch (error) {
         console.log(error)
       } finally {
@@ -34,57 +40,67 @@ function ReviewWindow() {
     }
 
     fetchData()
-  }, [])
+  }, [document_id, left_snapshot_id, right_snapshot_id])
 
   useEffect(() => {
-
-    if (editorRef.current && monacoRef.current) {
+    if (editorRef.current) {
+      const originalEditor = editorRef.current.getOriginalEditor();
       const modifiedEditor = editorRef.current.getModifiedEditor();
-
-      const lineNumber = 4;
-      const range = new monacoRef.current.Range(lineNumber, 24, lineNumber, 29);
-      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
-
-      decorationIdsRef.current = modifiedEditor.deltaDecorations(decorationIdsRef.current, [decoration]);
+  
+      const handleSelectionChange = (editor, snapshotID) => (e) => {
+        const selection = e.selection;
+        const startPosition = selection.getStartPosition();
+        const endPosition = selection.getEndPosition();
+  
+        setSnapshotID(Number(snapshotID));
+        setStart(startPosition);
+        setEnd(endPosition);
+        console.log(snapshotID);
+      };
+      originalEditor.onDidChangeCursorSelection(handleSelectionChange(originalEditor, left_snapshot_id));
+      modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
     }
-  }, [monacoRef, editorRef, currentLine, updatedCode])
+  }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady ])
 
-  async function handleClick() {
-    console.log(updatedCode)
+  function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
-    await createDiff('projectid', 'documentid', 'diffid', initialCode, updatedCode)
-      .then(data => console.log(data))
-      .catch((e) => {
-        console.log(e)
-      })
-  }
+    if (editorRef.current) {
 
-  function lineJump(newLine) {
-    setLine(newLine)
+      const range = new monacoRef.current.Range(highlightStartY, highlightStartX, highlightEndY, highlightEndX);
+      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
+      const modifiedEditor = editorRef.current.getModifiedEditor();
+      const originalEditor = editorRef.current.getOriginalEditor();
 
-    if (editorRef.current && editorRef.current.getModifiedEditor) {
-
-      editorRef.current.getModifiedEditor().revealLine(newLine);
+      if (snapshotID === Number(right_snapshot_id)) {
+        decorationIdsRefOrig.current = originalEditor.deltaDecorations(decorationIdsRefOrig.current, [])
+        decorationIdsRefModif.current = modifiedEditor.deltaDecorations(decorationIdsRefModif.current, [decoration]);
+        editorRef.current.getModifiedEditor().revealLine(highlightStartY);
+      } 
+      if (snapshotID === Number(left_snapshot_id)) {
+        decorationIdsRefModif.current = modifiedEditor.deltaDecorations(decorationIdsRefModif.current, []);
+        decorationIdsRefOrig.current = originalEditor.deltaDecorations(decorationIdsRefOrig.current, [decoration]);
+        editorRef.current.getOriginalEditor().revealLine(highlightStartY);
+      }
     }
   }
 
   if (editorLoading) {
     return (
       <div>
-        <AppHeader />
-        <Oauth/>
         <div className="Review-window">
           <div className="Code-view">
-            <div
-              className="Loading-data"
-            >
+            <div className="Loading-data">
               Loading...
             </div>
           </div>
           <div className="Comment-view">
             <CommentModule
               moduleLineJump={lineJump}
-              diffID={diffID}
+              snapshotId={snapshotId}
+              leftSnapshotId={Number(left_snapshot_id)}
+              rightSnapshotId={Number(right_snapshot_id)}
+              start={currentHighlightStart}
+              end={currentHighlightEnd}
             />
           </div>
         </div>
@@ -94,11 +110,8 @@ function ReviewWindow() {
 
   return (
     <div>
-      <AppHeader />
-      <Oauth/>
       <div className="Review-window">
         <div className="Code-view">
-          <button onClick={handleClick}>Submit Code</button>
           <DiffEditor 
             className="Monaco-editor"
             original={initialCode}
@@ -108,6 +121,12 @@ function ReviewWindow() {
             onMount={(editor, monaco) => {
               editorRef.current = editor
               monacoRef.current = monaco
+              editor.getModifiedEditor().updateOptions({
+                readOnly: true
+              })
+              editor.getOriginalEditor().updateOptions({
+                readOnly: true
+              })
 
               // Add the onChange event listener to the editor instance
               const onChangeHandler = () => {
@@ -116,15 +135,22 @@ function ReviewWindow() {
               };
 
               editor.onDidUpdateDiff(onChangeHandler);
+
+              setEditorReady(true)
             }}
           />
         </div>
         <div className="Comment-view">
-          <CommentModule moduleLineJump={lineJump} />
+          <CommentModule 
+            moduleLineJump={lineJump}
+            snapshotId={snapshotId}
+            leftSnapshotId={Number(left_snapshot_id)}
+            rightSnapshotId={Number(right_snapshot_id)}
+            start={currentHighlightStart}
+            end={currentHighlightEnd}
+          />
         </div>
       </div>
     </div>
   )
 }
-
-export default ReviewWindow
