@@ -222,3 +222,8 @@ def isValidRequest(parameters, requiredKeys):
             return False
 
     return True
+
+def deleteComment(project_id, comment_id):
+    with engine.connect() as conn:
+        stmt = select()
+    pass

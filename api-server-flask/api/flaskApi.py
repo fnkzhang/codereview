@@ -548,6 +548,25 @@ def createComment(snapshot_id):
         "reason": "Successful Write"
     }
 
+@app.route('/api/Snapshot/<snapshot_id>/comment/<comment_id>/resolve', method=["POST"])
+def resolveComment(snapshot_id, comment_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    # Delete Comment
+    
+    pass
 # look into pagination
 # https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
