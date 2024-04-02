@@ -3,14 +3,17 @@ import React, { useState } from 'react';
 import CommentList  from './CommentList';
 import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
+import { useRevalidator } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
   start , end, comments, setComments, userData}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
+  const [userDataLocal] = useState(userData);
+
   useEffect(() => {
-    console.log(leftSnapshotId, rightSnapshotId, comments, userData)
+    console.log(leftSnapshotId, rightSnapshotId, comments, userDataLocal)
 
     const fetchData = async () => {
       try {
@@ -35,34 +38,34 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     }
   }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
-  function handleNewCommentChange (event) {
+  function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
   };
 
-  async function handleNewCommentSubmit (event) {
-    event.preventDefault();
-
+  async function handleNewCommentSubmit() {
     try {
       console.log(snapshotId)
       if (snapshotId != null) {
-        console.log("adding comment ...")
-        // Create Comment
-        createComment(snapshotId, userData.email,)
-        // Append Current Comment to Comments
+        console.log("adding comment ...", userDataLocal)
 
-        // setComments([...comments,{
-        //   author_email: 2,//todo fix email
-        //   comment_id: 1000,
-        //   content: newComment,
-        //   date_created: "time",
-        //   date_modified: "time",
-        //   snapshot_id: snapshotId,
-        //   reply_to_id: 0,
-        //   highlight_start_x: start.column,
-        //   highlight_start_y: start.lineNumber,
-        //   highlight_end_x: end.column,
-        //   highlight_end_y: end.lineNumber
-        // }])
+        // ToDo Handle Nested Comments in future
+        let createdComment = await createComment(snapshotId, userDataLocal.email, 0, newComment)
+        console.log(createdComment)
+        // Append Current Comment to Comments
+        setComments([...comments,{
+          author_email: createdComment["snapshot_id"],
+          comment_id: createdComment["comment_id"],
+          content: createdComment["newComment"],
+          date_created: createdComment["date_created"],
+          date_modified: createdComment["date_modified"],
+          snapshot_id: createdComment["snapshotId"],
+          reply_to_id: createdComment["reply_to_id"],
+          highlight_start_x: createdComment["highlight_start_x"],
+          highlight_start_y: createdComment["highlight_start_y"],
+          highlight_end_x: createdComment["highlight_end_x"],
+          highlight_end_y: createdComment["highlight_end_y"]
+        }])
+
         setCommentsLoading(true);
       }
     } catch (error) {
@@ -79,17 +82,17 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
         <div className="Comment-loading">
           Loading...
         </div>
-        <form className="Comment-submit-section" onSubmit={handleNewCommentSubmit}>
+        <div className="Comment-submit-section">
         <label>Add a new comment:</label>
         <textarea
           rows="4"
           cols="50"
           value={newComment}
-          onChange={handleNewCommentChange}
+          onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button type="submit">Submit Comment</button>
-      </form>
+        <button type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+      </div>
       </div>
     )
   }
@@ -105,17 +108,17 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           listLineJump={moduleLineJump}
         />
       </div>
-      <form className="Comment-submit-section" onSubmit={handleNewCommentSubmit}>
+      <div className="Comment-submit-section">
         <label>Add a new comment:</label>
         <textarea
           rows="4"
           cols="50"
           value={newComment}
-          onChange={handleNewCommentChange}
+          onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button type="submit">Submit Comment</button>
-      </form>
+        <button type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+      </div>
     </div>
   );
 }

@@ -524,10 +524,10 @@ def createComment(snapshot_id):
     with Session() as session:
         try:
             session.add(models.Comment(
-                snapshot_id=snapshot_id,
-                author_email=body["author_email"],
-                reply_to_id=int(body["reply_to_id"]),
-                content=body["content"],
+                snapshot_id = snapshot_id,
+                author_email = body["author_email"],
+                reply_to_id = int(body["reply_to_id"]),
+                content = body["content"],
                 highlight_start_x = int(body["highlight_start_x"]),
                 highlight_start_y = int(body["highlight_start_y"]),
                 highlight_end_x = int(body["highlight_end_x"]),
@@ -545,7 +545,17 @@ def createComment(snapshot_id):
     print("Successful Write Comment")
     return {
         "success": True,
-        "reason": "Successful Write"
+        "reason": "Successful Write",
+        "body": {
+            "snapshot_id": snapshot_id,
+            "author_email": body["author_email"],
+            "reply_to_id": int(body["reply_to_id"]),
+            "content": body["content"],
+            "highlight_start_x": int(body["highlight_start_x"]),
+            "highlight_start_y": int(body["highlight_start_y"]),
+            "highlight_end_x":int(body["highlight_end_x"]),
+            "highlight_end_y": int(body["highlight_end_y"]),
+        }
     }
 
 @app.route('/api/Snapshot/<snapshot_id>/comment/<comment_id>/resolve', methods=["POST"])
