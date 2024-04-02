@@ -5,7 +5,7 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments }) {
+export default function ReviewWindow({ comments, setComments, userData }) {
 
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
@@ -102,6 +102,7 @@ export default function ReviewWindow({ comments, setComments }) {
               end={currentHighlightEnd}
               comments={comments}
               setComments={setComments}
+              userData={userData}
             />
           </div>
         </div>

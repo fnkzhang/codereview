@@ -5,12 +5,12 @@ import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments}) {
+  start , end, comments, setComments, userData}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
-    console.log(leftSnapshotId, rightSnapshotId, comments)
+    console.log(leftSnapshotId, rightSnapshotId, comments, userData)
 
     const fetchData = async () => {
       try {
@@ -46,19 +46,23 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       console.log(snapshotId)
       if (snapshotId != null) {
         console.log("adding comment ...")
-        setComments([...comments,{
-          author_email: 2,//todo fix email
-          comment_id: 1000,
-          content: newComment,
-          date_created: "time",
-          date_modified: "time",
-          snapshot_id: snapshotId,
-          reply_to_id: 0,
-          highlight_start_x: start.column,
-          highlight_start_y: start.lineNumber,
-          highlight_end_x: end.column,
-          highlight_end_y: end.lineNumber
-        }])
+        // Create Comment
+        createComment(snapshotId, userData.email,)
+        // Append Current Comment to Comments
+
+        // setComments([...comments,{
+        //   author_email: 2,//todo fix email
+        //   comment_id: 1000,
+        //   content: newComment,
+        //   date_created: "time",
+        //   date_modified: "time",
+        //   snapshot_id: snapshotId,
+        //   reply_to_id: 0,
+        //   highlight_start_x: start.column,
+        //   highlight_start_y: start.lineNumber,
+        //   highlight_end_x: end.column,
+        //   highlight_end_y: end.lineNumber
+        // }])
         setCommentsLoading(true);
       }
     } catch (error) {

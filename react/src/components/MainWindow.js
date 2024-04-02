@@ -11,7 +11,7 @@ export default function MainWindow() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userData, setUserData] = useState(null)
-  const [comments, setComments] =  useState([]) //useState(getComments())
+  const [comments, setComments] =  useState([])
 
   if (isLoggedIn) {
     return(
@@ -26,7 +26,8 @@ export default function MainWindow() {
           comments={comments}/>
         <ReviewWindow
           comments={comments}
-          setComments={setComments}/>
+          setComments={setComments}
+          userData={userData}/>
       </div>
     )
   } else {
