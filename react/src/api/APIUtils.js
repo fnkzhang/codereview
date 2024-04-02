@@ -61,11 +61,11 @@ export async function getDocSnapshot(proj_id, doc_id, snap_id) {
 }
 
 // snapshot_id: int
-// author_id: int
+// author_email: string
 // reply_to_id: int
 // content: string
 // creates a comment and (temporarily) generates an id between 0 and 2^31 - 1
-export async function createComment(snapshot_id, author_id, reply_to_id, content) {
+export async function createComment(snapshot_id, author_email, reply_to_id, content) {
   
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
@@ -77,7 +77,7 @@ export async function createComment(snapshot_id, author_id, reply_to_id, content
     },
     body: JSON.stringify({
       "snapshot_id": snapshot_id,
-      "author_id": author_id,
+      "author_email": author_email,
       "reply_to_id": reply_to_id,
       "content": content
     })
@@ -102,7 +102,7 @@ export async function getCommentsOnSnapshot(snapshot_id) {
     }
   };
 
-  return await fetch(`/api/Snapshot/${snapshot_id}/comments/get`, headers)
+  return await fetch(`/api/Snapshot/${snapshot_id}/comments/get/`, headers)
     .then(response => response.json())
 }
 

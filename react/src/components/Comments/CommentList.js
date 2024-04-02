@@ -13,7 +13,7 @@ function CommentList ({ comments, listLineJump }) {
         <Comment 
           key={index}
           commentID={comment.comment_id}
-          author={mapToName(comment.author_id)}
+          author={comment.author_email}
           text={comment.content} 
           subcomments={comment.subcomments}
           date={comment.date_modified}

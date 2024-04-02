@@ -11,7 +11,7 @@ export default function MainWindow() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userData, setUserData] = useState(null)
-  const [comments, setComments] = useState(getComments())
+  const [comments, setComments] =  useState([]) //useState(getComments())
 
   if (isLoggedIn) {
     return(

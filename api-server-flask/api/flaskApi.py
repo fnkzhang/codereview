@@ -514,7 +514,7 @@ def createComment(snapshot_id):
         }
 
     body = request.get_json()
-    if not isValidRequest(body, ["snapshot_id", "author_id", "reply_to_id", "content"]):
+    if not isValidRequest(body, ["author_email", "reply_to_id", "content"]):
         return {
             "success": False,
             "reason": "Invalid Request"
@@ -524,8 +524,8 @@ def createComment(snapshot_id):
     with Session() as session:
         try:
             session.add(models.Comment(
-                snapshot_id=int(body["snapshot_id"]),
-                author_id=int(body["author_id"]),
+                snapshot_id=snapshot_id,
+                author_email=body["author_email"],
                 reply_to_id=int(body["reply_to_id"]),
                 content=body["content"],
                 highlight_start_x = int(body["highlight_start_x"]),
@@ -542,13 +542,13 @@ def createComment(snapshot_id):
                 "reason": str(e)
             }
 
-    print("Successful Write")
+    print("Successful Write Comment")
     return {
         "success": True,
         "reason": "Successful Write"
     }
 
-@app.route('/api/Snapshot/<snapshot_id>/comment/<comment_id>/resolve', method=["POST"])
+@app.route('/api/Snapshot/<snapshot_id>/comment/<comment_id>/resolve', methods=["POST"])
 def resolveComment(snapshot_id, comment_id):
     # Authentication
     headers = request.headers
@@ -570,7 +570,7 @@ def resolveComment(snapshot_id, comment_id):
 # look into pagination
 # https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
-def getCommentsOnSnapshot(snapshot_id):
+def getCommentsOnSnapshot(snapshot_id): # ToDO HANDLE NEW COLUMN FOR COMMENTS
 
     # Authentication
     headers = request.headers
@@ -598,7 +598,7 @@ def getCommentsOnSnapshot(snapshot_id):
                 commentsList.append({
                     "comment_id": comment.comment_id,
                     "snapshot_id": comment.snapshot_id,
-                    "author_id": comment.author_id,
+                    "author_email": comment.author_email,
                     "reply_to_id": comment.reply_to_id,
                     "date_created": comment.date_created,
                     "date_modified": comment.date_modified,
@@ -613,7 +613,11 @@ def getCommentsOnSnapshot(snapshot_id):
             return []
     
     print("Successful Read")
-    return commentsList
+    return {
+        "success": True,
+        "reason": "",
+        "body": commentsList
+    }
 
 #requires
     #credentials in headers

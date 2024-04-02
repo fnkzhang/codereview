@@ -1,20 +1,26 @@
 import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
-// import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
+import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
   start , end, comments, setComments}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
-  //const [comments, setComments] = useState(null);
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
+    console.log(leftSnapshotId, rightSnapshotId, comments)
+
     const fetchData = async () => {
       try {
-        //const commentData = await getCommentsOnDiff(snapshotID)
+        let leftSnapshotComments = await getCommentsOnSnapshot(leftSnapshotId)
+        let rightSnapshotComments = await getCommentsOnSnapshot(rightSnapshotId)
+
+        console.log(leftSnapshotComments, rightSnapshotComments)
+
         let commentData = comments
+        
         console.log(commentData)
         setComments(commentData)
       } catch (error) {
@@ -27,7 +33,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading])
+  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
   function handleNewCommentChange (event) {
     setNewComment(event.target.value);
@@ -41,7 +47,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       if (snapshotId != null) {
         console.log("adding comment ...")
         setComments([...comments,{
-          author_id: 2,
+          author_email: 2,//todo fix email
           comment_id: 1000,
           content: newComment,
           date_created: "time",
