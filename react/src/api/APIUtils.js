@@ -84,7 +84,8 @@ export async function createComment(snapshot_id, author_email, reply_to_id, cont
       "highlight_start_x": highlight_start_x,
       "highlight_start_y": highlight_start_y,
       "highlight_end_x": highlight_end_x,
-      "highlight_end_y": highlight_end_y
+      "highlight_end_y": highlight_end_y,
+      "is_resolved": false,
     })
   };
 
@@ -97,7 +98,7 @@ export async function createComment(snapshot_id, author_email, reply_to_id, cont
 export async function getCommentsOnSnapshot(snapshot_id) {
   
   let oAuthToken = getCookie("cr_id_token")
-  console.log(oAuthToken)
+  //console.log(oAuthToken)
   let headers = {
     method: "GET",
     mode: "cors",
@@ -109,6 +110,7 @@ export async function getCommentsOnSnapshot(snapshot_id) {
 
   return await fetch(`/api/Snapshot/${snapshot_id}/comments/get`, headers)
     .then(response => response.json())
+    .then(data => data.body)
 }
 
 export async function getSubcommentsOnComment(comment_id) {

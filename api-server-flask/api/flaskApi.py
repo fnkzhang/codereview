@@ -532,6 +532,7 @@ def createComment(snapshot_id):
                 highlight_start_y = int(body["highlight_start_y"]),
                 highlight_end_x = int(body["highlight_end_x"]),
                 highlight_end_y = int(body["highlight_end_y"]),
+                is_resolved = body["is_resolved"]
 
             ))
             session.commit()
@@ -555,6 +556,7 @@ def createComment(snapshot_id):
             "highlight_start_y": int(body["highlight_start_y"]),
             "highlight_end_x":int(body["highlight_end_x"]),
             "highlight_end_y": int(body["highlight_end_y"]),
+            "is_resolved": body["is_resolved"]
         }
     }
 
@@ -616,7 +618,8 @@ def getCommentsOnSnapshot(snapshot_id): # ToDO HANDLE NEW COLUMN FOR COMMENTS
                     "highlight_start_x": comment.highlight_start_x,
                     "highlight_start_y": comment.highlight_start_y,
                     "highlight_end_x": comment.highlight_end_x,
-                    "highlight_end_y": comment.highlight_end_y
+                    "highlight_end_y": comment.highlight_end_y,
+                    "is_resolved": comment.is_resolved
                 })
         except Exception as e:
             print("Error: ", e)

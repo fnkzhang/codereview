@@ -10,10 +10,12 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
+
   const [userDataLocal] = useState(userData);
 
   useEffect(() => {
-    console.log(leftSnapshotId, rightSnapshotId, comments, userDataLocal)
+    console.log(start, end, comments)
+    //console.log(leftSnapshotId, rightSnapshotId, comments, userDataLocal)
 
     const fetchData = async () => {
       try {
@@ -22,10 +24,19 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
 
         console.log(leftSnapshotComments, rightSnapshotComments)
 
-        let commentData = comments
+        let allSnapshotComments = []
+        if (leftSnapshotId === rightSnapshotId)
+          allSnapshotComments = leftSnapshotComments
+        else 
+          allSnapshotComments = leftSnapshotComments.concat(rightSnapshotComments)
+
+        let existingCommentData = comments
         
-        console.log(commentData)
-        setComments(commentData)
+        console.log("Existing Comments", existingCommentData)
+        console.log("Snapshot Comments", allSnapshotComments) 
+
+        setComments(allSnapshotComments)
+        
       } catch (error) {
         console.log(error)
       } finally {
@@ -44,29 +55,33 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
 
   async function handleNewCommentSubmit() {
     try {
+      console.log(start, end, userData)
       console.log(snapshotId)
       if (snapshotId != null) {
         console.log("adding comment ...", userDataLocal)
 
         // ToDo Handle Nested Comments in future
-        let createdComment = await createComment(snapshotId, userDataLocal.email, 0, newComment)
+        let createdComment = await createComment(snapshotId, userDataLocal.email, 0, newComment, start.column, start.lineNumber, end.column, end.lineNumber)
+
         console.log(createdComment)
         
         // ToDo Handle hightling x and y handling not sure right now
         // Append Current Comment to Comments
-        setComments([...comments,{
-          author_email: createdComment["snapshot_id"],
-          comment_id: createdComment["comment_id"],
-          content: createdComment["newComment"],
-          date_created: createdComment["date_created"],
-          date_modified: createdComment["date_modified"],
-          snapshot_id: createdComment["snapshotId"],
-          reply_to_id: createdComment["reply_to_id"],
-          highlight_start_x: createdComment["highlight_start_x"],
-          highlight_start_y: createdComment["highlight_start_y"],
-          highlight_end_x: createdComment["highlight_end_x"],
-          highlight_end_y: createdComment["highlight_end_y"]
-        }])
+
+        // setComments([...comments,{
+        //   author_email: createdComment["snapshot_id"],
+        //   comment_id: createdComment["comment_id"],
+        //   content: createdComment["newComment"],
+        //   date_created: createdComment["date_created"],
+        //   date_modified: createdComment["date_modified"],
+        //   snapshot_id: createdComment["snapshotId"],
+        //   reply_to_id: createdComment["reply_to_id"],
+        //   highlight_start_x: createdComment["highlight_start_x"],
+        //   highlight_start_y: createdComment["highlight_start_y"],
+        //   highlight_end_x: createdComment["highlight_end_x"],
+        //   highlight_end_y: createdComment["highlight_end_y"],
+        //   is_resolved: createdComment["is_resolved"]
+        // }])
 
         setCommentsLoading(true);
       }
