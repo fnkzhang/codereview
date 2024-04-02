@@ -51,6 +51,8 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
         // ToDo Handle Nested Comments in future
         let createdComment = await createComment(snapshotId, userDataLocal.email, 0, newComment)
         console.log(createdComment)
+        
+        // ToDo Handle hightling x and y handling not sure right now
         // Append Current Comment to Comments
         setComments([...comments,{
           author_email: createdComment["snapshot_id"],
