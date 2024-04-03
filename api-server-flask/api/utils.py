@@ -223,7 +223,14 @@ def isValidRequest(parameters, requiredKeys):
 
     return True
 
-def deleteComment(project_id, comment_id):
+def resolveCommentHelperFunction(comment_id):
     with engine.connect() as conn:
-        stmt = select()
+        stmt = (update(models.Comment)
+        .where(models.Comment.comment_id == comment_id)
+        .values(is_resolved=True)
+        )
+
+        conn.execute(stmt)
+        conn.commit()
+
     pass

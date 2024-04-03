@@ -1,9 +1,20 @@
+import { resolveComment } from '../../api/APIUtils';
 import './Comments.css';
 import SubCommentList from './SubCommentList';
 import React from 'react';
 
 function Comment ({ commentID, author, text, subcomments, date, commentLineJump, snapshotID, 
   highlightStartX, highlightStartY, highlightEndX, highlightEndY }) {
+
+  async function handleResolve() {
+    console.log("RESOLVING COMMENT")
+    console.log(commentID, author, snapshotID)
+    let result = await resolveComment(commentID);
+
+    console.log(result)
+
+  }
+  
   return (
     <div>
       <div className="Comment-container">
@@ -15,6 +26,9 @@ function Comment ({ commentID, author, text, subcomments, date, commentLineJump,
         <div className="Comment-linejump-button">
           <button onClick={() => commentLineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY)}>
             Jump to Line
+          </button>
+          <button onClick={handleResolve}>
+            Resolve
           </button>
         </div>
       </div>

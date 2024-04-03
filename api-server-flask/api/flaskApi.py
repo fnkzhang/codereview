@@ -560,9 +560,11 @@ def createComment(snapshot_id):
         }
     }
 
-@app.route('/api/Snapshot/<snapshot_id>/comment/<comment_id>/resolve', methods=["POST"])
-def resolveComment(snapshot_id, comment_id):
+# Set comment is_resolved to true
+@app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
+def resolveComment(comment_id):
     # Authentication
+    print("TEST")
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -576,7 +578,13 @@ def resolveComment(snapshot_id, comment_id):
             "reason": "Failed to Authenticate"
         }
 
-    # Delete Comment
+    resolveCommentHelperFunction(comment_id)
+
+    return {
+        "success": True,
+        "reason": "Ran The Call"
+    }
+    # Set Comment is_resolved to true
     
     pass
 # look into pagination

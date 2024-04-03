@@ -108,7 +108,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       <div className="Comment-list-container">
         <CommentList 
           comments={comments.filter(function(comment) {
-            return (comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)
+            return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)) && (comment.is_resolved === false)
           })}
           listLineJump={moduleLineJump}
         />

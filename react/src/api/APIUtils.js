@@ -93,6 +93,26 @@ export async function createComment(snapshot_id, author_email, reply_to_id, cont
     .then(response => response.json())
 }
 
+//
+//
+//
+//
+export async function resolveComment(comment_id) {
+  let oAuthToken = getCookie("cr_id_token")
+  let headers = {
+    method: "PUT",
+    mode: "cors",
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch(`/api/comment/${comment_id}/resolve`, headers)
+  .then(response => response.json())
+
+}
+
 // snapshot_id: int
 // returns all comments (temporarily including subcomments) that match the snapshot_id
 export async function getCommentsOnSnapshot(snapshot_id) {
