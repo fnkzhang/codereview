@@ -16,6 +16,7 @@ import models
 from cloudSql import connectCloudSql
 
 from utils import engine
+from llm import init_llm, get_llm_code_from_suggestion
 
 #Todo hide later
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
@@ -25,6 +26,8 @@ app = Flask(__name__)
 CORS(app, headers=["Content-Type", "Authorization"])
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
+
+init_llm()
 
 @app.after_request
 def afterRequest(response):
@@ -785,4 +788,27 @@ def deleteComment(comment_id):
     return {
         "success": True,
         "reason": "Successful Delete"
+    }
+
+@app.route("/api/llm", methods=["GET"])
+def implement_code_changes_from_comment():
+    data = request.get_json()
+    code = data.get("code")
+    comment = data.get("comment")
+
+    response = get_llm_code_from_suggestion(
+        old_code=code,
+        suggestion=comment
+    )
+
+    if response is None:
+        return {
+            "success": False,
+            "reason": "LLM Error"
+        }
+
+    return {
+        "success": True,
+        "reason": "Success",
+        "body": response
     }
