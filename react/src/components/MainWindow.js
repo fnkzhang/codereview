@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
 import Oauth from "./Oauth"
@@ -13,7 +13,10 @@ export default function MainWindow() {
   const [userData, setUserData] = useState(null)
   const [comments, setComments] =  useState([])
 
+  const [snapshots, setSnapshots] = useState([])
+
   if (isLoggedIn) {
+    console.log(snapshots)
     return(
       <div>
         <Oauth
@@ -23,11 +26,14 @@ export default function MainWindow() {
         setUserData={setUserData}/>
         <AppHeader/>
         <SnapshotSelector
-          comments={comments}/>
+          comments={comments}
+          snapshots={snapshots}
+          setSnapshots={setSnapshots}/>
         <ReviewWindow
           comments={comments}
           setComments={setComments}
-          userData={userData}/>
+          userData={userData}
+          snapshots={snapshots}/>
       </div>
     )
   } else {

@@ -6,14 +6,17 @@ import { useEffect } from 'react';
 import { useRevalidator } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData}) {
+  start , end, comments, setComments, userData, snapshots}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
 
   const [userDataLocal] = useState(userData);
-
+  
   useEffect(() => {
+    if (snapshots.length <= 0)
+      return
+      
     console.log(start, end, comments)
     //console.log(leftSnapshotId, rightSnapshotId, comments, userDataLocal)
 
@@ -22,9 +25,13 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
         let leftSnapshotComments = await getCommentsOnSnapshot(leftSnapshotId)
         let rightSnapshotComments = await getCommentsOnSnapshot(rightSnapshotId)
 
-        console.log(leftSnapshotComments, rightSnapshotComments)
+        console.log(leftSnapshotComments, rightSnapshotComments, snapshots)
+
 
         let allSnapshotComments = []
+        
+        
+        
         if (leftSnapshotId === rightSnapshotId)
           allSnapshotComments = leftSnapshotComments
         else 
@@ -47,7 +54,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
+  }, [commentsLoading, leftSnapshotId, rightSnapshotId, snapshots])
 
   function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
@@ -55,7 +62,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
 
   async function handleNewCommentSubmit() {
     try {
-      console.log(start, end, userData)
       console.log(snapshotId)
       if (snapshotId != null) {
         console.log("adding comment ...", userDataLocal)
@@ -65,24 +71,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
 
         console.log(createdComment)
         
-        // ToDo Handle hightling x and y handling not sure right now
-        // Append Current Comment to Comments
-
-        // setComments([...comments,{
-        //   author_email: createdComment["snapshot_id"],
-        //   comment_id: createdComment["comment_id"],
-        //   content: createdComment["newComment"],
-        //   date_created: createdComment["date_created"],
-        //   date_modified: createdComment["date_modified"],
-        //   snapshot_id: createdComment["snapshotId"],
-        //   reply_to_id: createdComment["reply_to_id"],
-        //   highlight_start_x: createdComment["highlight_start_x"],
-        //   highlight_start_y: createdComment["highlight_start_y"],
-        //   highlight_end_x: createdComment["highlight_end_x"],
-        //   highlight_end_y: createdComment["highlight_end_y"],
-        //   is_resolved: createdComment["is_resolved"]
-        // }])
-
         setCommentsLoading(true);
       }
     } catch (error) {

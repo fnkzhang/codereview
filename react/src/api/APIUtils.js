@@ -111,6 +111,10 @@ export async function getCommentsOnSnapshot(snapshot_id) {
   return await fetch(`/api/Snapshot/${snapshot_id}/comments/get`, headers)
     .then(response => response.json())
     .then(data => data.body)
+    .catch(error => {
+      console.log(error)
+    })
+
 }
 
 export async function getSubcommentsOnComment(comment_id) {
