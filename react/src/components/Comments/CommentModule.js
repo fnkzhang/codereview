@@ -15,15 +15,13 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   const [userDataLocal] = useState(userData);
   
   useEffect(() => {
-      
     console.log(start, end, comments, document_id)
-    //console.log(leftSnapshotId, rightSnapshotId, comments, userDataLocal)
 
     const fetchData = async () => {
       try {
         let allComments = []
         let commentResults =  await getAllCommentsForDocument(document_id)
-        
+        console.log(commentResults)
 
         allComments = allComments.concat(commentResults)
 
@@ -41,6 +39,10 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       fetchData()
     }
   }, [commentsLoading, leftSnapshotId, rightSnapshotId])
+
+  useEffect(() => {
+    console.log("comment Updated")
+  }, [comments])
 
   function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
@@ -65,6 +67,17 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       setNewComment('')
     }
   };
+
+  function filterComments() {
+
+    if (comments.length > 0)
+      return comments.filter((comment) => {
+        console.log(comment)
+        return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)) && (comment.is_resolved === false)
+      })
+    
+    return []
+  }
 
   if (commentsLoading) {
     return (
@@ -93,7 +106,8 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       <p className="Comment-title">Comment Section</p>
       <div className="Comment-list-container">
         <CommentList 
-          comments={comments.filter(function(comment) {
+          setCommentsLoading={setCommentsLoading}
+          comments={comments.filter((comment) => {
             return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)) && (comment.is_resolved === false)
           })}
           listLineJump={moduleLineJump}

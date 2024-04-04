@@ -640,29 +640,30 @@ def getCommentsOnSnapshot(snapshot_id):
         "body": commentsList
     }
 
-@app.route('/api/Document/<document_id>/comments', methods=["GET"])
+@app.route('/api/Document/<document_id>/comments/', methods=["GET"])
 def getAllCommentsForDocument(document_id):
     # Authentication
     headers = request.headers
+
     if not isValidRequest(headers, ["Authorization"]):
         return {
             "success": False,
-            "reason": "Invalid Token Provided"
+            "reason": "Invalid Token Provided",
         }
 
     idInfo = authenticate()
     if idInfo is None:
         return {
             "success":False,
-            "reason": "Failed to Authenticate"
+            "reason": "Failed to Authenticate",
         }
     
     if not userExists(idInfo["email"]):
         return {
                 "success": False,
                 "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-                "body":{}
         }
+    
     listOfSnapshotIDs = []
     foundSnapshots = getAllDocumentSnapshotsInOrder(document_id)
 
@@ -692,13 +693,18 @@ def getAllCommentsForDocument(document_id):
                     "highlight_end_y": comment.highlight_end_y,
                     "is_resolved": comment.is_resolved
                 })
+
         except Exception as e:
             print("Error: ", e)
-            return []
+            return {
+                "success": False,
+                "reason": "Error Grabbing Comments From Database",
+                "body": []
+            }
 
     return {
         "success": True,
-        "reason": "",
+        "reason": "Found all Comments For All Snapshots for document",
         "body": listOfComments
     }
 
@@ -825,7 +831,7 @@ def getAllDocumentsFromProject(proj_id):
     arrayOfDocuments = getAllDocumentsForProject(proj_id)
     return {
         "success": True,
-        "reason": "",
+        "reason": "-",
         "body": arrayOfDocuments
     }
 

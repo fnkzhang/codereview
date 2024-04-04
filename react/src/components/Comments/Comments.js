@@ -3,7 +3,7 @@ import './Comments.css';
 import SubCommentList from './SubCommentList';
 import React from 'react';
 
-function Comment ({ commentID, author, text, subcomments, date, commentLineJump, snapshotID, 
+function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID, 
   highlightStartX, highlightStartY, highlightEndX, highlightEndY }) {
 
   async function handleResolve() {
@@ -11,6 +11,7 @@ function Comment ({ commentID, author, text, subcomments, date, commentLineJump,
     console.log(commentID, author, snapshotID)
     let result = await resolveComment(commentID);
 
+    setCommentsLoading(true)
     console.log(result)
 
   }

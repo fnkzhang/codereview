@@ -118,7 +118,6 @@ export async function resolveComment(comment_id) {
 export async function getCommentsOnSnapshot(snapshot_id) {
   
   let oAuthToken = getCookie("cr_id_token")
-  //console.log(oAuthToken)
   let headers = {
     method: "GET",
     mode: "cors",
@@ -139,7 +138,6 @@ export async function getCommentsOnSnapshot(snapshot_id) {
 
 export async function getAllCommentsForDocument(document_id) {
   let oAuthToken = getCookie("cr_id_token")
-  //console.log(oAuthToken)
   let headers = {
     method: "GET",
     mode: "cors",
@@ -149,7 +147,7 @@ export async function getAllCommentsForDocument(document_id) {
     }
   };
 
-  return await fetch(`/api/Document/${document_id}/comments`, headers)
+  return await fetch(`/api/Document/${document_id}/comments/`, headers)
     .then(response => response.json())
     .then(data => data.body)
     .catch(error => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import Comment from './Comments.js';
 
-function CommentList ({ comments, listLineJump }) {
+function CommentList ({ setCommentsLoading, comments, listLineJump }) {
   if (!Array.isArray(comments)) {
     return null
   }
@@ -10,6 +10,7 @@ function CommentList ({ comments, listLineJump }) {
     <div>
       {comments.map((comment, index) => (
         <Comment 
+        setCommentsLoading={setCommentsLoading}
           key={index}
           commentID={comment.comment_id}
           author={comment.author_email}
