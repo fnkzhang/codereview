@@ -590,7 +590,7 @@ def resolveComment(comment_id):
 # look into pagination
 # https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
-def getCommentsOnSnapshot(snapshot_id): # ToDO HANDLE NEW COLUMN FOR COMMENTS
+def getCommentsOnSnapshot(snapshot_id):
 
     # Authentication
     headers = request.headers
@@ -640,6 +640,69 @@ def getCommentsOnSnapshot(snapshot_id): # ToDO HANDLE NEW COLUMN FOR COMMENTS
         "body": commentsList
     }
 
+@app.route('/api/Document/<document_id>/comments', methods=["GET"])
+def getAllCommentsForDocument(document_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if not userExists(idInfo["email"]):
+        return {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+    listOfSnapshotIDs = []
+    foundSnapshots = getAllDocumentSnapshotsInOrder(document_id)
+
+    for snapshot in foundSnapshots:
+            # Query
+        listOfSnapshotIDs.append(snapshot["snapshot_id"])
+
+    listOfComments = []
+    with Session() as session:
+        try:
+            filteredComments = session.query(models.Comment) \
+                .filter(models.Comment.snapshot_id.in_(listOfSnapshotIDs)) \
+                .all()
+
+            for comment in filteredComments:
+                listOfComments.append({
+                    "comment_id": comment.comment_id,
+                    "snapshot_id": comment.snapshot_id,
+                    "author_email": comment.author_email,
+                    "reply_to_id": comment.reply_to_id,
+                    "date_created": comment.date_created,
+                    "date_modified": comment.date_modified,
+                    "content": comment.content,
+                    "highlight_start_x": comment.highlight_start_x,
+                    "highlight_start_y": comment.highlight_start_y,
+                    "highlight_end_x": comment.highlight_end_x,
+                    "highlight_end_y": comment.highlight_end_y,
+                    "is_resolved": comment.is_resolved
+                })
+        except Exception as e:
+            print("Error: ", e)
+            return []
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": listOfComments
+    }
+
+    #snapshotIdList = 
 #requires
     #credentials in headers
 

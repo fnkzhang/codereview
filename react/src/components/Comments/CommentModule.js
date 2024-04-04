@@ -1,48 +1,34 @@
 import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
-import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
+import { createComment, getAllCommentsForDocument, getCommentsOnSnapshot } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
-import { useRevalidator } from 'react-router';
+import { useRevalidator, useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData, snapshots}) {
+  start , end, comments, setComments, userData}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
+  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
   const [userDataLocal] = useState(userData);
   
   useEffect(() => {
-    if (snapshots.length <= 0)
-      return
       
-    console.log(start, end, comments)
+    console.log(start, end, comments, document_id)
     //console.log(leftSnapshotId, rightSnapshotId, comments, userDataLocal)
 
     const fetchData = async () => {
       try {
-        let leftSnapshotComments = await getCommentsOnSnapshot(leftSnapshotId)
-        let rightSnapshotComments = await getCommentsOnSnapshot(rightSnapshotId)
-
-        console.log(leftSnapshotComments, rightSnapshotComments, snapshots)
-
-
-        let allSnapshotComments = []
+        let allComments = []
+        let commentResults =  await getAllCommentsForDocument(document_id)
         
-        
-        
-        if (leftSnapshotId === rightSnapshotId)
-          allSnapshotComments = leftSnapshotComments
-        else 
-          allSnapshotComments = leftSnapshotComments.concat(rightSnapshotComments)
 
-        let existingCommentData = comments
-        
-        console.log("Existing Comments", existingCommentData)
-        console.log("Snapshot Comments", allSnapshotComments) 
+        allComments = allComments.concat(commentResults)
 
-        setComments(allSnapshotComments)
+
+        setComments(allComments)
         
       } catch (error) {
         console.log(error)
@@ -54,7 +40,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, leftSnapshotId, rightSnapshotId, snapshots])
+  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
   function handleCommentFieldChange (event) {
     setNewComment(event.target.value);

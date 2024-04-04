@@ -5,11 +5,12 @@ import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 import './SnapshotSelector.css'
 
-export default function SnapshotSelector({ comments, snapshots, setSnapshots }) { 
+export default function SnapshotSelector({ comments}) { 
     // const [snapshots, setSnapshots] = useState([])
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
     const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
 
+    const [snapshots, setSnapshots] = useState([])
     const navigate = useNavigate()
 
     const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
@@ -19,10 +20,8 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots }) 
         const grabSnapshots = async () => {
           let result = await getAllSnapshotsFromDocument(document_id)
           //console.log(result)
-          if (result.success) {
+          if (result.success)
             setSnapshots(result.body)
-            console.log("SET SNAPSGHOTS")
-          }
         }
 
         grabSnapshots()
