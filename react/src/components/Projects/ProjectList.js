@@ -29,7 +29,7 @@ export default function ProjectList( userData ) {
       console.log(id, name)
       return (
         <div 
-          className="flex border border-alternative border-2 rounded-lg"
+          className="flex border border-alternative border-2 rounded-lg m-1"
           onClick={() => handleProjectClick(id)}
         >
           <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
@@ -77,7 +77,9 @@ export default function ProjectList( userData ) {
         )
       }
 
-      return <p>No Project Available</p>
+      return (<div className="m-20 text-center text-textcolor text-2xl">
+        No projects Available.
+      </div>)
     }
 
     if (loading) {

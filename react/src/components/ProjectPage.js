@@ -30,13 +30,23 @@ export default function ProjectPage() {
     if (result.success)
       navigate(`/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
   }
-  function DocumentDisplayBox({id, name}) {
+  function DocumentDisplayBox({id, name, date}) {
     console.log(id, name)
     return (
-      <div onClick={() => handleDocumentClick(id, name)} style={{display: "flex", border: "solid white 2px", justifyContent: "center"}}>
-        <h4 style={{color: "white", margin:"5px"}}>{id}</h4>
-        <h4 style={{color: "white", margin:"5px"}}>{name}</h4>
-      </div>
+      <div 
+        onClick={() => handleDocumentClick(id, name)} 
+        className="flex border border-alternative border-2 rounded-lg m-1"
+      >
+          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
+            <span class="font-bold">Document Name: </span>
+            {name}
+          </h4>
+          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
+            <span class="font-bold">Document ID: </span>
+            {id}
+          </h4>
+          <h4 className="text-textcolor w-1/3 p-1 box-border"><span class="font-bold">Date Modified: </span>{date}</h4>
+        </div>
     )
   }
 
@@ -46,7 +56,22 @@ export default function ProjectPage() {
         <div>
           {
             projectDocuments.map((document, index) => {
-              return (< DocumentDisplayBox key={index} id={document.doc_id} name={document.name}/> )
+              return (<DocumentDisplayBox 
+                key={index} 
+                id={document.doc_id} 
+                name={document.name}
+                date={new Date(document.date_modified)
+                  .toLocaleDateString("en-US", { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    weekday: 'long',  
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                    timeZoneName: 'short',
+                  })}
+              /> )
             })
           }
         </div>
@@ -66,7 +91,7 @@ export default function ProjectPage() {
         setUserData={setUserData}
       />
       <div>
-        <h3 style={{color: "white", margin:"5px", fontSize:"50px"}}>Project: {project_id}</h3>
+        <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>
       </div>
 
       <DisplayDocumentBox/>
