@@ -1,8 +1,11 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
+import Oauth from "./Oauth.js"
 import { getProjectDocuments, getAllSnapshotsFromDocument } from "../api/APIUtils"
 
 export default function ProjectPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userData, setUserData] = useState(null)
 
   const [projectDocuments, setProjectDocuments] = useState([])
   const { project_id } = useParams()
@@ -56,6 +59,12 @@ export default function ProjectPage() {
 
   return (
     <div>
+      <Oauth
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        userData={userData}
+        setUserData={setUserData}
+      />
       <div>
         <h3 style={{color: "white", margin:"5px", fontSize:"50px"}}>Project: {project_id}</h3>
       </div>

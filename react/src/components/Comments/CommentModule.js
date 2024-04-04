@@ -1,9 +1,9 @@
 import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
-import { createComment, getAllCommentsForDocument, getCommentsOnSnapshot } from '../../api/APIUtils.js';
+import { createComment, getAllCommentsForDocument } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
-import { useRevalidator, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
   start , end, comments, setComments, userData}) {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { mapToName } from './../../dev/authorTranslate.js'
 import Comment from './Comments.js';
 
 function CommentList ({ comments, listLineJump }) {
