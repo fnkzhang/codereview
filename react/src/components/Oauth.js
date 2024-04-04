@@ -1,4 +1,3 @@
-import "./Oauth.css"
 import React, { useEffect, useCallback } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -117,13 +116,17 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
 
     function DisplayLoginButton() {
         if (isLoggedIn) {
-            return (<div className="Login-true">Logged IN to {userData.email}</div>)
+            return (<div 
+                className='border border-alternative border-2 bg-background text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
+                Logged in as {userData.email}
+                </div>)
         }
 
         return (
             <div>
         
-            <GoogleLogin
+            <GoogleLogin 
+                className="bg-background m-1 inline-block"
                 onSuccess={credentialResponse => {
                 let decodedResponse = jwtDecode(credentialResponse.credential)
                 console.log(decodedResponse)

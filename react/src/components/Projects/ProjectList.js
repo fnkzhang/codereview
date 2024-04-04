@@ -2,7 +2,6 @@ import React, {useState, useEffect} from "react";
 
 import { useNavigate } from "react-router";
 import { getUserProjects } from "../../api/APIUtils";
-import "./ProjectList.css"
 
 export default function ProjectList( userData ) {
 
@@ -22,16 +21,26 @@ export default function ProjectList( userData ) {
     }, [userData])
 
     // Clicking on project will redirect to project page to select documents
-    const handleProjectClick = (id, name) => {
+    const handleProjectClick = (id) => {
       navigate(`/Project/${id}`)
     }
 
-    function ProjectDisplayBox({id, name}) {
+    function ProjectDisplayBox({id, name, author, date}) {
       console.log(id, name)
       return (
-        <div onClick={() => handleProjectClick(id, name)} style={{display: "flex", border: "solid white 2px", justifyContent: "center"}}>
-          <h4 style={{color: "white", margin:"5px"}}>{id}</h4>
-          <h4 style={{color: "white", margin:"5px"}}>{name}</h4>
+        <div 
+          className="flex border border-alternative border-2 rounded-lg"
+          onClick={() => handleProjectClick(id)}
+        >
+          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
+            <span class="font-bold">Project Name: </span>
+            {author}/{name}
+          </h4>
+          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
+            <span class="font-bold">Project ID: </span>
+            {id}
+          </h4>
+          <h4 className="text-textcolor w-1/3 p-1 box-border"><span class="font-bold">Date Modified: </span>{date}</h4>
         </div>
       )
     }
@@ -45,7 +54,23 @@ export default function ProjectList( userData ) {
                 if(project === -1)
                   return null
 
-                return(<ProjectDisplayBox key={index} id={project["proj_id"]} name={project["name"]}/>)
+                return(<ProjectDisplayBox
+                  key={index} 
+                  id={project.proj_id} 
+                  name={project.name}
+                  author={project.author_email}
+                  date={new Date(project.date_modified)
+                    .toLocaleDateString("en-US", { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric', 
+                      weekday: 'long',  
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      second: 'numeric',
+                      timeZoneName: 'short',
+                    })}
+                  />)
               })
             }
           </div>
@@ -57,8 +82,8 @@ export default function ProjectList( userData ) {
 
     if (loading) {
         return (
-            <div className="Project-list">
-                <h3>Your Projects</h3>
+            <div>
+                <h3 className="text-textcolor text-2xl">Your Projects:</h3>
                 <div className="Loading-data">
                     Loading...
                 </div>
@@ -66,8 +91,8 @@ export default function ProjectList( userData ) {
         )
     } else {
         return (
-            <div className="Project-list">
-                <h3>Your Projects</h3>
+            <div>
+                <h3 className="text-textcolor text-2xl m-2">Your Projects:</h3>
     
                 <DisplayProjects/>
             </div>
