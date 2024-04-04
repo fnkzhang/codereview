@@ -43,7 +43,7 @@ export default function ProjectPage() {
         <div>
           {
             projectDocuments.map((document, index) => {
-              return (< DocumentDisplayBox key={index} id={document["doc_id"]} name={document["name"]}/> )
+              return (< DocumentDisplayBox key={index} id={document.doc_id} name={document.name}/> )
             })
           }
         </div>

@@ -3,9 +3,6 @@ import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
 import Oauth from "./Oauth"
 import AppHeader from "./AppHeader"
-import "./Logged-out.css"
-
-import { getComments } from '../dev/getComments.js'
 
 export default function MainWindow() {
 
@@ -45,7 +42,7 @@ export default function MainWindow() {
         userData={userData}
         setUserData={setUserData}/>
         <AppHeader/>
-        <div className="Logged-out-message">
+        <div className="m-20 text-center text-textcolor text-2xl">
           You must Log in to view this page.
         </div>
       </div>

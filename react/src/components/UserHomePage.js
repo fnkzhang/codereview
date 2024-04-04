@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import Oauth from "./Oauth";
 import ProjectList  from "./Projects/ProjectList";
-import "./Logged-out.css"
 
 export default function UserHomePage() {
 
@@ -30,7 +29,7 @@ export default function UserHomePage() {
             setIsLoggedIn={setIsLoggedIn}
             userData={userData}
             setUserData={setUserData}/>
-            <div className="Logged-out-message">
+            <div className="m-20 text-center text-textcolor text-2xl">
               You must Log in to view this page.
             </div>
         </div>
