@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
-import './SnapshotSelector.css'
 
 export default function SnapshotSelector({ comments }) { 
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
@@ -58,13 +57,13 @@ export default function SnapshotSelector({ comments }) {
                       return (index <= selectedRightSnapshotIndex) ? (
                         <div key={index}>
                           <button 
-                            id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
+                            className={snapshot.snapshot_id.toString() === left_snapshot_id ? 'bg-snapshotSelected' : null}
                             onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
                             data-tooltip-id={`tooltipleft${index}`}>
                               Snapshot {index} {str}
                           </button>
                           <Tooltip
-                            className="Tooltip" 
+                            className="z-9999" 
                             id={`tooltipleft${index}`}
                             place="bottom"
                             content={
@@ -105,13 +104,13 @@ export default function SnapshotSelector({ comments }) {
                     return (index >= selectedLeftSnapshotIndex) ? (
                       <div key={index}>
                         <button 
-                          id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
+                          className={snapshot.snapshot_id.toString() === right_snapshot_id ? 'bg-snapshotSelected' : null}
                           onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
                           data-tooltip-id={`tooltipright${index}`}>
                             Snapshot {index} {str}
                         </button>
                         <Tooltip
-                          className="Tooltip" 
+                          className="z-9999" 
                           id={`tooltipright${index}`}
                           place="bottom"
                           content={
@@ -138,7 +137,7 @@ export default function SnapshotSelector({ comments }) {
   }
 
     return (
-        <div className="Snapshot-selector">
+        <div className="text-textcolor">
             <div>
               <DisplayLeftSnapshots/>
               <DisplayRightSnapshots/>              
