@@ -86,7 +86,7 @@ export default function ProjectList( userData ) {
         return (
             <div>
                 <h3 className="text-textcolor text-2xl m-2">Your Projects:</h3>
-                <div className="Loading-data">
+                <div className="text-textcolor text-center m-20 text-xl">
                     Loading...
                 </div>
             </div>

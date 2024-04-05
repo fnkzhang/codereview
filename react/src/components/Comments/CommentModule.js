@@ -1,4 +1,3 @@
-import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
 import { createComment, getAllCommentsForDocument } from '../../api/APIUtils.js';
@@ -82,20 +81,20 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   if (commentsLoading) {
     return (
       <div>
-        <p className="Comment-title">Comment Section</p>
-        <div className="Comment-loading">
+        <p className="text-textcolor text-center text-xl">Comment Section</p>
+        <div className="text-textcolor text-center text-xl h-70vh">
           Loading...
         </div>
         <div className="Comment-submit-section">
-        <label>Add a new comment:</label>
+        <label className="text-textcolor">Add a new comment:</label>
         <textarea
-          rows="4"
-          cols="50"
+          className="border border-alternative rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 w-full h-1/5"
+          type="text"
           value={newComment}
           onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+        <button className="text-textcolor" type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
       </div>
       </div>
     )
@@ -103,8 +102,8 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
 
   return (
     <div>
-      <p className="Comment-title">Comment Section</p>
-      <div className="Comment-list-container">
+      <p className="text-textcolor text-center text-xl">Comment Section</p>
+      <div className="overflow-y-scroll h-70vh">
         <CommentList 
           setCommentsLoading={setCommentsLoading}
           comments={comments.filter((comment) => {
@@ -114,15 +113,15 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
         />
       </div>
       <div className="Comment-submit-section">
-        <label>Add a new comment:</label>
+        <label className="text-textcolor">Add a new comment:</label>
         <textarea
-          rows="4"
-          cols="50"
+          className="border border-alternative rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 w-full h-1/5"
+          type="text"
           value={newComment}
           onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+        <button className="text-textcolor" type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
       </div>
     </div>
   );

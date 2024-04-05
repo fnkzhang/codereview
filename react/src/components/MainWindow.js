@@ -15,7 +15,7 @@ export default function MainWindow() {
   if (isLoggedIn) {
     console.log(snapshots)
     return(
-      <div>
+      <div className="h-screen">
         <Oauth
         isLoggedIn={isLoggedIn}
         setIsLoggedIn={setIsLoggedIn}
