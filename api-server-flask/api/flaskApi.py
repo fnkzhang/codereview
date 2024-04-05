@@ -16,7 +16,7 @@ import models
 from cloudSql import connectCloudSql
 
 from utils import engine
-from llm import init_llm, get_llm_code_from_suggestion
+from llm import init_llm, get_llm_code_from_suggestion, get_llm_suggestion_from_code
 
 #Todo hide later
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
@@ -790,15 +790,44 @@ def deleteComment(comment_id):
         "reason": "Successful Delete"
     }
 
-@app.route("/api/llm", methods=["GET"])
+# EXAMPLE:
+# curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;", "coding_language": "python", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
+@app.route("/api/llm/code-implementation", methods=["GET"])
 def implement_code_changes_from_comment():
     data = request.get_json()
     code = data.get("code")
     comment = data.get("comment")
+    coding_language = data.get("coding_language")
 
     response = get_llm_code_from_suggestion(
         old_code=code,
+        coding_language=coding_language,
         suggestion=comment
+    )
+
+    if response is None:
+        return {
+            "success": False,
+            "reason": "LLM Error"
+        }
+
+    return {
+        "success": True,
+        "reason": "Success",
+        "body": response
+    }
+
+# EXAMPLE:
+# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def calc_avg(n):\n    total=0\n    count=0\n    for number in n:\n        total = total + number\n        count = count+1\n    average=total/count", "coding_language": "python"}'
+@app.route("/api/llm/comment-suggestion", methods=["GET"])
+def suggest_comment_from_code():
+    data = request.get_json()
+    code = data.get("code")
+    coding_language = data.get("coding_language")
+
+    response = get_llm_suggestion_from_code(
+        code=code,
+        coding_language=coding_language
     )
 
     if response is None:
