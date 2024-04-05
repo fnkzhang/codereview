@@ -45,17 +45,19 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             if (credentialToken == null) {
                 setIsLoggedIn(false)
                 setUserData(null)
+                setLoading(false)
                 return
             }
 
             let credentialObject = {
                 "credential": credentialToken
             }
-
+            
             verifyLogin(credentialObject)
         }
 
         setLoading(false)
+
     }, [verifyLogin, isLoggedIn, setIsLoggedIn, setUserData])
 
     // Check if user is valid when userData is returned
@@ -136,7 +138,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             <div>
         
             <GoogleLogin 
-                className="bg-background m-1 inline-block"
+                className="bg-background m-1 inline-block p-5"
                 onSuccess={credentialResponse => {
                 let decodedResponse = jwtDecode(credentialResponse.credential)
                 console.log(decodedResponse)

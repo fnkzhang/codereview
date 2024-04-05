@@ -10,7 +10,7 @@ function CommentList ({ setCommentsLoading, comments, listLineJump }) {
     <div>
       {comments.map((comment, index) => (
         <Comment 
-        setCommentsLoading={setCommentsLoading}
+          setCommentsLoading={setCommentsLoading}
           key={index}
           commentID={comment.comment_id}
           author={comment.author_email}
