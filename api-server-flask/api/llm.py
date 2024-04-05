@@ -38,6 +38,8 @@ def query_llm(system_prompt,
     streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=True)
     outputs = model.generate(inputs,
                              max_new_tokens=max_new_tokens,
+                             do_sample=True,
+                             temperature=0.75,
                              streamer=streamer)
     response = tokenizer.decode(outputs[0][len(inputs[0]):],
                                 skip_special_tokens=True)
@@ -80,14 +82,14 @@ def get_llm_suggestion_from_code(code, coding_language):
         f"```{coding_language}\n"
         f"{code}\n"
         "```\n"
-        "Identify some issues with the code, and explain how a "
+        "Identify an issue with the code, and explain how a "
         "possible revision would improve the code.\n"
     )
 
     try:
         suggestion = query_llm(system_prompt=system_prompt,
                              user_prompt=user_prompt,
-                             max_new_tokens=200)
+                             max_new_tokens=500)
     except Exception as e:
         return None
 
