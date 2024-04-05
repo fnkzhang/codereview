@@ -16,7 +16,6 @@ def init_llm():
 
 def query_llm(system_prompt,
               user_prompt,
-              assistant_prompt,
               max_new_tokens=128):
     
     messages = [
@@ -27,10 +26,6 @@ def query_llm(system_prompt,
         {
             "role": "user",
             "content": user_prompt
-        },
-        {
-            "role": "assistant",
-            "content": assistant_prompt
         }
     ]
 
@@ -38,7 +33,9 @@ def query_llm(system_prompt,
                                            tokenize=True,
                                            add_generation_prompt=True,
                                            return_tensors="pt").to(device)
-    streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    # streamer skip_prompt=True: display the response in terminal
+    # streamer skip_prompt=False: display system prompt, instruction, and response in terminal
+    streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=True)
     outputs = model.generate(inputs,
                              max_new_tokens=max_new_tokens,
                              streamer=streamer)
@@ -47,27 +44,51 @@ def query_llm(system_prompt,
     
     return response
 
-def get_llm_code_from_suggestion(old_code, suggestion):
+def get_llm_code_from_suggestion(old_code, coding_language, suggestion):
     system_prompt = (
-        "Implement code changes based on the user's comment"
-        "while adhering to best practices."
+        "You are a code editor. Your task is to implement the suggestion "
+        "to the given code while adhering to best practices.\n"
     )
 
     user_prompt = (
-        f"Code: {old_code}"
-        f"Comment Suggestion: {suggestion}"
-    )
-
-    assistant_prompt = (
-        "Here is the code:\n"
+        f"```{coding_language}\n"
+        f"{old_code}\n"
+        "```\n"
+        f"Here is a suggestion to improve the code: {suggestion}\n"
+        "Revise the code to implement the suggestion.\n"
     )
 
     try:
         new_code = query_llm(system_prompt=system_prompt,
                              user_prompt=user_prompt,
-                             assistant_prompt=assistant_prompt,
                              max_new_tokens=len(old_code)+128)
     except Exception as e:
         return None
     
     return new_code
+
+def get_llm_suggestion_from_code(code, coding_language):
+    system_prompt = (
+        "You are a code reviewer. Your task is to identify mistakes such as "
+        "overly complex code, unclear variable names, temporary or "
+        "commented out code, unhandled edge cases, or long functions that "
+        "need to be refactored, then explain how those changes would improve "
+        "the code.\n"
+    )
+
+    user_prompt = (
+        f"```{coding_language}\n"
+        f"{code}\n"
+        "```\n"
+        "Identify some issues with the code, and explain how a "
+        "possible revision would improve the code.\n"
+    )
+
+    try:
+        suggestion = query_llm(system_prompt=system_prompt,
+                             user_prompt=user_prompt,
+                             max_new_tokens=200)
+    except Exception as e:
+        return None
+
+    return suggestion
