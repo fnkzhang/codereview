@@ -1,4 +1,3 @@
-import './ReviewWindow.css';
 import CommentModule from './Comments/CommentModule.js';
 import { getDocSnapshot } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
@@ -66,7 +65,7 @@ export default function ReviewWindow({ comments, setComments, userData}) {
     if (editorRef.current) {
 
       const range = new monacoRef.current.Range(highlightStartY, highlightStartX, highlightEndY, highlightEndX);
-      const decoration = { range: range, options: { isWholeLine: false, className: 'highlight-line' } };
+      const decoration = { range: range, options: { isWholeLine: false, className: 'bg-highlight' } };
       const modifiedEditor = editorRef.current.getModifiedEditor();
       const originalEditor = editorRef.current.getOriginalEditor();
 
@@ -86,13 +85,13 @@ export default function ReviewWindow({ comments, setComments, userData}) {
   if (editorLoading) {
     return (
       <div>
-        <div className="Review-window">
-          <div className="Code-view">
-            <div className="Loading-data">
+        <div className="h-9/10 w-screen flex text-center">
+          <div className="bg-altBackground w-2/3 border border-1 border-solid border-black inline-block">
+            <div className="text-textcolor text-center m-20 text-xl">
               Loading...
             </div>
           </div>
-          <div className="Comment-view">
+          <div className="inline-block w-1/3">
             <CommentModule
               moduleLineJump={lineJump}
               snapshotId={snapshotId}
@@ -112,8 +111,8 @@ export default function ReviewWindow({ comments, setComments, userData}) {
 
   return (
     <div>
-      <div className="Review-window">
-        <div className="Code-view">
+      <div className="h-9/10 w-screen flex text-center">
+        <div className="bg-altBackground w-2/3 border border-1 border-solid border-black inline-block">
           <DiffEditor 
             className="Monaco-editor"
             original={initialCode}
@@ -142,7 +141,7 @@ export default function ReviewWindow({ comments, setComments, userData}) {
             }}
           />
         </div>
-        <div className="Comment-view">
+        <div className="inline-block w-1/3">
           <CommentModule 
             moduleLineJump={lineJump}
             snapshotId={snapshotId}
