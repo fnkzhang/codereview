@@ -1,3 +1,5 @@
+const flowbite = require("flowbite-react/tailwind");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   mode: 'jit',
@@ -7,7 +9,7 @@ module.exports = {
     extend: {
       colors: {
         background: '#282c34',
-        altBackground: '#4d4d4d',
+        altBackground: '#43474F',
         alternative: '#5c5c5c',
         textcolor: '#ffffff',
         highlight: '#ffff00',
@@ -20,6 +22,7 @@ module.exports = {
         '30': 30,
         '40': 40,
         '50': 50,
+        '9998': 9998,
         '9999': 9999,
       }
     }
@@ -39,6 +42,9 @@ module.exports = {
       },
     },
   },
+  content: [
+    flowbite.content(),
+  ],
   plugins: [
     function ({ addUtilities }) {
       const newUtilities = {
@@ -52,5 +58,6 @@ module.exports = {
 
       addUtilities(newUtilities);
     },
+    flowbite.plugin(),
   ],
 }

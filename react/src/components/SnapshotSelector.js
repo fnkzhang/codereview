@@ -57,7 +57,8 @@ export default function SnapshotSelector({ comments }) {
                       return (index <= selectedRightSnapshotIndex) ? (
                         <div key={index}>
                           <button 
-                            className={snapshot.snapshot_id.toString() === left_snapshot_id ? 'bg-snapshotSelected' : null}
+                            className={`border border-alternative border-2 p-1 m-1 rounded 
+                              ${snapshot.snapshot_id.toString() === left_snapshot_id ? 'bg-snapshotSelected' : null}`}
                             onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
                             data-tooltip-id={`tooltipleft${index}`}>
                               Snapshot {index} {str}
@@ -65,7 +66,7 @@ export default function SnapshotSelector({ comments }) {
                           <Tooltip
                             className="z-9999" 
                             id={`tooltipleft${index}`}
-                            place="bottom"
+                            place="right"
                             content={
                               <div>
                                 <p>
@@ -103,8 +104,9 @@ export default function SnapshotSelector({ comments }) {
                     //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
                     return (index >= selectedLeftSnapshotIndex) ? (
                       <div key={index}>
-                        <button 
-                          className={snapshot.snapshot_id.toString() === right_snapshot_id ? 'bg-snapshotSelected' : null}
+                        <button
+                          className={`border border-alternative border-2 p-1 m-1 rounded 
+                            ${snapshot.snapshot_id.toString() === right_snapshot_id ? 'bg-snapshotSelected' : null}`}
                           onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
                           data-tooltip-id={`tooltipright${index}`}>
                             Snapshot {index} {str}
@@ -112,7 +114,7 @@ export default function SnapshotSelector({ comments }) {
                         <Tooltip
                           className="z-9999" 
                           id={`tooltipright${index}`}
-                          place="bottom"
+                          place="right"
                           content={
                             <div>
                               <p>

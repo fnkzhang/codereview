@@ -23,11 +23,15 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
           <div className="text-offwhite items-right ml-4"><i>~ {date}</i></div>
         </div>
         <div className="mt-2">{text}</div>
-        <div className="mt-2">
-          <button onClick={() => commentLineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY)}>
+        <div className="flex items-center justify-center mt-2">
+          <button
+            className="border border-alternative border-1 px-2 py-1 w-1/2 transition duration-300 hover:bg-altBackground rounded"
+            onClick={() => commentLineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY)}>
             Jump to Line
           </button>
-          <button onClick={handleResolve}>
+          <button
+            className="border border-alternative border-1 px-2 py-1 ml-1 w-1/2 transition duration-300 hover:bg-altBackground rounded"
+            onClick={handleResolve}>
             Resolve Comment
           </button>
         </div>
