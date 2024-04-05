@@ -78,7 +78,9 @@ export default function ProjectPage() {
       )
     }
 
-    return <p>EMPTY</p>
+    return (<div className="m-20 text-center text-textcolor text-2xl">
+      No projects Available.
+  </div>)
   }
 
 
