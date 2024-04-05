@@ -16,7 +16,17 @@ function CommentList ({ setCommentsLoading, comments, listLineJump }) {
           author={comment.author_email}
           text={comment.content} 
           subcomments={comment.subcomments}
-          date={comment.date_modified}
+          date={new Date(comment.date_modified)
+          .toLocaleDateString("en-US", { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric', 
+            weekday: 'long',  
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            timeZoneName: 'short',
+          })}
           snapshotID={comment.snapshot_id}
           commentLineJump={listLineJump}
           highlightStartX={comment.highlight_start_x}

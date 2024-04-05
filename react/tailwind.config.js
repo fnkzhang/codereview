@@ -11,7 +11,8 @@ module.exports = {
         alternative: '#5c5c5c',
         textcolor: '#ffffff',
         highlight: '#ffff00',
-        snapshotSelected: '#ff0000'
+        snapshotSelected: '#ff0000',
+        offwhite: '#bababa',
       },
       zIndex: {
         '10': 10,

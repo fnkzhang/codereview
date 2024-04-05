@@ -1,5 +1,4 @@
 import { resolveComment } from '../../api/APIUtils';
-import './Comments.css';
 import SubCommentList from './SubCommentList';
 import React from 'react';
 
@@ -18,18 +17,18 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
   
   return (
     <div>
-      <div className="Comment-container">
-        <div className="Comment-name-date-container">
-          <strong className="Comment-author">{author}</strong>
-          <div className="Comment-date"><i>~ {date}</i></div>
+      <div className="border border-solid border-alternative border-2 p-2 m-2 text-textcolor text-sm text-left rounded-lg whitespace-pre-wrap">
+        <div className="flex">
+          <strong className="text-sm font-bold ml-4">{author}</strong>
+          <div className="text-offwhite items-right ml-4"><i>~ {date}</i></div>
         </div>
-        <div className="Comment-text">{text}</div>
-        <div className="Comment-linejump-button">
+        <div className="mt-2">{text}</div>
+        <div className="mt-2">
           <button onClick={() => commentLineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY)}>
             Jump to Line
           </button>
           <button onClick={handleResolve}>
-            Resolve
+            Resolve Comment
           </button>
         </div>
       </div>
