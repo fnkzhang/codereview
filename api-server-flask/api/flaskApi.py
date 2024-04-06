@@ -791,17 +791,17 @@ def deleteComment(comment_id):
     }
 
 # EXAMPLE:
-# curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;", "coding_language": "python", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
+# curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
 @app.route("/api/llm/code-implementation", methods=["GET"])
 def implement_code_changes_from_comment():
     data = request.get_json()
     code = data.get("code")
+    highlighted_code=data.get("highlighted_code")
     comment = data.get("comment")
-    coding_language = data.get("coding_language")
 
     response = get_llm_code_from_suggestion(
-        old_code=code,
-        coding_language=coding_language,
+        code=code,
+        highlighted_code=highlighted_code,
         suggestion=comment
     )
 
@@ -818,16 +818,14 @@ def implement_code_changes_from_comment():
     }
 
 # EXAMPLE:
-# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def calc_avg(n):\n    total=0\n    count=0\n    for number in n:\n        total = total + number\n        count = count+1\n    average=total/count", "coding_language": "python"}'
+# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def calc_avg(n):\n    tot=0\n    cnt=0\n    for number in n:\n      tot = tot+ number\n      cnt= cnt+1\n    average=tot/cnt"}'
 @app.route("/api/llm/comment-suggestion", methods=["GET"])
 def suggest_comment_from_code():
     data = request.get_json()
     code = data.get("code")
-    coding_language = data.get("coding_language")
 
     response = get_llm_suggestion_from_code(
-        code=code,
-        coding_language=coding_language
+        code=code
     )
 
     if response is None:
