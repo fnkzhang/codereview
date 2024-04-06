@@ -1,96 +1,141 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
-import torch
+import json
+from typing import List, Optional
 
-device = None
-tokenizer = None
+# pip install "google-cloud-aiplatform>=1.38"
+# https://ai.google.dev/docs/prompt_best_practices
+import vertexai
+from vertexai.generative_models import GenerativeModel, GenerationConfig, \
+    Content, Part
+
+#------------------------------------------------------------------------------
+# Initialize LLM
+#-------------------------------------------------------------------------------
 model = None
+def init_llm(project_id: str="codereview-413200",
+             location: str="us-central1"):
+    global model
+    vertexai.init(project=project_id, location=location)
+    model = GenerativeModel("gemini-1.0-pro")
 
-def init_llm():
-    global device, tokenizer, model
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-1.3b-instruct",
-                                              trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained("deepseek-ai/deepseek-coder-1.3b-instruct",
-                                                 trust_remote_code=True,
-                                                 torch_dtype=torch.bfloat16).to(device)
+#------------------------------------------------------------------------------
+# Helper Functions
+#-------------------------------------------------------------------------------
+def get_content(role: str,
+                text: str):
+    return Content(role=role,
+                   parts=[Part.from_text(text)])
 
-def query_llm(system_prompt,
-              user_prompt,
-              max_new_tokens=128):
+def get_json_from_llm_response(response: str):
+    start_index = response.find("```")
+    end_index = response.rfind("```")
+    json_response = response[start_index + 3: end_index]
     
-    messages = [
-        {
-            "role": "system",
-            "content": system_prompt
-        },
-        {
-            "role": "user",
-            "content": user_prompt
-        }
-    ]
+    return json.loads(json_response)
 
-    inputs = tokenizer.apply_chat_template(messages,
-                                           tokenize=True,
-                                           add_generation_prompt=True,
-                                           return_tensors="pt").to(device)
-    # streamer skip_prompt=True: display the response in terminal
-    # streamer skip_prompt=False: display system prompt, instruction, and response in terminal
-    streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=True)
-    outputs = model.generate(inputs,
-                             max_new_tokens=max_new_tokens,
-                             do_sample=True,
-                             temperature=0.75,
-                             streamer=streamer)
-    response = tokenizer.decode(outputs[0][len(inputs[0]):],
-                                skip_special_tokens=True)
+def get_chat_response(prompt: str,
+                      history: Optional[List["Content"]] = None,
+                      temperature: float=0.15):
+    text_response = []
+    chat = model.start_chat(history=history)
     
-    return response
+    responses = chat.send_message(prompt,
+                                  stream=True,
+                                  generation_config=GenerationConfig(
+                                      temperature=temperature
+                                  ))
+    for chunk in responses:
+        text_response.append(chunk.text)
+    return "".join(text_response)
 
-def get_llm_code_from_suggestion(old_code, coding_language, suggestion):
-    system_prompt = (
-        "You are a code editor. Your task is to implement the suggestion "
-        "to the given code while adhering to best practices.\n"
-    )
+#------------------------------------------------------------------------------
+# Functions used by route
+#-------------------------------------------------------------------------------
+def get_llm_code_from_suggestion(code: str,
+                                 highlighted_code: str,
+                                 suggestion: str):
+    history = []
 
-    user_prompt = (
-        f"```{coding_language}\n"
-        f"{old_code}\n"
-        "```\n"
-        f"Here is a suggestion to improve the code: {suggestion}\n"
-        "Revise the code to implement the suggestion.\n"
-    )
+    # System prompt with additional context and expected response format
+    system_prompt = f"""System Prompt:
+    Apply the suggestions to the highlighted code without additional \
+    commentary or text. The highlighted code will be a substring located \
+    in ```{code}```. Return a JSON object that has the field "code" \
+    with the value being the revised code.
+
+    Example
+    ```
+    {{
+        "code": "Your code here"
+    }}
+    ```
+    """
+    history.append(get_content("user", system_prompt))
+    history.append(get_content("model", "Understood."))
+
+    # User prompt
+    user_prompt = f"""Highlighted Code:```
+    {highlighted_code}
+    ```
+    Suggestion: {suggestion}
+    """
 
     try:
-        new_code = query_llm(system_prompt=system_prompt,
-                             user_prompt=user_prompt,
-                             max_new_tokens=len(old_code)+128)
-    except Exception as e:
+        response = get_chat_response(user_prompt, history=history)
+    except:
+        print("Failed to get response from LLM")
         return None
     
+    try:
+        new_code = get_json_from_llm_response(response)["code"]
+    except:
+        print("Failed to get code from response")
+        return None
+
+    print("Output:\n\n", new_code, '\n')
+
     return new_code
 
-def get_llm_suggestion_from_code(code, coding_language):
-    system_prompt = (
-        "You are a code reviewer. Your task is to identify mistakes such as "
-        "overly complex code, unclear variable names, temporary or "
-        "commented out code, unhandled edge cases, or long functions that "
-        "need to be refactored, then explain how those changes would improve "
-        "the code.\n"
-    )
+def get_llm_suggestion_from_code(code: str):
+    history = []
 
-    user_prompt = (
-        f"```{coding_language}\n"
-        f"{code}\n"
-        "```\n"
-        "Identify an issue with the code, and explain how a "
-        "possible revision would improve the code.\n"
-    )
+    # System prompt with additional context and expected response format
+    system_prompt = f"""System Prompt:
+    List some suggestions that would improve the quality of the highlighted \
+    code according to best practices. Return a JSON object that has the \
+    field "suggestions" with the value being a list of suggestions.
+
+    Example
+    ```
+    {{
+        "suggestions": [
+            "Your suggestions here"
+        ]
+    }}
+    ```
+    """
+    history.append(get_content("user", system_prompt))
+    history.append(get_content("model", "Understood."))
+
+    # User prompt
+    user_prompt = f"""
+    {code}
+    ```
+    """
 
     try:
-        suggestion = query_llm(system_prompt=system_prompt,
-                             user_prompt=user_prompt,
-                             max_new_tokens=500)
-    except Exception as e:
+        response = get_chat_response(user_prompt, history=history)
+    except:
+        print("Failed to get response from LLM")
+        return None
+    
+    try:
+        suggestions = get_json_from_llm_response(response)["suggestions"]
+    except:
+        print("Failed to get suggestions from response")
         return None
 
-    return suggestion
+    print("Output:\n")
+    for suggestion in suggestions:
+        print(suggestion, '\n')
+
+    return suggestions
