@@ -636,6 +636,92 @@ def getDocument(proj_id, doc_id):
     
     info = getDocumentInfo(doc_id)
     return {"success": True, "reason":"", "body": info}
+@app.route('/api/Snapshot/<snapshot_id>/', methods=["DELETE"])
+def deleteSnapshot(snapshot_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    # Query
+    rv = deleteSnapshotUtil(snapshot_id)
+    if(not rv)
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }
+
+@app.route('/api/Document/<doc_id>/', methods=["DELETE"])
+def deleteDocument(doc_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    # Query
+    rv = deleteDocumentUtil(doc_id)
+    if(not rv)
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }
+
+@app.route('/api/Folder/<folder_id>/', methods=["DELETE"])
+def deleteFolderUtil(folder_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    # Query
+    rv = deleteFolder(folder_id)
+    if(not rv)
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }
 
 # Comment POST, GET, PUT, DELETE
 @app.route('/api/snapshots/<snapshot_id>/comment/create', methods=["POST"])

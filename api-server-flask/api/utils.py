@@ -174,6 +174,70 @@ def createNewSnapshot(proj_id, doc_id, item):
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
         return snapshot_id
+def deleteSnapshotUtil(snapshot_id):
+    try:
+        with engine.connect as conn:
+            conn.query(models.Snapshot) \
+                .filter_by(snapshot_id=snapshot_id) \
+                .delete()
+
+            conn.commit()
+        return True
+    except Exception as e:
+        return False
+
+def deleteDocumentUtil(doc_id):
+    try:
+        with engine.connect as conn:
+            conn.query(models.Document) \
+                .filter_by(doc_id=doc_id) \
+                .delete()
+            conn.query(models.Snapshot) \
+                .filter_by(associated_document_id=doc_id) \
+                .delete()
+            conn.commit()
+        return True
+    except Exception as e:
+        return False
+
+def deleteFolderUtil(folder_id):
+    try:
+        with engine.connect as conn:
+            conn.query(models.Document) \
+                .filter_by(folder_id=folder_id) \
+                .delete()
+            
+            stmt = select(models.Document).where(models.Document.parent_folder=folder_id)
+            documents = conn.execute(stmt)
+            for document in documents:
+                deleteDocument(document.doc_id)
+            
+            stmt = select(models.Folder).where(models.Folder.parent_folder=folder_id)
+            folders = conn.execute(stmt)
+            for folder in folders:
+                deleteFolder(folder.folder_id)
+            
+            conn.commit()
+        return True
+    except Exception as e:
+        return False
+
+def deleteProjectUtil(proj_id):
+    try:
+        with engine.connect as conn:
+            stmt = select(models.Project).where(models.Project.proj_id = proj_id)
+            project = conn.execute(stmt).first()
+            deleteFolder(project.root_folder)
+            conn.query(models.Project) \
+                .filter_by(proj_id=proj_id) \
+                .delete()
+            conn.query(models.UserProjectRelation) \
+                .filter_by(proj_id=proj_id) \
+                .delete()
+            conn.commit()
+        return True
+    except Exception as e:
+        return False
 
 # Returns Array of Dictionaries
 def getAllDocumentSnapshotsInOrder(doc_id):
