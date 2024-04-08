@@ -28,7 +28,12 @@ def get_content(role: str,
 def get_json_from_llm_response(response: str):
     start_index = response.find("```")
     end_index = response.rfind("```")
+
     json_response = response[start_index + 3: end_index]
+    if (json_response.lower().startswith("json")):
+        json_response = json_response[4:]
+
+    print(json_response)
     
     return json.loads(json_response)
 
