@@ -55,7 +55,7 @@ def setUserProjPermissions(email, pid, r, perms):
 # Find all project relationship models for user email
 def getAllUserProjPermissions(user_email):
     with engine.connect() as conn:
-        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == "sichuan@ucdavis.edu")
+        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email)
 
         result = conn.execute(stmt)
 
@@ -67,7 +67,7 @@ def getAllUserProjPermissions(user_email):
 
 def getUserProjPermissions(user_email, proj_id):
     with engine.connect() as conn:
-        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == "sichuan@ucdavis.edu", models.UserProjectRelation.proj_id == proj_id)
+        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email, models.UserProjectRelation.proj_id == proj_id)
         #idk if this works :) change later
         result = conn.execute(stmt)
         #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
@@ -213,7 +213,7 @@ def getAllDocumentSnapshotsInOrder(doc_id):
 
 def userExists(user_email):
     with engine.connect() as conn:
-        stmt = select(models.User).where(models.User.user_email == "sichuan@ucdavis.edu")
+        stmt = select(models.User).where(models.User.user_email == user_email)
         result = conn.execute(stmt)
         return result.first() != None
 
