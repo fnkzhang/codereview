@@ -11,22 +11,26 @@ from google.auth.transport import requests
 
 from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, DateTime, Text
 from sqlalchemy.sql import func
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import sessionmaker
 from cloudSql import connectCloudSql
 
 import models
+
+from cacheUtils import cloudStorageCache, publishTopicUpdate
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
 os.environ["GCLOUD_PROJECT"] = "codereview-413200"
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 engine = connectCloudSql()
+Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.blob(blobName)
     blob.upload_from_string(data = item, content_type='application/json')
+    
     return True
 
 def getBlob(blobName):
@@ -51,7 +55,7 @@ def setUserProjPermissions(email, pid, r, perms):
 # Find all project relationship models for user email
 def getAllUserProjPermissions(user_email):
     with engine.connect() as conn:
-        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email)
+        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == "sichuan@ucdavis.edu")
 
         result = conn.execute(stmt)
 
@@ -63,7 +67,7 @@ def getAllUserProjPermissions(user_email):
 
 def getUserProjPermissions(user_email, proj_id):
     with engine.connect() as conn:
-        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email, models.UserProjectRelation.proj_id == proj_id)
+        stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == "sichuan@ucdavis.edu", models.UserProjectRelation.proj_id == proj_id)
         #idk if this works :) change later
         result = conn.execute(stmt)
         #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
@@ -209,7 +213,7 @@ def getAllDocumentSnapshotsInOrder(doc_id):
 
 def userExists(user_email):
     with engine.connect() as conn:
-        stmt = select(models.User).where(models.User.user_email == user_email)
+        stmt = select(models.User).where(models.User.user_email == "sichuan@ucdavis.edu")
         result = conn.execute(stmt)
         return result.first() != None
 
@@ -235,15 +239,57 @@ def resolveCommentHelperFunction(comment_id):
 
     pass
 
-def getCommentsForSnapshot(snapshot_id):
-     # Query
+def fetchFromCloudStorage(blobName:str):
+    '''
+    If cached, returns the blob in cache.
+    If uncached, makes a request for the blob in Google Buckets
+    and returns the blob.
+
+    Args
+      blobName:
+        Name of the blob to retrieve.
+    '''
+    blobContents = cloudStorageCache.get(blobName)
+    if blobContents is None:
+        blobContents = getBlob(blobName)
+        print('uncached\n\n\n')
+    else:
+        print('cached\n\n\n')
+    
+    if blobContents is not None:
+        cloudStorageCache.set(blobName, blobContents)
+    
+    return blobContents
+
+def publishCloudStorageUpdate(blobName: str):
+    '''
+    Publishes a message with the blobName as the key to indicate that the
+    specified blob has been updated. The key is used to delete the blob
+    from cache.
+
+    Args
+      blobName:
+        Name of the blob that was updated (created, edited, deleted)
+    '''
+    publishTopicUpdate("cloud-storage-updates", blobName)
+    return
+
+def filterCommentsByPredicate(predicate):
+    '''
+    Filters the comments database for all comments that satisfy the
+    given predicate and returns the comments as a list.
+
+    Args
+      predicate:
+        An SQL column expression that either returns True or False.
+    '''
     commentsList = []
     with Session() as session:
         try:
             filteredComments = session.query(models.Comment) \
-                .filter_by(snapshot_id=snapshot_id) \
+                .filter(predicate) \
                 .all()
-
+            
             for comment in filteredComments:
                 commentsList.append({
                     "comment_id": comment.comment_id,
@@ -259,8 +305,8 @@ def getCommentsForSnapshot(snapshot_id):
                     "highlight_end_y": comment.highlight_end_y,
                     "is_resolved": comment.is_resolved
                 })
+
         except Exception as e:
-            print("Error: ", e)
-            return []
-        
+            commentsList = None
+    
     return commentsList
