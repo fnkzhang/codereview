@@ -36,6 +36,22 @@ def getBlob(blobName):
     blob = bucket.get_blob(blobName)
     return blob.download_as_text()
 
+def deleteBlob(blobName):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket('cr_storage')
+    blob = bucket.get_blob(blobName)
+    blob.delete()
+    return True
+
+#location = basically the folder the files are located in
+def deleteBlobsInDirectory(location):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket('cr_storage')
+    blobs = bucket.list_blobs(prefix = location)
+    for blob in blobs:
+        blob.delete()
+    return True
+
 def setUserProjPermissions(email, pid, r, perms):
     with engine.connect() as conn:
         stmt = insert(models.UserProjectRelation).values(
