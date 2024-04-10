@@ -9,7 +9,7 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, DateTime, Text
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete, DateTime, Text
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 from cloudSql import connectCloudSql
@@ -46,6 +46,15 @@ def setUserProjPermissions(email, pid, r, perms):
         )
         conn.execute(stmt)
         conn.commit()
+    return True
+
+def deleteProjectWithProjectID(proj_id):
+    with engine.connect() as conn:
+        stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
+
+        conn.execute(stmt)
+        conn.commit()
+
     return True
 
 # Find all project relationship models for user email
@@ -234,33 +243,3 @@ def resolveCommentHelperFunction(comment_id):
         conn.commit()
 
     pass
-
-def getCommentsForSnapshot(snapshot_id):
-     # Query
-    commentsList = []
-    with Session() as session:
-        try:
-            filteredComments = session.query(models.Comment) \
-                .filter_by(snapshot_id=snapshot_id) \
-                .all()
-
-            for comment in filteredComments:
-                commentsList.append({
-                    "comment_id": comment.comment_id,
-                    "snapshot_id": comment.snapshot_id,
-                    "author_email": comment.author_email,
-                    "reply_to_id": comment.reply_to_id,
-                    "date_created": comment.date_created,
-                    "date_modified": comment.date_modified,
-                    "content": comment.content,
-                    "highlight_start_x": comment.highlight_start_x,
-                    "highlight_start_y": comment.highlight_start_y,
-                    "highlight_end_x": comment.highlight_end_x,
-                    "highlight_end_y": comment.highlight_end_y,
-                    "is_resolved": comment.is_resolved
-                })
-        except Exception as e:
-            print("Error: ", e)
-            return []
-        
-    return commentsList

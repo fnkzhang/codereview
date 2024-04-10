@@ -21,6 +21,13 @@ export async function sendData(bodyContents) {
     .then(response => response.json())
 }
 
+export async function createProject(projectName) {
+
+}
+export async function deleteProject(proj_id) {
+
+}
+
 export async function createDoc(bodyContents, proj_id, doc_id) {
 
   let oAuthToken = getCookie("cr_id_token")

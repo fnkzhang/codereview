@@ -224,6 +224,7 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    
     root_folder_id = createNewFolder('root', 0)
     with engine.connect() as conn:
         pid = createID()
@@ -243,12 +244,33 @@ def createProject(proj_name):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
+        
     return {
         "success": True,
         "reason": "",
         "body": {}
     }
 
+@app.route('/api/Project/<proj_id>/', methods = ["DELETE"])
+def deleteProject(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    isFinishedOperation = deleteProjectWithProjectID(proj_id)
+
+    # Remove from user Proj relation / remove blob too 
+    pass
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
 def getProject(proj_id):
     headers = request.headers
