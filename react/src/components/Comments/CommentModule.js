@@ -1,24 +1,32 @@
-import './CommentModule.css'
 import React, { useState } from 'react';
 import CommentList  from './CommentList';
-import { createComment, getCommentsOnSnapshot } from '../../api/APIUtils.js';
+import { createComment, getAllCommentsForDocument } from '../../api/APIUtils.js';
 import { useEffect } from 'react';
+import { useParams } from 'react-router';
 
-import { getComments } from '../../dev/getComments.js'
-
-function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, start , end}) {
+function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
+  start , end, comments, setComments, userData}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
-  //const [comments, setComments] = useState(null);
-  const [comments, setComments] = useState(getComments())
   const [newComment, setNewComment] = useState('');
 
+  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+
+  const [userDataLocal] = useState(userData);
+  
   useEffect(() => {
+    console.log(start, end, comments, document_id)
+
     const fetchData = async () => {
       try {
-        //const commentData = await getCommentsOnDiff(snapshotID)
-        let commentData = comments
-        console.log(commentData)
-        setComments(commentData)
+        let allComments = []
+        let commentResults =  await getAllCommentsForDocument(document_id)
+        console.log(commentResults)
+
+        allComments = allComments.concat(commentResults)
+
+
+        setComments(allComments)
+        
       } catch (error) {
         console.log(error)
       } finally {
@@ -31,30 +39,25 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     }
   }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
-  function handleNewCommentChange (event) {
+  useEffect(() => {
+    console.log("comment Updated")
+  }, [comments])
+
+  function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
   };
 
-  async function handleNewCommentSubmit (event) {
-    event.preventDefault();
-
+  async function handleNewCommentSubmit() {
     try {
       console.log(snapshotId)
       if (snapshotId != null) {
-        console.log("adding comment ...")
-        setComments([...comments,{
-          author_id: 2,
-          comment_id: 1000,
-          content: newComment,
-          date_created: "time",
-          date_modified: "time",
-          snapshot_id: snapshotId,
-          reply_to_id: 0,
-          highlight_start_x: start.column,
-          highlight_start_y: start.lineNumber,
-          highlight_end_x: end.column,
-          highlight_end_y: end.lineNumber
-        }])
+        console.log("adding comment ...", userDataLocal)
+
+        // ToDo Handle Nested Comments in future
+        let createdComment = await createComment(snapshotId, userDataLocal.email, 0, newComment, start.column, start.lineNumber, end.column, end.lineNumber)
+
+        console.log(createdComment)
+        
         setCommentsLoading(true);
       }
     } catch (error) {
@@ -64,50 +67,62 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     }
   };
 
+  function filterComments() {
+
+    if (comments.length > 0)
+      return comments.filter((comment) => {
+        console.log(comment)
+        return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)) && (comment.is_resolved === false)
+      })
+    
+    return []
+  }
+
   if (commentsLoading) {
     return (
       <div>
-        <p className="Comment-title">Comment Section</p>
-        <div className="Comment-loading">
+        <p className="text-textcolor text-center text-xl">Comment Section</p>
+        <div className="text-textcolor text-center text-xl h-70vh">
           Loading...
         </div>
-        <form className="Comment-submit-section" onSubmit={handleNewCommentSubmit}>
-        <label>Add a new comment:</label>
+        <div className="Comment-submit-section">
+        <label className="text-textcolor">Add a new comment:</label>
         <textarea
-          rows="4"
-          cols="50"
+          className="border border-alternative rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 w-full h-1/5"
+          type="text"
           value={newComment}
-          onChange={handleNewCommentChange}
+          onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button type="submit">Submit Comment</button>
-      </form>
+        <button className="text-textcolor" type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+      </div>
       </div>
     )
   }
 
   return (
     <div>
-      <p className="Comment-title">Comment Section</p>
-      <div className="Comment-list-container">
+      <p className="text-textcolor text-center text-xl">Comment Section</p>
+      <div className="overflow-y-scroll h-70vh">
         <CommentList 
-          comments={comments.filter(function(comment) {
-            return (comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)
+          setCommentsLoading={setCommentsLoading}
+          comments={comments.filter((comment) => {
+            return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)) && (comment.is_resolved === false)
           })}
           listLineJump={moduleLineJump}
         />
       </div>
-      <form className="Comment-submit-section" onSubmit={handleNewCommentSubmit}>
-        <label>Add a new comment:</label>
+      <div className="Comment-submit-section">
+        <label className="text-textcolor">Add a new comment:</label>
         <textarea
-          rows="4"
-          cols="50"
+          className="border border-alternative rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 w-full h-1/5"
+          type="text"
           value={newComment}
-          onChange={handleNewCommentChange}
+          onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button type="submit">Submit Comment</button>
-      </form>
+        <button className="text-textcolor" type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+      </div>
     </div>
   );
 }

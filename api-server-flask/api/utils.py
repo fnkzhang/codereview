@@ -47,18 +47,19 @@ def setUserProjPermissions(email, pid, r, perms):
         conn.execute(stmt)
         conn.commit()
     return True
-def getUserProjPermissions(user_email):
+
+# Find all project relationship models for user email
+def getAllUserProjPermissions(user_email):
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email)
-        #idk if this works :) change later
-        result = conn.execute(stmt)
-        #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
 
-        #needs to happen because you can only call result.first() once
-        relationfirst = result.first()
-        if relationfirst == None:
-            return -1
-        return result
+        result = conn.execute(stmt)
+
+        returnList = []
+        for row in result:
+            returnList.append(row._asdict())
+
+        return returnList
 
 def getUserProjPermissions(user_email, proj_id):
     with engine.connect() as conn:
@@ -79,8 +80,22 @@ def getProjectInfo(proj_id):
         foundProject = conn.execute(stmt).first()
         if foundProject == None:
             return -1
-        return foundProject
+        
+        return foundProject._asdict()
+    
+def getAllDocumentsForProject(proj_id):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
 
+        results = conn.execute(stmt)
+
+        arrayOfDocuments = []
+
+        for row in results:
+            arrayOfDocuments.append(row._asdict())
+        
+        return arrayOfDocuments
+    
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
@@ -88,7 +103,7 @@ def getDocumentInfo(doc_id):
         if foundDocument == None:
             return -1
         return foundDocument
-
+  
 def createNewDocument(document_name, parent_folder):
     doc_id = createID()
     with engine.connect() as conn:
@@ -207,3 +222,45 @@ def isValidRequest(parameters, requiredKeys):
             return False
 
     return True
+
+def resolveCommentHelperFunction(comment_id):
+    with engine.connect() as conn:
+        stmt = (update(models.Comment)
+        .where(models.Comment.comment_id == comment_id)
+        .values(is_resolved=True)
+        )
+
+        conn.execute(stmt)
+        conn.commit()
+
+    pass
+
+def getCommentsForSnapshot(snapshot_id):
+     # Query
+    commentsList = []
+    with Session() as session:
+        try:
+            filteredComments = session.query(models.Comment) \
+                .filter_by(snapshot_id=snapshot_id) \
+                .all()
+
+            for comment in filteredComments:
+                commentsList.append({
+                    "comment_id": comment.comment_id,
+                    "snapshot_id": comment.snapshot_id,
+                    "author_email": comment.author_email,
+                    "reply_to_id": comment.reply_to_id,
+                    "date_created": comment.date_created,
+                    "date_modified": comment.date_modified,
+                    "content": comment.content,
+                    "highlight_start_x": comment.highlight_start_x,
+                    "highlight_start_y": comment.highlight_start_y,
+                    "highlight_end_x": comment.highlight_end_x,
+                    "highlight_end_y": comment.highlight_end_y,
+                    "is_resolved": comment.is_resolved
+                })
+        except Exception as e:
+            print("Error: ", e)
+            return []
+        
+    return commentsList

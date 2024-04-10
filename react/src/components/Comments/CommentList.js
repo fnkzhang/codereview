@@ -1,8 +1,7 @@
 import React from 'react';
-import { mapToName } from './../../dev/authorTranslate.js'
 import Comment from './Comments.js';
 
-function CommentList ({ comments, listLineJump }) {
+function CommentList ({ setCommentsLoading, comments, listLineJump }) {
   if (!Array.isArray(comments)) {
     return null
   }
@@ -11,12 +10,23 @@ function CommentList ({ comments, listLineJump }) {
     <div>
       {comments.map((comment, index) => (
         <Comment 
+          setCommentsLoading={setCommentsLoading}
           key={index}
           commentID={comment.comment_id}
-          author={mapToName(comment.author_id)}
+          author={comment.author_email}
           text={comment.content} 
           subcomments={comment.subcomments}
-          date={comment.date_modified}
+          date={new Date(comment.date_modified)
+          .toLocaleDateString("en-US", { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric', 
+            weekday: 'long',  
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            timeZoneName: 'short',
+          })}
           snapshotID={comment.snapshot_id}
           commentLineJump={listLineJump}
           highlightStartX={comment.highlight_start_x}

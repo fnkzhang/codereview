@@ -177,30 +177,37 @@ def signUp():
     }
     return jsonify(retData)
 
+# Return body has array of project Data
+# Array can contain -1 value indicating missing references
 @app.route('/api/User/<user_email>/Project/', methods = ["GET"])
-def getUserProjects(user_email):
+def getAllUserProjects(user_email):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
-                "success":False,
+                "success": False,
                 "reason": "Invalid Token Provided"
         }
 
     idInfo = authenticate()
     if idInfo is None:
         return {
-            "success":False,
+            "success": False,
             "reason": "Failed to Authenticate"
         }
 
-    allPermissions = getUserProjPermissions(user_email)
+    allPermissions = getAllUserProjPermissions(user_email)
     if allPermissions == -1:
         return {"projects": "None"}
     projects = []
+
     for permission in allPermissions:
-        projects.append(getProjectInfo(permission.proj_id))
-    info = json.dumps(projects)
-    return {"proj_info": info}
+        projects.append(getProjectInfo(permission["proj_id"]))
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": projects
+        }
 
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
@@ -507,7 +514,7 @@ def createComment(snapshot_id):
         }
 
     body = request.get_json()
-    if not isValidRequest(body, ["snapshot_id", "author_id", "reply_to_id", "content"]):
+    if not isValidRequest(body, ["author_email", "reply_to_id", "content"]):
         return {
             "success": False,
             "reason": "Invalid Request"
@@ -517,14 +524,15 @@ def createComment(snapshot_id):
     with Session() as session:
         try:
             session.add(models.Comment(
-                snapshot_id=int(body["snapshot_id"]),
-                author_id=int(body["author_id"]),
-                reply_to_id=int(body["reply_to_id"]),
-                content=body["content"],
+                snapshot_id = snapshot_id,
+                author_email = body["author_email"],
+                reply_to_id = int(body["reply_to_id"]),
+                content = body["content"],
                 highlight_start_x = int(body["highlight_start_x"]),
                 highlight_start_y = int(body["highlight_start_y"]),
                 highlight_end_x = int(body["highlight_end_x"]),
                 highlight_end_y = int(body["highlight_end_y"]),
+                is_resolved = body["is_resolved"]
 
             ))
             session.commit()
@@ -535,12 +543,50 @@ def createComment(snapshot_id):
                 "reason": str(e)
             }
 
-    print("Successful Write")
+    print("Successful Write Comment")
     return {
         "success": True,
-        "reason": "Successful Write"
+        "reason": "Successful Write",
+        "body": {
+            "snapshot_id": snapshot_id,
+            "author_email": body["author_email"],
+            "reply_to_id": int(body["reply_to_id"]),
+            "content": body["content"],
+            "highlight_start_x": int(body["highlight_start_x"]),
+            "highlight_start_y": int(body["highlight_start_y"]),
+            "highlight_end_x":int(body["highlight_end_x"]),
+            "highlight_end_y": int(body["highlight_end_y"]),
+            "is_resolved": body["is_resolved"]
+        }
     }
 
+# Set comment is_resolved to true
+@app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
+def resolveComment(comment_id):
+    # Authentication
+    print("TEST")
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    resolveCommentHelperFunction(comment_id)
+
+    return {
+        "success": True,
+        "reason": "Ran The Call"
+    }
+    # Set Comment is_resolved to true
+    
+    pass
 # look into pagination
 # https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
@@ -572,7 +618,7 @@ def getCommentsOnSnapshot(snapshot_id):
                 commentsList.append({
                     "comment_id": comment.comment_id,
                     "snapshot_id": comment.snapshot_id,
-                    "author_id": comment.author_id,
+                    "author_email": comment.author_email,
                     "reply_to_id": comment.reply_to_id,
                     "date_created": comment.date_created,
                     "date_modified": comment.date_modified,
@@ -580,15 +626,89 @@ def getCommentsOnSnapshot(snapshot_id):
                     "highlight_start_x": comment.highlight_start_x,
                     "highlight_start_y": comment.highlight_start_y,
                     "highlight_end_x": comment.highlight_end_x,
-                    "highlight_end_y": comment.highlight_end_y
+                    "highlight_end_y": comment.highlight_end_y,
+                    "is_resolved": comment.is_resolved
                 })
         except Exception as e:
             print("Error: ", e)
             return []
     
     print("Successful Read")
-    return commentsList
+    return {
+        "success": True,
+        "reason": "",
+        "body": commentsList
+    }
 
+@app.route('/api/Document/<document_id>/comments/', methods=["GET"])
+def getAllCommentsForDocument(document_id):
+    # Authentication
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided",
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate",
+        }
+    
+    if not userExists(idInfo["email"]):
+        return {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+        }
+    
+    listOfSnapshotIDs = []
+    foundSnapshots = getAllDocumentSnapshotsInOrder(document_id)
+
+    for snapshot in foundSnapshots:
+            # Query
+        listOfSnapshotIDs.append(snapshot["snapshot_id"])
+
+    listOfComments = []
+    with Session() as session:
+        try:
+            filteredComments = session.query(models.Comment) \
+                .filter(models.Comment.snapshot_id.in_(listOfSnapshotIDs)) \
+                .all()
+
+            for comment in filteredComments:
+                listOfComments.append({
+                    "comment_id": comment.comment_id,
+                    "snapshot_id": comment.snapshot_id,
+                    "author_email": comment.author_email,
+                    "reply_to_id": comment.reply_to_id,
+                    "date_created": comment.date_created,
+                    "date_modified": comment.date_modified,
+                    "content": comment.content,
+                    "highlight_start_x": comment.highlight_start_x,
+                    "highlight_start_y": comment.highlight_start_y,
+                    "highlight_end_x": comment.highlight_end_x,
+                    "highlight_end_y": comment.highlight_end_y,
+                    "is_resolved": comment.is_resolved
+                })
+
+        except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": "Error Grabbing Comments From Database",
+                "body": []
+            }
+
+    return {
+        "success": True,
+        "reason": "Found all Comments For All Snapshots for document",
+        "body": listOfComments
+    }
+
+    #snapshotIdList = 
 #requires
     #credentials in headers
 
@@ -625,7 +745,6 @@ def createDocument(proj_id):
 
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
 def getAllDocumentSnapshots(proj_id, doc_id):
-    print("Request:", request.headers)
     headers = request.headers
  
     if not isValidRequest(headers, ["Authorization"]):
@@ -680,6 +799,41 @@ def getDocument(proj_id, doc_id):
     
     info = json.dumps(getDocumentInfo(doc_id))
     return {"success": True, "reason":"", "body": info}
+
+@app.route('/api/Document/<proj_id>/', methods=["GET"])
+def getAllDocumentsFromProject(proj_id):
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success":False,
+            "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    #if not userExists(idInfo["email"]):
+    #    return {
+    #            "success": False,
+    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+    #            "body":{}
+    #    }
+
+    # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+
+    arrayOfDocuments = getAllDocumentsForProject(proj_id)
+    return {
+        "success": True,
+        "reason": "-",
+        "body": arrayOfDocuments
+    }
 
 # Comment POST, GET, PUT, DELETE
 
