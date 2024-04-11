@@ -3,6 +3,8 @@ import React, {useState, useEffect} from "react";
 import { useNavigate } from "react-router";
 import { getUserProjects } from "../../api/APIUtils";
 
+import { Card } from "flowbite-react"
+
 export default function ProjectList( userData ) {
 
     const [userProjects, setUserProjects] = useState([])
@@ -28,27 +30,27 @@ export default function ProjectList( userData ) {
     function ProjectDisplayBox({id, name, author, date}) {
       console.log(id, name)
       return (
-        <div 
-          className="flex border border-alternative border-2 rounded-lg m-1"
+        <Card 
+          className="max-w-sm transition-all duration-300  hover:bg-slate-100"
           onClick={() => handleProjectClick(id)}
         >
-          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
+          <h4 className="text-textcolor w-1/3 p-1">
             <span class="font-bold">Project Name: </span>
             {author}/{name}
           </h4>
-          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
+          <h4 className="text-textcolor w-1/3 p-1">
             <span class="font-bold">Project ID: </span>
             {id}
           </h4>
-          <h4 className="text-textcolor w-1/3 p-1 box-border"><span class="font-bold">Date Modified: </span>{date}</h4>
-        </div>
+          <h4 className="text-textcolor w-1/3 p-1"><span class="font-bold">Date Modified: </span>{date}</h4>
+        </Card>
       )
     }
     function DisplayProjects() {
 
       if(userProjects.length > 0) {
         return ( 
-          <div>
+          <div className="flex">
             {
               userProjects.map( (project, index) => {
                 if(project === -1)

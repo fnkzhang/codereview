@@ -266,9 +266,19 @@ def deleteProject(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    
+    # Delete Project row From Table, and proj user relationship row, delete blobs from buckets
     isFinishedOperation = deleteProjectWithProjectID(proj_id)
 
+    if isFinishedOperation:
+        return {
+            "success": True,
+            "reason": ""
+        }
+
+    return {
+        "success": False,
+        "reason": "Could Not Delete project"
+    }
     # Remove from user Proj relation / remove blob too 
     pass
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
