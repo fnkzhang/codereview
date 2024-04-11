@@ -79,7 +79,7 @@ export default function ProjectPage() {
     }
 
     return (<div className="m-20 text-center text-textcolor text-2xl">
-      No projects Available.
+      No Documents In Project.
   </div>)
   }
 

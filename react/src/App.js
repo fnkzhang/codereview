@@ -7,7 +7,8 @@ import { Navbar, Avatar } from 'flowbite-react';
 
 function App() {
   return (
-    <div>
+    <div> 
+      {/* MOST LIKELY MOVE THIS INTO PROJECT LATER INSTEAD OF OUTSIDE */}
    <Navbar fluid rounded className='text-3xl text-textcolor p-5 
    list-none justify-between bg-[#373b49] border-b-2 border-slate-500 mb-2'>
       <div className='flex-1'>

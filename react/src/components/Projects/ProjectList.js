@@ -31,7 +31,7 @@ export default function ProjectList( userData ) {
       console.log(id, name)
       return (
         <Card 
-          className="max-w-sm transition-all duration-300  hover:bg-slate-100"
+          className="max-w-sm transition-all duration-300 hover:bg-slate-100 p-3 m-3"
           onClick={() => handleProjectClick(id)}
         >
           <h4 className="text-textcolor w-1/3 p-1">
@@ -50,7 +50,7 @@ export default function ProjectList( userData ) {
 
       if(userProjects.length > 0) {
         return ( 
-          <div className="flex">
+          <div className="flex flex-wrap">
             {
               userProjects.map( (project, index) => {
                 if(project === -1)
@@ -84,22 +84,27 @@ export default function ProjectList( userData ) {
       </div>)
     }
 
-    if (loading) {
-        return (
+
+    return (
+        <div>
+            <div className="text-textcolor text-xl">
+              <button className="p-3 rounded-lg border-2 bg-alternative m-1">Join Project</button>
+              <button className="p-3 rounded-lg border-2 bg-alternative m-1">Create Project</button>
+            </div>
+
             <div>
-                <h3 className="text-textcolor text-2xl m-2">Your Projects:</h3>
+              <h3 className="text-textcolor text-2xl m-2">Your Projects:</h3>
+              
+              {/* Inline conditional */}
+              { loading ? (                
                 <div className="text-textcolor text-center m-20 text-xl">
                     Loading...
-                </div>
-            </div>
-        )
-    } else {
-        return (
-            <div>
-                <h3 className="text-textcolor text-2xl m-2">Your Projects:</h3>
-    
+                </div> 
+              ) : ( 
                 <DisplayProjects/>
+              )}
             </div>
-        )
-    }
+
+        </div>
+    )
 }
