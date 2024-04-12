@@ -119,7 +119,8 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button className="text-textcolor" type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+        <button className="text-textcolor border border-alternative border-2 m-1 w-full transition duration-300 hover:bg-altBackground rounded"
+          type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
       </div>
     </div>
   );
