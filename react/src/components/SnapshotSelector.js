@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
+import { Dropdown } from "flowbite-react";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -45,75 +46,25 @@ export default function SnapshotSelector({ comments }) {
     function DisplayLeftSnapshots() {
         if(snapshots.length !== 0) {
             return (
-              <div>
-                <div>Dsiplay on Left</div>
-                <div style={{"display": "flex"}}>
-                  {snapshots.map((snapshot, index) => { 
-                      const value = filterComments(snapshot)
-                      let str = ""
-                      if (value !== 0)
-                        str = `(${value})`
-                      //console.log(snapshot)
-                      return (index <= selectedRightSnapshotIndex) ? (
-                        <div key={index}>
-                          <button 
-                            className={`border border-alternative border-2 p-1 m-1 rounded 
-                              ${snapshot.snapshot_id.toString() === left_snapshot_id ? 'bg-snapshotSelected' : null}`}
-                            onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
-                            data-tooltip-id={`tooltipleft${index}`}>
-                              Snapshot {index} {str}
-                          </button>
-                          <Tooltip
-                            className="z-9999" 
-                            id={`tooltipleft${index}`}
-                            place="right"
-                            content={
-                              <div>
-                                <p>
-                                  Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
-                                </p>
-                                <p>
-                                  Open Comments: {value}
-                                </p>
-                              </div>
-                            }
-                          />
-                        </div>
-                      ) : null
-                  })} 
-                </div> 
-              </div>
-          )
-         } 
-         else {
-            return <div>EMPTY</div>
-         }
-    }
-    
-    function DisplayRightSnapshots() {
-      if(snapshots.length !== 0) {
-          return (
-            <div>
-              <div>Dsiplay on Right</div>
-              <div style={{"display": "flex"}}>
+              <Dropdown 
+                className= "z-9999 bg-background" label={`Snapshot ${selectedLeftSnapshotIndex}`}>
                 {snapshots.map((snapshot, index) => { 
                     const value = filterComments(snapshot)
                     let str = ""
                     if (value !== 0)
                       str = `(${value})`
-                    //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
-                    return (index >= selectedLeftSnapshotIndex) ? (
-                      <div key={index}>
-                        <button
-                          className={`border border-alternative border-2 p-1 m-1 rounded 
-                            ${snapshot.snapshot_id.toString() === right_snapshot_id ? 'bg-snapshotSelected' : null}`}
-                          onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
-                          data-tooltip-id={`tooltipright${index}`}>
-                            Snapshot {index} {str}
-                        </button>
+                    //console.log(snapshot)
+                    return (index <= selectedRightSnapshotIndex) ? (
+                      <Dropdown.Item 
+                        className="z-9999 bg-background"
+                        key={index}
+                        onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
+                        data-tooltip-id={`tooltipleft${index}`}
+                      >
+                        Snapshot {index} {str}
                         <Tooltip
                           className="z-9999" 
-                          id={`tooltipright${index}`}
+                          id={`tooltipleft${index}`}
                           place="right"
                           content={
                             <div>
@@ -126,12 +77,55 @@ export default function SnapshotSelector({ comments }) {
                             </div>
                           }
                         />
-                      </div>
+                      </Dropdown.Item>
                     ) : null
-                })} 
-              </div>             
-            </div>
-        )
+                })}
+              </Dropdown>
+            )
+         } 
+         else {
+            return <div>EMPTY</div>
+         }
+    }
+    
+    function DisplayRightSnapshots() {
+      if(snapshots.length !== 0) {
+          return (
+            <Dropdown className="z-9999 bg-background" label={`Snapshot ${selectedRightSnapshotIndex}`}>
+              {snapshots.map((snapshot, index) => { 
+                  const value = filterComments(snapshot)
+                  let str = ""
+                  if (value !== 0)
+                    str = `(${value})`
+                  //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
+                  return (index >= selectedLeftSnapshotIndex) ? (
+                    <Dropdown.Item 
+                      className="z-9999 bg-background"
+                      key={index}
+                      onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
+                      data-tooltip-id={`tooltipright${index}`}
+                    >
+                      Snapshot {index} {str}
+                      <Tooltip
+                        className="z-9999" 
+                        id={`tooltipright${index}`}
+                        place="right"
+                        content={
+                          <div>
+                            <p>
+                              Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
+                            </p>
+                            <p>
+                              Open Comments: {value}
+                            </p>
+                          </div>
+                        }
+                      />
+                    </Dropdown.Item>
+                  ) : null
+              })}           
+            </Dropdown>
+          )
        } 
        else {
           return <div>EMPTY</div>
@@ -139,12 +133,13 @@ export default function SnapshotSelector({ comments }) {
   }
 
     return (
-        <div className="text-textcolor">
-            <div>
-              <DisplayLeftSnapshots/>
-              <DisplayRightSnapshots/>              
-            </div>
-
+        <div className="w-2/3 text-textcolor flex">
+          <div className="w-1/2 m-1">
+            <DisplayLeftSnapshots/>
+          </div>
+          <div className="w-1/2 m-1">
+            <DisplayRightSnapshots/>
+          </div>
         </div>
     )
 }
