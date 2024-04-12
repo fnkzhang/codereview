@@ -162,25 +162,34 @@ def getFolderInfo(folder_id):
 
 def createNewFolder(folder_name, parent_folder):
     folder_id = createID()
-    with engine.connect() as conn:
-        stmt = insert(models.Folder).values(
-            folder_id = folder_id,
-            name = folder_name,
-            parent_folder = parent_folder
-        )
-        conn.execute(stmt)
-        foldercontentstmt = select(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                )
-        contents = conn.execute(stmt).first().contents
-        contents.append([folder_id, 1])
-        stmt = update(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                ).values(
-                contents = contents
-                )
-        conn.commit()
-    return folder_id
+    try:
+        print(folder_id, folder_name, parent_folder)
+        with engine.connect() as conn:
+            stmt = insert(models.Folder).values(
+                folder_id = folder_id,
+                name = folder_name,
+                parent_folder = parent_folder,
+            )
+
+            conn.execute(stmt)
+
+            # foldercontentstmt = select(models.Folder).where(
+            #         models.Folder.folder_id == parent_folder
+            #         )
+            #todo Fix Folder Purpose Issue
+            contents = conn.execute(stmt).first().contents
+            contents.append([folder_id, 1])
+            stmt = update(models.Folder).where(
+                    models.Folder.folder_id == parent_folder
+                    ).values(
+                    contents = contents
+                    )
+
+            conn.commit()
+        return folder_id
+    except Exception as e:
+        print(e)
+        return None
 
 def getAllChildDocuments(folder_id):
     with engine.connect() as conn:

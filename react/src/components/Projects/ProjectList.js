@@ -42,7 +42,7 @@ export default function ProjectList( userData ) {
             <span className="font-bold">Project ID: </span>
             {id}
           </h4>
-          <h4 className="text-textcolor w-1/3 p-1"><span class="font-bold">Date Modified: </span>{date}</h4>
+          <h4 className="text-textcolor w-1/3 p-1"><span className="font-bold">Date Modified: </span>{date}</h4>
         </Card>
       )
     }
@@ -88,8 +88,8 @@ export default function ProjectList( userData ) {
     return (
         <div>
             <div className="text-textcolor text-xl">
-              <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1">Join Project</button>
-              <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1">Create Project</button>
+              <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1"
+              onClick={() => navigate("/Project/Create")}>Create Project</button>
             </div>
 
             <div>

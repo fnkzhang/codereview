@@ -4,6 +4,7 @@ import MainWindow from './components/MainWindow.js';
 import ProjectPage from './components/ProjectPage.js';
 
 import { Navbar, Avatar } from 'flowbite-react';
+import ProjectCreation from './components/Projects/ProjectCreation.js';
 
 function App() {
   return (
@@ -33,9 +34,11 @@ function App() {
           {/*<Route exact path="/" element={<ReviewWindow/>} /> */}
           <Route path="/" element={<UserHomePage/>} />
           <Route path="/Project/:project_id" element={<ProjectPage/>}/>
+          <Route path="/Project/Create" element={<ProjectCreation/>}/>
           {/* todo add new document snapshot selection page for a document */}
           <Route path="/Document/:document_id/" /> 
           <Route path="/Document/:document_id/:left_snapshot_id/:right_snapshot_id" element={<MainWindow/>}/>
+
         </Routes>
       </Router>
     </div>

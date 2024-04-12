@@ -38,14 +38,14 @@ export default function ProjectPage() {
         className="flex border border-alternative border-2 rounded-lg m-1"
       >
           <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
-            <span class="font-bold">Document Name: </span>
+            <span className="font-bold">Document Name: </span>
             {name}
           </h4>
           <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
-            <span class="font-bold">Document ID: </span>
+            <span className="font-bold">Document ID: </span>
             {id}
           </h4>
-          <h4 className="text-textcolor w-1/3 p-1 box-border"><span class="font-bold">Date Modified: </span>{date}</h4>
+          <h4 className="text-textcolor w-1/3 p-1 box-border"><span className="font-bold">Date Modified: </span>{date}</h4>
         </div>
     )
   }
@@ -92,8 +92,15 @@ export default function ProjectPage() {
         userData={userData}
         setUserData={setUserData}
       />
-      <div>
-        <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>
+      <div className="flex">
+        <div>
+          <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>
+        </div>
+
+        <div className="text-textcolor text-xl">
+              <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-red-800/75 m-1"
+              onClick={() => navigate("/Project/Create")}>Delete Project</button>
+        </div>
       </div>
 
       <DisplayDocumentBox/>

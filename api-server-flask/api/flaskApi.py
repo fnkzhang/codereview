@@ -225,7 +225,7 @@ def createProject(proj_name):
             "reason": "Failed to Authenticate"
         }
     
-    root_folder_id = createNewFolder('root', 0)
+    root_folder_id = None # createNewFolder('root', 0)
     with engine.connect() as conn:
         pid = createID()
         projstmt = insert(models.Project).values(
@@ -247,7 +247,7 @@ def createProject(proj_name):
         
     return {
         "success": True,
-        "reason": "",
+        "reason": "Success",
         "body": {}
     }
 

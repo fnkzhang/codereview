@@ -23,6 +23,21 @@ export async function sendData(bodyContents) {
 
 export async function createProject(projectName) {
 
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Project/${projectName}/`), headers)
+    .then(response => response.json())
+
 }
 export async function deleteProject(proj_id) {
 
