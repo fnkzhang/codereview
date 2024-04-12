@@ -1,5 +1,6 @@
 import pytest
 import sys
+
 sys.path.append("../")
 import flaskApiLesserCredentials
 import oauth2client.client
@@ -52,6 +53,16 @@ def getDocID(client, proj_id, email):
             break
     return doc_id
 
+def getSnapshotID(client, proj_id, doc_id, email):
+    response = client.get('/api/Document/' + str(proj_id) + '/' + str(doc_id) + '/getSnapshotID/', headers = {'Authorization': email})
+    snapshot_id = -1
+    print(response)
+    if len(response.json["body"]) == 1:
+        snapshot_id = response.json["body"][0]["snapshot_id"]
+    if len(response.json["body"]) == 0:
+        snapshot_id = -2
+    return snapshot_id
+
 def test_request_example(client):
     response = client.get("/")
     assert b"test" in response.data
@@ -83,7 +94,7 @@ def test_create_document(client):
     assert response.json["body"]["doc_id"] == doc_id
     assert response.json["body"]["name"] == doc_name
 
-    response = client.get('/api/Document/' + str(proj_id) +'/' + str(doc_id) + '/getSnapshotId/', headers = {'Authorization': email1})
+    response = client.get('/api/Document/' + str(proj_id) +'/' + str(doc_id) + '/getSnapshotID/', headers = {'Authorization': email1})
     assert response.json["success"] == True
     assert len(response.json["body"]) == 1
     assert response.json["body"][0]["associated_document_id"] == doc_id
@@ -91,16 +102,37 @@ def test_create_document(client):
     response = client.get('/api/Snapshot/' + str(proj_id) +'/' + str(doc_id) + '/' + str(snap_id) + '/', headers = {'Authorization': email1})
     assert response.json["success"] == True
     assert response.json["body"] == doc_body
+    
 
 def test_permissions(client):
     proj_id = getProjID(client, email1)
     assert proj_id != -1
     doc_id = getDocID(client, proj_id, email1)
-    assert proj_id != -1
-    response = client.get('/api/Document/' + str(proj_id) +'/' + str(doc_id) + '/getSnapshotId/', headers = {'Authorization': email1})
+    assert doc_id != -1
+    response = client.get('/api/Document/' + str(proj_id) +'/' + str(doc_id) + '/getSnapshotID/', headers = {'Authorization': email1})
     assert response.json["success"] == True
 
-    response = client.get('/api/Document/' + str(proj_id) +'/' + str(doc_id) + '/getSnapshotId/', headers = {'Authorization': email2})
+    response = client.get('/api/Document/' + str(proj_id) +'/' + str(doc_id) + '/getSnapshotID/', headers = {'Authorization': email2})
     assert response.json["success"] == False
+
+def test_delete(client):
+    proj_id = getProjID(client, email1)
+    assert proj_id != -1
+    doc_id = getDocID(client, proj_id, email1)
+    assert doc_id != -1
+    snapshot_id = getSnapshotID(client, proj_id, doc_id, email1)
+    response = client.delete('/api/Snapshot/' + str(snapshot_id) + '/', headers = {'Authorization': email1})
+    assert response.json["success"] == True
+    deletedsnapshot_id = getSnapshotID(client, proj_id, doc_id, email1)
+    assert deletedsnapshot_id == -2
+    
+    response = client.delete('/api/Document/' + str(doc_id) + '/', headers = {'Authorization': email1})
+    assert response.json["success"] == True
+    doc_id = getDocID(client, proj_id, email1)
+    assert doc_id == -1
+    response = client.delete('/api/Project/' + str(proj_id) + '/', headers = {'Authorization': email1})
+    response.json["success"] == True
+    proj_id = getProjID(client, email1)
+    assert proj_id == -1
 
 

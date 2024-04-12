@@ -9,7 +9,7 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text, delete
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 from cloudSql import connectCloudSql
@@ -191,70 +191,79 @@ def createNewSnapshot(proj_id, doc_id, item):
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
         return snapshot_id
+
 def deleteSnapshotUtil(snapshot_id):
     try:
-        with engine.connect as conn:
-            conn.query(models.Snapshot) \
-                .filter_by(snapshot_id=snapshot_id) \
-                .delete()
-
+        with engine.connect() as conn:
+            stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
+            snapshot = conn.execute(stmt)
+            doc_id = snapshot.first().associated_document_id
+            
+            stmt = select(models.Document).where(models.Document.doc_id == doc_id)
+            document = conn.execute(stmt)
+            proj_id = document.first().associated_proj_id
+            
+            deleteBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id))
+            
+            stmt = delete(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
+            conn.execute(stmt)
+            stmt = delete(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
+            conn.execute(stmt)
             conn.commit()
-        return True
+        return True, "No Error"
     except Exception as e:
-        return False
+        return False, e
 
 def deleteDocumentUtil(doc_id):
     try:
-        with engine.connect as conn:
-            conn.query(models.Document) \
-                .filter_by(doc_id=doc_id) \
-                .delete()
-            conn.query(models.Snapshot) \
-                .filter_by(associated_document_id=doc_id) \
-                .delete()
+        with engine.connect() as conn:
+            stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
+            snapshots = conn.execute(stmt)
+            for snapshot in snapshots:
+                deleteSnapshotUtil(snapshot.snapshot_id)
+            stmt = delete(models.Document).where(models.Document.doc_id == doc_id)
+            conn.execute(stmt)
+
             conn.commit()
-        return True
+        return True, "No Error"
     except Exception as e:
-        return False
+        return False, e
 
 def deleteFolderUtil(folder_id):
     try:
-        with engine.connect as conn:
-            conn.query(models.Document) \
-                .filter_by(folder_id=folder_id) \
-                .delete()
+        with engine.connect() as conn:
             
-            stmt = select(models.Document).where(models.Document.parent_folder=folder_id)
+            stmt = select(models.Document).where(models.Document.parent_folder == folder_id)
             documents = conn.execute(stmt)
             for document in documents:
-                deleteDocument(document.doc_id)
+                deleteDocumentUtil(document.doc_id)
             
-            stmt = select(models.Folder).where(models.Folder.parent_folder=folder_id)
+            stmt = select(models.Folder).where(models.Folder.parent_folder ==folder_id)
             folders = conn.execute(stmt)
             for folder in folders:
-                deleteFolder(folder.folder_id)
-            
+                deleteFolderUtil(folder.folder_id)
+            stmt = delete(models.Folder).where(models.Folder.folder_id == folder_id)
+            conn.execute(stmt)
+
             conn.commit()
-        return True
+        return True, "No Error"
     except Exception as e:
-        return False
+        return False, e
 
 def deleteProjectUtil(proj_id):
     try:
-        with engine.connect as conn:
-            stmt = select(models.Project).where(models.Project.proj_id = proj_id)
+        with engine.connect() as conn:
+            stmt = select(models.Project).where(models.Project.proj_id == proj_id)
             project = conn.execute(stmt).first()
-            deleteFolder(project.root_folder)
-            conn.query(models.Project) \
-                .filter_by(proj_id=proj_id) \
-                .delete()
-            conn.query(models.UserProjectRelation) \
-                .filter_by(proj_id=proj_id) \
-                .delete()
+            deleteFolderUtil(project.root_folder)
+            stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
+            conn.execute(stmt)
+            stmt = delete(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
+            conn.execute(stmt)
             conn.commit()
-        return True
+        return True, "No Error"
     except Exception as e:
-        return False
+        return False, e
 
 # Returns Array of Dictionaries
 def getAllDocumentSnapshotsInOrder(doc_id):

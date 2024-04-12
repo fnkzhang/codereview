@@ -578,7 +578,7 @@ def createDocument(proj_id):
     }
 
 
-@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
+@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotID/', methods=["GET"])
 def getAllDocumentSnapshots(proj_id, doc_id):
     headers = request.headers
 
@@ -636,6 +636,7 @@ def getDocument(proj_id, doc_id):
     
     info = getDocumentInfo(doc_id)
     return {"success": True, "reason":"", "body": info}
+
 @app.route('/api/Snapshot/<snapshot_id>/', methods=["DELETE"])
 def deleteSnapshot(snapshot_id):
     # Authentication
@@ -653,8 +654,8 @@ def deleteSnapshot(snapshot_id):
         }
 
     # Query
-    rv = deleteSnapshotUtil(snapshot_id)
-    if(not rv)
+    rv, e = deleteSnapshotUtil(snapshot_id)
+    if(not rv):
         return {
             "success": False,
             "reason": str(e)
@@ -682,8 +683,8 @@ def deleteDocument(doc_id):
         }
 
     # Query
-    rv = deleteDocumentUtil(doc_id)
-    if(not rv)
+    rv, e = deleteDocumentUtil(doc_id)
+    if(not rv):
         return {
             "success": False,
             "reason": str(e)
@@ -695,7 +696,7 @@ def deleteDocument(doc_id):
     }
 
 @app.route('/api/Folder/<folder_id>/', methods=["DELETE"])
-def deleteFolderUtil(folder_id):
+def deleteFolder(folder_id):
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -711,8 +712,36 @@ def deleteFolderUtil(folder_id):
         }
 
     # Query
-    rv = deleteFolder(folder_id)
-    if(not rv)
+    rv, e = deleteFolderUtil(folder_id)
+    if(not rv):
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+
+    return {
+        "success": True,
+        "reason": "Successful Delete"
+    }
+@app.route('/api/Project/<proj_id>/', methods=["DELETE"])
+def deleteProject(proj_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    # Query
+    rv, e = deleteProjectUtil(proj_id)
+    if(not rv):
         return {
             "success": False,
             "reason": str(e)
