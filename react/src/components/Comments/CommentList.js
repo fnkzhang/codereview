@@ -33,6 +33,7 @@ function CommentList ({ setCommentsLoading, comments, listLineJump }) {
           highlightStartY={comment.highlight_start_y}
           highlightEndX={comment.highlight_end_x}
           highlightEndY={comment.highlight_end_y}
+          isResolved={comment.is_resolved}
         />
       ))}
     </div>

@@ -3,7 +3,7 @@ import SubCommentList from './SubCommentList';
 import React from 'react';
 
 function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID, 
-  highlightStartX, highlightStartY, highlightEndX, highlightEndY }) {
+  highlightStartX, highlightStartY, highlightEndX, highlightEndY, isResolved }) {
 
   async function handleResolve() {
     console.log("RESOLVING COMMENT")
@@ -14,10 +14,24 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
     console.log(result)
 
   }
+
+  function ResolveButton () {
+    if (!isResolved) {
+      return (
+      <button
+        className="border border-alternative border-1 px-2 py-1 ml-1 w-1/2 transition duration-300 hover:bg-altBackground rounded"
+        onClick={handleResolve}>
+        Resolve Comment
+      </button>)
+    }
+     return
+  }
   
   return (
     <div>
-      <div className="border border-solid border-alternative border-2 p-2 m-2 text-textcolor text-sm text-left rounded-lg whitespace-pre-wrap">
+      <div className={isResolved ? 
+        "border border-solid border-alternative border-2 p-2 m-2 text-textcolor text-sm text-left rounded-lg whitespace-pre-wrap"
+        : "border border-solid border-offwhite border-2 p-2 m-2 text-textcolor text-sm text-left rounded-lg whitespace-pre-wrap"}>
         <div className="flex">
           <strong className="text-sm font-bold ml-4">{author}</strong>
           <div className="text-offwhite items-right ml-4"><i>~ {date}</i></div>
@@ -29,11 +43,7 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
             onClick={() => commentLineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY)}>
             Jump to Line
           </button>
-          <button
-            className="border border-alternative border-1 px-2 py-1 ml-1 w-1/2 transition duration-300 hover:bg-altBackground rounded"
-            onClick={handleResolve}>
-            Resolve Comment
-          </button>
+          <ResolveButton/> 
         </div>
       </div>
       <div className="Sub-comment-list-container">
