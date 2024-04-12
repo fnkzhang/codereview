@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import { Button, Label, TextInput } from "flowbite-react";
 import { createProject } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
 export default function ProjectCreation() {
@@ -32,7 +32,7 @@ export default function ProjectCreation() {
           <div className="mb-3 block">
             <Label className="text-2xl" value="Project Name"/>
           </div>
-          <TextInput className="text-black shadow-white" sizing="lg" onChange={(e) => setProjectName(e.target.value)} shadow/>
+          <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setProjectName(e.target.value)} shadow/>
         </div>
 
         {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}

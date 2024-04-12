@@ -269,16 +269,17 @@ def deleteProject(proj_id):
     # Delete Project row From Table, and proj user relationship row, delete blobs from buckets
     isFinishedOperation = deleteProjectWithProjectID(proj_id)
 
-    if isFinishedOperation:
+    if not isFinishedOperation:
         return {
-            "success": True,
-            "reason": ""
+            "success": False,
+            "reason": "Could Not Delete project"
         }
 
     return {
-        "success": False,
-        "reason": "Could Not Delete project"
+        "success": True,
+        "reason": ""
     }
+
     # Remove from user Proj relation / remove blob too 
     pass
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
@@ -299,8 +300,21 @@ def getProject(proj_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    info = json.dumps(getProjectInfo(proj_id))
-    return {"proj_info": info}
+    
+    # ProjectData else -1
+    projectData = getProjectInfo(proj_id)
+
+    if projectData == -1:
+        return {
+            "success": False,
+            "reason": "Could Not Get project"
+        }
+    
+    return {
+        "success": True,
+        "reason": "",
+        "body": projectData
+    }
 
 @app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
 def getProjectDocuments(proj_id):

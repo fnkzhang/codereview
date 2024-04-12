@@ -1,25 +1,34 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import Oauth from "./Oauth.js"
-import { getProjectDocuments, getAllSnapshotsFromDocument } from "../api/APIUtils"
+import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo } from "../api/APIUtils"
 
 export default function ProjectPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userData, setUserData] = useState(null)
 
   const [projectDocuments, setProjectDocuments] = useState([])
+  const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
+
   const { project_id } = useParams()
   const navigate = useNavigate()
 
   // Grab Documents if logged in and userdata
   useEffect(() => {
+    async function grabProjectData() {
+      let result = await getProjectInfo(project_id)
+
+      setProjectOwnerEmail(result.author_email)
+    }
 
     // Grab User Data
-    async function grabProjectData() {
+    async function grabProjectDocuments() {
       const docArray = await getProjectDocuments(project_id)
       console.log(docArray)
       setProjectDocuments(docArray)
     } 
+    grabProjectDocuments()
+
     grabProjectData()
 
   }, [])
@@ -51,6 +60,7 @@ export default function ProjectPage() {
   }
 
   function DisplayDocumentBox() {
+    console.log(projectDocuments)
     if(projectDocuments.length > 0) {
       return (
         <div>
@@ -83,6 +93,21 @@ export default function ProjectPage() {
   </div>)
   }
 
+  function DisplayDeleteButton() {
+    console.log(userData, projectOwnerEmail)
+    if (userData === null)
+      return null
+
+    if (userData.email !== projectOwnerEmail)
+      return null
+
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-red-800/75 m-1"
+        onClick={() => navigate(`/Project/Delete/${project_id}`)}>Delete Project</button>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -97,10 +122,8 @@ export default function ProjectPage() {
           <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>
         </div>
 
-        <div className="text-textcolor text-xl">
-              <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-red-800/75 m-1"
-              onClick={() => navigate("/Project/Create")}>Delete Project</button>
-        </div>
+        <DisplayDeleteButton/>
+
       </div>
 
       <DisplayDocumentBox/>

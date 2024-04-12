@@ -41,6 +41,21 @@ export async function createProject(projectName) {
 }
 export async function deleteProject(proj_id) {
 
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "DELETE",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Project/${proj_id}/`), headers)
+    .then(response => response.json())
+
 }
 
 export async function createDoc(bodyContents, proj_id, doc_id) {
@@ -274,6 +289,34 @@ export async function getUserProjects(userEmail) {
     return data.body
 }))
 }
+export async function getProjectInfo(project_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+
+  };
+
+  return await fetch((`/api/Project/${project_id}/`), headers)
+  .then(response => response.json()
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data.body
+  }))
+
+}
+
 
 export async function getProjectDocuments(proj_id) {
   let oAuthToken = getCookie("cr_id_token")
