@@ -17,7 +17,7 @@ export default function UserHomePage() {
             setUserData={setUserData}
           />
           
-          <div className="m-16">
+          <div className="m-5">
             <ProjectList
               userData={userData}
             />

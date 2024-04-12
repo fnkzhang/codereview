@@ -13,14 +13,12 @@ function App() {
    list-none justify-between bg-[#373b49] border-b-2 border-slate-500 mb-2'>
       <div className='flex-1'>
         <Navbar.Brand href="#">
-            <p>LOGO</p>
+            <p>Code Review</p>
           </Navbar.Brand>
       </div>
 
       <div className='flex flex-1 justify-around align-middle'>
-        <Navbar.Link href="#" active>
-          Home
-        </Navbar.Link>
+        <Navbar.Link href="/" active>Home</Navbar.Link>
         <Navbar.Link href="#">Account</Navbar.Link>
         <Avatar alt="User settings" 
         img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" 

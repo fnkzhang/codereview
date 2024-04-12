@@ -31,15 +31,15 @@ export default function ProjectList( userData ) {
       console.log(id, name)
       return (
         <Card 
-          className="max-w-sm transition-all duration-300 hover:bg-slate-100 p-3 m-3"
+          className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
           onClick={() => handleProjectClick(id)}
         >
           <h4 className="text-textcolor w-1/3 p-1">
-            <span class="font-bold">Project Name: </span>
+            <span className="font-bold">Project Name: </span>
             {author}/{name}
           </h4>
           <h4 className="text-textcolor w-1/3 p-1">
-            <span class="font-bold">Project ID: </span>
+            <span className="font-bold">Project ID: </span>
             {id}
           </h4>
           <h4 className="text-textcolor w-1/3 p-1"><span class="font-bold">Date Modified: </span>{date}</h4>
@@ -88,8 +88,8 @@ export default function ProjectList( userData ) {
     return (
         <div>
             <div className="text-textcolor text-xl">
-              <button className="p-3 rounded-lg border-2 bg-alternative m-1">Join Project</button>
-              <button className="p-3 rounded-lg border-2 bg-alternative m-1">Create Project</button>
+              <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1">Join Project</button>
+              <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1">Create Project</button>
             </div>
 
             <div>
