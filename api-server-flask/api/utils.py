@@ -14,6 +14,9 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 from cloudSql import connectCloudSql
 
+from github import Github
+from github import Auth
+
 import models
 engine = connectCloudSql()
 
@@ -76,14 +79,20 @@ def getAllUserProjPermissions(user_email):
             returnList.append(row._asdict())
 
         return returnList
+def getUser(user_email):
+    with engine.connect() as conn:
+        stmt = select(models.User).where(models.User.user_email == user_email)
+        result = conn.execute(stmt)
+        #needs to happen because you can only call result.first() once
+        user = result.first()
+        if user == None:
+            return -1
+        return user._asdict()
 
 def getUserProjPermissions(user_email, proj_id):
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email, models.UserProjectRelation.proj_id == proj_id)
-        #idk if this works :) change later
         result = conn.execute(stmt)
-        #can probably remove/change the 2nd part of the or statement when we finalize what permissions are represented by what
-        
         #needs to happen because you can only call result.first() once
         relation = result.first()
         if relation == None:
@@ -98,7 +107,7 @@ def getProjectInfo(proj_id):
             return -1
         return foundProject._asdict()
 
-def getAllDocumentsForProject(proj_id):
+def getAllProjectDocuments(proj_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
 
@@ -116,10 +125,18 @@ def getDocumentInfo(doc_id):
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
         foundDocument = conn.execute(stmt).first()
         if foundDocument == None:
-            return -1
+            return None
         return foundDocument._asdict()
 
-def createNewDocument(document_name, parent_folder, proj_id):
+def getDocumentInfo(name, parent_folder):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.name == name, models.Document.parent_folder == parent_folder)
+        foundDocument = conn.execute(stmt).first()
+        if foundDocument == None:
+            return None
+        return foundDocument._asdict()
+
+def createNewDocument(document_name, parent_folder, proj_id, item):
     doc_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
@@ -130,6 +147,7 @@ def createNewDocument(document_name, parent_folder, proj_id):
         )
         conn.execute(stmt)
         conn.commit()
+    createNewSnapshot(proj_id, doc_id, item)
     return doc_id
 
 
@@ -138,7 +156,15 @@ def getFolderInfo(folder_id):
         stmt = select(models.Folder).where(models.Folder.folder_id == folder_id)
         foundFolder = conn.execute(stmt).first()
         if foundFolder == None:
-            return -1
+            return None
+        return foundFolder._asdict()
+
+def getFolderInfo(name, parent_folder):
+    with engine.connect() as conn:
+        stmt = select(models.Folder).where(models.Folder.name == name, models.Folder.parent_folder == parent_folder)
+        foundFolder = conn.execute(stmt).first()
+        if foundFolder == None:
+            return None
         return foundFolder._asdict()
 
 def createNewFolder(folder_name, parent_folder, proj_id):
@@ -153,21 +179,14 @@ def createNewFolder(folder_name, parent_folder, proj_id):
         conn.execute(stmt)
         conn.commit()
     return folder_id
-
-def getAllChildDocuments(folder_id):
+def getAllProjectFolders(proj_id):
     with engine.connect() as conn:
-        stmt = select(models.Folder).where(models.Folder.folder_id == folder_id)
-        folder = conn.execute(stmt).first()
-        if folder == None:
-            return -1
-        else:
-            documents = []
-            for content in folder.content:
-                if content[2] == 0:
-                    documents.append(content[0])
-                else:
-                    documents = documents + getAllChildDocuments(content[0])
-            return documents
+        stmt = select(models.Folder).where(models.Folder.associated_proj_id == proj_id)
+        foundFolders = conn.execute(stmt)
+        folders = []
+        for folder in foundFolders:
+            folders.append(folder._asdict())
+        return folders
 
 #puts documentname as snapshot name until that changes
 def createNewSnapshot(proj_id, doc_id, item):
@@ -278,6 +297,19 @@ def getAllDocumentSnapshotsInOrder(doc_id):
         
         return listOfSnapshots
 
+def getLastSnapshotinDocumentContent(doc_id):
+    snapshot = getAllDocumentSnapshotsInOrder(doc_id)[-1]
+    if snapshot == None:
+        return False
+    doc_id = snapshot["associated_document_id"]
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.doc_id == doc_id)
+        document = conn.execute(stmt)
+        proj_id = document.first().associated_proj_id
+
+    snapshotContents = getBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot["snapshot_id"]))
+    return snapshotContents
+
 def userExists(user_email):
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)
@@ -293,3 +325,22 @@ def isValidRequest(parameters, requiredKeys):
             return False
 
     return True
+
+#repository = "user/reponame", aka just github style
+def getBranches(token, repository):
+    try:
+        auth = Auth.Token(token)
+        g = Github(auth=auth)
+        g.get_user().login
+        
+        repo = g.get_repo(repository)
+        branches = list(repo.get_branches())
+        print(branches)
+        branchnames = []
+        for branch in branches:
+            branchnames.append(branch.name)
+        return True, branchnames
+    except Exception as e:
+        return False, e
+
+

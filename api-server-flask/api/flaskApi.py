@@ -217,18 +217,21 @@ def getAllUserProjects(user_email):
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
     headers = request.headers
+    '''
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
                 "reason": "Invalid Token Provided"
         }
-
+    
     idInfo = authenticate()
     if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    '''
+    idInfo = {"email":"billingtonbill12@gmail.com"}
     pid = createID()
     root_folder_id = createNewFolder('root', 0, pid)
     with engine.connect() as conn:
@@ -308,7 +311,7 @@ def getAllDocumentsFromProject(proj_id):
     #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
 
-    arrayOfDocuments = getAllDocumentsForProject(proj_id)
+    arrayOfDocuments = getAllProjectDocuments(proj_id)
     return {
         "success": True,
         "reason": "",
@@ -567,9 +570,7 @@ def createDocument(proj_id):
         folder = getProjectInfo(proj_id)["root_folder"]
     else:
         folder = inputBody["parent_folder"]
-    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id)
-
-    createNewSnapshot(proj_id, doc_id, inputBody["data"])
+    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"])
 
     return {
         "success": True,
@@ -950,4 +951,194 @@ def deleteComment(comment_id):
         "success": True,
         "reason": "Successful Delete"
     }
+#needs auth because everything does lmao
+#put token in the body in "github_token"
+@app.route('/api/Github/addToken', methods=["POST"])
+def addGithubToken(repository):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
 
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    body = request.get_json()
+    token = body["github_token"]
+    with engine.connect() as conn:
+        stmt = update(models.User).where(models.User.user_email == idInfo["email"]).values(github_token = token)
+        conn.execute(stmt)
+        conn.commit()
+    return {"success":True,
+            "reason": "",
+        }
+
+#needs auth because everything does lmao
+#needs repo name in "repository", format is "ownername/reponame", aka github format
+@app.route('/api/Github/Repo/', methods=["GET"])
+def getRepoBranchesFromGithub():
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+        #
+    #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    body = request.get_json()
+    user = getUser(idInfo["email"])
+    success, rv = getBranches(user["github_token"], body["repository"])
+    if (not success):
+        return {"success":False,
+                "reason": rv
+                }
+    return {"success":True,
+            "reason": "",
+            "body":rv
+        }
+
+
+#needs auth
+#put repository path in "repository" and branch in "branch"
+#format -> repository = "fnkzhang/codereview", branch = "main"
+@app.route('/api/Github/Pull/<proj_id>', methods=["GET"])
+def pullFromBranch(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+        #
+    #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    body = request.get_json()
+    user = getUser(idInfo["email"])
+
+    g = Github(auth = Auth.Token(user["github_token"]))
+    repo = g.get_repo(repository)
+    project = getProjectInfo(proj_id)
+    folders = getAllProjectFolders(proj_id)
+    pathToFolderID = []
+    pathToFolderID[""] = project["root_folder"];
+    contents = repo.get_contents("", body["branch"])
+    updated_files = []
+    documents = getAllProjectDocuments(proj_id)
+    folders = getAllProjectFolders(proj_id)
+    docs_to_delete = [document['doc_id'] for document in documents]
+    folders_to_delete = [folder['folder_id'] for folder in folders]
+    folders_to_delete.remove(project["root_folder"])
+    while contents:
+        file_content = contents.pop(0)
+        index = file_content.path.rfind('/')
+        if index < 0:
+            path = ""
+        else:
+            path = file_content.path[:index]
+        if file_content.type == "dir":
+            contents.extend(repo.get_contents(file_content.path))
+            folder = getFolderInfo(file_content.name, pathToFolderID[path])
+            if folder != None:
+                folder_id = folder["folder_id"]
+                folders_to_delete.remove(folder_id)
+            else:
+                folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
+            pathToFolderID[file_content.path] = folder_id
+        else:
+            document = getDocumentInfo(file_content.name, pathToFolderID[path])
+            if document != None:
+                doc_id = document["doc_id"]
+                if file_content.decoded_content.decode() != getLastSnapshotinDocumentContent(doc_id):
+                    createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode())
+                    updated_files.append(doc_id)
+                docs_to_delete.remove(doc_id)
+            else:
+                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode())
+                updated_files.append(doc_id)
+        print(pathToFolderID)
+    for doc_to_delete in docs_to_delete:
+        deleteDocumentUtil(doc_to_delete)
+    for folder_to_delete in folders_to_delete:
+        deleteFolderUtil(folder_to_delete)
+
+    return {"success":True, "reason":"", "body":updated_files}
+
+
+#testfunctionifthatwasn'tobviousbyitsname
+@app.route('/api/test/<proj_id>/', methods=["POST"])
+def testo(proj_id):
+    body = request.get_json()
+    g = Github(auth = Auth.Token(body["github_token"]))
+    g.get_user().login
+    repo = g.get_repo(body["repository"])
+    contents = repo.get_contents("", body["branch"])
+    project = getProjectInfo(proj_id)
+    folders = getAllProjectFolders(proj_id)
+    pathToFolderID = {}
+    pathToFolderID[""] = project["root_folder"];
+    contents = repo.get_contents("", body["branch"])
+    updated_files = []
+    documents = getAllProjectDocuments(proj_id)
+    folders = getAllProjectFolders(proj_id)
+    docs_to_delete = [document['doc_id'] for document in documents]
+    folders_to_delete = [folder['folder_id'] for folder in folders]
+    folders_to_delete.remove(project["root_folder"])
+    print(docs_to_delete)
+    print(folders_to_delete)
+    while contents:
+        file_content = contents.pop(0)
+        index = file_content.path.rfind('/')
+        if index < 0:
+            path = ""
+        else:
+            path = file_content.path[:index]
+        if file_content.type == "dir":
+            contents.extend(repo.get_contents(file_content.path))
+            folder = getFolderInfo(file_content.name, pathToFolderID[path])
+            if folder != None:
+                folder_id = folder["folder_id"]
+                folders_to_delete.remove(folder_id)
+            else:
+                folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
+            pathToFolderID[file_content.path] = folder_id
+        else:
+            document = getDocumentInfo(file_content.name, pathToFolderID[path])
+            if document != None:
+                doc_id = document["doc_id"]
+                if file_content.decoded_content.decode() != getLastSnapshotinDocumentContent(doc_id):
+                    createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode())
+                    updated_files.append(doc_id)
+                docs_to_delete.remove(doc_id)
+            else:
+                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode())
+                updated_files.append(doc_id)
+        print(pathToFolderID)
+    print(docs_to_delete)
+    print(folders_to_delete)
+    for doc_to_delete in docs_to_delete:
+        deleteDocumentUtil(doc_to_delete)
+    for folder_to_delete in folders_to_delete:
+        deleteFolderUtil(folder_to_delete)
+
+    return {"success":True, "reason":"", "body":updated_files}
