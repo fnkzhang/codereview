@@ -1,68 +1,34 @@
-from cloudSql import connectCloudSql
-from flask import Flask, request, make_response, jsonify
-from flask_cors import CORS
-
-from utils import *
-from diff_match_patch import diff_match_patch
-from google.oauth2 import id_token
-from google.auth.transport import requests
-
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete
-from sqlalchemy.orm import sessionmaker
-
-import pymysql
-
-import models
-from cloudSql import connectCloudSql
-
-from utils import engine
-
-#Todo hide later
-CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
-
+from flask import Flask, request, jsonify
 app = Flask(__name__)
 
-CORS(app, headers=["Content-Type", "Authorization"])
-engine = connectCloudSql()
+from flask_cors import CORS
+CORS(app)
+
+try:
+    from testRoutes import createTable, dropUserProjectRelationTable, \
+        testInsert, grabData, sendData
+except:
+    pass
+
+from cloudSql import connectCloudSql
+from utils import *
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from sqlalchemy import insert, update, delete
+from sqlalchemy.orm import sessionmaker
+import models
+
+from utils import engine
+from llm import init_llm, get_llm_code_from_suggestion, get_llm_suggestion_from_code
+
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
+
+init_llm()
 
 @app.after_request
 def afterRequest(response):
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
-
-# Remove Later for testing
-@app.route('/createTable')
-def createTable():
-    engine = connectCloudSql()
-    
-    models.Comment.metadata = models.Base.metadata
-
-    models.Comment.metadata.create_all(engine)
-    models.User.metadata = models.Base.metadata
-    models.User.metadata.create_all(engine)
-    models.UserProjectRelation.metadata = models.Base.metadata
-    models.UserProjectRelation.metadata.create_all(engine)
-    #metaData.create_all(engine)
-    print("Table was created")
-    return "Created Table"
-
-# Takes in json with "code" section
-@app.route('/api/sendData', methods=["POST"])
-def sendData():
-    inputBody = request.get_json()
-
-    # Check valid request json
-    if "credential" not in inputBody or "code" not in inputBody:
-        return { "success": False,
-                "reason": "Invalid JSON Provided",
-                "body": {}
-        }
-    
-    return { "success": True,
-            "reason": "N/A",
-            "body": inputBody
-            }
 
 @app.route('/api/user/authenticate', methods=["POST"])
 def authenticator():
@@ -540,7 +506,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    blob = getBlob(proj_id + '/' + doc_id + '/' + snapshot_id)
+    blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
     return {"blobContents": blob}
 
 @app.route('/api/Snapshot/<snapshot_id>/comment/create', methods=["POST"])
@@ -653,31 +619,12 @@ def getCommentsOnSnapshot(snapshot_id):
         }
 
     # Query
-    commentsList = []
-    with Session() as session:
-        try:
-            filteredComments = session.query(models.Comment) \
-                .filter_by(snapshot_id=snapshot_id) \
-                .all()
-
-            for comment in filteredComments:
-                commentsList.append({
-                    "comment_id": comment.comment_id,
-                    "snapshot_id": comment.snapshot_id,
-                    "author_email": comment.author_email,
-                    "reply_to_id": comment.reply_to_id,
-                    "date_created": comment.date_created,
-                    "date_modified": comment.date_modified,
-                    "content": comment.content,
-                    "highlight_start_x": comment.highlight_start_x,
-                    "highlight_start_y": comment.highlight_start_y,
-                    "highlight_end_x": comment.highlight_end_x,
-                    "highlight_end_y": comment.highlight_end_y,
-                    "is_resolved": comment.is_resolved
-                })
-        except Exception as e:
-            print("Error: ", e)
-            return []
+    commentsList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshot_id)
+    if commentsList is None:
+        return {
+            "success": False,
+            "reason": "Error Grabbing Comments From Database"
+        }
     
     print("Successful Read")
     return {
@@ -714,39 +661,15 @@ def getAllCommentsForDocument(document_id):
     foundSnapshots = getAllDocumentSnapshotsInOrder(document_id)
 
     for snapshot in foundSnapshots:
-            # Query
+        # Query
         listOfSnapshotIDs.append(snapshot["snapshot_id"])
 
-    listOfComments = []
-    with Session() as session:
-        try:
-            filteredComments = session.query(models.Comment) \
-                .filter(models.Comment.snapshot_id.in_(listOfSnapshotIDs)) \
-                .all()
-
-            for comment in filteredComments:
-                listOfComments.append({
-                    "comment_id": comment.comment_id,
-                    "snapshot_id": comment.snapshot_id,
-                    "author_email": comment.author_email,
-                    "reply_to_id": comment.reply_to_id,
-                    "date_created": comment.date_created,
-                    "date_modified": comment.date_modified,
-                    "content": comment.content,
-                    "highlight_start_x": comment.highlight_start_x,
-                    "highlight_start_y": comment.highlight_start_y,
-                    "highlight_end_x": comment.highlight_end_x,
-                    "highlight_end_y": comment.highlight_end_y,
-                    "is_resolved": comment.is_resolved
-                })
-
-        except Exception as e:
-            print("Error: ", e)
-            return {
-                "success": False,
-                "reason": "Error Grabbing Comments From Database",
-                "body": []
-            }
+    listOfComments = filterCommentsByPredicate(models.Comment.snapshot_id.in_(listOfSnapshotIDs))
+    if listOfComments is None:
+        return {
+            "success": False,
+            "reason": "Error Grabbing Comments From Database"
+        }
 
     return {
         "success": True,
@@ -985,4 +908,54 @@ def deleteComment(comment_id):
     return {
         "success": True,
         "reason": "Successful Delete"
+    }
+
+# EXAMPLE:
+# curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
+@app.route("/api/llm/code-implementation", methods=["GET"])
+def implement_code_changes_from_comment():
+    data = request.get_json()
+    code = data.get("code")
+    highlighted_code=data.get("highlighted_code")
+    comment = data.get("comment")
+
+    response = get_llm_code_from_suggestion(
+        code=code,
+        highlighted_code=highlighted_code,
+        suggestion=comment
+    )
+
+    if response is None:
+        return {
+            "success": False,
+            "reason": "LLM Error"
+        }
+
+    return {
+        "success": True,
+        "reason": "Success",
+        "body": response
+    }
+
+# EXAMPLE:
+# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def calc_avg(n):\n    tot=0\n    cnt=0\n    for number in n:\n      tot = tot+ number\n      cnt= cnt+1\n    average=tot/cnt"}'
+@app.route("/api/llm/comment-suggestion", methods=["GET"])
+def suggest_comment_from_code():
+    data = request.get_json()
+    code = data.get("code")
+
+    response = get_llm_suggestion_from_code(
+        code=code
+    )
+
+    if response is None:
+        return {
+            "success": False,
+            "reason": "LLM Error"
+        }
+
+    return {
+        "success": True,
+        "reason": "Success",
+        "body": response
     }
