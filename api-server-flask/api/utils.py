@@ -9,7 +9,7 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, DateTime, Text
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete, DateTime, Text
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from cloudSql import connectCloudSql
@@ -40,6 +40,22 @@ def getBlob(blobName):
     blob = bucket.get_blob(blobName)
     return blob.download_as_text()
 
+def deleteBlob(blobName):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket('cr_storage')
+    blob = bucket.get_blob(blobName)
+    blob.delete()
+    return True
+
+#location = basically the folder the files are located in
+def deleteBlobsInDirectory(location):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket('cr_storage')
+    blobs = bucket.list_blobs(prefix = location)
+    for blob in blobs:
+        blob.delete()
+    return True
+
 def setUserProjPermissions(email, pid, r, perms):
     with engine.connect() as conn:
         stmt = insert(models.UserProjectRelation).values(
@@ -50,6 +66,15 @@ def setUserProjPermissions(email, pid, r, perms):
         )
         conn.execute(stmt)
         conn.commit()
+    return True
+
+def deleteProjectWithProjectID(proj_id):
+    with engine.connect() as conn:
+        stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
+
+        conn.execute(stmt)
+        conn.commit()
+
     return True
 
 # Find all project relationship models for user email
@@ -141,25 +166,34 @@ def getFolderInfo(folder_id):
 
 def createNewFolder(folder_name, parent_folder):
     folder_id = createID()
-    with engine.connect() as conn:
-        stmt = insert(models.Folder).values(
-            folder_id = folder_id,
-            name = folder_name,
-            parent_folder = parent_folder
-        )
-        conn.execute(stmt)
-        foldercontentstmt = select(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                )
-        contents = conn.execute(stmt).first().contents
-        contents.append([folder_id, 1])
-        stmt = update(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                ).values(
-                contents = contents
-                )
-        conn.commit()
-    return folder_id
+    try:
+        print(folder_id, folder_name, parent_folder)
+        with engine.connect() as conn:
+            stmt = insert(models.Folder).values(
+                folder_id = folder_id,
+                name = folder_name,
+                parent_folder = parent_folder,
+            )
+
+            conn.execute(stmt)
+
+            # foldercontentstmt = select(models.Folder).where(
+            #         models.Folder.folder_id == parent_folder
+            #         )
+            #todo Fix Folder Purpose Issue
+            contents = conn.execute(stmt).first().contents
+            contents.append([folder_id, 1])
+            stmt = update(models.Folder).where(
+                    models.Folder.folder_id == parent_folder
+                    ).values(
+                    contents = contents
+                    )
+
+            conn.commit()
+        return folder_id
+    except Exception as e:
+        print(e)
+        return None
 
 def getAllChildDocuments(folder_id):
     with engine.connect() as conn:
@@ -238,7 +272,7 @@ def resolveCommentHelperFunction(comment_id):
         conn.commit()
 
     pass
-
+  
 def fetchFromCloudStorage(blobName:str):
     '''
     If cached, returns the blob in cache.

@@ -83,5 +83,4 @@ class Folder(Base):
     name = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    contents = Column(ARRAY(Integer, dimensions=2), default = [])
     parent_folder = Column(Integer)

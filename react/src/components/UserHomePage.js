@@ -16,9 +16,13 @@ export default function UserHomePage() {
             userData={userData}
             setUserData={setUserData}
           />
-          <ProjectList
-            userData={userData}
-          />
+          
+          <div className="m-5">
+            <ProjectList
+              userData={userData}
+            />
+          </div>
+
         </div>
       )
     } else {

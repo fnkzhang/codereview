@@ -21,7 +21,6 @@ export default function MainWindow() {
         setIsLoggedIn={setIsLoggedIn}
         userData={userData}
         setUserData={setUserData}/>
-        <AppHeader/>
         <SnapshotSelector
           comments={comments}
           snapshots={snapshots}
@@ -41,7 +40,6 @@ export default function MainWindow() {
         setIsLoggedIn={setIsLoggedIn}
         userData={userData}
         setUserData={setUserData}/>
-        <AppHeader/>
         <div className="m-20 text-center text-textcolor text-2xl">
           You must Log in to view this page.
         </div>

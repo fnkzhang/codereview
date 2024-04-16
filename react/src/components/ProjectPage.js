@@ -1,25 +1,34 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import Oauth from "./Oauth.js"
-import { getProjectDocuments, getAllSnapshotsFromDocument } from "../api/APIUtils"
+import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo } from "../api/APIUtils"
 
 export default function ProjectPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userData, setUserData] = useState(null)
 
   const [projectDocuments, setProjectDocuments] = useState([])
+  const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
+
   const { project_id } = useParams()
   const navigate = useNavigate()
 
   // Grab Documents if logged in and userdata
   useEffect(() => {
+    async function grabProjectData() {
+      let result = await getProjectInfo(project_id)
+
+      setProjectOwnerEmail(result.author_email)
+    }
 
     // Grab User Data
-    async function grabProjectData() {
+    async function grabProjectDocuments() {
       const docArray = await getProjectDocuments(project_id)
       console.log(docArray)
       setProjectDocuments(docArray)
     } 
+    grabProjectDocuments()
+
     grabProjectData()
 
   }, [])
@@ -38,19 +47,20 @@ export default function ProjectPage() {
         className="flex border border-alternative border-2 rounded-lg m-1"
       >
           <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
-            <span class="font-bold">Document Name: </span>
+            <span className="font-bold">Document Name: </span>
             {name}
           </h4>
           <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
-            <span class="font-bold">Document ID: </span>
+            <span className="font-bold">Document ID: </span>
             {id}
           </h4>
-          <h4 className="text-textcolor w-1/3 p-1 box-border"><span class="font-bold">Date Modified: </span>{date}</h4>
+          <h4 className="text-textcolor w-1/3 p-1 box-border"><span className="font-bold">Date Modified: </span>{date}</h4>
         </div>
     )
   }
 
   function DisplayDocumentBox() {
+    console.log(projectDocuments)
     if(projectDocuments.length > 0) {
       return (
         <div>
@@ -79,10 +89,25 @@ export default function ProjectPage() {
     }
 
     return (<div className="m-20 text-center text-textcolor text-2xl">
-      No projects Available.
+      No Documents In Project.
   </div>)
   }
 
+  function DisplayDeleteButton() {
+    console.log(userData, projectOwnerEmail)
+    if (userData === null)
+      return null
+
+    if (userData.email !== projectOwnerEmail)
+      return null
+
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-red-800/75 m-1"
+        onClick={() => navigate(`/Project/Delete/${project_id}`)}>Delete Project</button>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -92,8 +117,13 @@ export default function ProjectPage() {
         userData={userData}
         setUserData={setUserData}
       />
-      <div>
-        <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>
+      <div className="flex">
+        <div>
+          <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>
+        </div>
+
+        <DisplayDeleteButton/>
+
       </div>
 
       <DisplayDocumentBox/>

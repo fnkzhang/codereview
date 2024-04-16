@@ -67,17 +67,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     }
   };
 
-  function filterComments() {
-
-    if (comments.length > 0)
-      return comments.filter((comment) => {
-        console.log(comment)
-        return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)) && (comment.is_resolved === false)
-      })
-    
-    return []
-  }
-
   if (commentsLoading) {
     return (
       <div>
@@ -106,8 +95,17 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       <div className="overflow-y-scroll h-70vh">
         <CommentList 
           setCommentsLoading={setCommentsLoading}
-          comments={comments.filter((comment) => {
-            return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId)) && (comment.is_resolved === false)
+          comments={comments.sort((a, b) => {
+            // First, compare by boolean
+            if (a.is_resolved !== b.is_resolved) {
+              // If boolean component is not equal, sort by boolean component
+              return a.is_resolved ? 1 : -1;
+            } else {
+              // If boolean component is equal, sort by date
+              return (new Date(b.date_modified)) - (new Date(a.date_modified));
+            }
+          }).filter((comment) => {
+            return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId))
           })}
           listLineJump={moduleLineJump}
         />
@@ -121,7 +119,8 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button className="text-textcolor" type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
+        <button className="text-textcolor border border-alternative border-2 m-1 w-full transition duration-300 hover:bg-altBackground rounded"
+          type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
       </div>
     </div>
   );

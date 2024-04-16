@@ -190,7 +190,8 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    root_folder_id = createNewFolder('root', 0)
+    
+    root_folder_id = None # createNewFolder('root', 0)
     with engine.connect() as conn:
         pid = createID()
         projstmt = insert(models.Project).values(
@@ -209,12 +210,44 @@ def createProject(proj_name):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
+        
     return {
         "success": True,
-        "reason": "",
+        "reason": "Success",
         "body": {}
     }
 
+@app.route('/api/Project/<proj_id>/', methods = ["DELETE"])
+def deleteProject(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    # Delete Project row From Table, and proj user relationship row, delete blobs from buckets
+    isFinishedOperation = deleteProjectWithProjectID(proj_id)
+
+    if not isFinishedOperation:
+        return {
+            "success": False,
+            "reason": "Could Not Delete project"
+        }
+
+    return {
+        "success": True,
+        "reason": ""
+    }
+
+    # Remove from user Proj relation / remove blob too 
+    pass
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
 def getProject(proj_id):
     headers = request.headers
@@ -233,8 +266,21 @@ def getProject(proj_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    info = json.dumps(getProjectInfo(proj_id))
-    return {"proj_info": info}
+    
+    # ProjectData else -1
+    projectData = getProjectInfo(proj_id)
+
+    if projectData == -1:
+        return {
+            "success": False,
+            "reason": "Could Not Get project"
+        }
+    
+    return {
+        "success": True,
+        "reason": "",
+        "body": projectData
+    }
 
 @app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
 def getProjectDocuments(proj_id):
