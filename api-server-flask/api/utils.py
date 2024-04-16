@@ -14,7 +14,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 from cloudSql import connectCloudSql
 
-from github import Github
+from github import Github, InputGitTreeElement
 from github import Auth
 
 import models
@@ -79,14 +79,14 @@ def getAllUserProjPermissions(user_email):
             returnList.append(row._asdict())
 
         return returnList
-def getUser(user_email):
+def getUserInfo(user_email):
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)
         result = conn.execute(stmt)
         #needs to happen because you can only call result.first() once
         user = result.first()
         if user == None:
-            return -1
+            return None
         return user._asdict()
 
 def getUserProjPermissions(user_email, proj_id):
@@ -128,7 +128,7 @@ def getDocumentInfo(doc_id):
             return None
         return foundDocument._asdict()
 
-def getDocumentInfo(name, parent_folder):
+def getDocumentInfoViaLocation(name, parent_folder):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.name == name, models.Document.parent_folder == parent_folder)
         foundDocument = conn.execute(stmt).first()
@@ -187,6 +187,16 @@ def getAllProjectFolders(proj_id):
         for folder in foundFolders:
             folders.append(folder._asdict())
         return folders
+def newDocumentEvent(doc_id, event_type):
+    return True
+def getAllProjectEvents(proj_id):
+    with engine.connect() as conn:
+        stmt = select(models.Event).where(models.Event.associated_proj_id == proj_id)
+        foundEvents = conn.execute(stmt)
+        events = []
+        for event in foundEvents:
+            events.append(event._asdict())
+        return events
 
 #puts documentname as snapshot name until that changes
 def createNewSnapshot(proj_id, doc_id, item):
@@ -210,20 +220,33 @@ def createNewSnapshot(proj_id, doc_id, item):
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
         return snapshot_id
-
-def deleteSnapshotUtil(snapshot_id):
+def getSnapshotPath(snapshot_id):
     try:
         with engine.connect() as conn:
             stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
             snapshot = conn.execute(stmt)
             doc_id = snapshot.first().associated_document_id
-            
+
             stmt = select(models.Document).where(models.Document.doc_id == doc_id)
             document = conn.execute(stmt)
             proj_id = document.first().associated_proj_id
-            
-            deleteBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id))
-            
+            return str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id)
+    except:
+        return None
+
+def getSnapshotInfo(snapshot_id):
+    with engine.connect() as conn:
+        stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
+        snapshot = conn.execute(stmt).first()
+        return snapshot._asdict()
+def getSnapshotContentUtil(snapshot_id):
+    blob = getBlob(getSnapshotPath(snapshot_id))
+    return blob
+
+def deleteSnapshotUtil(snapshot_id):
+    try:
+        with engine.connect() as conn:
+            deleteBlob(getSnapshotPath(snapshot_id))
             stmt = delete(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
             conn.execute(stmt)
             stmt = delete(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
@@ -297,7 +320,7 @@ def getAllDocumentSnapshotsInOrder(doc_id):
         
         return listOfSnapshots
 
-def getLastSnapshotinDocumentContent(doc_id):
+def getDocumentLastSnapshotContent(doc_id):
     snapshot = getAllDocumentSnapshotsInOrder(doc_id)[-1]
     if snapshot == None:
         return False
@@ -336,6 +359,7 @@ def getBranches(token, repository):
         repo = g.get_repo(repository)
         branches = list(repo.get_branches())
         print(branches)
+        print("___________________________")
         branchnames = []
         for branch in branches:
             branchnames.append(branch.name)
@@ -343,4 +367,28 @@ def getBranches(token, repository):
     except Exception as e:
         return False, e
 
+#i don't want to have to query the database for every folder, money moment
+#terrible optimization but whatevertbh
+def getFolderPathsFromList(folder_id, current_path,list_of_folders):
+    folderIDToPath = {}
+    foldersInFolder = []
+    for folder in list_of_folders:
+        if folder["parent_folder"] == folder_id:
+            list_of_folders.remove(folder)
+            foldersInFolder.append(folder)
+    for folder in foldersInFolder:
+            folderpath = current_path + folder["name"] + '/'
+            folderIDToPath[folder["folder_id"]] = folderpath
+            folderIDToPath.update(getFolderPathsFromList(folder["folder_id"], folderpath, list_of_folders))
+    return folderIDToPath
+
+def getProjectFoldersAsPaths(proj_id):
+    project = getProjectInfo(proj_id)
+    folders = getAllProjectFolders(proj_id)
+    folderIDToPath = {}
+    folders = [folder for folder in folders if folder["parent_folder"] > 0]
+    folderIDToPath = getFolderPathsFromList(project["root_folder"], "", folders)
+    folderIDToPath[project["root_folder"]] = ""
+    return folderIDToPath
+    
 

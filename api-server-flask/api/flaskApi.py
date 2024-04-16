@@ -85,9 +85,9 @@ def authenticator():
 
 def authenticate():
     headers = request.headers
+    print(headers["Authorization"])
     if (not isValidRequest(headers, ["Authorization"])):
         return None
-
     try:
         idInfo = id_token.verify_oauth2_token(
             headers["Authorization"],
@@ -170,11 +170,10 @@ def signUp():
         )
         conn.execute(stmt)
         conn.commit()
-
     retData = {
             "success":True,
             "reason": "N/A",
-            "body": {idInfo}
+            "body": idInfo
     }
     return jsonify(retData)
 
@@ -217,7 +216,6 @@ def getAllUserProjects(user_email):
 @app.route('/api/Project/<proj_name>/', methods = ["POST"])
 def createProject(proj_name):
     headers = request.headers
-    '''
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
@@ -230,7 +228,6 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    '''
     idInfo = {"email":"billingtonbill12@gmail.com"}
     pid = createID()
     root_folder_id = createNewFolder('root', 0, pid)
@@ -342,7 +339,7 @@ def createFolder(proj_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
+    
     folder_id = createNewFolder(inputBody["folder_name"], inputBody["parent_folder"], proj_id)
     return {
         "success": True,
@@ -954,7 +951,7 @@ def deleteComment(comment_id):
 #needs auth because everything does lmao
 #put token in the body in "github_token"
 @app.route('/api/Github/addToken', methods=["POST"])
-def addGithubToken(repository):
+def addGithubToken():
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -980,17 +977,18 @@ def addGithubToken(repository):
         }
 
 #needs auth because everything does lmao
-#needs repo name in "repository", format is "ownername/reponame", aka github format
-@app.route('/api/Github/Repo/', methods=["GET"])
-def getRepoBranchesFromGithub():
+#needs "ownername", "reponame", github repo is ownername/reponame, they must be separated or else it doesn't register
+@app.route('/api/Github/Repo/<ownername>/<reponame>/', methods=["GET"])
+def getRepoBranchesFromGithub(ownername, reponame):
     headers = request.headers
+    '''
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
                 "reason": "Invalid Token Provided"
         }
-
-    idInfo = authenticate()
+    '''
+    idInfo = {"email":"billingtonbill12@gmail.com"}#authenticate()
     if idInfo is None:
         return {
             "success":False,
@@ -999,9 +997,9 @@ def getRepoBranchesFromGithub():
         #
     #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
     #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    body = request.get_json()
-    user = getUser(idInfo["email"])
-    success, rv = getBranches(user["github_token"], body["repository"])
+    #body = request.get_json()
+    user = getUserInfo(idInfo["email"])
+    success, rv = getBranches(user["github_token"], ownername + '/' + reponame)#body["repository"])
     if (not success):
         return {"success":False,
                 "reason": rv
@@ -1034,14 +1032,14 @@ def pullFromBranch(proj_id):
     #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
     #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
     body = request.get_json()
-    user = getUser(idInfo["email"])
+    user = getUserInfo(idInfo["email"])
 
     g = Github(auth = Auth.Token(user["github_token"]))
     repo = g.get_repo(repository)
     project = getProjectInfo(proj_id)
     folders = getAllProjectFolders(proj_id)
     pathToFolderID = []
-    pathToFolderID[""] = project["root_folder"];
+    pathToFolderID[""] = project["root_folder"]
     contents = repo.get_contents("", body["branch"])
     updated_files = []
     documents = getAllProjectDocuments(proj_id)
@@ -1066,10 +1064,10 @@ def pullFromBranch(proj_id):
                 folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
             pathToFolderID[file_content.path] = folder_id
         else:
-            document = getDocumentInfo(file_content.name, pathToFolderID[path])
+            document = getDocumentInfoViaLocation(file_content.name, pathToFolderID[path])
             if document != None:
                 doc_id = document["doc_id"]
-                if file_content.decoded_content.decode() != getLastSnapshotinDocumentContent(doc_id):
+                if file_content.decoded_content.decode() != getDocumentLastSnapshotContent(doc_id):
                     createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode())
                     updated_files.append(doc_id)
                 docs_to_delete.remove(doc_id)
@@ -1084,61 +1082,56 @@ def pullFromBranch(proj_id):
 
     return {"success":True, "reason":"", "body":updated_files}
 
-
-#testfunctionifthatwasn'tobviousbyitsname
+#testfunctionifthatwasn'tobviousbyitsname, is currently emulating push
+#put list of snapshots ID's to push in "snapshots"
+#put repository in "repository"
+#put branchname in "branch"
+#put commit message in "message", or if we eventually put a generic message that's fine
 @app.route('/api/test/<proj_id>/', methods=["POST"])
 def testo(proj_id):
+    '''auth lmao'''
     body = request.get_json()
-    g = Github(auth = Auth.Token(body["github_token"]))
+    idInfo = {"email":"billingtonbill12@gmail.com"}
+    user = getUserInfo(idInfo["email"])
+    g = Github(auth = Auth.Token(user["github_token"]))
     g.get_user().login
     repo = g.get_repo(body["repository"])
-    contents = repo.get_contents("", body["branch"])
     project = getProjectInfo(proj_id)
     folders = getAllProjectFolders(proj_id)
-    pathToFolderID = {}
-    pathToFolderID[""] = project["root_folder"];
-    contents = repo.get_contents("", body["branch"])
     updated_files = []
     documents = getAllProjectDocuments(proj_id)
-    folders = getAllProjectFolders(proj_id)
-    docs_to_delete = [document['doc_id'] for document in documents]
-    folders_to_delete = [folder['folder_id'] for folder in folders]
-    folders_to_delete.remove(project["root_folder"])
-    print(docs_to_delete)
-    print(folders_to_delete)
-    while contents:
-        file_content = contents.pop(0)
-        index = file_content.path.rfind('/')
-        if index < 0:
-            path = ""
-        else:
-            path = file_content.path[:index]
-        if file_content.type == "dir":
-            contents.extend(repo.get_contents(file_content.path))
-            folder = getFolderInfo(file_content.name, pathToFolderID[path])
-            if folder != None:
-                folder_id = folder["folder_id"]
-                folders_to_delete.remove(folder_id)
-            else:
-                folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
-            pathToFolderID[file_content.path] = folder_id
-        else:
-            document = getDocumentInfo(file_content.name, pathToFolderID[path])
-            if document != None:
-                doc_id = document["doc_id"]
-                if file_content.decoded_content.decode() != getLastSnapshotinDocumentContent(doc_id):
-                    createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode())
-                    updated_files.append(doc_id)
-                docs_to_delete.remove(doc_id)
-            else:
-                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode())
-                updated_files.append(doc_id)
-        print(pathToFolderID)
-    print(docs_to_delete)
-    print(folders_to_delete)
-    for doc_to_delete in docs_to_delete:
-        deleteDocumentUtil(doc_to_delete)
-    for folder_to_delete in folders_to_delete:
-        deleteFolderUtil(folder_to_delete)
+    folderIDToPath = getProjectFoldersAsPaths(proj_id)
+    body = request.get_json()
+    snapshotIDs = body["snapshots"]
+    blobs = {}
+    tree_elements = []
+    for snapshotID in snapshotIDs:
+        snapshot = getSnapshotInfo(snapshotID)
+        document = getDocumentInfo(snapshot["associated_document_id"])
+        tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
+                mode = "100644",
+                type = "blob",
+                sha = repo.create_git_blob(
+                content = getSnapshotContentUtil(snapshotID),
+                encoding = 'utf-8',
+                ).sha
+            ))
+    branch_sha = repo.get_branch(body["branch"]).commit.sha
+    try:
+        new_tree = repo.create_git_tree(
+            tree = tree_elements,
+            base_tree = repo.get_git_tree(sha="main")
+            )
+    except:
+        new_tree = repo.create_git_tree(
+            tree = tree_elements,
+            )
 
+    commit = repo.create_git_commit(
+            message=body["message"],
+            tree = repo.get_git_tree(sha=new_tree.sha),
+            parents=[repo.get_git_commit(branch_sha)],
+            )
+    ref = repo.get_git_ref(ref='heads/' + body["branch"])
+    ref.edit(sha=commit.sha)
     return {"success":True, "reason":"", "body":updated_files}
