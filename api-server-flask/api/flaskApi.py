@@ -1056,7 +1056,7 @@ def pullFromBranch(proj_id):
             path = file_content.path[:index]
         if file_content.type == "dir":
             contents.extend(repo.get_contents(file_content.path))
-            folder = getFolderInfo(file_content.name, pathToFolderID[path])
+            folder = getFolderInfoViaLocation(file_content.name, pathToFolderID[path])
             if folder != None:
                 folder_id = folder["folder_id"]
                 folders_to_delete.remove(folder_id)
@@ -1135,3 +1135,30 @@ def testo(proj_id):
     ref = repo.get_git_ref(ref='heads/' + body["branch"])
     ref.edit(sha=commit.sha)
     return {"success":True, "reason":"", "body":updated_files}
+
+@app.route('/api/Project/<proj_id>/getFolderTree/',methods=["GET"])
+def getProjectFolderTree(proj_id):
+    '''
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    '''
+    project = getProjectInfo(proj_id)
+    foldertree = getFolderTree(project["root_folder"])
+    return {
+            "success":True,
+            "reason": "",
+            "body":foldertree
+            }

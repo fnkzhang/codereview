@@ -159,7 +159,7 @@ def getFolderInfo(folder_id):
             return None
         return foundFolder._asdict()
 
-def getFolderInfo(name, parent_folder):
+def getFolderInfoViaLocation(name, parent_folder):
     with engine.connect() as conn:
         stmt = select(models.Folder).where(models.Folder.name == name, models.Folder.parent_folder == parent_folder)
         foundFolder = conn.execute(stmt).first()
@@ -358,14 +358,43 @@ def getBranches(token, repository):
         
         repo = g.get_repo(repository)
         branches = list(repo.get_branches())
-        print(branches)
-        print("___________________________")
         branchnames = []
         for branch in branches:
             branchnames.append(branch.name)
         return True, branchnames
     except Exception as e:
         return False, e
+def getAllFolderContents(folder_id):
+    with engine.connect() as conn:
+        stmt = select(models.Folder).where(models.Folder.parent_folder == folder_id)
+        foundFolders = conn.execute(stmt)
+        folders = []
+        for folder in foundFolders:
+            folders.append(folder._asdict())
+        stmt = select(models.Document).where(models.Document.parent_folder == folder_id)
+
+        results = conn.execute(stmt)
+
+        arrayOfDocuments = []
+
+        for row in results:
+            arrayOfDocuments.append(row._asdict())
+
+        return {"folders": folders, "documents":arrayOfDocuments}
+
+def getFolderTree(folder_id):
+    root = getFolderInfo(folder_id)
+    contents = getAllFolderContents(folder_id)
+    folders = []
+    documents = []
+    for document in contents["documents"]:
+        documents.append(document)
+    for folder in contents["folders"]:
+        foldertree = getFolderTree(folder["folder_id"])
+        folders.append(foldertree)
+    content = { "folders":folders, "documents":documents}
+    root["content"] = content
+    return root
 
 #i don't want to have to query the database for every folder, money moment
 #terrible optimization but whatevertbh
