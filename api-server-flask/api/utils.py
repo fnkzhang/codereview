@@ -108,6 +108,8 @@ def getProjectInfo(proj_id):
         foundProject = conn.execute(stmt).first()
         if foundProject == None:
             return -1
+        return foundProject._asdict()
+        
 def getAllProjectDocuments(proj_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
