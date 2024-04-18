@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router"
 import Oauth from "./Oauth.js"
 import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo } from "../api/APIUtils"
 
+// Display Documents For Project
 export default function ProjectPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userData, setUserData] = useState(null)

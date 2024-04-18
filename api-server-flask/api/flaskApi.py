@@ -707,11 +707,7 @@ def createDocument(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    # Todo fix parent folderings
-    doc_id = createNewDocument(inputBody["document_name"], 0, inputBody["project_id"], inputBody["data"]) #inputBody["parent_folder"]
-
-    #createNewDocument already creates snapshot
-    #createNewSnapshot(proj_id, doc_id, inputBody["data"])
+    doc_id = createNewDocument(inputBody["document_name"], inputBody["parent_folder_id"], inputBody["project_id"], inputBody["data"])
 
     return {
         "success": True,

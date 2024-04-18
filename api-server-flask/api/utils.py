@@ -139,8 +139,7 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
         stmt = insert(models.Document).values(
             doc_id = doc_id,
             name = document_name,
-            # todo FIX PARENT folder code from mod 
-            # #parent_folder = parent_folder,
+            parent_folder = parent_folder,
             associated_proj_id = proj_id
         )
         conn.execute(stmt)
@@ -158,36 +157,20 @@ def getFolderInfo(folder_id):
             return -1
         return foundFolder
 
-def createNewFolder(folder_name, parent_folder):
+def createNewFolder(folder_name, parent_folder, proj_id):
     folder_id = createID()
-    try:
-        print(folder_id, folder_name, parent_folder)
-        with engine.connect() as conn:
-            stmt = insert(models.Folder).values(
-                folder_id = folder_id,
-                name = folder_name,
-                parent_folder = parent_folder,
-            )
+    with engine.connect() as conn:
+        stmt = insert(models.Folder).values(
+            folder_id = folder_id,
+            name = folder_name,
+            parent_folder = parent_folder,
+            associated_proj_id = proj_id
+        )
 
-            conn.execute(stmt)
+        conn.execute(stmt)
+        conn.commit()
 
-            # foldercontentstmt = select(models.Folder).where(
-            #         models.Folder.folder_id == parent_folder
-            #         )
-            #todo Fix Folder Purpose Issue
-            contents = conn.execute(stmt).first().contents
-            contents.append([folder_id, 1])
-            stmt = update(models.Folder).where(
-                    models.Folder.folder_id == parent_folder
-                    ).values(
-                    contents = contents
-                    )
-
-            conn.commit()
-        return folder_id
-    except Exception as e:
-        print(e)
-        return None
+    return folder_id
 
 def getAllChildDocuments(folder_id):
     with engine.connect() as conn:
