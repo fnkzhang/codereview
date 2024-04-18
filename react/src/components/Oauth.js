@@ -1,31 +1,64 @@
-import "./Oauth.css"
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
 import { jwtDecode } from 'jwt-decode';
 import getCookie from "../utils/utils";
 
-export default function Oauth(){
+export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData } ){
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [userData, setUserData] = useState(null)
+    const[loading, setLoading] = useState(true)
+
+
+    const verifyLogin = useCallback(async (credentialResponse) => {
+        let oAuthToken = credentialResponse.credential
+        
+        let headers= {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Authorization": oAuthToken,
+              "Content-Type": "application/json"
+            },
+        }
+
+        await fetch('/api/user/authenticate', headers)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success === false) {
+                console.log("Failed to validate token")
+                return
+            }
+            
+            setUserData(data.body)
+            console.log("Valid Token Provided, Saving to cookies")
+            setIsLoggedIn(true)
+            // Save to Cookie
+            document.cookie = `cr_id_token=${credentialResponse.credential}; domain=; path=/`;
+        })
+        .catch(e => console.log(e))
+    }, [setIsLoggedIn, setUserData])
 
     // Check If the user token is valid
     useEffect(() => {
-        let credentialToken = getCookie("cr_id_token")
-        if (credentialToken == null) {
-            setIsLoggedIn(false)
-            setUserData(null)
-            return
+        if (isLoggedIn === false) {
+            let credentialToken = getCookie("cr_id_token")
+            if (credentialToken == null) {
+                setIsLoggedIn(false)
+                setUserData(null)
+                setLoading(false)
+                return
+            }
+
+            let credentialObject = {
+                "credential": credentialToken
+            }
+            
+            verifyLogin(credentialObject)
         }
 
-        let credentialObject = {
-            "credential": credentialToken
-        }
+        setLoading(false)
 
-        verifyLogin(credentialObject)
-
-    }, [])
+    }, [verifyLogin, isLoggedIn, setIsLoggedIn, setUserData])
 
     // Check if user is valid when userData is returned
     useEffect(() => {
@@ -45,37 +78,6 @@ export default function Oauth(){
 
     }, [userData])
 
-    async function verifyLogin(credentialResponse) {
-        let oAuthToken = credentialResponse.credential
-        
-        let headers= {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              "Authorization": oAuthToken,
-              "Content-Type": "application/json"
-            },
-        }
-        console.log("FETCHING")
-
-        await fetch('/api/user/authenticate', headers)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success === false) {
-                console.log("Failed to validate token")
-                return
-            }
-            
-            setUserData(data.body)
-            console.log("Valid Token Provided, Saving to cookies")
-            setIsLoggedIn(true)
-            // Save to Cookie
-            document.cookie = `cr_id_token=${credentialResponse.credential}`;
-        })
-        .catch(e => console.log(e))
-    }
-
-    
     async function checkIfUserExists(email) {
         let credential = getCookie("cr_id_token")
 
@@ -119,14 +121,24 @@ export default function Oauth(){
     }
 
     function DisplayLoginButton() {
+        if (loading) {
+            return (<div 
+                className='border border-alternative border-2 bg-background text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
+                </div>)
+        }
+
         if (isLoggedIn) {
-            return (<div className="Login-true">Logged IN to {userData.email}</div>)
+            return (<div 
+                className='border border-alternative border-2 bg-background text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
+                Logged in as {userData.email}
+                </div>)
         }
 
         return (
             <div>
         
-            <GoogleLogin
+            <GoogleLogin 
+                className="bg-background m-1 inline-block p-5"
                 onSuccess={credentialResponse => {
                 let decodedResponse = jwtDecode(credentialResponse.credential)
                 console.log(decodedResponse)

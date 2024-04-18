@@ -1,69 +1,34 @@
-from cloudSql import connectCloudSql
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-
-from utils import *
-from diff_match_patch import diff_match_patch
-from google.oauth2 import id_token
-from google.auth.transport import requests
-
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete
-from sqlalchemy.orm import sessionmaker
-
-import pymysql
-
-import models
-from cloudSql import connectCloudSql
-
-from utils import engine
-
-#Todo hide later
-CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
-
 app = Flask(__name__)
 
+from flask_cors import CORS
 CORS(app)
-engine = connectCloudSql()
+
+try:
+    from testRoutes import createTable, dropUserProjectRelationTable, \
+        testInsert, grabData, sendData
+except:
+    pass
+
+from cloudSql import connectCloudSql
+from utils import *
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from sqlalchemy import insert, update, delete
+from sqlalchemy.orm import sessionmaker
+import models
+
+from utils import engine
+from llm import init_llm, get_llm_code_from_suggestion, get_llm_suggestion_from_code
+
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
+init_llm()
 
 @app.after_request
 def afterRequest(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
-
-# Remove Later for testing
-@app.route('/createTable')
-def createTable():
-    engine = connectCloudSql()
-    
-    models.Comment.metadata = models.Base.metadata
-
-    models.Comment.metadata.create_all(engine)
-    models.User.metadata = models.Base.metadata
-    models.User.metadata.create_all(engine)
-    models.UserProjectRelation.metadata = models.Base.metadata
-    models.UserProjectRelation.metadata.create_all(engine)
-    #metaData.create_all(engine)
-    print("Table was created")
-    return "Created Table"
-
-# Takes in json with "code" section
-@app.route('/api/sendData', methods=["POST"])
-def sendData():
-    inputBody = request.get_json()
-
-    # Check valid request json
-    if "credential" not in inputBody or "code" not in inputBody:
-        return { "success": False,
-                "reason": "Invalid JSON Provided",
-                "body": {}
-        }
-    
-    return { "success": True,
-            "reason": "N/A",
-            "body": inputBody
-            }
 
 @app.route('/api/user/authenticate', methods=["POST"])
 def authenticator():
@@ -248,6 +213,7 @@ def createProject(proj_name):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
+        
     return {
         "success": True,
         "reason": "",
@@ -272,22 +238,29 @@ def getProject(proj_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    info = getProjectInfo(proj_id)
+    
+    # ProjectData else -1
+    projectData = getProjectInfo(proj_id)
+
+    if projectData == -1:
+        return {
+            "success": False,
+            "reason": "Could Not Get project"
+        }
+    
     return {
         "success": True,
         "reason": "",
-        "body": info
-        }
+        "body": projectData
+    }
 
-
-@app.route('/api/Document/<proj_id>/', methods=["GET"])
-def getAllDocumentsFromProject(proj_id):
+@app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
+def getProjectDocuments(proj_id):
     headers = request.headers
-
     if not isValidRequest(headers, ["Authorization"]):
         return {
-            "success":False,
-            "reason": "Invalid Token Provided"
+                "success":False,
+                "reason": "Invalid Token Provided"
         }
 
     idInfo = authenticate()
@@ -296,7 +269,6 @@ def getAllDocumentsFromProject(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
     #if not userExists(idInfo["email"]):
     #    return {
     #            "success": False,
@@ -314,7 +286,6 @@ def getAllDocumentsFromProject(proj_id):
         "reason": "",
         "body": arrayOfDocuments
     }
-
 #requires
     #authentication stuff
 #needs in body
@@ -535,7 +506,174 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
         "body": blob
     }
 
+@app.route('/api/Snapshot/<snapshot_id>/comment/create', methods=["POST"])
+def createComment(snapshot_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
 
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    body = request.get_json()
+    if not isValidRequest(body, ["author_email", "reply_to_id", "content"]):
+        return {
+            "success": False,
+            "reason": "Invalid Request"
+        }
+
+    # Query
+    with Session() as session:
+        try:
+            session.add(models.Comment(
+                snapshot_id = snapshot_id,
+                author_email = body["author_email"],
+                reply_to_id = int(body["reply_to_id"]),
+                content = body["content"],
+                highlight_start_x = int(body["highlight_start_x"]),
+                highlight_start_y = int(body["highlight_start_y"]),
+                highlight_end_x = int(body["highlight_end_x"]),
+                highlight_end_y = int(body["highlight_end_y"]),
+                is_resolved = body["is_resolved"]
+
+            ))
+            session.commit()
+        except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
+
+    print("Successful Write Comment")
+    return {
+        "success": True,
+        "reason": "Successful Write",
+        "body": {
+            "snapshot_id": snapshot_id,
+            "author_email": body["author_email"],
+            "reply_to_id": int(body["reply_to_id"]),
+            "content": body["content"],
+            "highlight_start_x": int(body["highlight_start_x"]),
+            "highlight_start_y": int(body["highlight_start_y"]),
+            "highlight_end_x":int(body["highlight_end_x"]),
+            "highlight_end_y": int(body["highlight_end_y"]),
+            "is_resolved": body["is_resolved"]
+        }
+    }
+
+# Set comment is_resolved to true
+@app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
+def resolveComment(comment_id):
+    # Authentication
+    print("TEST")
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    resolveCommentHelperFunction(comment_id)
+
+    return {
+        "success": True,
+        "reason": "Ran The Call"
+    }
+    # Set Comment is_resolved to true
+    
+    pass
+# look into pagination
+# https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
+@app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
+def getCommentsOnSnapshot(snapshot_id):
+
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    # Query
+    commentsList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshot_id)
+    if commentsList is None:
+        return {
+            "success": False,
+            "reason": "Error Grabbing Comments From Database"
+        }
+    
+    print("Successful Read")
+    return {
+        "success": True,
+        "reason": "",
+        "body": commentsList
+    }
+
+@app.route('/api/Document/<document_id>/comments/', methods=["GET"])
+def getAllCommentsForDocument(document_id):
+    # Authentication
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided",
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate",
+        }
+    
+    if not userExists(idInfo["email"]):
+        return {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+        }
+    
+    listOfSnapshotIDs = []
+    foundSnapshots = getAllDocumentSnapshotsInOrder(document_id)
+
+    for snapshot in foundSnapshots:
+        # Query
+        listOfSnapshotIDs.append(snapshot["snapshot_id"])
+
+    listOfComments = filterCommentsByPredicate(models.Comment.snapshot_id.in_(listOfSnapshotIDs))
+    if listOfComments is None:
+        return {
+            "success": False,
+            "reason": "Error Grabbing Comments From Database"
+        }
+
+    return {
+        "success": True,
+        "reason": "Found all Comments For All Snapshots for document",
+        "body": listOfComments
+    }
+ 
 #requires
     #credentials in headers
 
@@ -563,6 +701,7 @@ def createDocument(proj_id):
     
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     if "parent_folder" not in inputBody:
         folder = getProjectInfo(proj_id)["root_folder"]
     else:
@@ -575,11 +714,10 @@ def createDocument(proj_id):
         "body": doc_id
     }
 
-
-@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotID/', methods=["GET"])
+@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
 def getAllDocumentSnapshots(proj_id, doc_id):
     headers = request.headers
-
+ 
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
@@ -628,7 +766,6 @@ def getDocument(proj_id, doc_id):
     #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
     #            "body":{}
     #    }
-
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
@@ -749,101 +886,12 @@ def deleteProject(proj_id):
         "success": True,
         "reason": "Successful Delete"
     }
-
-# Comment POST, GET, PUT, DELETE
-@app.route('/api/snapshots/<snapshot_id>/comment/create', methods=["POST"])
-def createComment(snapshot_id):
-    # Authentication
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-            "success": False,
-            "reason": "Invalid Token Provided"
-        }
-
-    if authenticate() is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-
-    body = request.get_json()
-    if not isValidRequest(body, ["snapshot_id", "author_id", "reply_to_id", "content"]):
-        return {
-            "success": False,
-            "reason": "Invalid Request"
-        }
-
-    # Query
-    with Session() as session:
-        try:
-            session.add(models.Comment(
-                snapshot_id=int(body["snapshot_id"]),
-                author_id=int(body["author_id"]),
-                reply_to_id=int(body["reply_to_id"]),
-                content=body["content"],
-                highlight_start_x = int(body["highlight_start_x"]),
-                highlight_start_y = int(body["highlight_start_y"]),
-                highlight_end_x = int(body["highlight_end_x"]),
-                highlight_end_y = int(body["highlight_end_y"]),
-
-            ))
-            session.commit()
-        except Exception as e:
-            print("Error: ", e)
-            return {
-                "success": False,
-                "reason": str(e)
-            }
-
-    print("Successful Write")
+    arrayOfDocuments = getAllDocumentsForProject(proj_id)
     return {
         "success": True,
-        "reason": "Successful Write"
+        "reason": "-",
+        "body": arrayOfDocuments
     }
-
-# look into pagination
-# https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
-@app.route('/api/snapshots/<snapshot_id>/comments/get', methods=["GET"])
-def getCommentsOnSnapshot(snapshot_id):
-    # Authentication
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-            "success": False,
-            "reason": "Invalid Token Provided"
-        }
-
-    if authenticate() is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-
-    # Query
-    commentsList = []
-    with Session() as session:
-        try:
-            filteredComments = session.query(models.Comment) \
-                .filter_by(snapshot_id=snapshot_id) \
-                .all()
-
-            for comment in filteredComments:
-                commentsList.append({
-                    "comment_id": comment.comment_id,
-                    "snapshot_id": comment.snapshot_id,
-                    "author_id": comment.author_id,
-                    "reply_to_id": comment.reply_to_id,
-                    "date_created": comment.date_created,
-                    "date_modified": comment.date_modified,
-                    "content": comment.content
-                })
-        except Exception as e:
-            print("Error: ", e)
-            return []
-    
-    print("Successful Read")
-    return commentsList
 
 @app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
 def getSubcommentsOnComment(comment_id):
@@ -1162,3 +1210,52 @@ def getProjectFolderTree(proj_id):
             "reason": "",
             "body":foldertree
             }
+# EXAMPLE:
+# curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
+@app.route("/api/llm/code-implementation", methods=["GET"])
+def implement_code_changes_from_comment():
+    data = request.get_json()
+    code = data.get("code")
+    highlighted_code=data.get("highlighted_code")
+    comment = data.get("comment")
+
+    response = get_llm_code_from_suggestion(
+        code=code,
+        highlighted_code=highlighted_code,
+        suggestion=comment
+    )
+
+    if response is None:
+        return {
+            "success": False,
+            "reason": "LLM Error"
+        }
+
+    return {
+        "success": True,
+        "reason": "Success",
+        "body": response
+    }
+
+# EXAMPLE:
+# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def calc_avg(n):\n    tot=0\n    cnt=0\n    for number in n:\n      tot = tot+ number\n      cnt= cnt+1\n    average=tot/cnt"}'
+@app.route("/api/llm/comment-suggestion", methods=["GET"])
+def suggest_comment_from_code():
+    data = request.get_json()
+    code = data.get("code")
+
+    response = get_llm_suggestion_from_code(
+        code=code
+    )
+
+    if response is None:
+        return {
+            "success": False,
+            "reason": "LLM Error"
+        }
+
+    return {
+        "success": True,
+        "reason": "Success",
+        "body": response
+    }

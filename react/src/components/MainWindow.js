@@ -1,17 +1,49 @@
-import React from "react";
-import { useParams } from "react-router";
+import React, { useState } from "react";
 import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
+import Oauth from "./Oauth"
+import AppHeader from "./AppHeader"
 
 export default function MainWindow() {
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userData, setUserData] = useState(null)
+  const [comments, setComments] =  useState([])
 
-  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
-  
-  return(
-    <div>
-      <SnapshotSelector/>
-      <ReviewWindow/>
-    </div>
-  )
+  const [snapshots, setSnapshots] = useState([])
+
+  if (isLoggedIn) {
+    console.log(snapshots)
+    return(
+      <div className="h-screen">
+        <Oauth
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        userData={userData}
+        setUserData={setUserData}/>
+        <SnapshotSelector
+          comments={comments}
+          snapshots={snapshots}
+          setSnapshots={setSnapshots}/>
+        <ReviewWindow
+          comments={comments}
+          setComments={setComments}
+          userData={userData}
+          snapshots={snapshots}/>
+      </div>
+    )
+  } else {
+    return(
+      <div>
+        <Oauth
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        userData={userData}
+        setUserData={setUserData}/>
+        <div className="m-20 text-center text-textcolor text-2xl">
+          You must Log in to view this page.
+        </div>
+      </div>
+    )
+  }
 }

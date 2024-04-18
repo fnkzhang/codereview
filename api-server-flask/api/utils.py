@@ -9,27 +9,31 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text, delete
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete, DateTime, Text
 from sqlalchemy.sql import func
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import sessionmaker
 from cloudSql import connectCloudSql
 
 from github import Github, InputGitTreeElement
 from github import Auth
 
 import models
-engine = connectCloudSql()
 
+from cacheUtils import cloudStorageCache, publishTopicUpdate
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
 os.environ["GCLOUD_PROJECT"] = "codereview-413200"
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
+
+engine = connectCloudSql()
+Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.blob(blobName)
     blob.upload_from_string(data = item, content_type='application/json')
+    
     return True
 
 def getBlob(blobName):
@@ -53,7 +57,6 @@ def deleteBlobsInDirectory(location):
     for blob in blobs:
         blob.delete()
     return True
-
 
 def setUserProjPermissions(email, pid, r, perms):
     with engine.connect() as conn:
@@ -105,8 +108,6 @@ def getProjectInfo(proj_id):
         foundProject = conn.execute(stmt).first()
         if foundProject == None:
             return -1
-        return foundProject._asdict()
-
 def getAllProjectDocuments(proj_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
@@ -117,9 +118,9 @@ def getAllProjectDocuments(proj_id):
 
         for row in results:
             arrayOfDocuments.append(row._asdict())
-
+        
         return arrayOfDocuments
-
+    
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
@@ -146,6 +147,16 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
             associated_proj_id = proj_id
         )
         conn.execute(stmt)
+        foldercontentstmt = select(models.Folder).where(
+                models.Folder.folder_id == parent_folder
+                )
+        contents = conn.execute(stmt).first().contents
+        contents.append([doc_id, 0])
+        stmt = update(models.Folder).where(
+                models.Folder.folder_id == parent_folder
+                ).values(
+                contents = contents
+                )
         conn.commit()
     createNewSnapshot(proj_id, doc_id, item)
     return doc_id
@@ -179,6 +190,7 @@ def createNewFolder(folder_name, parent_folder, proj_id):
         conn.execute(stmt)
         conn.commit()
     return folder_id
+  
 def getAllProjectFolders(proj_id):
     with engine.connect() as conn:
         stmt = select(models.Folder).where(models.Folder.associated_proj_id == proj_id)
@@ -187,17 +199,7 @@ def getAllProjectFolders(proj_id):
         for folder in foundFolders:
             folders.append(folder._asdict())
         return folders
-def newDocumentEvent(doc_id, event_type):
-    return True
-def getAllProjectEvents(proj_id):
-    with engine.connect() as conn:
-        stmt = select(models.Event).where(models.Event.associated_proj_id == proj_id)
-        foundEvents = conn.execute(stmt)
-        events = []
-        for event in foundEvents:
-            events.append(event._asdict())
-        return events
-
+      
 #puts documentname as snapshot name until that changes
 def createNewSnapshot(proj_id, doc_id, item):
     with engine.connect() as conn:
@@ -421,3 +423,86 @@ def getProjectFoldersAsPaths(proj_id):
     return folderIDToPath
     
 
+def resolveCommentHelperFunction(comment_id):
+    with engine.connect() as conn:
+        stmt = (update(models.Comment)
+        .where(models.Comment.comment_id == comment_id)
+        .values(is_resolved=True)
+        )
+
+        conn.execute(stmt)
+        conn.commit()
+
+    pass
+  
+def fetchFromCloudStorage(blobName:str):
+    '''
+    If cached, returns the blob in cache.
+    If uncached, makes a request for the blob in Google Buckets
+    and returns the blob.
+
+    Args
+      blobName:
+        Name of the blob to retrieve.
+    '''
+    blobContents = cloudStorageCache.get(blobName)
+    if blobContents is None:
+        blobContents = getBlob(blobName)
+        print('uncached\n\n\n')
+    else:
+        print('cached\n\n\n')
+    
+    if blobContents is not None:
+        cloudStorageCache.set(blobName, blobContents)
+    
+    return blobContents
+
+def publishCloudStorageUpdate(blobName: str):
+    '''
+    Publishes a message with the blobName as the key to indicate that the
+    specified blob has been updated. The key is used to delete the blob
+    from cache.
+
+    Args
+      blobName:
+        Name of the blob that was updated (created, edited, deleted)
+    '''
+    publishTopicUpdate("cloud-storage-updates", blobName)
+    return
+
+def filterCommentsByPredicate(predicate):
+    '''
+    Filters the comments database for all comments that satisfy the
+    given predicate and returns the comments as a list.
+
+    Args
+      predicate:
+        An SQL column expression that either returns True or False.
+    '''
+    commentsList = []
+    with Session() as session:
+        try:
+            filteredComments = session.query(models.Comment) \
+                .filter(predicate) \
+                .all()
+            
+            for comment in filteredComments:
+                commentsList.append({
+                    "comment_id": comment.comment_id,
+                    "snapshot_id": comment.snapshot_id,
+                    "author_email": comment.author_email,
+                    "reply_to_id": comment.reply_to_id,
+                    "date_created": comment.date_created,
+                    "date_modified": comment.date_modified,
+                    "content": comment.content,
+                    "highlight_start_x": comment.highlight_start_x,
+                    "highlight_start_y": comment.highlight_start_y,
+                    "highlight_end_x": comment.highlight_end_x,
+                    "highlight_end_y": comment.highlight_end_y,
+                    "is_resolved": comment.is_resolved
+                })
+
+        except Exception as e:
+            commentsList = None
+    
+    return commentsList
