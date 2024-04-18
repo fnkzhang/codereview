@@ -1201,6 +1201,7 @@ def getProjectFolderTree(proj_id):
             "reason": "",
             "body":foldertree
             }
+
 # EXAMPLE:
 # curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
 @app.route("/api/llm/code-implementation", methods=["GET"])
