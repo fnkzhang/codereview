@@ -1,71 +1,42 @@
-import React, {useState, useEffect} from "react";
-import getCookie from "../utils/utils";
-import { useNavigate } from "react-router";
+import React, {useState} from "react";
+import Oauth from "./Oauth";
+import ProjectList  from "./Projects/ProjectList";
 
 export default function UserHomePage() {
+
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(null)
 
-    const navigate = useNavigate()
-
-    // Validate User or Send to Login
-    useEffect(() => {
-      let credentialToken = getCookie("cr_id_token")
-
-      if (credentialToken === null)
-        return
-
-      let credentialObject = {
-          "credential": credentialToken
-      }
-
-      verifyLogin(credentialObject)
-      // After Setting userData, use email to grab user related documents from API
-
-    }, [])
-
-    useEffect(() => {
-      if (userData === null)  
-        return
-
-      // todo GRAB USER DATA FROM API
-
-      
-    }, [userData])
-    async function verifyLogin(credentialResponse) {
-      let oAuthToken = credentialResponse.credential
-
-      let headers= {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          }
-      }
-      console.log("FETCHING")
-
-      await fetch('/api/user/authenticate', headers)
-      .then(response => response.json())
-      .then(data => {
-          if (data.success === false) {
-              console.log("Failed to validate token")
-              return
-          }
+    if (isLoggedIn) {
+      return (
+        <div>
+          <Oauth
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+            userData={userData}
+            setUserData={setUserData}
+          />
           
-          setUserData(data.body)
-          console.log(data)
-          setIsLoggedIn(true)
-          // Save to Cookie
-          document.cookie = `cr_id_token=${credentialResponse.credential}`;
-      })
-      .catch(e => console.log(e))
+          <div className="m-5">
+            <ProjectList
+              userData={userData}
+            />
+          </div>
 
+        </div>
+      )
+    } else {
+      return (
+        <div>
+            <Oauth
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+            userData={userData}
+            setUserData={setUserData}/>
+            <div className="m-20 text-center text-textcolor text-2xl">
+              You must Log in to view this page.
+            </div>
+        </div>
+      )
     }
-
-    return (
-      <div>
-
-      </div>
-    )
 }

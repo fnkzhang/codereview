@@ -1,129 +1,87 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
-import getCookie from "../utils/utils";
-import './SnapshotSelector.css'
+import { Dropdown } from "flowbite-react";
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'
 
-// todo testing remove later
-import Oauth from "./Oauth.js";
-
-export default function SnapshotSelector() { 
-    const [snapshots, setSnapshots] = useState([])
+export default function SnapshotSelector({ comments }) { 
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
+    const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
 
-    const navivate = useNavigate()
+    const [snapshots, setSnapshots] = useState([])
+    const navigate = useNavigate()
 
     const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
     // Get snapshots for document
     useEffect(() => {
-      console.log(document_id, left_snapshot_id, right_snapshot_id)
 
         const grabSnapshots = async () => {
-            let result = await getAllSnapshotsFromDocument(document_id)
-
-            if (result.success)
-              setSnapshots(result.body)
+          let result = await getAllSnapshotsFromDocument(document_id)
+          //console.log(result)
+          if (result.success)
+            setSnapshots(result.body)
         }
 
         grabSnapshots()
-    }, [])
+    }, [document_id])
 
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
-      console.log(selectedSnapshot, selectedIndex)
       setSelectedLeftSnapshotIndex(selectedIndex)
-      navivate(`/Document/${document_id}/${selectedSnapshot}/${selectedSnapshot}`)
-      navivate(0)
-
+      navigate(`/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`)
     }
+
     async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
-      console.log(selectedSnapshot, selectedIndex)
-      navivate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
-      navivate(0)
-
+      setSelectedRightSnapshotIndex(selectedIndex)
+      navigate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
     }
-    async function createProj() {
-        let oAuthToken = getCookie("cr_id_token")
-  
-        let headers = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          }
-        };
+
+    function filterComments(snapshot) {
+      if (comments.length > 0)
+        return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot_id) && (comment.is_resolved === false)).length
       
-        await fetch(`/api/Project/testProject/`, headers)
-          .then(response => response.json())
-          //.then(data => data.snapshots)
-          .catch(e => console.log("ERROR", e))
+      return []
     }
-    async function createSnapshot() {
-      let oAuthToken = getCookie("cr_id_token")
-        
-        let bodyData = {
-            name: "TestDocument",
-            data: "TESTFILECODE WITH CHANGE"
-        }
-        let headers = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(bodyData)
-          
-          
-        };
-
-        return await fetch(`/api/Snapshot/684153597/386854791/`, headers)
-          .then(response => response.json())
-          .then(data => console.log(data))
-          .catch(e => console.log("ERROR", e))
-        // Create Snapshot for testing
-    }
-    async function createDocument() {
-        let oAuthToken = getCookie("cr_id_token")
-        
-        let bodyData = {
-            name: "TestDocument",
-            data: "TESTFILECODE"
-        }
-        let headers = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Authorization": oAuthToken,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(bodyData)
-          
-        };
-      
-        return await fetch(`/api/Document/684153597/`, headers)
-          .then(response => response.json())
-          .then(data => console.log(data))
-          .catch(e => console.log("ERROR", e))
-    }
-
 
     function DisplayLeftSnapshots() {
-        console.log(snapshots)
         if(snapshots.length !== 0) {
             return (
-              <div>
-                <p>ALIVE</p>
+              <Dropdown 
+                className= "z-9999 bg-background" label={`Snapshot ${selectedLeftSnapshotIndex}`}>
                 {snapshots.map((snapshot, index) => { 
+                    const value = filterComments(snapshot)
+                    let str = ""
+                    if (value !== 0)
+                      str = `(${value})`
                     //console.log(snapshot)
-                    return (
-                      <button id={snapshot.snapshot_id.toString() === left_snapshot_id ? 'Selected-Item' : null}
-                              onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}>
-                        Left Snap test
-                      </button>)
-                })}              
-              </div>
-          )
+                    return (index <= selectedRightSnapshotIndex) ? (
+                      <Dropdown.Item 
+                        className="z-9999 bg-background"
+                        key={index}
+                        onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
+                        data-tooltip-id={`tooltipleft${index}`}
+                      >
+                        Snapshot {index} {str}
+                        <Tooltip
+                          className="z-9999" 
+                          id={`tooltipleft${index}`}
+                          place="right"
+                          content={
+                            <div>
+                              <p>
+                                Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
+                              </p>
+                              <p>
+                                Open Comments: {value}
+                              </p>
+                            </div>
+                          }
+                        />
+                      </Dropdown.Item>
+                    ) : null
+                })}
+              </Dropdown>
+            )
          } 
          else {
             return <div>EMPTY</div>
@@ -131,23 +89,43 @@ export default function SnapshotSelector() {
     }
     
     function DisplayRightSnapshots() {
-      console.log(snapshots)
       if(snapshots.length !== 0) {
           return (
-            <div>
-              <p>ALIVE</p>
+            <Dropdown className="z-9999 bg-background" label={`Snapshot ${selectedRightSnapshotIndex}`}>
               {snapshots.map((snapshot, index) => { 
+                  const value = filterComments(snapshot)
+                  let str = ""
+                  if (value !== 0)
+                    str = `(${value})`
                   //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
-                  
                   return (index >= selectedLeftSnapshotIndex) ? (
-                    <button id={snapshot.snapshot_id.toString() === right_snapshot_id ? 'Selected-Item' : null}
-                            onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}>
-                      Righttest
-                    </button>
+                    <Dropdown.Item 
+                      className="z-9999 bg-background"
+                      key={index}
+                      onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
+                      data-tooltip-id={`tooltipright${index}`}
+                    >
+                      Snapshot {index} {str}
+                      <Tooltip
+                        className="z-9999" 
+                        id={`tooltipright${index}`}
+                        place="right"
+                        content={
+                          <div>
+                            <p>
+                              Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
+                            </p>
+                            <p>
+                              Open Comments: {value}
+                            </p>
+                          </div>
+                        }
+                      />
+                    </Dropdown.Item>
                   ) : null
-              })}              
-            </div>
-        )
+              })}           
+            </Dropdown>
+          )
        } 
        else {
           return <div>EMPTY</div>
@@ -155,15 +133,13 @@ export default function SnapshotSelector() {
   }
 
     return (
-        <div>
-            <button onClick={createProj}>CreateProject</button>
-            <button onClick={createSnapshot}>createSnapshot</button>
-            <Oauth/>
-            <div>
-              <DisplayLeftSnapshots/>
-              <DisplayRightSnapshots/>              
-            </div>
-
+        <div className="w-2/3 text-textcolor flex">
+          <div className="w-1/2 m-1">
+            <DisplayLeftSnapshots/>
+          </div>
+          <div className="w-1/2 m-1">
+            <DisplayRightSnapshots/>
+          </div>
         </div>
     )
 }
