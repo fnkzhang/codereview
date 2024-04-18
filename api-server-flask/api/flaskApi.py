@@ -892,7 +892,7 @@ def implement_code_changes_from_comment():
     }
 
 # EXAMPLE:
-# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def calc_avg(n):\n    tot=0\n    cnt=0\n    for number in n:\n      tot = tot+ number\n      cnt= cnt+1\n    average=tot/cnt"}'
+# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTo(2))"}'
 @app.route("/api/llm/comment-suggestion", methods=["GET"])
 def suggest_comment_from_code():
     data = request.get_json()
