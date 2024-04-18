@@ -279,3 +279,74 @@ export async function getProjectDocuments(proj_id) {
     return data.body
   })
 }
+
+/**
+ * @param {string} code The entire code in the document/snapshot
+ * @param {string} highlightedCode A substring of the code that will be changed
+ * @param {string} comment A suggestion on what to do with the highlighted code
+ * @returns {string} The code implementation based on the suggestion
+*/
+export async function getCodeImplementation(code, highlightedCode, comment) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "code": code,
+      "highlighed_code": highlightedCode,
+      "comment": comment
+    })
+  };
+
+  return await fetch((`/api/llm/code-implementation`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return highlightedCode
+    }
+
+    return data.body
+  })
+}
+
+/**
+ * @param {string} code The entire code in the document/snapshot
+ * @returns {object[]} A list of JSON objects that have keys startLine, endLine, and suggestion.
+ * startLine: number - line # to begin highlight
+ * endLine: number - line # to stop highlight
+ * suggestion: string - Suggestion on how to improve the highlighted section of code
+*/
+export async function getCommentSuggestion(code) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "code": code
+    })
+  };
+
+  return await fetch((`/api/llm/comment-suggestion`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return []
+    }
+
+    return data.body
+  })
+}
