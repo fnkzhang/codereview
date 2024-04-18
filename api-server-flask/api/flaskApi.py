@@ -191,7 +191,8 @@ def createProject(proj_name):
             "reason": "Failed to Authenticate"
         }
     
-    root_folder_id = None # createNewFolder('root', 0)
+    root_folder_id = createNewFolder('root', 0)
+
     with engine.connect() as conn:
         pid = createID()
         projstmt = insert(models.Project).values(
@@ -706,11 +707,17 @@ def createDocument(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    doc_id = createNewDocument(inputBody["doc_name"], inputBody["parent_folder"])
+    # Todo fix parent folderings
+    doc_id = createNewDocument(inputBody["document_name"], 0, inputBody["project_id"], inputBody["data"]) #inputBody["parent_folder"]
 
-    createNewSnapshot(proj_id, doc_id, inputBody["data"])
+    #createNewDocument already creates snapshot
+    #createNewSnapshot(proj_id, doc_id, inputBody["data"])
 
-    return {"posted": inputBody}
+    return {
+        "success": True,
+        "reason": "",
+        "body": inputBody
+    }
 
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
 def getAllDocumentSnapshots(proj_id, doc_id):

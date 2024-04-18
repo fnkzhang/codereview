@@ -108,6 +108,15 @@ export default function ProjectPage() {
       </div>
     )
   }
+  
+  function DisplayUploadDocumentButton() {
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-red-800/75 m-1"
+        onClick={() => navigate(`/Project/${project_id}/Document/Create`)}>Upload Document</button>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -123,7 +132,7 @@ export default function ProjectPage() {
         </div>
 
         <DisplayDeleteButton/>
-
+        <DisplayUploadDocumentButton/>
       </div>
 
       <DisplayDocumentBox/>

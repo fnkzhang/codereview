@@ -6,6 +6,7 @@ import ProjectPage from './components/ProjectPage.js';
 import { Navbar, Avatar } from 'flowbite-react';
 import ProjectCreation from './components/Projects/ProjectCreation.js';
 import ProjectDeletion from './components/Projects/ProjectDeletion.js';
+import DocumentCreation from './components/Documents/DocumentCreation.js';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Routes>
           {/*<Route exact path="/" element={<ReviewWindow/>} /> */}
           <Route path="/" element={<UserHomePage/>} />
+          <Route path="/Project/:project_id/Document/Create" element={<DocumentCreation/>}/>
           <Route path="/Project/:project_id" element={<ProjectPage/>}/>
           <Route path="/Project/Create" element={<ProjectCreation/>}/>
           <Route path="/Project/Delete/:project_id/" element={<ProjectDeletion/>}/>

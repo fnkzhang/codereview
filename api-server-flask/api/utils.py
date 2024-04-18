@@ -133,28 +133,22 @@ def getDocumentInfo(doc_id):
             return -1
         return foundDocument
   
-def createNewDocument(document_name, parent_folder):
+def createNewDocument(document_name, parent_folder, proj_id, item):
     doc_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
             doc_id = doc_id,
             name = document_name,
-            parent_folder = parent_folder
+            # todo FIX PARENT folder code from mod 
+            # #parent_folder = parent_folder,
+            associated_proj_id = proj_id
         )
         conn.execute(stmt)
-        foldercontentstmt = select(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                )
-        contents = conn.execute(stmt).first().contents
-        contents.append([doc_id, 0])
-        stmt = update(models.Folder).where(
-                models.Folder.folder_id == parent_folder
-                ).values(
-                contents = contents
-                )
         conn.commit()
-    return doc_id
 
+    createNewSnapshot(proj_id, doc_id, item)
+    
+    return doc_id
 
 def getFolderInfo(folder_id):
     with engine.connect() as conn:
