@@ -283,14 +283,16 @@ export async function getProjectDocuments(proj_id) {
 /**
  * @param {string} code The entire code in the document/snapshot
  * @param {string} highlightedCode A substring of the code that will be changed
+ * @param {number} startLine Starting line # of highlighted code
+ * @param {number} endLine Ending line # of highlighted code
  * @param {string} comment A suggestion on what to do with the highlighted code
  * @returns {string} The code implementation based on the suggestion
 */
-export async function getCodeImplementation(code, highlightedCode, comment) {
+export async function getCodeImplementation(code, highlightedCode, startLine, endLine, comment) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
-    method: "GET",
+    method: "POST",
     mode: "cors",
     headers: {
       "Authorization": oAuthToken,
@@ -298,7 +300,9 @@ export async function getCodeImplementation(code, highlightedCode, comment) {
     },
     body: JSON.stringify({
       "code": code,
-      "highlighed_code": highlightedCode,
+      "highlighedCode": highlightedCode,
+      "startLine": startLine,
+      "endLine": endLine,
       "comment": comment
     })
   };
@@ -327,7 +331,7 @@ export async function getCommentSuggestion(code) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
-    method: "GET",
+    method: "POST",
     mode: "cors",
     headers: {
       "Authorization": oAuthToken,
