@@ -117,8 +117,9 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
     }
 
     function displayProfileImage() {
-        return (<Avatar alt="User settings" 
-          img={userData.picture} 
+        return (<Avatar
+          img={userData.picture}
+          alt="?"
           className='w-10 h-10 rounded-sm ml-2'/>
         )
     }
