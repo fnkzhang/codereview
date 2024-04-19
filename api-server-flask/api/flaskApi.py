@@ -507,6 +507,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+        
     blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
     return {"blobContents": blob}
 
@@ -707,7 +708,7 @@ def createDocument(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    doc_id = createNewDocument(inputBody["document_name"], inputBody["parent_folder_id"], inputBody["project_id"], inputBody["data"])
+    createNewDocument(inputBody["document_name"], inputBody["parent_folder_id"], inputBody["project_id"], inputBody["data"])
 
     return {
         "success": True,
@@ -759,15 +760,15 @@ def getDocument(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #if not userExists(idInfo["email"]):
-    #    return {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
 
-    # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
     info = json.dumps(getDocumentInfo(doc_id))
     return {"success": True, "reason":"", "body": info}
@@ -789,15 +790,15 @@ def getAllDocumentsFromProject(proj_id):
             "reason": "Failed to Authenticate"
         }
     
-    #if not userExists(idInfo["email"]):
-    #    return {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
 
-    # if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
 
     arrayOfDocuments = getAllDocumentsForProject(proj_id)

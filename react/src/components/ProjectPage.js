@@ -10,6 +10,7 @@ export default function ProjectPage() {
 
   const [projectDocuments, setProjectDocuments] = useState([])
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
+  const [projectRootFolderID, setProjectRootFolderID] = useState(null)
 
   const { project_id } = useParams()
   const navigate = useNavigate()
@@ -18,7 +19,9 @@ export default function ProjectPage() {
   useEffect(() => {
     async function grabProjectData() {
       let result = await getProjectInfo(project_id)
-
+      console.log(result)
+      
+      setProjectRootFolderID(result.root_folder)
       setProjectOwnerEmail(result.author_email)
     }
 
@@ -114,7 +117,7 @@ export default function ProjectPage() {
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-red-800/75 m-1"
-        onClick={() => navigate(`/Project/${project_id}/Document/Create`)}>Upload Document</button>
+        onClick={() => navigate(`/Project/${project_id}/${projectRootFolderID}/Document/Create`)}>Upload Document</button>
       </div>
     )
   }

@@ -28,6 +28,7 @@ Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_b
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
+    print("Uploading to", blobName)
     blob = bucket.blob(blobName)
     blob.upload_from_string(data = item, content_type='application/json')
     
@@ -70,9 +71,14 @@ def setUserProjPermissions(email, pid, r, perms):
 
 def deleteProjectWithProjectID(proj_id):
     with engine.connect() as conn:
-        stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
+        # GET PROJECT AUTHOR EMAIL AND DELETE THE COMMENT
+        deleteProjectStatement = delete(models.Project).where(models.Project.proj_id == proj_id)
+        deleteDocumentStatement  = delete(models.Document).where(models.Document.associated_proj_id == proj_id)
+        #deleteDocumentCommentsStatement = delete(models.Comment).where()
+        
+        conn.execute(deleteProjectStatement)
+        conn.execute(deleteDocumentStatement)
 
-        conn.execute(stmt)
         conn.commit()
 
     return True
@@ -260,17 +266,22 @@ def fetchFromCloudStorage(blobName:str):
       blobName:
         Name of the blob to retrieve.
     '''
-    blobContents = cloudStorageCache.get(blobName)
-    if blobContents is None:
-        blobContents = getBlob(blobName)
-        print('uncached\n\n\n')
-    else:
-        print('cached\n\n\n')
-    
-    if blobContents is not None:
-        cloudStorageCache.set(blobName, blobContents)
-    
-    return blobContents
+    try:
+
+        blobContents = cloudStorageCache.get(blobName)
+        if blobContents is None:
+            blobContents = getBlob(blobName)
+            print('uncached\n\n\n')
+        else:
+            print('cached\n\n\n')
+        
+        if blobContents is not None:
+            cloudStorageCache.set(blobName, blobContents)
+        
+        return blobContents
+    except Exception as e:
+        print(e)
+        return None
 
 def publishCloudStorageUpdate(blobName: str):
     '''

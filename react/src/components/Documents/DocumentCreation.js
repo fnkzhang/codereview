@@ -13,14 +13,14 @@ export default function DocumentCreation() {
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
-  const {project_id} = useParams();
+  const {project_id, parent_folder_id} = useParams();
 
 
   const handleCreateDocument = async () =>  {
     console.log(documentName, project_id, documentData)
 
     //Todo handle folder in future
-    let result = await createDocument(documentName, project_id, documentData)
+    let result = await createDocument(documentName, project_id, documentData, parent_folder_id)
     console.log(result)
     
     if (result.success)

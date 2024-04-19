@@ -35,7 +35,7 @@ function App() {
         <Routes>
           {/*<Route exact path="/" element={<ReviewWindow/>} /> */}
           <Route path="/" element={<UserHomePage/>} />
-          <Route path="/Project/:project_id/Document/Create" element={<DocumentCreation/>}/>
+          <Route path="/Project/:project_id/:project_root_folder_id/Document/Create" element={<DocumentCreation/>}/>
           <Route path="/Project/:project_id" element={<ProjectPage/>}/>
           <Route path="/Project/Create" element={<ProjectCreation/>}/>
           <Route path="/Project/Delete/:project_id/" element={<ProjectDeletion/>}/>

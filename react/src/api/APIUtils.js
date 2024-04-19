@@ -58,14 +58,16 @@ export async function deleteProject(proj_id) {
 
 }
 
-export async function createDocument(documentName, proj_id, documentData) {
+export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
     document_name: documentName,
     data: documentData,
-    project_id: proj_id
+    project_id: proj_id,
+    parent_folder_id: parent_folder_id
   }
+  
   let headers = {
     method: "POST",
     mode: "cors",
