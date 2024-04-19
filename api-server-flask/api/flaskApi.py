@@ -191,10 +191,14 @@ def createProject(proj_name):
             "reason": "Failed to Authenticate"
         }
     
-    root_folder_id = createNewFolder('root', 0)
+
 
     with engine.connect() as conn:
         pid = createID()
+
+        root_folder_id = createNewFolder('root', 0, pid)
+        print(root_folder_id)
+
         projstmt = insert(models.Project).values(
                 proj_id = pid,
                 name = proj_name,
@@ -459,6 +463,7 @@ def removeUser(proj_id):
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
 def createSnapshot(proj_id, doc_id):
+    print(proj_id, doc_id)
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -474,23 +479,23 @@ def createSnapshot(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #todo:make this a function
-    #if not userExists(idInfo["email"]):
-    #    retData = {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
-    #    return jsonify(retData)
+    if not userExists(idInfo["email"]):
+       retData = {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
+       return jsonify(retData)
 
-    # if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
-    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    ##########################
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     createNewSnapshot(proj_id, doc_id, inputBody["data"])
     return {"posted": inputBody}
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
 def getSnapshot(proj_id, doc_id, snapshot_id):
+    print("GETTING SNAPSHOT", proj_id, doc_id, snapshot_id)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -578,7 +583,6 @@ def createComment(snapshot_id):
 @app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
 def resolveComment(comment_id):
     # Authentication
-    print("TEST")
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {

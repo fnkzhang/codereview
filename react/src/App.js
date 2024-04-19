@@ -42,7 +42,7 @@ function App() {
           
           {/* todo add new document snapshot selection page for a document */}
           <Route path="/Document/:document_id/" /> 
-          <Route path="/Document/:document_id/:left_snapshot_id/:right_snapshot_id" element={<MainWindow/>}/>
+          <Route path="Project/:project_id/Document/:document_id/:left_snapshot_id/:right_snapshot_id" element={<MainWindow/>}/>
 
         </Routes>
       </Router>

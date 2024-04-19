@@ -35,7 +35,7 @@ def uploadBlob(blobName, item):
     return True
 
 def getBlob(blobName):
-    print(blobName)
+    print("GETTING BLOB", blobName)
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
@@ -71,11 +71,21 @@ def setUserProjPermissions(email, pid, r, perms):
 
 def deleteProjectWithProjectID(proj_id):
     with engine.connect() as conn:
+        grabProjectStatement = select(models.Project.author_email).where(models.Project.proj_id == proj_id)
+
+        result = conn.execute(grabProjectStatement)
+        projectOwnerEmail = result.first()
+        print(result)
+
+
+
         # GET PROJECT AUTHOR EMAIL AND DELETE THE COMMENT
+        deleteProjectRelation = delete(models.UserProjectRelation).where(models.UserProjectRelation.user_email == projectOwnerEmail)
         deleteProjectStatement = delete(models.Project).where(models.Project.proj_id == proj_id)
         deleteDocumentStatement  = delete(models.Document).where(models.Document.associated_proj_id == proj_id)
         #deleteDocumentCommentsStatement = delete(models.Comment).where()
-        
+
+        conn.execute(deleteProjectRelation)
         conn.execute(deleteProjectStatement)
         conn.execute(deleteDocumentStatement)
 

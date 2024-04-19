@@ -81,6 +81,7 @@ class Folder(Base):
     __tablename__ = "folders"
     folder_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
     name = Column(String(50))
+    associated_proj_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
     parent_folder = Column(Integer)

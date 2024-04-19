@@ -1,6 +1,8 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import Oauth from "./Oauth.js"
+
+import { Card } from "flowbite-react"
 import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo } from "../api/APIUtils"
 
 // Display Documents For Project
@@ -41,25 +43,25 @@ export default function ProjectPage() {
   async function handleDocumentClick (id, name) {
     const result = await getAllSnapshotsFromDocument(id)
     if (result.success)
-      navigate(`/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
+      navigate(`/Project/${project_id}/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
   }
   function DocumentDisplayBox({id, name, date}) {
     console.log(id, name)
     return (
-      <div 
-        onClick={() => handleDocumentClick(id, name)} 
-        className="flex border border-alternative border-2 rounded-lg m-1"
+      <Card 
+        className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
+        onClick={() => handleDocumentClick(id, name)}
       >
-          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
-            <span className="font-bold">Document Name: </span>
-            {name}
-          </h4>
-          <h4 className="text-textcolor w-1/3 p-1 box-border border-r-2 border-alternative">
-            <span className="font-bold">Document ID: </span>
-            {id}
-          </h4>
-          <h4 className="text-textcolor w-1/3 p-1 box-border"><span className="font-bold">Date Modified: </span>{date}</h4>
-        </div>
+        <h4 className="text-textcolor p-1">
+          <span className="font-bold">Document Name: </span>
+          {name}
+        </h4>
+        <h4 className="text-textcolor p-1">
+          <span className="font-bold">Document ID: </span>
+          {id}
+        </h4>
+        <h4 className="text-textcolor p-1"><span className="font-bold">Date Modified: </span>{date}</h4>
+      </Card>
     )
   }
 
@@ -67,7 +69,7 @@ export default function ProjectPage() {
     console.log(projectDocuments)
     if(projectDocuments.length > 0) {
       return (
-        <div>
+        <div className="flex flex-wrap">
           {
             projectDocuments.map((document, index) => {
               return (<DocumentDisplayBox 
@@ -116,7 +118,7 @@ export default function ProjectPage() {
   function DisplayUploadDocumentButton() {
     return (
       <div className="text-textcolor text-xl">
-        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-red-800/75 m-1"
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
         onClick={() => navigate(`/Project/${project_id}/${projectRootFolderID}/Document/Create`)}>Upload Document</button>
       </div>
     )
