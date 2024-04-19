@@ -5,8 +5,7 @@ from flask_cors import CORS
 CORS(app)
 
 try:
-    from testRoutes import createTable, dropUserProjectRelationTable, \
-        testInsert, grabData, sendData
+    from testRoutes import test_llm
 except:
     pass
 
@@ -865,17 +864,21 @@ def deleteComment(comment_id):
     }
 
 # EXAMPLE:
-# curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
-@app.route("/api/llm/code-implementation", methods=["GET"])
+# curl -X POST http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "startLine": 1, "endLine": 2, "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
+@app.route("/api/llm/code-implementation", methods=["POST"])
 def implement_code_changes_from_comment():
     data = request.get_json()
     code = data.get("code")
-    highlighted_code=data.get("highlighted_code")
+    highlighted_code=data.get("highlightedCode")
+    start_line = data.get("startLine")
+    end_line = data.get("endLine")
     comment = data.get("comment")
 
     response = get_llm_code_from_suggestion(
         code=code,
         highlighted_code=highlighted_code,
+        start_line=start_line,
+        end_line=end_line,
         suggestion=comment
     )
 
@@ -892,8 +895,8 @@ def implement_code_changes_from_comment():
     }
 
 # EXAMPLE:
-# curl -X GET http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTo(2))"}'
-@app.route("/api/llm/comment-suggestion", methods=["GET"])
+# curl -X POST http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTo(2))"}'
+@app.route("/api/llm/comment-suggestion", methods=["POST"])
 def suggest_comment_from_code():
     data = request.get_json()
     code = data.get("code")
