@@ -1,14 +1,10 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
-import Oauth from "./Oauth.js"
-
 import { Card } from "flowbite-react"
 import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo } from "../api/APIUtils"
 
 // Display Documents For Project
-export default function ProjectPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userData, setUserData] = useState(null)
+export default function ProjectPage( props ) {
 
   const [projectDocuments, setProjectDocuments] = useState([])
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
@@ -100,11 +96,11 @@ export default function ProjectPage() {
   }
 
   function DisplayDeleteButton() {
-    console.log(userData, projectOwnerEmail)
-    if (userData === null)
+    console.log(props.userData, projectOwnerEmail)
+    if (props.userData === null)
       return null
 
-    if (userData.email !== projectOwnerEmail)
+    if (props.userData.email !== projectOwnerEmail)
       return null
 
     return (
@@ -126,12 +122,6 @@ export default function ProjectPage() {
 
   return (
     <div>
-      <Oauth
-        isLoggedIn={isLoggedIn}
-        setIsLoggedIn={setIsLoggedIn}
-        userData={userData}
-        setUserData={setUserData}
-      />
       <div className="flex">
         <div>
           <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>

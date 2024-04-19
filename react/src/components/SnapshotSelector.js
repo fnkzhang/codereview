@@ -12,7 +12,7 @@ export default function SnapshotSelector({ comments }) {
     const [snapshots, setSnapshots] = useState([])
     const navigate = useNavigate()
 
-    const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+    const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
     // Get snapshots for document
     useEffect(() => {
 
@@ -28,12 +28,12 @@ export default function SnapshotSelector({ comments }) {
 
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
-      navigate(`/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`)
+      navigate(`/Project/${project_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`)
     }
 
     async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedRightSnapshotIndex(selectedIndex)
-      navigate(`/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
+      navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
     }
 
     function filterComments(snapshot) {

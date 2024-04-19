@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { GoogleLogin } from "@react-oauth/google";
-
 import { jwtDecode } from 'jwt-decode';
 import getCookie from "../utils/utils";
 
 export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData } ){
-
-    const[loading, setLoading] = useState(true)
-
 
     const verifyLogin = useCallback(async (credentialResponse) => {
         let oAuthToken = credentialResponse.credential
@@ -45,7 +41,6 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             if (credentialToken == null) {
                 setIsLoggedIn(false)
                 setUserData(null)
-                setLoading(false)
                 return
             }
 
@@ -56,7 +51,6 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             verifyLogin(credentialObject)
         }
 
-        setLoading(false)
 
     }, [verifyLogin, isLoggedIn, setIsLoggedIn, setUserData])
 
@@ -121,16 +115,10 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
     }
 
     function DisplayLoginButton() {
-        if (loading) {
-            return (<div 
-                className='border border-alternative border-2 bg-background text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
-                </div>)
-        }
-
         if (isLoggedIn) {
             return (<div 
-                className='border border-alternative border-2 bg-background text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
-                Logged in as {userData.email}
+                className='border border-alternative border-2 bg-background text-xl text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
+                {userData.email}
                 </div>)
         }
 
