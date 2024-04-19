@@ -18,3 +18,8 @@ export default function getCookie(name) {
     console.log("Cookie not found")
     return null;
 }
+
+export function deleteCookie(name) {
+    // Set the cookie to expire in the past, effectively deleting it
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+}

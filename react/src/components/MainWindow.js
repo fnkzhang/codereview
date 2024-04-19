@@ -22,13 +22,13 @@ export default function MainWindow( props ) {
           snapshots={snapshots}/>
       </div>
     )
-  } else {
-    return(
-      <div>
-        <div className="m-20 text-center text-textcolor text-2xl">
-          You must Log in to view this page.
-        </div>
-      </div>
-    )
   }
+  
+  return(
+    <div>
+      <div className="m-20 text-center text-textcolor text-2xl">
+        You must Log in to view this page.
+      </div>
+    </div>
+  )
 }

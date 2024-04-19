@@ -2,9 +2,6 @@ import ProjectList  from "./Projects/ProjectList";
 
 export default function UserHomePage( props ) {
 
-  console.log(props.isLoggedIn)
-  console.log(props.userData)
-
   if (props.isLoggedIn) {
     return (
       <div>          

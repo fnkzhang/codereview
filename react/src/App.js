@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import Oauth from './components/Oauth.js';
 import UserHomePage from './components/UserHomePage.js';
@@ -8,22 +7,12 @@ import ProjectPage from './components/ProjectPage.js';
 import ProjectCreation from './components/Projects/ProjectCreation.js';
 import ProjectDeletion from './components/Projects/ProjectDeletion.js';
 import DocumentCreation from './components/Documents/DocumentCreation.js';
-import { Navbar, Avatar } from 'flowbite-react';
+import { Navbar } from 'flowbite-react';
 
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userData, setUserData] = useState(null)
-
-  function displayProfileImage(isLoggedIn) {
-    if (isLoggedIn) {
-      return (<Avatar alt="User settings" 
-      img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" 
-      className='w-10 h-10 rounded-sm'/>)
-    }
-
-    return
-  }
 
   return (
     <div> 
@@ -47,7 +36,6 @@ function App() {
                 setUserData={setUserData}
               />
             </Navbar.Brand>
-            {displayProfileImage(isLoggedIn)}
           </div>
         </Navbar>
         <Routes>
