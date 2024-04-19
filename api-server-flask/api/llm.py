@@ -1,21 +1,25 @@
 import json, re
 from typing import List, Optional
+from textwrap import dedent
 
 # pip install "google-cloud-aiplatform>=1.38"
+# pip install --upgrade google-cloud-aiplatform
 # https://ai.google.dev/docs/prompt_best_practices
 import vertexai
-from vertexai.generative_models import GenerativeModel, GenerationConfig, \
-    Content, Part
+from vertexai.generative_models import (
+    GenerativeModel,
+    Content, 
+    Part
+)
+
 
 #------------------------------------------------------------------------------
 # Initialize LLM
 #-------------------------------------------------------------------------------
-model = None
+MODEL_NAME = "gemini-1.5-pro-preview-0409"
 def init_llm(project_id: str="codereview-413200",
              location: str="us-central1"):
-    global model
     vertexai.init(project=project_id, location=location)
-    model = GenerativeModel("gemini-1.0-pro")
 
 #------------------------------------------------------------------------------
 # Helper Functions
@@ -33,20 +37,16 @@ def get_json_from_llm_response(response: str):
 
     return json.loads(json_response)
 
-def get_chat_response(prompt: str,
-                      history: Optional[List["Content"]] = None,
-                      temperature: float=0.15):
-    text_response = []
+def get_chat_response(user_prompt: str,
+                      system_prompt: str = None,
+                      history: Optional[List["Content"]] = None):
+    
+    model = GenerativeModel(MODEL_NAME,
+                            system_instruction=system_prompt)
     chat = model.start_chat(history=history)
     
-    responses = chat.send_message(prompt,
-                                  stream=True,
-                                  generation_config=GenerationConfig(
-                                      temperature=temperature
-                                  ))
-    for chunk in responses:
-        text_response.append(chunk.text)
-    return "".join(text_response)
+    response = chat.send_message(user_prompt)
+    return response.text
 
 def add_few_shot_prompt(example_input, example_output):
     example = []
@@ -61,58 +61,66 @@ def add_few_shot_prompt(example_input, example_output):
 #-------------------------------------------------------------------------------
 def get_llm_code_from_suggestion(code: str,
                                  highlighted_code: str,
+                                 start_line: int,
+                                 end_line: int,
                                  suggestion: str):
     history = []
 
     # Configure System Prompt
-    system_prompt = (
-        "System Prompt: "
-        "Apply [suggestion] to [highlighted_code] which is a substring "
-        "located in [code]. Return the revised code as a JSON with the "
-        "key being \"revised_code\".\n"
-    )
-
-    history.append(get_content("user", system_prompt))
-    history.append(get_content("model", "Understood."))
+    system_prompt = dedent("""\
+        Apply <suggestion> to <highlighted_code> which is located at lines
+        <start_line> to <end_line> of the <code>. Modify the 
+        <highlighted_code> only. Avoid modifying <code>. Return the revised
+        code in a JSON.\
+    """)
 
     # Provide Few-Shot Examples on how the LLM should respond
-    example_json = json.dumps({
-        "revised_code": "say_hello()"
-    })
     history.extend(
         add_few_shot_prompt(
-            example_input = (
-                "[code]: def foo():\n    print(\"Hello World\")\n\nfoo()\n"
-                "[highlighted_code]: foo()\n"
-                "[suggestion]: rename to something more meaningful\n"
-            ),
-            example_output = (
-                "```json\n"
-                f"{example_json}\n"
-                "```\n"
-            )
+            example_input = dedent("""\
+                <code>: ```def foo():
+                            print("Hello World")
+
+                        print("Testing foo()")
+                        foo()
+                        print("Done testing foo()")```
+                <highlighted_code>: ```foo```
+                <start_line>: 1
+                <end_line>: 1
+                <suggestion>: rename to something more meaningful\
+            """),
+            example_output = dedent("""\
+                ```json
+                {"revised_code": "say_hello()"}```\
+            """)
         )
     )
 
     # Configure User Prompt
-    user_prompt = (
-        f"[code]: {code}\n"
-        f"[highlighted_code]: {highlighted_code}\n"
-        f"[suggestion]: {suggestion}\n"
-    )
+    user_prompt = dedent(f"""\
+        <code>: {code}
+        <highlighted_code>: {highlighted_code}
+        <start_line>: {start_line}
+        <end_line>: {end_line}
+        <suggestion>: {suggestion}\
+    """)
 
     # Generate a response from LLM
     try:
-        response = get_chat_response(user_prompt, history=history)
-    except:
+        response = get_chat_response(user_prompt=user_prompt,
+                                     system_prompt=system_prompt,
+                                     history=history)
+    except Exception as e:
         print("Failed to get response from LLM")
+        print(e)
         return None
     
     # Extract the wanted output from response
     try:
         revised_code = get_json_from_llm_response(response)["revised_code"]
-    except:
+    except Exception as e:
         print("Failed to get code from response")
+        print(e)
         return None
 
     print("Implemented Code Generated by AI:", revised_code)
@@ -122,18 +130,12 @@ def get_llm_suggestion_from_code(code: str):
     history = []
 
     # Configure System Prompt
-    system_prompt = (
-        "System Prompt: "
-        "List some suggestions that would improve the quality of [code] "
-        "according to best practices. Return the list of suggestions as "
-        "a JSON with the key being \"suggestions\". with the value being "
-        "a JSON. A JSON suggestion should contain the keys \"startLine\" "
-        "and \"endLine\" to highlight the section of code being referenced "
-        "and the key \"suggestion\" to store the suggestion.\n"
-    )
-
-    history.append(get_content("user", system_prompt))
-    history.append(get_content("model", "Understood."))
+    system_prompt = dedent("""\
+        List some suggestions that would improve the quality of <code> 
+        according to best practices. Return the list of suggestions in a 
+        JSON that contains other JSONs with the code suggestion, start 
+        line of the highlight, and end line of the highlight.\
+    """)
 
     # Provide Few-Shot Examples on how the LLM should respond
     example_suggestions = [
@@ -160,7 +162,7 @@ def get_llm_suggestion_from_code(code: str):
     history.extend(
         add_few_shot_prompt(
             example_input = (
-                "[code]: def calc_avg(n):\n    tot=0\n    cnt=0\n    for number in n:\n      tot = tot+ number\n      cnt= cnt+1\n    average=tot/cnt"
+                "<code>: def calc_avg(n):\n    tot=0\n    cnt=0\n    for number in n:\n      tot = tot+ number\n      cnt= cnt+1\n    average=tot/cnt"
             ),
             example_output = (
                 "```json\n"
@@ -171,22 +173,26 @@ def get_llm_suggestion_from_code(code: str):
     )
 
     # Configure User Prompt
-    user_prompt = (
-        f"[code]: {code}\n"
-    )
+    user_prompt = dedent(f"""\
+        <code>: {code}\
+    """)
 
     # Generate a response from LLM
     try:
-        response = get_chat_response(user_prompt, history=history)
-    except:
+        response = get_chat_response(user_prompt=user_prompt,
+                                     system_prompt=system_prompt,
+                                     history=history)
+    except Exception as e:
         print("Failed to get response from LLM")
+        print(e)
         return None
     
     # Extract the wanted output from response
     try:
         suggestions = get_json_from_llm_response(response)["suggestions"]
-    except:
+    except Exception as e:
         print("Failed to get suggestions from response")
+        print(e)
         return None
 
     print("Comment Suggestions Generated by AI:")
