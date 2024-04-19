@@ -24,6 +24,21 @@ from llm import init_llm, get_llm_code_from_suggestion, get_llm_suggestion_from_
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
 init_llm()
+# Remove Later for testing
+@app.route('/createTable')
+def createTable():
+    engine = connectCloudSql()
+    
+    models.Comment.metadata = models.Base.metadata
+
+    models.Comment.metadata.create_all(engine)
+    models.User.metadata = models.Base.metadata
+    models.User.metadata.create_all(engine)
+    models.UserProjectRelation.metadata = models.Base.metadata
+    models.UserProjectRelation.metadata.create_all(engine)
+    #metaData.create_all(engine)
+    print("Table was created")
+    return "Created Table"
 
 @app.after_request
 def afterRequest(response):
@@ -250,7 +265,7 @@ def getProject(proj_id):
         "reason": "",
         "body": projectData
     }
-@app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
+@app.route('/api/Project/<proj_id>/Documents/', methods = ["GET"])
 def getProjectDocuments(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -541,6 +556,78 @@ def createDocument(proj_id):
         "body": doc_id
     }
 
+#requires
+    #credentials in headers
+    #In body:
+    #parent_folder (folder you're moving it to
+@app.route('/api/Document/<doc_id>/move/', methods=["POST"])
+def moveDocument(doc_id):
+    inputBody = request.get_json()
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    folder = inputBody["parent_folder"]
+    if not moveDocumentUtil(doc_id, folder):
+        return {"success": False,
+                "reason":"invalid document"
+                }
+    return {
+        "success": True,
+        "reason": "",
+        "body": ""
+    }
+
+    #requires
+    #credentials in headers
+    #In body:
+    #parent_folder (folder you're moving it to
+@app.route('/api/Folder/<folder_id>/move/', methods=["POST"])
+def moveFolder(folder_id):
+    inputBody = request.get_json()
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    parent_folder = inputBody["parent_folder"]
+    if not moveFolderUtil(folder_id, parent_folder):
+        return {"success": False,
+                "reason":"invalid document"
+                }
+    return {
+        "success": True,
+        "reason": "",
+        "body": ""
+    }
+
+
+
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
 def getAllDocumentSnapshots(proj_id, doc_id):
     headers = request.headers
@@ -573,6 +660,7 @@ def getAllDocumentSnapshots(proj_id, doc_id):
 
 @app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id):
+    print(request)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -988,7 +1076,7 @@ def deleteComment(comment_id):
         "reason": "Successful Delete"
     }
 #needs auth because everything does lmao
-#put token in the body in "github_token"
+#put code in the body in "github_code"
 @app.route('/api/Github/addToken', methods=["POST"])
 def addGithubToken():
     headers = request.headers
@@ -1006,9 +1094,10 @@ def addGithubToken():
         }
 
     body = request.get_json()
-    token = body["github_token"]
+    code = body["github_code"]
+    token = gapp.get_access_token(code)
     with engine.connect() as conn:
-        stmt = update(models.User).where(models.User.user_email == idInfo["email"]).values(github_token = token)
+        stmt = update(models.User).where(models.User.user_email == idInfo["email"]).values(github_token = token.token)
         conn.execute(stmt)
         conn.commit()
     return {"success":True,
@@ -1016,43 +1105,38 @@ def addGithubToken():
         }
 
 #needs auth because everything does lmao
-#needs "ownername", "reponame", github repo is ownername/reponame, they must be separated or else it doesn't register
-@app.route('/api/Github/Repo/<ownername>/<reponame>/', methods=["GET"])
-def getRepoBranchesFromGithub(ownername, reponame):
+#needs "owner_name", "repo_name", github repo is ownername/reponame, they must be separated or else it doesn't register
+@app.route('/api/Github/<owner_name>/<repo_name>/', methods=["GET"])
+def getGithubRepositoryBranches(owner_name, repo_name):
     headers = request.headers
-    '''
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
                 "reason": "Invalid Token Provided"
         }
-    '''
-    idInfo = {"email":"billingtonbill12@gmail.com"}#authenticate()
+
+    idInfo = authenticate()
     if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
         }
-        #
-    #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    #body = request.get_json()
-    user = getUserInfo(idInfo["email"])
-    success, rv = getBranches(user["github_token"], ownername + '/' + reponame)#body["repository"])
+    token = getUserInfo(idInfo["email"])["github_token"]
+    success, rv = getBranches(token, owner_name + '/' + repo_name)#body["repository"])
     if (not success):
         return {"success":False,
-                "reason": rv
+                "reason": str(rv)
                 }
     return {"success":True,
             "reason": "",
-            "body":rv
+            "body": rv
         }
 
 
 #needs auth
 #put repository path in "repository" and branch in "branch"
 #format -> repository = "fnkzhang/codereview", branch = "main"
-@app.route('/api/Github/Pull/<proj_id>', methods=["GET"])
+@app.route('/api/Github/<proj_id>/Pull/', methods=["POST"])
 def pullFromBranch(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -1068,16 +1152,16 @@ def pullFromBranch(proj_id):
             "reason": "Failed to Authenticate"
         }
         #
-    #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     body = request.get_json()
     user = getUserInfo(idInfo["email"])
-
-    g = Github(auth = Auth.Token(user["github_token"]))
-    repo = g.get_repo(repository)
+    g2 = Github(auth = Auth.Token(user["github_token"]))
+    repo = g2.get_repo(body["repository"])
     project = getProjectInfo(proj_id)
     folders = getAllProjectFolders(proj_id)
-    pathToFolderID = []
+    pathToFolderID = {}
     pathToFolderID[""] = project["root_folder"]
     contents = repo.get_contents("", body["branch"])
     updated_files = []
@@ -1118,42 +1202,98 @@ def pullFromBranch(proj_id):
         deleteDocumentUtil(doc_to_delete)
     for folder_to_delete in folders_to_delete:
         deleteFolderUtil(folder_to_delete)
-
+    deleteProjectDeletedDocuments(proj_id)
     return {"success":True, "reason":"", "body":updated_files}
+
+@app.route('/api/DeletedDocuments/<proj_id>/', methods=["GET"])
+def getProjectDeletedDocuments(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+    with engine.connect() as conn:
+        stmt = select(models.DeletedDocument).where(models.DeletedDocument.associated_proj_id == int(proj_id))
+
+        results = conn.execute(stmt)
+
+        arrayOfDocuments = []
+
+        for row in results:
+            arrayOfDeletedDocuments.append(row._asdict())
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": arrayOfDeletedDocuments
+    }
 
 #testfunctionifthatwasn'tobviousbyitsname, is currently emulating push
 #put list of snapshots ID's to push in "snapshots"
+#put list of document ID's to delete in "deleteddocuments"
 #put repository in "repository"
 #put branchname in "branch"
 #put commit message in "message", or if we eventually put a generic message that's fine
-@app.route('/api/test/<proj_id>/', methods=["POST"])
-def testo(proj_id):
-    '''auth lmao'''
+@app.route('/api/Github/<proj_id>/Push/', methods=["POST"])
+def pushToBranch(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+        #
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     body = request.get_json()
-    idInfo = {"email":"billingtonbill12@gmail.com"}
     user = getUserInfo(idInfo["email"])
-    g = Github(auth = Auth.Token(user["github_token"]))
-    g.get_user().login
-    repo = g.get_repo(body["repository"])
-    project = getProjectInfo(proj_id)
-    folders = getAllProjectFolders(proj_id)
+    token = user["github_token"]
+    g2 = Github(auth = Auth.Token(token))
+    repo = g2.get_repo(body["repository"])
     updated_files = []
-    documents = getAllProjectDocuments(proj_id)
     folderIDToPath = getProjectFoldersAsPaths(proj_id)
     body = request.get_json()
     snapshotIDs = body["snapshots"]
-    blobs = {}
+    deletedDocumentIDs = body["deleteddocuments"]
     tree_elements = []
+    for deletedDocumentID in deletedDocumentIDs:
+        deletedDocument = getDeletedDocumentInfo(deletedDocumentID)
+        tree_elements.append(InputGitTreeElement(path = deletedDocument["path"],
+                mode = "100644",
+                type = "blob",
+                sha = None
+            ))
     for snapshotID in snapshotIDs:
         snapshot = getSnapshotInfo(snapshotID)
         document = getDocumentInfo(snapshot["associated_document_id"])
+        blob = repo.create_git_blob(
+                content = getSnapshotContentUtil(snapshotID),
+                encoding = 'utf-8',
+                )
         tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
                 mode = "100644",
                 type = "blob",
-                sha = repo.create_git_blob(
-                content = getSnapshotContentUtil(snapshotID),
-                encoding = 'utf-8',
-                ).sha
+                sha = blob.sha
             ))
     branch_sha = repo.get_branch(body["branch"]).commit.sha
     try:

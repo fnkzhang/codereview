@@ -28,6 +28,13 @@ CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleuserconten
 
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
+with open('github_oath_credentials.json') as creds:
+    creds = json.load(creds)
+    github_client_id = creds["client-id"]
+    github_client_secret = creds["client-secret"]
+
+g = Github()
+gapp = g.get_oauth_application(github_client_id, github_client_secret)
 
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
@@ -131,6 +138,15 @@ def getDocumentInfo(doc_id):
             return None
         return foundDocument._asdict()
 
+def getDeletedDocumentInfo(doc_id):
+    with engine.connect() as conn:
+        stmt = select(models.DeletedDocument).where(models.DeletedDocument.doc_id == doc_id)
+        foundDocument = conn.execute(stmt).first()
+        if foundDocument == None:
+            return None
+        return foundDocument._asdict()
+
+
 def getDocumentInfoViaLocation(name, parent_folder):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.name == name, models.Document.parent_folder == parent_folder)
@@ -153,6 +169,66 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
     createNewSnapshot(proj_id, doc_id, item)
     return doc_id
 
+def moveDocumentUtil(doc_id, parent_folder):
+    with engine.connect() as conn:
+        if not createNewDeletedDocument(doc_id):
+            return -1
+        stmt = (update(models.Document)
+        .where(models.Document.doc_id == doc_id)
+        .values(parent_folder = parent_folder)
+        )
+        conn.execute(stmt)
+        conn.commit()
+
+        path = getDocumentPath(doc_id)
+        document = getDocumentInfo(doc_id)
+        stmt = delete(models.DeletedDocument).where(models.DeletedDocument.path == path, models.DeletedDocument.associated_proj_id == document["associated_proj_id"])
+        conn.execute(stmt)
+        conn.commit()
+    return parent_folder
+
+def moveFolderUtil(folder_id, parent_folder):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.parent_folder == folder_id)
+        childDocuments = conn.execute(stmt)
+        for document in childDocuments:
+            moveDocumentUtil(document.doc_id, folder_id)
+        stmt = select(models.Folder).where(models.Folder.parent_folder == folder_id)
+        childFolders = conn.execute(stmt)
+        for folder in childFolders:
+            moveFolderUtil(folder.folder_id, folder_id)
+        stmt = (update(models.Folder)
+        .where(models.Folder.folder_id == folder_id)
+        .values(parent_folder = parent_folder)
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return parent_folder
+
+def createNewDeletedDocument(doc_id):
+    document = getDocumentInfo(doc_id)
+    path = getDocumentPath(doc_id)
+    if document == None:
+        return -1
+    with engine.connect() as conn:
+        stmt = insert(models.DeletedDocument).values(
+                doc_id = doc_id,
+                associated_proj_id = document["associated_proj_id"],
+                path = path
+            )
+        conn.execute(stmt)
+        conn.commit()
+    return doc_id
+
+def getDocumentPath(doc_id):
+    document = getDocumentInfo(doc_id)
+    paths = getProjectFoldersAsPaths(document["associated_proj_id"])
+    return paths[document["parent_folder"]] + document["name"]
+
+def getFolderPath(folder_id):
+    folder = getFolderInfo(folder_id)
+    paths = getProjectFoldersAsPaths(folder["associated_proj_id"])
+    return paths[folder["parent_folder"]] + folder["name"]
 
 def getFolderInfo(folder_id):
     with engine.connect() as conn:
@@ -252,6 +328,7 @@ def deleteSnapshotUtil(snapshot_id):
 
 def deleteDocumentUtil(doc_id):
     try:
+        createNewDeletedDocument(doc_id)
         with engine.connect() as conn:
             stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
             snapshots = conn.execute(stmt)
@@ -259,7 +336,26 @@ def deleteDocumentUtil(doc_id):
                 deleteSnapshotUtil(snapshot.snapshot_id)
             stmt = delete(models.Document).where(models.Document.doc_id == doc_id)
             conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
 
+def deleteDeletedDocumentUtil(doc_id):
+    try:
+        with engine.connect() as conn:
+            stmt = delete(models.DeletedDocument).where(models.DeletedDocument.doc_id == doc_id)
+            conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
+
+def deleteProjectDeletedDocuments(proj_id):
+    try:
+        with engine.connect() as conn:
+            stmt = delete(models.DeletedDocument).where(models.DeletedDocument.associated_proj_id == proj_id)
+            conn.execute(stmt)
             conn.commit()
         return True, "No Error"
     except Exception as e:
@@ -343,14 +439,14 @@ def isValidRequest(parameters, requiredKeys):
 
     return True
 
+
 #repository = "user/reponame", aka just github style
 def getBranches(token, repository):
     try:
         auth = Auth.Token(token)
-        g = Github(auth=auth)
-        g.get_user().login
+        g2 = Github(auth=auth)
         
-        repo = g.get_repo(repository)
+        repo = g2.get_repo(repository)
         branches = list(repo.get_branches())
         branchnames = []
         for branch in branches:
@@ -358,6 +454,7 @@ def getBranches(token, repository):
         return True, branchnames
     except Exception as e:
         return False, e
+
 def getAllFolderContents(folder_id):
     with engine.connect() as conn:
         stmt = select(models.Folder).where(models.Folder.parent_folder == folder_id)
@@ -400,9 +497,9 @@ def getFolderPathsFromList(folder_id, current_path,list_of_folders):
             list_of_folders.remove(folder)
             foldersInFolder.append(folder)
     for folder in foldersInFolder:
-            folderpath = current_path + folder["name"] + '/'
-            folderIDToPath[folder["folder_id"]] = folderpath
-            folderIDToPath.update(getFolderPathsFromList(folder["folder_id"], folderpath, list_of_folders))
+        folderpath = current_path + folder["name"] + '/'
+        folderIDToPath[folder["folder_id"]] = folderpath
+        folderIDToPath.update(getFolderPathsFromList(folder["folder_id"], folderpath, list_of_folders))
     return folderIDToPath
 
 def getProjectFoldersAsPaths(proj_id):
