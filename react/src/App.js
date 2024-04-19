@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import Oauth from './components/Oauth.js';
 import UserHomePage from './components/UserHomePage.js';
@@ -26,17 +27,18 @@ function App() {
 
   return (
     <div> 
-      {/* MOST LIKELY MOVE THIS INTO PROJECT LATER INSTEAD OF OUTSIDE */}
-      <Navbar fluid rounded className='text-3xl text-textcolor p-5 
-      list-none justify-between bg-[#373b49] border-b-2 border-slate-500 mb-2'>
+      <Router>
+              {/* MOST LIKELY MOVE THIS INTO PROJECT LATER INSTEAD OF OUTSIDE */}
+        <Navbar fluid rounded className='text-3xl text-textcolor p-5 
+        list-none justify-between bg-[#373b49] border-b-2 border-slate-500 mb-2'>
           <div className='flex-1'>
-            <Navbar.Brand href="#">
+            <Navbar.Brand>
                 <p>Code Review</p>
               </Navbar.Brand>
           </div>
 
           <div className='flex flex-1 justify-around align-middle'>
-            <Navbar.Link href="/" active>Home</Navbar.Link>
+            <Navbar.Brand href="/" active>Home</Navbar.Brand>
             <Navbar.Brand>
               <Oauth
                 isLoggedIn={isLoggedIn}
@@ -48,8 +50,6 @@ function App() {
             {displayProfileImage(isLoggedIn)}
           </div>
         </Navbar>
-
-      <Router>
         <Routes>
           {/*<Route exact path="/" element={<ReviewWindow/>} /> */}
           <Route path="/" element={<UserHomePage

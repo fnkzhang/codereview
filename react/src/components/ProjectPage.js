@@ -6,21 +6,26 @@ import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo } from
 // Display Documents For Project
 export default function ProjectPage( props ) {
 
+  const [loading, setLoading] = useState(true)
   const [projectDocuments, setProjectDocuments] = useState([])
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
   const [projectRootFolderID, setProjectRootFolderID] = useState(null)
+  const [projectName, setProjectName] = useState(null)
 
   const { project_id } = useParams()
   const navigate = useNavigate()
 
+
   // Grab Documents if logged in and userdata
   useEffect(() => {
+    console.log(loading)
     async function grabProjectData() {
       let result = await getProjectInfo(project_id)
       console.log(result)
       
       setProjectRootFolderID(result.root_folder)
       setProjectOwnerEmail(result.author_email)
+      setProjectName(result.name)
     }
 
     // Grab User Data
@@ -29,10 +34,21 @@ export default function ProjectPage( props ) {
       console.log(docArray)
       setProjectDocuments(docArray)
     } 
-    grabProjectDocuments()
 
-    grabProjectData()
+    async function fetchData() {
+      try {
+        await Promise.all([
+          grabProjectDocuments(),
+          grabProjectData()
+        ])
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
+    fetchData()
   }, [])
 
   // Clicking on project will redirect to project page to select documents
@@ -120,11 +136,31 @@ export default function ProjectPage( props ) {
     )
   }
 
+  if( props.isLoggedIn === false ) {
+    return (
+    <div>
+      <div className="m-20 text-center text-textcolor text-2xl">
+        You must Log in to view this page.
+      </div>
+    </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <div className="text-textcolor text-center m-20 text-xl">
+          Loading...
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="flex">
         <div>
-          <h3 className="text-textcolor text-2xl m-2">Project ID: {project_id}</h3>
+          <h3 className="text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
         </div>
 
         <DisplayDeleteButton/>
