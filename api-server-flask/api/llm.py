@@ -92,7 +92,7 @@ CALCULATE_AVERAGE_CODE = """\
 #------------------------------------------------------------------------------
 # Initialize LLM
 #-------------------------------------------------------------------------------
-MODEL_NAME = "gemini-1.5-pro-preview-0409"
+MODEL_NAME = "gemini-1.5-pro-preview-0409"#"gemini-1.0-pro"
 def init_llm(project_id: str="codereview-413200",
              location: str="us-central1"):
     vertexai.init(project=project_id, location=location)
@@ -105,18 +105,17 @@ def get_json_from_llm_response(response: str):
     json_match = re.search(r"```json\s*(.*?)\s*```", response, re.DOTALL)
 
     json_response = json_match.group(1) if json_match else response
-    print("JSON response by LLM: ", json_response)
 
     return json.loads(json_response)
 
 def get_chat_response(user_prompt: str,
                       system_prompt: str = None):
-
     model = GenerativeModel(MODEL_NAME,
                             system_instruction=system_prompt)
     chat = model.start_chat()
 
     response = chat.send_message(user_prompt)
+
     return response.text
 
 def add_few_shot_example(example_number, example_input, example_output):
