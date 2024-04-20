@@ -122,6 +122,12 @@ def get_chat_response(user_prompt: str,
 def add_few_shot_example(example_number, example_input, example_output):
     return FEW_SHOT_EXAMPLE.format(example_number, example_input, example_output, example_number)
 
+def get_code_with_line_numbers(code: str):
+    return '\n'.join([
+        f"{i+1}| {line}" 
+        for i, line in enumerate(code.splitlines())
+    ])
+
 #------------------------------------------------------------------------------
 # Functions used by route
 #-------------------------------------------------------------------------------
@@ -138,7 +144,8 @@ def get_llm_code_from_suggestion(code: str,
     system_prompt += add_few_shot_example(
         example_number=1,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-            SAY_HELLO_CODE,"foo", 1, 1,
+            SAY_HELLO_CODE,"foo",
+            1, 1,
             "rename to something more meaningful"
         ),
         example_output=json.dumps({
@@ -148,13 +155,8 @@ def get_llm_code_from_suggestion(code: str,
     system_prompt += "</examples>"
 
     # Configure User Prompt
-    lines = code.splitlines()
-    code_with_line_number = ""
-    for line_number, line in enumerate(lines, start=1):
-        code_with_line_number += f"{line_number}| {line}\n"
-
     user_prompt=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-        code_with_line_number, highlighted_code,
+        get_code_with_line_numbers(code), highlighted_code,
         start_line, end_line,
         suggestion
     )
@@ -215,11 +217,9 @@ def get_llm_suggestion_from_code(code: str,
     system_prompt += "</examples>"
 
     # Configure User Prompt
-    lines = code.splitlines()
-    code_with_line_number = ""
-    for line_number, line in enumerate(lines, start=1):
-        code_with_line_number += f"{line_number}| {line}\n"
-    user_prompt = USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(code_with_line_number)
+    user_prompt = USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
+        get_code_with_line_numbers(code)
+    )
 
     # Generate a response from LLM
     try:
