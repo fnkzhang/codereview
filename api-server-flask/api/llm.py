@@ -1,17 +1,93 @@
 import json, re
-from typing import List, Optional
-from textwrap import dedent
 
 # pip install "google-cloud-aiplatform>=1.38"
 # pip install --upgrade google-cloud-aiplatform
 # https://ai.google.dev/docs/prompt_best_practices
 import vertexai
 from vertexai.generative_models import (
-    GenerativeModel,
-    Content, 
-    Part
+    GenerativeModel
 )
 
+#------------------------------------------------------------------------------
+# System Instruction Prompts
+#-------------------------------------------------------------------------------
+SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION = """\
+Apply the user's suggestion to the highlighted code which is located at lines
+between the start line and end line of the code. Modify the highlighted code. 
+Avoid modifying the original code. Return a JSON object with the key 
+"revised_code".
+"""
+SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE = """\
+In all of your replies, speak like {}.
+Generate multiple suggestions to improve the quality of code. Provide a 
+diverse set of recommendations for enhancing the code's readability, 
+performance, and maintainability. Return a JSON object with the key 
+"suggestions" and a list of JSON objects. Each object in the list should 
+contain 'startLine', 'endLine', and 'suggestion' keys, indicating the 
+highlighted code lines and suggested changes. Be creative and offer as many 
+suggestions as you can think of!
+"""
+#------------------------------------------------------------------------------
+# User Instruction Prompt Formats
+#-------------------------------------------------------------------------------
+USER_INSTRUCTION_CODE_FROM_SUGGESTION = """
+<code>
+{}
+</code>
+<highlighted_code>
+{}
+</highlighted_code>
+<start_line>
+{}
+</start_line>
+<end_line>
+{}
+</end_line>
+<suggestion>
+{}
+</suggestion>
+"""
+USER_INSTRUCTION_SUGGESTION_FROM_CODE = """
+<code>
+{}
+</code>
+"""
+#------------------------------------------------------------------------------
+# Few-Shot Prompt Format
+#-------------------------------------------------------------------------------
+FEW_SHOT_EXAMPLE = """
+<example_{}>
+<input>
+{}
+</input>
+<output>
+{}
+</output>
+</example_{}>
+"""
+
+#------------------------------------------------------------------------------
+# Few-Shot Examples
+#-------------------------------------------------------------------------------
+SAY_HELLO_CODE = """\
+1| def foo():
+2|     print("Hello World!")
+3|
+4| print("Testing foo()")
+5| foo()
+6| print("Done testing foo()")
+"""
+
+CALCULATE_AVERAGE_CODE = """\
+1|def calc_avg(n):
+2|    tot=0
+3|    cnt=0
+4|    for number in n:
+5|      tot = tot+ number
+6|      cnt= cnt+1
+7|
+8|    average=tot/cnt
+"""
 
 #------------------------------------------------------------------------------
 # Initialize LLM
@@ -24,10 +100,6 @@ def init_llm(project_id: str="codereview-413200",
 #------------------------------------------------------------------------------
 # Helper Functions
 #-------------------------------------------------------------------------------
-def get_content(role: str,
-                text: str):
-    return Content(role=role,
-                   parts=[Part.from_text(text)])
 
 def get_json_from_llm_response(response: str):
     json_match = re.search(r"```json\s*(.*?)\s*```", response, re.DOTALL)
@@ -38,23 +110,17 @@ def get_json_from_llm_response(response: str):
     return json.loads(json_response)
 
 def get_chat_response(user_prompt: str,
-                      system_prompt: str = None,
-                      history: Optional[List["Content"]] = None):
-    
+                      system_prompt: str = None):
+
     model = GenerativeModel(MODEL_NAME,
                             system_instruction=system_prompt)
-    chat = model.start_chat(history=history)
-    
+    chat = model.start_chat()
+
     response = chat.send_message(user_prompt)
     return response.text
 
-def add_few_shot_prompt(example_input, example_output):
-    example = []
-
-    example.append(get_content("user", example_input))
-    example.append(get_content("model", example_output))
-
-    return example
+def add_few_shot_example(example_number, example_input, example_output):
+    return FEW_SHOT_EXAMPLE.format(example_number, example_input, example_output, example_number)
 
 #------------------------------------------------------------------------------
 # Functions used by route
@@ -64,57 +130,44 @@ def get_llm_code_from_suggestion(code: str,
                                  start_line: int,
                                  end_line: int,
                                  suggestion: str):
-    history = []
-
     # Configure System Prompt
-    system_prompt = dedent("""\
-        Apply <suggestion> to <highlighted_code> which is located at lines
-        <start_line> to <end_line> of the <code>. Modify the 
-        <highlighted_code> only. Avoid modifying <code>. Return the revised
-        code in a JSON.\
-    """)
+    system_prompt = SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION
 
     # Provide Few-Shot Examples on how the LLM should respond
-    history.extend(
-        add_few_shot_prompt(
-            example_input = dedent("""\
-                <code>: ```def foo():
-                            print("Hello World")
-
-                        print("Testing foo()")
-                        foo()
-                        print("Done testing foo()")```
-                <highlighted_code>: ```foo```
-                <start_line>: 1
-                <end_line>: 1
-                <suggestion>: rename to something more meaningful\
-            """),
-            example_output = dedent("""\
-                ```json
-                {"revised_code": "say_hello()"}```\
-            """)
-        )
+    system_prompt += "<examples>\n"
+    system_prompt += add_few_shot_example(
+        example_number=1,
+        example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
+            SAY_HELLO_CODE,"foo", 1, 1,
+            "rename to something more meaningful"
+        ),
+        example_output=json.dumps({
+            "revised_code": "say_hello"
+        })
     )
+    system_prompt += "</examples>"
 
     # Configure User Prompt
-    user_prompt = dedent(f"""\
-        <code>: {code}
-        <highlighted_code>: {highlighted_code}
-        <start_line>: {start_line}
-        <end_line>: {end_line}
-        <suggestion>: {suggestion}\
-    """)
+    lines = code.splitlines()
+    code_with_line_number = ""
+    for line_number, line in enumerate(lines, start=1):
+        code_with_line_number += f"{line_number}| {line}\n"
+
+    user_prompt=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
+        code_with_line_number, highlighted_code,
+        start_line, end_line,
+        suggestion
+    )
 
     # Generate a response from LLM
     try:
         response = get_chat_response(user_prompt=user_prompt,
-                                     system_prompt=system_prompt,
-                                     history=history)
+                                     system_prompt=system_prompt)
     except Exception as e:
         print("Failed to get response from LLM")
         print(e)
         return None
-    
+
     # Extract the wanted output from response
     try:
         revised_code = get_json_from_llm_response(response)["revised_code"]
@@ -126,67 +179,57 @@ def get_llm_code_from_suggestion(code: str,
     print("Implemented Code Generated by AI:", revised_code)
     return revised_code
 
-def get_llm_suggestion_from_code(code: str):
-    history = []
-
+def get_llm_suggestion_from_code(code: str,
+                                 character="a developer at a code review session"):
     # Configure System Prompt
-    system_prompt = dedent("""\
-        List some suggestions that would improve the quality of <code> 
-        according to best practices. Return the list of suggestions in a 
-        JSON that contains other JSONs with the code suggestion, start 
-        line of the highlight, and end line of the highlight.\
-    """)
+    system_prompt = SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE.format(character)
 
     # Provide Few-Shot Examples on how the LLM should respond
-    example_suggestions = [
-        json.dumps({
-            "startLine": 1,
-            "endLine": 3,
-            "suggestion": "Rename `n`, `tot`, and `cnt` to more descriptive names such as `numbers`, `total_sum`, and `count` respectively."
-        }),
-        json.dumps({
-            "startLine": 4,
-            "endLine": 6,
-            "suggestion": "This works, but use Python's built-in functions like sum() and len() instead." 
-        }),
-        json.dumps({
-            "startLine": 7,
-            "endLine": 7,
-            "suggestion": "You forgot a return statement. The function calculates the average but does nothing with it." 
-        })
-    ]
-    example_json = json.dumps({
-        "suggestions": example_suggestions
-    })
+    system_prompt += "<examples>\n"
 
-    history.extend(
-        add_few_shot_prompt(
-            example_input = (
-                "<code>: def calc_avg(n):\n    tot=0\n    cnt=0\n    for number in n:\n      tot = tot+ number\n      cnt= cnt+1\n    average=tot/cnt"
-            ),
-            example_output = (
-                "```json\n"
-                f"{example_json}\n"
-                "```\n"
-            )
-        )
+    system_prompt += add_few_shot_example(
+        example_number=1,
+        example_input=USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
+            CALCULATE_AVERAGE_CODE
+        ),
+        example_output=json.dumps({
+            "suggestions": [
+                json.dumps({
+                    "startLine": 1,
+                    "endLine": 3,
+                    "suggestion": "Rename `n`, `tot`, and `cnt` to more descriptive names such as `numbers`, `total_sum`, and `count` respectively."
+                }),
+                json.dumps({
+                    "startLine": 4,
+                    "endLine": 6,
+                    "suggestion": "This works, but use Python's built-in functions like sum() and len() instead."
+                }),
+                json.dumps({
+                    "startLine": 7,
+                    "endLine": 7,
+                    "suggestion": "You forgot a return statement. The function calculates the average but does nothing with it."
+                })
+            ]
+        })
     )
+    system_prompt += "</examples>"
 
     # Configure User Prompt
-    user_prompt = dedent(f"""\
-        <code>: {code}\
-    """)
+    lines = code.splitlines()
+    code_with_line_number = ""
+    for line_number, line in enumerate(lines, start=1):
+        code_with_line_number += f"{line_number}| {line}\n"
+    user_prompt = USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(code_with_line_number)
 
     # Generate a response from LLM
     try:
         response = get_chat_response(user_prompt=user_prompt,
-                                     system_prompt=system_prompt,
-                                     history=history)
+                                     system_prompt=system_prompt)
     except Exception as e:
         print("Failed to get response from LLM")
         print(e)
         return None
-    
+
     # Extract the wanted output from response
     try:
         suggestions = get_json_from_llm_response(response)["suggestions"]
