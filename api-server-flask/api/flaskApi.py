@@ -895,7 +895,7 @@ def implement_code_changes_from_comment():
     }
 
 # EXAMPLE:
-# curl -X POST http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTo(2))"}'
+# curl -X POST http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "#include <ioteam>\n\nint main() {\n    int num = 4;\n    switch(num) {\n        case 4:\n            std::cout << \"4\" << std::endl;\n            break;\n        default:\n            std::cout << \"not 4\" << std::edl\n            break;\n    }\n    return 0;\n}"}'
 @app.route("/api/llm/comment-suggestion", methods=["POST"])
 def suggest_comment_from_code():
     data = request.get_json()

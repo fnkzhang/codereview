@@ -300,7 +300,7 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
     },
     body: JSON.stringify({
       "code": code,
-      "highlighedCode": highlightedCode,
+      "highlightedCode": highlightedCode,
       "startLine": startLine,
       "endLine": endLine,
       "comment": comment
