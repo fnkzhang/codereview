@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text, ARRAY
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 import uuid
@@ -34,6 +34,7 @@ class User(Base):
     name = Column(String(50))
     #username = Column(String(50)) #unsure if user_id is necessary if username is already unique
     date_joined = Column(DateTime(timezone=True), server_default=func.now())
+    github_token = Column(String(50))
 
 class Project(Base):
     __tablename__ = "projects"
@@ -71,17 +72,23 @@ class Document(Base):
     doc_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
     # Allow us to find project the document is associated with
     associated_proj_id = Column(Integer)
-    name = Column(String(50))
+    name = Column(String(50), primary_key=True)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-
     parent_folder = Column(Integer)
 
 class Folder(Base):
     __tablename__ = "folders"
     folder_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
     name = Column(String(50))
+
     associated_proj_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    parent_folder = Column(Integer)
+    parent_folder = Column(Integer, primary_key=True)
+
+class DeletedDocument(Base):
+    __tablename__ = "deleteddocuments"
+    doc_id = Column(Integer, primary_key=True)
+    associated_proj_id = Column(Integer)
+    path = Column(Text)
