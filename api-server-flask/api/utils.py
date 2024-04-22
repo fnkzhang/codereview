@@ -20,11 +20,11 @@ from github import Auth
 
 import models
 
-from cacheUtils import cloudStorageCache, publishTopicUpdate
-
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
 os.environ["GCLOUD_PROJECT"] = "codereview-413200"
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
+
+from cacheUtils import cloudStorageCache, publishTopicUpdate
 
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
@@ -32,6 +32,7 @@ Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_b
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
+    print("Uploading to", blobName)
     blob = bucket.blob(blobName)
     blob.upload_from_string(data = item, content_type='application/json')
     
@@ -150,9 +151,9 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
         )
         conn.execute(stmt)
         conn.commit()
+
     createNewSnapshot(proj_id, doc_id, item)
     return doc_id
-
 
 def getFolderInfo(folder_id):
     with engine.connect() as conn:
@@ -436,17 +437,22 @@ def fetchFromCloudStorage(blobName:str):
       blobName:
         Name of the blob to retrieve.
     '''
-    blobContents = cloudStorageCache.get(blobName)
-    if blobContents is None:
-        blobContents = getBlob(blobName)
-        print('uncached\n\n\n')
-    else:
-        print('cached\n\n\n')
-    
-    if blobContents is not None:
-        cloudStorageCache.set(blobName, blobContents)
-    
-    return blobContents
+    try:
+
+        blobContents = cloudStorageCache.get(blobName)
+        if blobContents is None:
+            blobContents = getBlob(blobName)
+            print('uncached\n\n\n')
+        else:
+            print('cached\n\n\n')
+        
+        if blobContents is not None:
+            cloudStorageCache.set(blobName, blobContents)
+        
+        return blobContents
+    except Exception as e:
+        print(e)
+        return None
 
 def publishCloudStorageUpdate(blobName: str):
     '''

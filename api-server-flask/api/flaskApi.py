@@ -193,8 +193,10 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+
     pid = createID()
     root_folder_id = createNewFolder('root', 0, pid)
+    
     with engine.connect() as conn:
         projstmt = insert(models.Project).values(
                 proj_id = pid,
@@ -444,6 +446,7 @@ def removeUser(proj_id):
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
 def createSnapshot(proj_id, doc_id):
+    print(proj_id, doc_id)
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -459,18 +462,17 @@ def createSnapshot(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #todo:make this a function
-    #if not userExists(idInfo["email"]):
-    #    retData = {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
-    #    return jsonify(retData)
+    if not userExists(idInfo["email"]):
+       retData = {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
+       return jsonify(retData)
 
-    # if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
-    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    ##########################
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"])
     return {
         "success": True,
@@ -480,6 +482,7 @@ def createSnapshot(proj_id, doc_id):
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
 def getSnapshot(proj_id, doc_id, snapshot_id):
+    print("GETTING SNAPSHOT", proj_id, doc_id, snapshot_id)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -496,6 +499,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+        
     blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
     return {
         "success": True,
@@ -782,7 +786,6 @@ def createComment(snapshot_id):
 @app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
 def resolveComment(comment_id):
     # Authentication
-    print("TEST")
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -881,6 +884,135 @@ def getAllCommentsForDocument(document_id):
         "success": True,
         "reason": "Found all Comments For All Snapshots for document",
         "body": listOfComments
+    }
+
+    #snapshotIdList = 
+    #requires
+    #credentials in headers
+
+    #In body:
+    #data (text you want in the document)
+    #doc_name (name of document)
+    #parent_folder (folder you're making it in)
+@app.route('/api/Document/<proj_id>/', methods=["POST"])
+def createDocument(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    createNewDocument(inputBody["document_name"], inputBody["parent_folder_id"], inputBody["project_id"], inputBody["data"])
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": inputBody
+    }
+
+@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
+def getAllDocumentSnapshots(proj_id, doc_id):
+    headers = request.headers
+ 
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if not userExists(idInfo["email"]):
+        return {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+    
+    foundSnapshots = getAllDocumentSnapshotsInOrder(doc_id)
+    
+    return {"success": True, "reason":"", "body": foundSnapshots}
+
+@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
+def getDocument(proj_id, doc_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    info = json.dumps(getDocumentInfo(doc_id))
+    return {"success": True, "reason":"", "body": info}
+
+@app.route('/api/Document/<proj_id>/', methods=["GET"])
+def getAllDocumentsFromProject(proj_id):
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success":False,
+            "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+
+    arrayOfDocuments = getAllDocumentsForProject(proj_id)
+    return {
+        "success": True,
+        "reason": "-",
+        "body": arrayOfDocuments
     }
 
 # Comment POST, GET, PUT, DELETE

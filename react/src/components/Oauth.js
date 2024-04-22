@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { GoogleLogin } from "@react-oauth/google";
-
 import { jwtDecode } from 'jwt-decode';
-import getCookie from "../utils/utils";
+import { Dropdown, Avatar } from 'flowbite-react';
+import getCookie, { deleteCookie } from "../utils/utils";
 
 export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData } ){
-
-    const[loading, setLoading] = useState(true)
-
 
     const verifyLogin = useCallback(async (credentialResponse) => {
         let oAuthToken = credentialResponse.credential
@@ -31,6 +28,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             
             setUserData(data.body)
             console.log("Valid Token Provided, Saving to cookies")
+            console.log(userData)
             setIsLoggedIn(true)
             // Save to Cookie
             document.cookie = `cr_id_token=${credentialResponse.credential}; domain=; path=/`;
@@ -45,7 +43,6 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             if (credentialToken == null) {
                 setIsLoggedIn(false)
                 setUserData(null)
-                setLoading(false)
                 return
             }
 
@@ -56,7 +53,6 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             verifyLogin(credentialObject)
         }
 
-        setLoading(false)
 
     }, [verifyLogin, isLoggedIn, setIsLoggedIn, setUserData])
 
@@ -120,40 +116,50 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
 
     }
 
-    function DisplayLoginButton() {
-        if (loading) {
-            return (<div 
-                className='border border-alternative border-2 bg-background text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
-                </div>)
-        }
-
-        if (isLoggedIn) {
-            return (<div 
-                className='border border-alternative border-2 bg-background text-textcolor px-4 py-2 m-1 rounded-lg inline-block'>
-                Logged in as {userData.email}
-                </div>)
-        }
-
-        return (
-            <div>
-        
-            <GoogleLogin 
-                className="bg-background m-1 inline-block p-5"
-                onSuccess={credentialResponse => {
-                let decodedResponse = jwtDecode(credentialResponse.credential)
-                console.log(decodedResponse)
-                console.log(credentialResponse)
-                
-                verifyLogin(credentialResponse)
-                
-            }}
-                onError={() => {console.log("Failed To login")}}
-            />
-        </div>
+    function displayProfileImage() {
+        return (<Avatar
+          img={userData.picture}
+          alt="?"
+          className='w-10 h-10 rounded-sm ml-2'/>
         )
     }
 
-    return(
-        <DisplayLoginButton/>
+    function handleLogout() {
+        deleteCookie("cr_id_token")
+        setIsLoggedIn(false)
+    }
+    
+
+    if (isLoggedIn) {
+      return (
+        <div className="flex">
+        <Dropdown
+          inline
+          className="bg-background"
+          label="Account"
+        >
+          <Dropdown.Item className="bg-background" onClick={handleLogout}>Logout</Dropdown.Item>
+          <Dropdown.Item className="bg-background">Connect to Github</Dropdown.Item>
+        </Dropdown>
+        {displayProfileImage()}
+        </div>
+      )
+    }
+
+    return (
+      <div>
+        <GoogleLogin 
+            className="bg-background m-1 inline-block p-5"
+            onSuccess={credentialResponse => {
+            let decodedResponse = jwtDecode(credentialResponse.credential)
+            console.log(decodedResponse)
+            console.log(credentialResponse)
+            
+            verifyLogin(credentialResponse)
+            
+        }}
+            onError={() => {console.log("Failed To login")}}
+        />
+      </div>
     )
 }

@@ -18,7 +18,7 @@ export default function ReviewWindow({ comments, setComments, userData}) {
   const decorationIdsRefOrig = useRef([]);
   const decorationIdsRefModif = useRef([]);
 
-  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+  const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,8 +26,8 @@ export default function ReviewWindow({ comments, setComments, userData}) {
       setEditorLoading(true)
       try {
         const [left_doc, right_doc] = await Promise.all([
-          getDocSnapshot('684153597', document_id, left_snapshot_id),
-          getDocSnapshot('684153597', document_id, right_snapshot_id)
+          getDocSnapshot(project_id, document_id, left_snapshot_id),
+          getDocSnapshot(project_id, document_id, right_snapshot_id)
         ]);
         setInit(left_doc.blobContents)
         setCode(right_doc.blobContents)

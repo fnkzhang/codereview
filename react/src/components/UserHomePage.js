@@ -1,42 +1,25 @@
-import React, {useState} from "react";
-import Oauth from "./Oauth";
 import ProjectList  from "./Projects/ProjectList";
 
-export default function UserHomePage() {
+export default function UserHomePage( props ) {
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [userData, setUserData] = useState(null)
-
-    if (isLoggedIn) {
-      return (
-        <div>
-          <Oauth
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
-            userData={userData}
-            setUserData={setUserData}
+  if (props.isLoggedIn) {
+    return (
+      <div>          
+        <div className="m-5">
+          <ProjectList
+            isLoggedIn={props.isLoggedIn}
+            userData={props.userData}
           />
-          
-          <div className="m-5">
-            <ProjectList
-              userData={userData}
-            />
-          </div>
+        </div>
+      </div>
+    )
+  }
 
-        </div>
-      )
-    } else {
-      return (
-        <div>
-            <Oauth
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
-            userData={userData}
-            setUserData={setUserData}/>
-            <div className="m-20 text-center text-textcolor text-2xl">
-              You must Log in to view this page.
-            </div>
-        </div>
-      )
-    }
+  return (
+    <div>
+      <div className="m-20 text-center text-textcolor text-2xl">
+        You must Log in to view this page.
+      </div>
+    </div>
+  )
 }
