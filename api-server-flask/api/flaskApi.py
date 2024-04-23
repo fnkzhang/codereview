@@ -512,7 +512,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     #credentials in headers
     #In body:
     #data (text you want in the document)
-    #doc_name (name of document)
+    #document_name (name of document)
     #parent_folder (folder you're making it in), if not in request will put in root folder
 @app.route('/api/Document/<proj_id>/', methods=["POST"])
 def createDocument(proj_id):
@@ -538,7 +538,7 @@ def createDocument(proj_id):
         folder = getProjectInfo(proj_id)["root_folder"]
     else:
         folder = inputBody["parent_folder"]
-    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"])
+    doc_id = createNewDocument(inputBody["document_name"], folder, proj_id, inputBody["data"])
     return {
         "success": True,
         "reason": "",
