@@ -52,11 +52,12 @@ export default function ProjectPage( props ) {
   }, [])
 
   // Clicking on project will redirect to project page to select documents
-  async function handleDocumentClick (id, name) {
-    const result = await getAllSnapshotsFromDocument(id)
+  async function handleDocumentClick (document_id, name) {
+    const result = await getAllSnapshotsFromDocument(project_id, document_id)
     if (result.success)
-      navigate(`/Project/${project_id}/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
+      navigate(`/Project/${project_id}/Document/${document_id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
   }
+
   function DocumentDisplayBox({id, name, date}) {
     console.log(id, name)
     return (

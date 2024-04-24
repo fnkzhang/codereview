@@ -29,8 +29,9 @@ export default function ReviewWindow({ comments, setComments, userData}) {
           getDocSnapshot(project_id, document_id, left_snapshot_id),
           getDocSnapshot(project_id, document_id, right_snapshot_id)
         ]);
-        setInit(left_doc.blobContents)
-        setCode(right_doc.blobContents)
+        console.log(left_doc.body, right_doc.body)
+        setInit(left_doc.body)
+        setCode(right_doc.body)
       } catch (error) {
         console.log(error)
       } finally {

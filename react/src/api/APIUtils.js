@@ -247,7 +247,7 @@ export async function deleteComment(comment_id) {
     .then(response => response.json())
 }
 
-export async function getAllSnapshotsFromDocument(document_id) {
+export async function getAllSnapshotsFromDocument(project_id, document_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -262,7 +262,7 @@ export async function getAllSnapshotsFromDocument(document_id) {
 
   };
 
-    return await fetch((`/api/Document/0/${document_id}/getSnapshotId/`), headers)
+    return await fetch((`/api/Document/${project_id}/${document_id}/getSnapshotId/`), headers)
       .then(response => response.json())
 }
 

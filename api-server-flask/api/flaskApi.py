@@ -50,7 +50,7 @@ def authenticator():
 
 def authenticate():
     headers = request.headers
-    print(headers["Authorization"])
+
     if (not isValidRequest(headers, ["Authorization"])):
         return None
     try:
@@ -501,6 +501,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
         
     blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
+    print(blob)
     return {
         "success": True,
         "reason": "",
