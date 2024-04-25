@@ -1074,6 +1074,26 @@ def deleteComment(comment_id):
         "success": True,
         "reason": "Successful Delete"
     }
+#checks whether authenticated user has github connected
+@app.route('/api/Github/userHasGithub/', methods = ["GET"])
+def getUserGithubStatus():
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    user = getUserInfo(idInfo["email"])
+    if user == None:
+        return {"success":False, "reason":"User does not exist"}
+    return {"success:":True, "reason":"", "body": user["github_token"] != None}
 #needs auth because everything does lmao
 #put code in the body in "github_code"
 @app.route('/api/Github/addToken', methods=["POST"])
