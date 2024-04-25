@@ -4,22 +4,28 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData}) {
-
+export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
   const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
-  const [updatedCode, setCode] = useState(null); 
+  const [updatedCode, setCode] = useState(null);
+  const [initialUpdatedCode, setInitialUpdatedCode] = useState(null)
+
   const [currentHighlightStart, setStart] = useState(null);
   const [currentHighlightEnd, setEnd] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
   const [snapshotId, setSnapshotID] = useState(null);
+
   const decorationIdsRefOrig = useRef([]);
   const decorationIdsRefModif = useRef([]);
 
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
+  if (latestSnapshotData)
+    console.log(latestSnapshotData.snapshot_id == right_snapshot_id, latestSnapshotData.snapshot_id)
+
+  // Get Code for the 2 editors
   useEffect(() => {
     const fetchData = async () => {
       setEditorReady(false)
@@ -29,9 +35,10 @@ export default function ReviewWindow({ comments, setComments, userData}) {
           getDocSnapshot(project_id, document_id, left_snapshot_id),
           getDocSnapshot(project_id, document_id, right_snapshot_id)
         ]);
-        console.log(left_doc.body, right_doc.body)
         setInit(left_doc.body)
         setCode(right_doc.body)
+        setInitialUpdatedCode(right_doc.body)
+        
       } catch (error) {
         console.log(error)
       } finally {
@@ -42,6 +49,7 @@ export default function ReviewWindow({ comments, setComments, userData}) {
     fetchData()
   }, [document_id, left_snapshot_id, right_snapshot_id])
 
+  // 
   useEffect(() => {
     if (editorRef.current) {
       const originalEditor = editorRef.current.getOriginalEditor();
@@ -118,13 +126,14 @@ export default function ReviewWindow({ comments, setComments, userData}) {
             className="Monaco-editor"
             original={initialCode}
             modified={updatedCode}
-            originalLanguage="python"
-            modifiedLanguage="python"
+            originalLanguage="javascript"
+            modifiedLanguage="javascript"
             onMount={(editor, monaco) => {
               editorRef.current = editor
               monacoRef.current = monaco
               editor.getModifiedEditor().updateOptions({
-                readOnly: true
+                // Set True Or False if Matching Right Editor Snapshot
+                readOnly: latestSnapshotData.snapshot_id == right_snapshot_id ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
@@ -133,6 +142,7 @@ export default function ReviewWindow({ comments, setComments, userData}) {
               // Add the onChange event listener to the editor instance
               const onChangeHandler = () => {
                 const updatedCode = editor.getModifiedEditor().getValue();
+                setHasUpdatedCode(true)
                 setCode(updatedCode);
               };
 
