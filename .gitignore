@@ -6,3 +6,7 @@ api-server-flask/api/dbEnv.py
 googlecreds.json
 
 api-server-flask/api/googlecreds.json
+
+api-server-flask/cr_cache
+
+api-server-flask/api/test/__pycache__

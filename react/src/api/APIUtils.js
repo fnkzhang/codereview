@@ -21,12 +21,53 @@ export async function sendData(bodyContents) {
     .then(response => response.json())
 }
 
-export async function createDoc(bodyContents, proj_id, doc_id) {
+export async function createProject(projectName) {
+
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Project/${projectName}/`), headers)
+    .then(response => response.json())
+
+}
+export async function deleteProject(proj_id) {
+
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "DELETE",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Project/${proj_id}/`), headers)
+    .then(response => response.json())
+
+}
+
+export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
-    data: bodyContents
+    document_name: documentName,
+    data: documentData,
+    project_id: proj_id,
+    parent_folder_id: parent_folder_id
   }
+  
   let headers = {
     method: "POST",
     mode: "cors",
@@ -38,7 +79,7 @@ export async function createDoc(bodyContents, proj_id, doc_id) {
     },
     body: JSON.stringify(bodyData)
   }
-  return await fetch((`/api/Document/${proj_id}/${doc_id}/create`), headers)
+  return await fetch((`/api/Document/${proj_id}/`), headers)
     .then(response => response.json())
 }
 
@@ -206,7 +247,7 @@ export async function deleteComment(comment_id) {
     .then(response => response.json())
 }
 
-export async function getAllSnapshotsFromDocument(document_id) {
+export async function getAllSnapshotsFromDocument(project_id, document_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -221,7 +262,7 @@ export async function getAllSnapshotsFromDocument(document_id) {
 
   };
 
-    return await fetch((`/api/Document/0/${document_id}/getSnapshotId/`), headers)
+    return await fetch((`/api/Document/${project_id}/${document_id}/getSnapshotId/`), headers)
       .then(response => response.json())
 }
 
@@ -252,6 +293,34 @@ export async function getUserProjects(userEmail) {
     return data.body
 }))
 }
+export async function getProjectInfo(project_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+
+  };
+
+  return await fetch((`/api/Project/${project_id}/`), headers)
+  .then(response => response.json()
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data.body
+  }))
+
+}
+
 
 export async function getProjectDocuments(proj_id) {
   let oAuthToken = getCookie("cr_id_token")
