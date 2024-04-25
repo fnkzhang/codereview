@@ -36,7 +36,7 @@ export default function DocumentCreation() {
 
     let fileInformation = e.target.files[0];
 
-    setDocumentName(fileInformation.name.split(".")[0])
+    setDocumentName(fileInformation.name)
 
     console.log(fileInformation)
 
