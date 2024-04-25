@@ -1183,7 +1183,6 @@ def testo(proj_id):
 
 @app.route('/api/Project/<proj_id>/getFolderTree/',methods=["GET"])
 def getProjectFolderTree(proj_id):
-    '''
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -1199,7 +1198,7 @@ def getProjectFolderTree(proj_id):
         }
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    '''
+
     project = getProjectInfo(proj_id)
     foldertree = getFolderTree(project["root_folder"])
     return {

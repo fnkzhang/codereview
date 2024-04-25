@@ -27,8 +27,6 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             }
             
             setUserData(data.body)
-            console.log("Valid Token Provided, Saving to cookies")
-            console.log(userData)
             setIsLoggedIn(true)
             // Save to Cookie
             document.cookie = `cr_id_token=${credentialResponse.credential}; domain=; path=/`;

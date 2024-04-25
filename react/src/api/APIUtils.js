@@ -284,7 +284,6 @@ export async function getUserProjects(userEmail) {
   return await fetch((`/api/User/${userEmail}/Project/`), headers)
   .then(response => response.json()
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
@@ -311,7 +310,6 @@ export async function getProjectInfo(project_id) {
   return await fetch((`/api/Project/${project_id}/`), headers)
   .then(response => response.json()
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
@@ -339,12 +337,67 @@ export async function getProjectDocuments(proj_id) {
   return await fetch((`/api/Document/${proj_id}/`), headers)
   .then(response => response.json())
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
     }
 
     return data.body
+  })
+}
+
+export async function getProjectTree(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Project/${proj_id}/getFolderTree/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+
+    return data.body
+  })
+}
+
+export async function createFolder(folder_name, proj_id, parent_folder_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "folder_name" : folder_name,
+      "parent_folder" : parent_folder_id,
+    }),
+  };
+
+  return await fetch((`/api/Folder/${proj_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+
+    return data
   })
 }

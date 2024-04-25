@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import { Card } from "flowbite-react"
-import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo } from "../api/APIUtils"
+import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo, getProjectTree } from "../api/APIUtils"
 
 // Display Documents For Project
 export default function ProjectPage( props ) {
@@ -18,10 +18,8 @@ export default function ProjectPage( props ) {
 
   // Grab Documents if logged in and userdata
   useEffect(() => {
-    console.log(loading)
     async function grabProjectData() {
       let result = await getProjectInfo(project_id)
-      console.log(result)
       
       setProjectRootFolderID(result.root_folder)
       setProjectOwnerEmail(result.author_email)
@@ -31,15 +29,20 @@ export default function ProjectPage( props ) {
     // Grab User Data
     async function grabProjectDocuments() {
       const docArray = await getProjectDocuments(project_id)
-      console.log(docArray)
       setProjectDocuments(docArray)
     } 
+
+    async function grabProjectTree() {
+      const projectTree = await getProjectTree(project_id)
+      console.log(projectTree)
+    }
 
     async function fetchData() {
       try {
         await Promise.all([
           grabProjectDocuments(),
-          grabProjectData()
+          grabProjectData(),
+          grabProjectTree()
         ])
       } catch (error) {
         console.log(error)
@@ -59,7 +62,6 @@ export default function ProjectPage( props ) {
   }
 
   function DocumentDisplayBox({id, name, date}) {
-    console.log(id, name)
     return (
       <Card 
         className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
@@ -79,7 +81,6 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayDocumentBox() {
-    console.log(projectDocuments)
     if(projectDocuments.length > 0) {
       return (
         <div className="flex flex-wrap">
@@ -113,7 +114,6 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayDeleteButton() {
-    console.log(props.userData, projectOwnerEmail)
     if (props.userData === null)
       return null
 
@@ -133,6 +133,15 @@ export default function ProjectPage( props ) {
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
         onClick={() => navigate(`/Project/${project_id}/${projectRootFolderID}/Document/Create`)}>Upload Document</button>
+      </div>
+    )
+  }
+
+  function DisplayCreateFolderButton() {
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        onClick={() => navigate(`/Project/${project_id}/${projectRootFolderID}/Folder/Create`)}>Create Folder</button>
       </div>
     )
   }
@@ -166,6 +175,7 @@ export default function ProjectPage( props ) {
 
         <DisplayDeleteButton/>
         <DisplayUploadDocumentButton/>
+        <DisplayCreateFolderButton/>
       </div>
 
       <DisplayDocumentBox/>
