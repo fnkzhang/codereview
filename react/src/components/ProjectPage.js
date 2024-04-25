@@ -9,8 +9,8 @@ export default function ProjectPage( props ) {
   const [loading, setLoading] = useState(true)
   const [projectDocuments, setProjectDocuments] = useState([])
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
-  const [projectRootFolderID, setProjectRootFolderID] = useState(null)
   const [projectName, setProjectName] = useState(null)
+  const [folderID, setFolderID] = useState(null)
 
   const { project_id } = useParams()
   const navigate = useNavigate()
@@ -20,8 +20,8 @@ export default function ProjectPage( props ) {
   useEffect(() => {
     async function grabProjectData() {
       let result = await getProjectInfo(project_id)
-      
-      setProjectRootFolderID(result.root_folder)
+    
+      setFolderID(result.root_folder)
       setProjectOwnerEmail(result.author_email)
       setProjectName(result.name)
     }
@@ -29,11 +29,12 @@ export default function ProjectPage( props ) {
     // Grab User Data
     async function grabProjectDocuments() {
       const docArray = await getProjectDocuments(project_id)
-      setProjectDocuments(docArray)
+      console.log(docArray)
     } 
 
     async function grabProjectTree() {
       const projectTree = await getProjectTree(project_id)
+      setProjectDocuments(projectTree)
       console.log(projectTree)
     }
 
@@ -61,6 +62,23 @@ export default function ProjectPage( props ) {
       navigate(`/Project/${project_id}/Document/${document_id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
   }
 
+  function FolderDisplayBox({id, name, date}) {
+    return (
+      <Card 
+        className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
+      >
+        <h4 className="text-textcolor p-1">
+          <span className="font-bold">Folder Name: </span>
+          {name}
+        </h4>
+        <h4 className="text-textcolor p-1">
+          <span className="font-bold">Folder ID: </span>
+          {id}
+        </h4>
+      </Card>
+    )
+  }
+
   function DocumentDisplayBox({id, name, date}) {
     return (
       <Card 
@@ -80,12 +98,38 @@ export default function ProjectPage( props ) {
     )
   }
 
+  function sortByName(a, b) {
+    // Convert both names to lowercase to ensure case-insensitive comparison
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+
+    if (nameA < nameB) {
+      return -1; // nameA should come before nameB in the sorted order
+    }
+    if (nameA > nameB) {
+      return 1; // nameA should come after nameB in the sorted order
+    }
+    return 0; // names are equal
+  }
+
   function DisplayDocumentBox() {
-    if(projectDocuments.length > 0) {
+    if(projectDocuments.content.documents.length !== 0
+      || projectDocuments.content.folders.length !== 0) {
       return (
         <div className="flex flex-wrap">
           {
-            projectDocuments.map((document, index) => {
+            projectDocuments.content.folders.sort(sortByName)
+            .map((folder, index) => {
+              return (<FolderDisplayBox
+                key={index}
+                id={folder.folder_id}
+                name={folder.name}
+              />)
+            })
+          }
+          {
+            projectDocuments.content.documents.sort(sortByName).
+            map((document, index) => {
               return (<DocumentDisplayBox 
                 key={index} 
                 id={document.doc_id} 
@@ -101,7 +145,7 @@ export default function ProjectPage( props ) {
                     second: 'numeric',
                     timeZoneName: 'short',
                   })}
-              /> )
+              />)
             })
           }
         </div>
@@ -109,7 +153,7 @@ export default function ProjectPage( props ) {
     }
 
     return (<div className="m-20 text-center text-textcolor text-2xl">
-      No Documents In Project.
+      There is nothing in this Folder.
   </div>)
   }
 
@@ -132,7 +176,7 @@ export default function ProjectPage( props ) {
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${projectRootFolderID}/Document/Create`)}>Upload Document</button>
+        onClick={() => navigate(`/Project/${project_id}/${folderID}/Document/Create`)}>Upload Document</button>
       </div>
     )
   }
@@ -141,7 +185,7 @@ export default function ProjectPage( props ) {
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${projectRootFolderID}/Folder/Create`)}>Create Folder</button>
+        onClick={() => navigate(`/Project/${project_id}/${folderID}/Folder/Create`)}>Create Folder</button>
       </div>
     )
   }

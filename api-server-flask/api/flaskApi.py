@@ -50,7 +50,7 @@ def authenticator():
 
 def authenticate():
     headers = request.headers
-
+    print(headers["Authorization"])
     if (not isValidRequest(headers, ["Authorization"])):
         return None
     try:
@@ -252,7 +252,7 @@ def getProject(proj_id):
         "reason": "",
         "body": projectData
     }
-@app.route('/api/Document/<proj_id>/', methods = ["GET"])
+@app.route('/api/Project/<proj_id>/Documents', methods = ["GET"])
 def getProjectDocuments(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -512,7 +512,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     #credentials in headers
     #In body:
     #data (text you want in the document)
-    #document_name (name of document)
+    #doc_name (name of document)
     #parent_folder (folder you're making it in), if not in request will put in root folder
 @app.route('/api/Document/<proj_id>/', methods=["POST"])
 def createDocument(proj_id):
@@ -538,7 +538,7 @@ def createDocument(proj_id):
         folder = getProjectInfo(proj_id)["root_folder"]
     else:
         folder = inputBody["parent_folder"]
-    doc_id = createNewDocument(inputBody["document_name"], folder, proj_id, inputBody["data"])
+    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"])
     return {
         "success": True,
         "reason": "",
@@ -577,10 +577,7 @@ def getAllDocumentSnapshots(proj_id, doc_id):
 
 @app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id):
-    try:
-        headers = request.headers
-    except:
-        return {"what":"huh"}
+    headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
@@ -887,6 +884,135 @@ def getAllCommentsForDocument(document_id):
         "success": True,
         "reason": "Found all Comments For All Snapshots for document",
         "body": listOfComments
+    }
+
+    #snapshotIdList = 
+    #requires
+    #credentials in headers
+
+    #In body:
+    #data (text you want in the document)
+    #doc_name (name of document)
+    #parent_folder (folder you're making it in)
+@app.route('/api/Document/<proj_id>/', methods=["POST"])
+def createDocument(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+    
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    createNewDocument(inputBody["document_name"], inputBody["parent_folder_id"], inputBody["project_id"], inputBody["data"])
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": inputBody
+    }
+
+@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
+def getAllDocumentSnapshots(proj_id, doc_id):
+    headers = request.headers
+ 
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if not userExists(idInfo["email"]):
+        return {
+                "success": False,
+                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+                "body":{}
+        }
+    
+    foundSnapshots = getAllDocumentSnapshotsInOrder(doc_id)
+    
+    return {"success": True, "reason":"", "body": foundSnapshots}
+
+@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
+def getDocument(proj_id, doc_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    info = json.dumps(getDocumentInfo(doc_id))
+    return {"success": True, "reason":"", "body": info}
+
+@app.route('/api/Document/<proj_id>/', methods=["GET"])
+def getAllDocumentsFromProject(proj_id):
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success":False,
+            "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+
+    arrayOfDocuments = getAllDocumentsForProject(proj_id)
+    return {
+        "success": True,
+        "reason": "-",
+        "body": arrayOfDocuments
     }
 
 # Comment POST, GET, PUT, DELETE
@@ -1198,7 +1324,6 @@ def getProjectFolderTree(proj_id):
         }
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
     project = getProjectInfo(proj_id)
     foldertree = getFolderTree(project["root_folder"])
     return {
