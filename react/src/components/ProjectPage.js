@@ -1,16 +1,15 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import { Card } from "flowbite-react"
-import { getProjectDocuments, getAllSnapshotsFromDocument, getProjectInfo, getProjectTree } from "../api/APIUtils"
+import { getAllSnapshotsFromDocument, getProjectInfo, getProjectTree } from "../api/APIUtils"
 
 // Display Documents For Project
 export default function ProjectPage( props ) {
 
   const [loading, setLoading] = useState(true)
-  const [projectDocuments, setProjectDocuments] = useState([])
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
   const [projectName, setProjectName] = useState(null)
-  const [folderID, setFolderID] = useState(null)
+  const [folderStack, setFolderStack] = useState(null)
 
   const { project_id } = useParams()
   const navigate = useNavigate()
@@ -21,27 +20,18 @@ export default function ProjectPage( props ) {
     async function grabProjectData() {
       let result = await getProjectInfo(project_id)
     
-      setFolderID(result.root_folder)
       setProjectOwnerEmail(result.author_email)
       setProjectName(result.name)
     }
 
-    // Grab User Data
-    async function grabProjectDocuments() {
-      const docArray = await getProjectDocuments(project_id)
-      console.log(docArray)
-    } 
-
     async function grabProjectTree() {
       const projectTree = await getProjectTree(project_id)
-      setProjectDocuments(projectTree)
-      console.log(projectTree)
+      setFolderStack([projectTree])
     }
 
     async function fetchData() {
       try {
         await Promise.all([
-          grabProjectDocuments(),
           grabProjectData(),
           grabProjectTree()
         ])
@@ -55,6 +45,10 @@ export default function ProjectPage( props ) {
     fetchData()
   }, [])
 
+  function handleFolderClick (folder) {
+    setFolderStack([...folderStack, folder])
+  }
+
   // Clicking on project will redirect to project page to select documents
   async function handleDocumentClick (document_id, name) {
     const result = await getAllSnapshotsFromDocument(project_id, document_id)
@@ -62,10 +56,11 @@ export default function ProjectPage( props ) {
       navigate(`/Project/${project_id}/Document/${document_id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
   }
 
-  function FolderDisplayBox({id, name, date}) {
+  function FolderDisplayBox({id, name, folder}) {
     return (
       <Card 
         className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
+        onClick={() => handleFolderClick(folder)}
       >
         <h4 className="text-textcolor p-1">
           <span className="font-bold">Folder Name: </span>
@@ -113,22 +108,24 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayDocumentBox() {
-    if(projectDocuments.content.documents.length !== 0
-      || projectDocuments.content.folders.length !== 0) {
+    let currentFolder = folderStack[folderStack.length - 1]
+    if(currentFolder.content.documents.length !== 0
+      || currentFolder.content.folders.length !== 0) {
       return (
         <div className="flex flex-wrap">
           {
-            projectDocuments.content.folders.sort(sortByName)
+            currentFolder.content.folders.sort(sortByName)
             .map((folder, index) => {
               return (<FolderDisplayBox
                 key={index}
                 id={folder.folder_id}
                 name={folder.name}
+                folder={folder}
               />)
             })
           }
           {
-            projectDocuments.content.documents.sort(sortByName).
+            currentFolder.content.documents.sort(sortByName).
             map((document, index) => {
               return (<DocumentDisplayBox 
                 key={index} 
@@ -176,7 +173,7 @@ export default function ProjectPage( props ) {
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${folderID}/Document/Create`)}>Upload Document</button>
+        onClick={() => navigate(`/Project/${project_id}/${folderStack[folderStack.length - 1].folder_id}/Document/Create`)}>Upload Document</button>
       </div>
     )
   }
@@ -185,9 +182,25 @@ export default function ProjectPage( props ) {
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${folderID}/Folder/Create`)}>Create Folder</button>
+        onClick={() => navigate(`/Project/${project_id}/${folderStack[folderStack.length - 1].folder_id}/Folder/Create`)}>Create Folder</button>
       </div>
     )
+  }
+
+  function DisplayNavigateParentFolderButton() {
+    if (folderStack.length === 1) {
+      return
+    }
+
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        onClick={() => {
+          setFolderStack(folderStack.slice(0, folderStack.length - 1))
+          }
+        }>Parent Folder</button>
+      </div>
+    )  
   }
 
   if( props.isLoggedIn === false ) {
@@ -220,6 +233,7 @@ export default function ProjectPage( props ) {
         <DisplayDeleteButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>
+        <DisplayNavigateParentFolderButton/>
       </div>
 
       <DisplayDocumentBox/>
