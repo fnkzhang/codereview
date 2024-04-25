@@ -65,7 +65,6 @@ def authenticator():
 
 def authenticate():
     headers = request.headers
-    print(headers["Authorization"])
     if (not isValidRequest(headers, ["Authorization"])):
         return None
     try:
@@ -265,7 +264,7 @@ def getProject(proj_id):
         "reason": "",
         "body": projectData
     }
-@app.route('/api/Document/<proj_id>/', methods = ["GET"])
+@app.route('/api/Document/<proj_id>/GetDocuments/', methods = ["GET"])
 def getProjectDocuments(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -1131,38 +1130,6 @@ def getGithubRepositoryBranches(owner_name, repo_name):
             "reason": "",
             "body": rv
         }
-#body has "oldBranch" which is what you're making the new branch from
-#body has "newBranch" which is the new branch you're making
-@app.route('/api/Github/<owner_name>/<repo_name>/', methods=["GET"])
-def createGithubBranch(owner_name, repo_name):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    token = getUserInfo(idInfo["email"])["github_token"]
-    g2 = Github(auth = Auth.Token(token))
-    repo = g2.get_repo(body["repository"])
-    ref = repo.get_git_ref(ref='heads/' + body["branch"])
-    success = True
-    rv = "hi"
-    if (not success):
-        return {"success":False,
-                "reason": str(rv)
-                }
-    return {"success":True,
-            "reason": "",
-            "body": rv
-        }
-
 
 #needs auth
 #put repository path in "repository" and branch in "branch"
@@ -1278,9 +1245,11 @@ def getProjectDeletedDocuments(proj_id):
         "body": arrayOfDeletedDocuments
     }
 
-@app.route('/api/Github/<owner_name>/<repo_name>/<branch>/<proj_id>/getNonexistent/', methods=["GET"])
-def getProjectNonexistentGithubDocuments(owner_name, repo_name, branch, proj_id):
+#needs "branch" in arguments, for example /api/Github/fnkzhang/codereview/12345/getNonexistent/?branch=main
+@app.route('/api/Github/<owner_name>/<repo_name>/<proj_id>/getNonexistent/', methods=["GET"])
+def getProjectNonexistentGithubDocuments(owner_name, repo_name, proj_id):
     headers = request.headers
+    branch = request.get.args.get("branch")
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
