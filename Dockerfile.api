@@ -2,7 +2,7 @@ FROM python:3.9
 WORKDIR /app
 
 COPY ./requirements.txt ./api-server-flask/api/flaskApi.py ./api-server-flask/api/.flaskenv ./
-COPY ./api-server-flask/api/utils.py ./api-server-flask/api/models.py ./api-server-flask/api/cloudSql.py ./
+COPY ./api-server-flask/api/utils.py ./api-server-flask/api/models.py ./api-server-flask/api/cloudSql.py ./api-server-flask/api/cacheUtils.py ./api-server-flask/api/llm.py ./api-server-flask/api/github_oath_credentials.json ./
 RUN pip install -r ./requirements.txt
 ENV FLASK_ENV production
 COPY ./googlecreds.json ./googlecreds.json

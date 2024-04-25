@@ -129,7 +129,31 @@ def getAllProjectDocuments(proj_id):
             arrayOfDocuments.append(row._asdict())
         
         return arrayOfDocuments
-    
+
+def getGithubProjectDocumentsAsPaths(repo, branch, token):
+    g2 = Github(auth = Auth.Token(token))
+    repo = g2.get_repo(repo)
+    try:
+        contents = repo.get_contents("", branch)
+    except:
+        return []
+    githubfiles = []
+    while contents:
+        file_content = contents.pop(0)
+        if file_content.type == "dir":
+            contents.extend(repo.get_contents(file_content.path))
+        else:
+            print(file_content.path)
+            githubfiles.append(file_content.path)
+    return githubfiles
+
+def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
+    allGithubFiles = set(getGithubProjectDocumentsAsPaths(repo, branch, token))
+    projectDocuments = getAllProjectDocuments(proj_id)
+    projectDocumentPaths = set([getDocumentPath(document['doc_id']) for document in projectDocuments])
+    nonexistant = list(allGithubFiles - projectDocumentPaths)
+    return nonexistant
+
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
