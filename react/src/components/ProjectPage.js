@@ -53,7 +53,7 @@ export default function ProjectPage( props ) {
   async function handleDocumentClick (document_id, name) {
     const result = await getAllSnapshotsFromDocument(project_id, document_id)
     if (result.success)
-      navigate(`/Project/${project_id}/Document/${document_id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
+      navigate(`/Project/${project_id}/Document/${document_id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`, {state: {documentName: name}})
   }
 
   function FolderDisplayBox({id, name, folder}) {

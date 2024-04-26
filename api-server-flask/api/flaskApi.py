@@ -523,12 +523,12 @@ def getDocument(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #if not userExists(idInfo["email"]):
-    #    return {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}

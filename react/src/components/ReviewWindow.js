@@ -4,7 +4,7 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload}) {
+export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
   const [editorReady, setEditorReady] = useState(false);
@@ -143,6 +143,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     )
   }
 
+  console.log(editorLanguage)
   return (
     <div>
       <div className="h-9/10 w-screen flex text-center">
@@ -151,8 +152,8 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             className="Monaco-editor"
             original={initialCode}
             modified={updatedCode}
-            originalLanguage="javascript"
-            modifiedLanguage="javascript"
+            originalLanguage={editorLanguage}
+            modifiedLanguage={editorLanguage}
             onMount={(editor, monaco) => {
               // Set Value Because Editor Changes length of the Document after mounting
               setCode(editor.getModifiedEditor().getValue())
