@@ -4,7 +4,7 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode}) {
+export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
   const [editorReady, setEditorReady] = useState(false);
@@ -22,9 +22,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   const decorationIdsRefModif = useRef([]);
 
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
-
-  if (latestSnapshotData)
-    console.log(latestSnapshotData.snapshot_id == right_snapshot_id, latestSnapshotData.snapshot_id)
 
   // Get Code for the 2 editors
   useEffect(() => {
@@ -69,6 +66,35 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
       modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
     }
   }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady ])
+
+
+  // Handle Code Edit Detection For New Snapshot Creation
+  useEffect(() => {
+    if (initialUpdatedCode === null && updatedCode === null)
+      return
+
+    console.log(initialUpdatedCode.length, updatedCode.length)
+    // Matching length but code is different or no change made
+    if (initialUpdatedCode.length === updatedCode.length) {
+
+      if(initialUpdatedCode !== updatedCode) {
+        console.log("Code Not Same as Initial")
+        setHasUpdatedCode(true)
+        setDataToUpload(updatedCode)
+      } else {
+        setHasUpdatedCode(false)
+      }
+      
+      
+      return 
+    }
+
+    console.log("Code Not Same as Initial")
+    // No matching length and is different
+    setHasUpdatedCode(true)
+    setDataToUpload(updatedCode)
+
+  }, [updatedCode])
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
@@ -130,11 +156,15 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             originalLanguage="javascript"
             modifiedLanguage="javascript"
             onMount={(editor, monaco) => {
+              // Set Value Because Editor Changes length of the Document after mounting
+              setCode(editor.getModifiedEditor().getValue())
+              setInitialUpdatedCode(editor.getModifiedEditor().getValue())
+
               editorRef.current = editor
               monacoRef.current = monaco
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: latestSnapshotData.snapshot_id == right_snapshot_id ? false : true
+                readOnly: latestSnapshotData.snapshot_id?.toString() === right_snapshot_id ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
@@ -143,7 +173,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               // Add the onChange event listener to the editor instance
               const onChangeHandler = () => {
                 const updatedCode = editor.getModifiedEditor().getValue();
-                setHasUpdatedCode(true)
                 setCode(updatedCode);
               };
 

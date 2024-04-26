@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
 import { useParams } from 'react-router';
+import { createSnapshotForDocument } from "../api/APIUtils";
 
 export default function MainWindow( props ) {
 
@@ -9,12 +10,17 @@ export default function MainWindow( props ) {
   const [snapshots, setSnapshots] = useState([])
   const [hasUpdatedCode, setHasUpdatedCode] = useState(false)
   
-  const [dataToUpload, setDataToUpload] = useState("")
+  const [dataToUpload, setDataToUpload] = useState(null) // Null until set to a string value
 
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
-  const handleCreateSnapshotClick = (snapshotContents) => {
+  const handleCreateSnapshotClick = () => {
+    if (!dataToUpload) {
+      console.log("No Data To Upload")
+      return
+    }
 
+    createSnapshotForDocument(project_id, document_id, dataToUpload)
   }
 
   const DisplaySnapshotCreateButton = () => {
@@ -23,7 +29,7 @@ export default function MainWindow( props ) {
 
     return (
     <div className="justify-center">
-      <button className="p-3 text-textcolor hover:bg-alternative">TEST</button> 
+      <button className="p-3 text-textcolor hover:bg-alternative" onClick={handleCreateSnapshotClick}>TEST</button> 
     </div>
       
   )}
@@ -33,8 +39,8 @@ export default function MainWindow( props ) {
   }, [hasUpdatedCode])
 
   if (props.isLoggedIn) {
-    console.log(snapshots)
-    console.log(hasUpdatedCode)
+    // console.log(snapshots)
+    // console.log(hasUpdatedCode)
     return(
       <div className="h-screen">
         <div className="flex">
@@ -50,7 +56,8 @@ export default function MainWindow( props ) {
           setComments={setComments}
           userData={props.userData}
           latestSnapshotData={snapshots[snapshots.length - 1]}
-          setHasUpdatedCode={setHasUpdatedCode}/>
+          setHasUpdatedCode={setHasUpdatedCode}
+          setDataToUpload={setDataToUpload}/>
           
          
       </div>
