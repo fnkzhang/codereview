@@ -42,7 +42,9 @@ export default function ProjectPage( props ) {
       }
     }
 
-    fetchData()
+    if (loading) {
+      fetchData()
+    }
   }, [project_id])
 
   function handleFolderClick (folder) {
@@ -240,11 +242,12 @@ export default function ProjectPage( props ) {
   for (let i = 1; i < folderStack.length; i++) {
     path += `/${folderStack[i].name}`
   }
+
   return (
     <div>
       <div className="flex">
-        <div>
-          <h3 className="text-textcolor text-2xl m-2">{`${path}`}</h3>
+        <div className="overflow-x-auto">
+          <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">{`${path}`}</h3>
         </div>
         <DisplayNavigateParentFolderButton/>
       </div>

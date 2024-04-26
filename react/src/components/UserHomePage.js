@@ -1,10 +1,11 @@
 import ProjectList  from "./Projects/ProjectList";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { addGitHubToken } from "../api/APIUtils";
 
 export default function UserHomePage( props ) {
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -51,6 +52,10 @@ export default function UserHomePage( props ) {
       <div>
         <div className="m-20 text-center text-textcolor text-2xl">
           You have successfully connected your account to GitHub.
+        </div>
+        <div className="flex justify-center items-center text-textcolor text-xl">
+          <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+          onClick={() => navigate(`/`)}>Go back to Projects page.</button>
         </div>
       </div>
     )
