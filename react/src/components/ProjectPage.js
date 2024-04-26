@@ -207,11 +207,11 @@ export default function ProjectPage( props ) {
 
     return (
       <div className="text-textcolor text-xl">
-        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        <button className="rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-2 pl-1 pr-1"
         onClick={() => {
           setFolderStack(folderStack.slice(0, folderStack.length - 1))
           }
-        }>Parent Folder</button>
+        }>^</button>
       </div>
     )  
   }
@@ -236,19 +236,23 @@ export default function ProjectPage( props ) {
     )
   }
 
+  let path = `${projectOwnerEmail}/${projectName}`
+  for (let i = 1; i < folderStack.length; i++) {
+    path += `/${folderStack[i].name}`
+  }
   return (
     <div>
       <div className="flex">
         <div>
-          <h3 className="text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
+          <h3 className="text-textcolor text-2xl m-2">{`${path}`}</h3>
         </div>
-
+        <DisplayNavigateParentFolderButton/>
+      </div>
+      <div className="flex">
         <DisplayDeleteButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>
-        <DisplayNavigateParentFolderButton/>
       </div>
-
       <DisplayFolderBox/>
       <DisplayDocumentBox/>
     </div>
