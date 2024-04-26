@@ -10,6 +10,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
   const [updatedCode, setCode] = useState(null);
+
   const [initialUpdatedCode, setInitialUpdatedCode] = useState(null)
 
   const [currentHighlightStart, setStart] = useState(null);

@@ -34,7 +34,7 @@ def afterRequest(response):
 def authenticator():
     idInfo = authenticate()
     if idInfo is not None:
-        print("Success?")
+        print("Successful authentication")
         # RETURN User Data back
         return jsonify({
             "success": True,
@@ -50,7 +50,6 @@ def authenticator():
 
 def authenticate():
     headers = request.headers
-    print(headers["Authorization"])
     if (not isValidRequest(headers, ["Authorization"])):
         return None
     try:
@@ -444,9 +443,10 @@ def removeUser(proj_id):
         conn.commit()
     return {"success": True, "reason":"N/A", "body": {}}
 
+# Data Passed in body while project and document id passed in url
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
 def createSnapshot(proj_id, doc_id):
-    print(proj_id, doc_id)
+    print("Creating Snapshot", proj_id, doc_id)
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):

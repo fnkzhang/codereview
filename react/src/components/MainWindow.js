@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
+import { useParams } from 'react-router';
 
 export default function MainWindow( props ) {
 
@@ -8,8 +9,16 @@ export default function MainWindow( props ) {
   const [snapshots, setSnapshots] = useState([])
   const [hasUpdatedCode, setHasUpdatedCode] = useState(false)
   
+  const [dataToUpload, setDataToUpload] = useState("")
 
-  const DisplayNewSnapshotButton = () => {
+  const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
+
+  const handleCreateSnapshotClick = (snapshotContents) => {
+
+  }
+
+  const DisplaySnapshotCreateButton = () => {
+
 
 
     return (
@@ -33,7 +42,7 @@ export default function MainWindow( props ) {
             comments={comments}
             snapshots={snapshots}
             setSnapshots={setSnapshots}/>
-          {hasUpdatedCode ? <DisplayNewSnapshotButton/> : null}
+          {hasUpdatedCode ? <DisplaySnapshotCreateButton/> : null}
         </div>
 
         <ReviewWindow
@@ -46,7 +55,6 @@ export default function MainWindow( props ) {
          
       </div>
 
-     
     )
   }
   

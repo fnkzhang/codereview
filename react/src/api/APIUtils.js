@@ -100,6 +100,25 @@ export async function getDocSnapshot(proj_id, doc_id, snap_id) {
   return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}/`), headers)
     .then(response => response.json())
 }
+export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data) {
+  let oAuthToken = getCookie("cr_id_token")
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    credentials: 'include',
+    headers: {
+      "Access-Control-Allow-Credentials": true,
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: {
+      data: snapshot_data
+    }
+  }
+
+  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/`), headers)
+    .then(response => response.json())
+}
 
 // snapshot_id: int
 // author_email: string
