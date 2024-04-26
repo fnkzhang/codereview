@@ -39,7 +39,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots }) 
       if (comments.length > 0)
         return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot_id) && (comment.is_resolved === false)).length
       
-      return []
+      return 0
     }
 
     function DisplayLeftSnapshots() {

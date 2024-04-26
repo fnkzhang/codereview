@@ -43,7 +43,7 @@ export default function ProjectPage( props ) {
     }
 
     fetchData()
-  }, [])
+  })
 
   function handleFolderClick (folder) {
     setFolderStack([...folderStack, folder])
@@ -137,8 +137,8 @@ export default function ProjectPage( props ) {
           <h4 className="text-textcolor text-2xl m-2">Documents: </h4>
           <div className="flex flex-wrap">
             {
-              currentFolder.content.documents.sort(sortByName).
-              map((document, index) => {
+              currentFolder.content.documents.sort(sortByName)
+              .map((document, index) => {
                 return (<DocumentDisplayBox 
                   key={index} 
                   id={document.doc_id} 
