@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { createSnapshotForDocument } from "../api/APIUtils";
 
 export default function MainWindow( props ) {
@@ -14,13 +14,16 @@ export default function MainWindow( props ) {
 
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
-  const handleCreateSnapshotClick = () => {
+  const navigate = useNavigate()
+  const handleCreateSnapshotClick = async () => {
     if (!dataToUpload) {
       console.log("No Data To Upload")
       return
     }
 
-    createSnapshotForDocument(project_id, document_id, dataToUpload)
+    let response = await createSnapshotForDocument(project_id, document_id, dataToUpload)
+    console.log(response)
+    navigate(0)
   }
 
   const DisplaySnapshotCreateButton = () => {
@@ -28,8 +31,11 @@ export default function MainWindow( props ) {
 
 
     return (
-    <div className="justify-center">
-      <button className="p-3 text-textcolor hover:bg-alternative" onClick={handleCreateSnapshotClick}>TEST</button> 
+    <div className=" m-5 text-textcolor text-xl ">
+      <button className="p-3 rounded-lg border-2 transition-all duration-300
+       hover:bg-alternative m-1" onClick={handleCreateSnapshotClick}>
+        Add New Snapshot
+      </button> 
     </div>
       
   )}
@@ -48,6 +54,7 @@ export default function MainWindow( props ) {
             comments={comments}
             snapshots={snapshots}
             setSnapshots={setSnapshots}/>
+
           {hasUpdatedCode ? <DisplaySnapshotCreateButton/> : null}
         </div>
 

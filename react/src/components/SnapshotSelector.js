@@ -15,7 +15,6 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots }) 
     const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
     // Get snapshots for document
     useEffect(() => {
-
         const grabSnapshots = async () => {
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
           console.log(result)

@@ -105,19 +105,25 @@ export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data) 
   let headers = {
     method: "POST",
     mode: "cors",
-    credentials: 'include',
     headers: {
-      "Access-Control-Allow-Credentials": true,
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
     },
-    body: {
-      data: snapshot_data
-    }
+    body: JSON.stringify({
+      "data": snapshot_data
+    })
   }
 
+  // Fail = Null
+  // Success = SnapshotID
   return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/`), headers)
     .then(response => response.json())
+    .then(data => {
+      if (data.success)
+        return data.body
+      return null
+    })
+    .catch(error => console.log(error))
 }
 
 // snapshot_id: int
@@ -151,6 +157,7 @@ export async function createComment(snapshot_id, author_email, reply_to_id, cont
 
   return await fetch(`/api/Snapshot/${snapshot_id}/comment/create`, headers)
     .then(response => response.json())
+
 }
 
 //

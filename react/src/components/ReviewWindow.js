@@ -73,7 +73,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     if (initialUpdatedCode === null && updatedCode === null)
       return
 
-    console.log(initialUpdatedCode.length, updatedCode.length)
     // Matching length but code is different or no change made
     if (initialUpdatedCode.length === updatedCode.length) {
 
@@ -84,7 +83,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
       } else {
         setHasUpdatedCode(false)
       }
-      
       
       return 
     }
@@ -164,7 +162,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               monacoRef.current = monaco
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: latestSnapshotData.snapshot_id?.toString() === right_snapshot_id ? false : true
+                readOnly: latestSnapshotData?.snapshot_id?.toString() === right_snapshot_id ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
