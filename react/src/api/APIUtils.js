@@ -441,8 +441,8 @@ export async function addGitHubToken(token) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      "gihtub_token" : token,
-    }),
+      "github_token" : token,
+    })
   };
 
   return await fetch((`/api/Github/addToken`), headers)
