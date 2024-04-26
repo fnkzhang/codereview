@@ -3,6 +3,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from 'jwt-decode';
 import { Dropdown, Avatar } from 'flowbite-react';
 import getCookie, { deleteCookie } from "../utils/utils";
+import GitHubStatus from "./GitHub/GitHubStatus"
 
 export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData } ){
 
@@ -137,7 +138,9 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
           label="Account"
         >
           <Dropdown.Item className="bg-background" onClick={handleLogout}>Logout</Dropdown.Item>
-          <Dropdown.Item className="bg-background">Connect to Github</Dropdown.Item>
+          <Dropdown.Item className="bg-background">
+            <GitHubStatus/>
+          </Dropdown.Item>
         </Dropdown>
         {displayProfileImage()}
         </div>
