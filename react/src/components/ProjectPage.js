@@ -43,7 +43,7 @@ export default function ProjectPage( props ) {
     }
 
     fetchData()
-  })
+  }, [project_id])
 
   function handleFolderClick (folder) {
     setFolderStack([...folderStack, folder])
