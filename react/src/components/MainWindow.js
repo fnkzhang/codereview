@@ -26,27 +26,16 @@ export default function MainWindow( props ) {
     navigate(0)
   }
 
-  const DisplaySnapshotCreateButton = () => {
-
-
-
-    return (
-    <div className=" m-5 text-textcolor text-xl ">
-      <button className="p-3 rounded-lg border-2 transition-all duration-300
-       hover:bg-alternative m-1" onClick={handleCreateSnapshotClick}>
-        Add New Snapshot
-      </button> 
-    </div>
-      
-  )}
-
-  useEffect(() => {
-    console.log(hasUpdatedCode, "SWTG")
-  }, [hasUpdatedCode])
+  const DisplaySnapshotCreateButton = () => (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300
+        hover:bg-alternative m-1" onClick={handleCreateSnapshotClick}>
+          Add New Snapshot
+        </button> 
+      </div>
+  )
 
   if (props.isLoggedIn) {
-    // console.log(snapshots)
-    // console.log(hasUpdatedCode)
     return(
       <div className="h-screen">
         <div className="flex">
@@ -65,10 +54,7 @@ export default function MainWindow( props ) {
           latestSnapshotData={snapshots[snapshots.length - 1]}
           setHasUpdatedCode={setHasUpdatedCode}
           setDataToUpload={setDataToUpload}/>
-          
-         
       </div>
-
     )
   }
   
