@@ -62,12 +62,11 @@ export default function ProjectPage( props ) {
         className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
         onClick={() => handleFolderClick(folder)}
       >
-        <h4 className="text-textcolor p-1">
-          <span className="font-bold">Folder Name: </span>
-          {name}
+        <h4 className="text-textcolor text-xl p-1">
+          <span className="font-bold">{name}</span>
         </h4>
         <h4 className="text-textcolor p-1">
-          <span className="font-bold">Folder ID: </span>
+          <span className="font-bold">ID: </span>
           {id}
         </h4>
       </Card>
@@ -80,12 +79,11 @@ export default function ProjectPage( props ) {
         className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
         onClick={() => handleDocumentClick(id, name)}
       >
-        <h4 className="text-textcolor p-1">
-          <span className="font-bold">Document Name: </span>
-          {name}
+        <h4 className="text-textcolor text-xl p-1">
+          <span className="font-bold">{name} </span>
         </h4>
         <h4 className="text-textcolor p-1">
-          <span className="font-bold">Document ID: </span>
+          <span className="font-bold">ID: </span>
           {id}
         </h4>
         <h4 className="text-textcolor p-1"><span className="font-bold">Date Modified: </span>{date}</h4>
@@ -107,51 +105,66 @@ export default function ProjectPage( props ) {
     return 0; // names are equal
   }
 
-  function DisplayDocumentBox() {
+  function DisplayFolderBox() {
     let currentFolder = folderStack[folderStack.length - 1]
-    if(currentFolder.content.documents.length !== 0
-      || currentFolder.content.folders.length !== 0) {
+    if(currentFolder.content.folders.length !== 0) {
       return (
-        <div className="flex flex-wrap">
-          {
-            currentFolder.content.folders.sort(sortByName)
-            .map((folder, index) => {
-              return (<FolderDisplayBox
-                key={index}
-                id={folder.folder_id}
-                name={folder.name}
-                folder={folder}
-              />)
-            })
-          }
-          {
-            currentFolder.content.documents.sort(sortByName).
-            map((document, index) => {
-              return (<DocumentDisplayBox 
-                key={index} 
-                id={document.doc_id} 
-                name={document.name}
-                date={new Date(document.date_modified)
-                  .toLocaleDateString("en-US", { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric', 
-                    weekday: 'long',  
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    second: 'numeric',
-                    timeZoneName: 'short',
-                  })}
-              />)
-            })
-          }
+        <div>
+          <h4 className="text-textcolor text-2xl m-2">Folders: </h4>
+          <div className="flex flex-wrap">
+            {
+              currentFolder.content.folders.sort(sortByName)
+              .map((folder, index) => {
+                return (<FolderDisplayBox
+                  key={index}
+                  id={folder.folder_id}
+                  name={folder.name}
+                  folder={folder}
+                />)
+              })
+            }
+          </div>
         </div>
       )
     }
+  }
 
-    return (<div className="m-20 text-center text-textcolor text-2xl">
-      There is nothing in this Folder.
-  </div>)
+  function DisplayDocumentBox() {
+    let currentFolder = folderStack[folderStack.length - 1]
+    if(currentFolder.content.documents.length !== 0) {
+      return (
+        <div>
+          <h4 className="text-textcolor text-2xl m-2">Documents: </h4>
+          <div className="flex flex-wrap">
+            {
+              currentFolder.content.documents.sort(sortByName).
+              map((document, index) => {
+                return (<DocumentDisplayBox 
+                  key={index} 
+                  id={document.doc_id} 
+                  name={document.name}
+                  date={new Date(document.date_modified)
+                    .toLocaleDateString("en-US", { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric', 
+                      weekday: 'long',  
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      second: 'numeric',
+                      timeZoneName: 'short',
+                    })}
+                />)
+              })
+            }
+          </div>
+        </div>
+      )
+    }
+    if(currentFolder.content.folders.length === 0)
+      return (<div className="m-20 text-center text-textcolor text-2xl">
+        There is nothing in this Folder.
+      </div>)
   }
 
   function DisplayDeleteButton() {
@@ -236,6 +249,7 @@ export default function ProjectPage( props ) {
         <DisplayNavigateParentFolderButton/>
       </div>
 
+      <DisplayFolderBox/>
       <DisplayDocumentBox/>
     </div>
     
