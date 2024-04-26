@@ -22,9 +22,7 @@ export default function MainWindow( props ) {
   // Handle Setting Program Language that document uses
   useEffect(() => {
     let extensionName = location.state.documentName.split('.')[1].toLowerCase()
-    console.log(extensionName)
     extensionName = EXTENSION_TO_LANGUAGE_MAP[extensionName]
-    console.log(extensionName)
 
     setEditorLanguage(extensionName)
   }, [location.state.documentName])

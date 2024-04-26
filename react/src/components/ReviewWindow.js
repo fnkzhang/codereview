@@ -142,8 +142,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
       </div>
     )
   }
-
-  console.log(editorLanguage)
+  
   return (
     <div>
       <div className="h-9/10 w-screen flex text-center">
