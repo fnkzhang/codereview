@@ -192,8 +192,9 @@ def getAllUserProjects(user_email):
         "body": projects
         }
 
-@app.route('/api/Project/<proj_name>/', methods = ["POST"])
-def createProject(proj_name):
+#put project name in body
+@app.route('/api/Project/createProject/', methods = ["POST"])
+def createProject():
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -207,6 +208,8 @@ def createProject(proj_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    body = request.get_json()
+    proj_name = body["project_name"]
     pid = createID()
     root_folder_id = createNewFolder('root', 0, pid)
     with engine.connect() as conn:
@@ -1124,9 +1127,9 @@ def addGithubToken():
         }
 
 #needs auth because everything does lmao
-#needs "owner_name", "repo_name", github repo is ownername/reponame, they must be separated or else it doesn't register
-@app.route('/api/Github/<owner_name>/<repo_name>/', methods=["GET"])
-def getGithubRepositoryBranches(owner_name, repo_name):
+#needs parameter, ex ..../getRepositoryBranches/?repository=fnkzhang/codereview
+@app.route('/api/Github/getRepositoryBranches/', methods=["GET"])
+def getGithubRepositoryBranches():
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -1140,8 +1143,9 @@ def getGithubRepositoryBranches(owner_name, repo_name):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    repository = request.args.get("repository")
     token = getUserInfo(idInfo["email"])["github_token"]
-    success, rv = getBranches(token, owner_name + '/' + repo_name)#body["repository"])
+    success, rv = getBranches(token, repository)#body["repository"])
     if (not success):
         return {"success":False,
                 "reason": str(rv)
@@ -1265,11 +1269,12 @@ def getProjectDeletedDocuments(proj_id):
         "body": arrayOfDeletedDocuments
     }
 
-#needs "branch" in arguments, for example /api/Github/fnkzhang/codereview/12345/getNonexistent/?branch=main
-@app.route('/api/Github/<owner_name>/<repo_name>/<proj_id>/getNonexistent/', methods=["GET"])
-def getProjectNonexistentGithubDocuments(owner_name, repo_name, proj_id):
+#needs "branch" in arguments, for example /api/Github/12345/getNonexistent/?owner_name=fnkzhang&repo_name=coderaview&branch=main
+@app.route('/api/Github/<proj_id>/getNonexistent/', methods=["GET"])
+def getProjectNonexistentGithubDocuments(proj_id):
     headers = request.headers
-    branch = request.get.args.get("branch")
+    repository = request.args.get("repository")
+    branch = request.args.get("branch")
     if not isValidRequest(headers, ["Authorization"]):
         return {
                 "success":False,
@@ -1287,7 +1292,7 @@ def getProjectNonexistentGithubDocuments(owner_name, repo_name, proj_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     user = getUserInfo(idInfo["email"])
     token = user["github_token"]
-    documents = getProjectNonexistentGithubDocumentsUtil(owner_name + '/' + repo_name, branch, token, proj_id)
+    documents = getProjectNonexistentGithubDocumentsUtil(repository, branch, token, proj_id)
     return {"success":True, "reason":"", "body":documents}
 
 #testfunctionifthatwasn'tobviousbyitsname, is currently emulating push
