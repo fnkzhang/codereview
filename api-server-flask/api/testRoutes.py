@@ -1,5 +1,5 @@
 from app import get_app
-app = get_app()
+app = get_app(__name__)
 
 from flask import request
 
