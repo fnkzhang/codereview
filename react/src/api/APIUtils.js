@@ -358,7 +358,7 @@ export async function getProjectDocuments(proj_id) {
  * @param {string} language The coding language used
  * @returns {string} The code implementation based on the suggestion
 */
-export async function getCodeImplementation(code, highlightedCode, startLine, endLine, comment) {
+export async function getCodeImplementation(code, highlightedCode, startLine, endLine, comment, language) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -399,7 +399,7 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
  * endLine: number - line # to stop highlight
  * suggestion: string - Suggestion on how to improve the highlighted section of code
 */
-export async function getCommentSuggestion(code) {
+export async function getCommentSuggestion(code, language) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
