@@ -355,6 +355,7 @@ export async function getProjectDocuments(proj_id) {
  * @param {number} startLine Starting line # of highlighted code
  * @param {number} endLine Ending line # of highlighted code
  * @param {string} comment A suggestion on what to do with the highlighted code
+ * @param {string} language The coding language used
  * @returns {string} The code implementation based on the suggestion
 */
 export async function getCodeImplementation(code, highlightedCode, startLine, endLine, comment) {
@@ -372,7 +373,8 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
       "highlightedCode": highlightedCode,
       "startLine": startLine,
       "endLine": endLine,
-      "comment": comment
+      "comment": comment,
+      "language": language
     })
   };
 
@@ -391,6 +393,7 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
 
 /**
  * @param {string} code The entire code in the document/snapshot
+ * @param {string} language The coding language used
  * @returns {object[]} A list of JSON objects that have keys startLine, endLine, and suggestion.
  * startLine: number - line # to begin highlight
  * endLine: number - line # to stop highlight
@@ -407,7 +410,8 @@ export async function getCommentSuggestion(code) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      "code": code
+      "code": code,
+      "language": language
     })
   };
 
