@@ -1,4 +1,5 @@
-from flaskApi import app
+from app import get_app
+app = get_app()
 
 from flask import request
 
@@ -21,3 +22,6 @@ def test_llm():
         }
 
     return response
+
+def get_app():
+    return app
