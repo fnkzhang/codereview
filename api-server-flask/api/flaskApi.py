@@ -1445,14 +1445,8 @@ def testo():
     com.create_comment(body="what was the point", path="weee/foldername123/testfile")
     com.create_comment(body="what was the point2", path="README.md")
     '''
-    a = []
-    with engine.connect() as conn:
-        stmt = select(models.Project).where(models.Project.root_folder == None)
-        results = conn.execute(stmt)
-        for result in results:
-            b = result._asdict()
-            deleteProjectUtil(b["proj_id"])
-            a.append(b)
+    a = filterCommentsByPredicate(models.Comment.author_email == "sichuan@ucdavis.edu" and models.Comment.content == "Remove this")
+    a = [b for b in a if b["content"] == "Remove this"]
     return {"erm":a}
 
 @app.route('/api/Project/<proj_id>/getFolderTree/',methods=["GET"])

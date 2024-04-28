@@ -180,9 +180,10 @@ def assembleGithubComments(snapshotIDs):
     for snapshotID in snapshotIDs:
         doc_id = getSnapshotInfo(snapshotID)["associated_document_id"]
         documentPaths = getDocumentPath(doc_id)
-        commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID)
+        commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID )
         for comment in commentList:
-            githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + highlight_start_y + ' to Line ' + highlight_end_y + '\n'+ comment.content)
+            if comment["is_resolved"] == False:
+                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + highlight_start_y + ' to Line ' + highlight_end_y + '\n'+ comment.content)
     return githubComments   
 
 
