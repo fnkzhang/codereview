@@ -178,7 +178,7 @@ def assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs):
 def assembleGithubComments(snapshotIDs):
     githubComments = []
     for snapshotID in snapshotIDs:
-        doc_id = getSnapshotInfo(snapshotID)["associated_doc_id"]
+        doc_id = getSnapshotInfo(snapshotID)["associated_document_id"]
         documentPaths = getDocumentPath(doc_id)
         commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID)
         for comment in commentList:

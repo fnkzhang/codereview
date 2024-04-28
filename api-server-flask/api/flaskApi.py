@@ -1450,7 +1450,9 @@ def testo():
         stmt = select(models.Project).where(models.Project.root_folder == None)
         results = conn.execute(stmt)
         for result in results:
-            a.append(result._asdict())
+            b = result._asdict()
+            deleteProjectUtil(b["proj_id"])
+            a.append(b)
     return {"erm":a}
 
 @app.route('/api/Project/<proj_id>/getFolderTree/',methods=["GET"])
