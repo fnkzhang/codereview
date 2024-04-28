@@ -1357,7 +1357,7 @@ def pushToExistingBranch(proj_id):
     ref.edit(sha=commit.sha, force=True)
     commit = repo.get_branch(body["branch"]).commit
     allcomments = assembleGithubComments(snapshotIDs)
-    for comment in :
+    for comment in allcomments:
         com.create_comment(body=comment)
     return {"success":True, "reason":"", "body":updated_files}
 
@@ -1426,7 +1426,7 @@ def pushToNewBranch(proj_id):
     ref.edit(sha=commit.sha, force=True)
     commit = repo.get_branch(body["branch"]).commit
     allcomments = assembleGithubComments(snapshotIDs)
-    for comment in :
+    for comment in allcomments:
         com.create_comment(body=comment)
     return {"success":True, "reason":"", "body":updated_files}
 
