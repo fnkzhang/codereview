@@ -118,7 +118,7 @@ def checkIsValidUser():
 #literally just authenticate but it adds a user to the database.
 #needs sections:
     #credentials
-@app.route('/api/user/signup', methods = ["POST"])
+@app.route('/api/user/signup/', methods = ["POST"])
 def signUp():
     headers = request.headers
     if (not isValidRequest(headers, ["Authorization"])):
@@ -1295,15 +1295,15 @@ def getProjectNonexistentGithubDocuments(proj_id):
     documents = getProjectNonexistentGithubDocumentsUtil(repository, branch, token, proj_id)
     return {"success":True, "reason":"", "body":documents}
 
+
 #testfunctionifthatwasn'tobviousbyitsname, is currently emulating push
 #put list of snapshots ID's to push in "snapshots"
 #put list of paths in deletedDocuments, should just be the samae paths as received in 
 #put repository including owner name in "repository", ex: billingtonbill12/testrepo
 #put branchname in "branch"
-#put True/False into "newbranch"
 #put commit message in "message", or if we eventually put a generic message that's fine
-@app.route('/api/Github/<proj_id>/Push/', methods=["POST"])
-def pushToBranch(proj_id):
+@app.route('/api/Github/<proj_id>/PushToExisting/', methods=["POST"])
+def pushToExistingBranch(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -1328,10 +1328,7 @@ def pushToBranch(proj_id):
     if (not success):
         return {"success":False,
                 "reason": str(rv)}
-    if body["newbranch"] == True and body["branch"] in rv:
-        return {"success":False,
-                "reason": "branch already exists"}
-    if body["newbranch"] == False and body["branch"] not in rv:
+    if body["branch"] not in rv:
         return {"success":False,
                 "reason": "branch does not exist"}
     repo = g2.get_repo(body["repository"])
@@ -1340,59 +1337,117 @@ def pushToBranch(proj_id):
     body = request.get_json()
     snapshotIDs = body["snapshots"]
     deletedDocumentPaths = body["deletedDocuments"]
-    tree_elements = []
-    for deletedDocumentPath in deletedDocumentPaths:
-        tree_elements.append(InputGitTreeElement(path = deletedDocumentPath,
-                mode = "100644",
-                type = "blob",
-                sha = None
-            ))
-    for snapshotID in snapshotIDs:
-        snapshot = getSnapshotInfo(snapshotID)
-        document = getDocumentInfo(snapshot["associated_document_id"])
-        blob = repo.create_git_blob(
-                content = getSnapshotContentUtil(snapshotID),
-                encoding = 'utf-8',
-                )
-        tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
-                mode = "100644",
-                type = "blob",
-                sha = blob.sha
-            ))
-    if body["newbranch"] == True:
-        branch_sha = repo.get_branch(repo.default_branch).commit.sha
+    tree_elements = assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs)
+    branch_sha = repo.get_branch(body["branch"]).commit.sha
+    try:
         new_tree = repo.create_git_tree(
-            tree = tree_elements
+            tree = tree_elements,
+            base_tree = repo.get_git_tree(sha=branch_sha)
             )
-        commit = repo.create_git_commit(
+    except Exception as e:
+        new_tree = repo.create_git_tree(
+            tree = tree_elements,
+            )
+    commit = repo.create_git_commit(
         message=body["message"],
         tree = repo.get_git_tree(sha=new_tree.sha),
-        parents=[],
+        parents=[repo.get_git_commit(branch_sha)],
         )
-        ref = repo.create_git_ref(ref='refs/heads/' + body["branch"], sha = branch_sha)
-    else:
-        branch_sha = repo.get_branch(body["branch"]).commit.sha
-        try:
-            new_tree = repo.create_git_tree(
-                tree = tree_elements,
-                base_tree = repo.get_git_tree(sha=branch_sha)
-                )
-        except Exception as e:
-            new_tree = repo.create_git_tree(
-                tree = tree_elements,
-                )
-        commit = repo.create_git_commit(
-            message=body["message"],
-            tree = repo.get_git_tree(sha=new_tree.sha),
-            parents=[repo.get_git_commit(branch_sha)],
-            )
-        ref = repo.get_git_ref(ref='heads/' + body["branch"])
+    ref = repo.get_git_ref(ref='heads/' + body["branch"])
     ref.edit(sha=commit.sha, force=True)
+    commit = repo.get_branch(body["branch"]).commit
+    allcomments = assembleGithubComments(snapshotIDs)
+    for comment in :
+        com.create_comment(body=comment)
     return {"success":True, "reason":"", "body":updated_files}
+
+
+#testfunctionifthatwasn'tobviousbyitsname, is currently emulating push
+#put list of snapshots ID's to push in "snapshots"
+#put list of paths in deletedDocuments, should just be the samae paths as received in 
+#put repository including owner name in "repository", ex: billingtonbill12/testrepo
+#put branchname in "branch"
+#put branch you're building off of into "oldbranch"
+#put commit message in "message", or if we eventually put a generic message that's fine
+@app.route('/api/Github/<proj_id>/PushToNewBranch/', methods=["POST"])
+def pushToNewBranch(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+        #
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    body = request.get_json()
+    user = getUserInfo(idInfo["email"])
+    token = user["github_token"]
+    g2 = Github(auth = Auth.Token(token))
+    success, rv = getBranches(token, body["repository"])
+    if (not success):
+        return {"success":False,
+                "reason": str(rv)}
+    if body["oldbranch"] not in rv:
+        return {"success":False,
+                "reason": "branch getting built off of does not exist"}
+    if body["branch"] in rv:
+        return {"success":False,
+                "reason": "branch already exists"}
+    repo = g2.get_repo(body["repository"])
+    updated_files = []
+    folderIDToPath = getProjectFoldersAsPaths(proj_id)
+    body = request.get_json()
+    snapshotIDs = body["snapshots"]
+    deletedDocumentPaths = body["deletedDocuments"]
+    tree_elements = assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs)
+    try:
+        new_tree = repo.create_git_tree(
+            tree = tree_elements,
+            base_tree = repo.get_git_tree(sha=branch_sha)
+            )
+    except Exception as e:
+        new_tree = repo.create_git_tree(
+            tree = tree_elements,
+            )
+    commit = repo.create_git_commit(
+        message=body["message"],
+        tree = repo.get_git_tree(sha=new_tree.sha),
+        parents=[repo.get_git_commit(branch_sha)],
+        )
+    ref = repo.create_git_ref(ref='refs/heads/' + body["branch"], sha = branch_sha)
+    ref.edit(sha=commit.sha, force=True)
+    commit = repo.get_branch(body["branch"]).commit
+    allcomments = assembleGithubComments(snapshotIDs)
+    for comment in :
+        com.create_comment(body=comment)
+    return {"success":True, "reason":"", "body":updated_files}
+
+@app.route('/api/testo/', methods=["POST"])
+def testo():
+    user = getUserInfo("billingtonbill12@gmail.com")
+    token = user["github_token"]
+    g2 = Github(auth = Auth.Token(token))
+    repo = g2.get_repo("billingtonbill12/testrepo")
+    com = repo.get_branch("main").commit
+    print(com.get_comments())
+    for i in com.get_comments():
+        print(i.body)
+        print(i.line)
+    com.create_comment(body="what was the point", path="weee/foldername123/testfile")
+    com.create_comment(body="what was the point2", path="README.md")
+    return {"erm":"ern"}
 
 @app.route('/api/Project/<proj_id>/getFolderTree/',methods=["GET"])
 def getProjectFolderTree(proj_id):
-    '''
+    
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -1408,7 +1463,7 @@ def getProjectFolderTree(proj_id):
         }
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    '''
+    
     project = getProjectInfo(proj_id)
     foldertree = getFolderTree(project["root_folder"])
     return {

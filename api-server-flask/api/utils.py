@@ -153,6 +153,40 @@ def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
     projectDocumentPaths = set([getDocumentPath(document['doc_id']) for document in projectDocuments])
     nonexistant = list(allGithubFiles - projectDocumentPaths)
     return nonexistant
+def assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs):
+    tree_elements = []
+    for deletedDocumentPath in deletedDocumentPaths:
+        tree_elements.append(InputGitTreeElement(path = deletedDocumentPath,
+                mode = "100644",
+                type = "blob",
+                sha = None
+            ))
+    for snapshotID in snapshotIDs:
+        snapshot = getSnapshotInfo(snapshotID)
+        document = getDocumentInfo(snapshot["associated_document_id"])
+        blob = repo.create_git_blob(
+                content = getSnapshotContentUtil(snapshotID),
+                encoding = 'utf-8',
+                )
+        tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
+                mode = "100644",
+                type = "blob",
+                sha = blob.sha
+            ))
+    return tree_elements
+
+def assembleGithubCommentArguments(snapshotIDs):
+    githubComments = []
+    documentPaths = {}
+    for snapshotID in snapshotIDs:
+        doc_id = getSnapshotInfo(snapshotID)["associated_doc_id"]
+        documentPaths[doc_id] = getDocumentPath(doc_id)
+        commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID)
+        for comment in commentList:
+            body = "Comment From CodeReview\nComment Author:" + comment["author_email"] + "\n" + comment.content
+    return 2
+    
+
 
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
