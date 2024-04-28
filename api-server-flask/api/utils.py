@@ -175,17 +175,15 @@ def assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs):
             ))
     return tree_elements
 
-def assembleGithubCommentArguments(snapshotIDs):
+def assembleGithubComments(snapshotIDs):
     githubComments = []
-    documentPaths = {}
     for snapshotID in snapshotIDs:
         doc_id = getSnapshotInfo(snapshotID)["associated_doc_id"]
-        documentPaths[doc_id] = getDocumentPath(doc_id)
+        documentPaths = getDocumentPath(doc_id)
         commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID)
         for comment in commentList:
-            body = "Comment From CodeReview\nComment Author:" + comment["author_email"] + "\n" + comment.content
-    return 2
-    
+            githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + highlight_start_y + ' to Line ' + highlight_end_y + '\n'+ comment.content)
+    return githubComments   
 
 
 def getDocumentInfo(doc_id):
@@ -240,7 +238,6 @@ def moveDocumentUtil(doc_id, parent_folder):
 
         path = getDocumentPath(doc_id)
         document = getDocumentInfo(doc_id)
-        stmt = delete(models.DeletedDocument).where(models.DeletedDocument.path == path, models.DeletedDocument.associated_proj_id == document["associated_proj_id"])
         conn.execute(stmt)
         conn.commit()
     return parent_folder

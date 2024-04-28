@@ -1432,6 +1432,7 @@ def pushToNewBranch(proj_id):
 
 @app.route('/api/testo/', methods=["POST"])
 def testo():
+    '''
     user = getUserInfo("billingtonbill12@gmail.com")
     token = user["github_token"]
     g2 = Github(auth = Auth.Token(token))
@@ -1443,7 +1444,14 @@ def testo():
         print(i.line)
     com.create_comment(body="what was the point", path="weee/foldername123/testfile")
     com.create_comment(body="what was the point2", path="README.md")
-    return {"erm":"ern"}
+    '''
+    a = []
+    with engine.connect() as conn:
+        stmt = select(models.Project).where(models.Project.root_folder == None)
+        results = conn.execute(stmt)
+        for result in results:
+            a.append(result._asdict())
+    return {"erm":a}
 
 @app.route('/api/Project/<proj_id>/getFolderTree/',methods=["GET"])
 def getProjectFolderTree(proj_id):
