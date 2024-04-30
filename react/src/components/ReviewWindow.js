@@ -4,22 +4,26 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData}) {
-
+export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
   const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
-  const [updatedCode, setCode] = useState(null); 
+  const [updatedCode, setCode] = useState(null);
+
+  const [initialUpdatedCode, setInitialUpdatedCode] = useState(null)
+
   const [currentHighlightStart, setStart] = useState(null);
   const [currentHighlightEnd, setEnd] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
   const [snapshotId, setSnapshotID] = useState(null);
+
   const decorationIdsRefOrig = useRef([]);
   const decorationIdsRefModif = useRef([]);
 
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
+  // Get Code for the 2 editors
   useEffect(() => {
     const fetchData = async () => {
       setEditorReady(false)
@@ -29,9 +33,10 @@ export default function ReviewWindow({ comments, setComments, userData}) {
           getDocSnapshot(project_id, document_id, left_snapshot_id),
           getDocSnapshot(project_id, document_id, right_snapshot_id)
         ]);
-        console.log(left_doc.body, right_doc.body)
         setInit(left_doc.body)
         setCode(right_doc.body)
+        setInitialUpdatedCode(right_doc.body)
+        
       } catch (error) {
         console.log(error)
       } finally {
@@ -42,6 +47,7 @@ export default function ReviewWindow({ comments, setComments, userData}) {
     fetchData()
   }, [document_id, left_snapshot_id, right_snapshot_id])
 
+  // 
   useEffect(() => {
     if (editorRef.current) {
       const originalEditor = editorRef.current.getOriginalEditor();
@@ -60,6 +66,33 @@ export default function ReviewWindow({ comments, setComments, userData}) {
       modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
     }
   }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady ])
+
+
+  // Handle Code Edit Detection For New Snapshot Creation
+  useEffect(() => {
+    if (initialUpdatedCode === null && updatedCode === null)
+      return
+
+    // Matching length but code is different or no change made
+    if (initialUpdatedCode.length === updatedCode.length) {
+
+      if(initialUpdatedCode !== updatedCode) {
+        console.log("Code Not Same as Initial")
+        setHasUpdatedCode(true)
+        setDataToUpload(updatedCode)
+      } else {
+        setHasUpdatedCode(false)
+      }
+      
+      return 
+    }
+
+    console.log("Code Not Same as Initial")
+    // No matching length and is different
+    setHasUpdatedCode(true)
+    setDataToUpload(updatedCode)
+
+  }, [updatedCode])
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
@@ -109,7 +142,7 @@ export default function ReviewWindow({ comments, setComments, userData}) {
       </div>
     )
   }
-
+  
   return (
     <div>
       <div className="h-9/10 w-screen flex text-center">
@@ -118,13 +151,18 @@ export default function ReviewWindow({ comments, setComments, userData}) {
             className="Monaco-editor"
             original={initialCode}
             modified={updatedCode}
-            originalLanguage="python"
-            modifiedLanguage="python"
+            originalLanguage={editorLanguage}
+            modifiedLanguage={editorLanguage}
             onMount={(editor, monaco) => {
+              // Set Value Because Editor Changes length of the Document after mounting
+              setCode(editor.getModifiedEditor().getValue())
+              setInitialUpdatedCode(editor.getModifiedEditor().getValue())
+
               editorRef.current = editor
               monacoRef.current = monaco
               editor.getModifiedEditor().updateOptions({
-                readOnly: true
+                // Set True Or False if Matching Right Editor Snapshot
+                readOnly: latestSnapshotData?.snapshot_id?.toString() === right_snapshot_id ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true

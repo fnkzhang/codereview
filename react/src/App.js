@@ -7,6 +7,7 @@ import ProjectPage from './components/ProjectPage.js';
 import ProjectCreation from './components/Projects/ProjectCreation.js';
 import ProjectDeletion from './components/Projects/ProjectDeletion.js';
 import DocumentCreation from './components/Documents/DocumentCreation.js';
+import FolderCreation from './components/Folders/FolderCreation.js';
 import { Navbar } from 'flowbite-react';
 
 function App() {
@@ -47,8 +48,8 @@ function App() {
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/Delete/:project_id/" element={<ProjectDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="/Project/:project_id/:project_root_folder_id/Document/Create" element={<DocumentCreation/>}/>
-          {/* todo add new document snapshot selection page for a document */}
+          <Route path="/Project/:project_id/:parent_folder_id/Document/Create" element={<DocumentCreation/>}/>
+          <Route path="/Project/:project_id/:parent_folder_id/Folder/Create" element={<FolderCreation/>}/>
           <Route path="/Document/:document_id/" /> 
           <Route path="Project/:project_id/Document/:document_id/:left_snapshot_id/:right_snapshot_id" element={<MainWindow
             isLoggedIn={isLoggedIn} userData={userData}/>}/>

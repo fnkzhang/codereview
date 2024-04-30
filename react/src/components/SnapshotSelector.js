@@ -5,17 +5,16 @@ import { Dropdown } from "flowbite-react";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 
-export default function SnapshotSelector({ comments }) { 
+export default function SnapshotSelector({ comments, snapshots, setSnapshots, fileExtensionName }) { 
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
     const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
 
-    const [snapshots, setSnapshots] = useState([])
+    //const [snapshots, setSnapshots] = useState([])
     const navigate = useNavigate()
 
     const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
     // Get snapshots for document
     useEffect(() => {
-
         const grabSnapshots = async () => {
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
           console.log(result)
@@ -28,19 +27,19 @@ export default function SnapshotSelector({ comments }) {
 
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
-      navigate(`/Project/${project_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`)
+      navigate(`/Project/${project_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`,  {state: {documentName: fileExtensionName}})
     }
 
     async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedRightSnapshotIndex(selectedIndex)
-      navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`)
+      navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`,  {state: {documentName: fileExtensionName}})
     }
 
     function filterComments(snapshot) {
       if (comments.length > 0)
         return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot_id) && (comment.is_resolved === false)).length
       
-      return []
+      return 0
     }
 
     function DisplayLeftSnapshots() {

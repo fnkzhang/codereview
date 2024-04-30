@@ -100,6 +100,31 @@ export async function getDocSnapshot(proj_id, doc_id, snap_id) {
   return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}/`), headers)
     .then(response => response.json())
 }
+export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data) {
+  let oAuthToken = getCookie("cr_id_token")
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "data": snapshot_data
+    })
+  }
+
+  // Fail = Null
+  // Success = SnapshotID
+  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/`), headers)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success)
+        return data.body
+      return null
+    })
+    .catch(error => console.log(error))
+}
 
 // snapshot_id: int
 // author_email: string
@@ -132,6 +157,7 @@ export async function createComment(snapshot_id, author_email, reply_to_id, cont
 
   return await fetch(`/api/Snapshot/${snapshot_id}/comment/create`, headers)
     .then(response => response.json())
+
 }
 
 //
@@ -282,17 +308,17 @@ export async function getUserProjects(userEmail) {
   };
 
   return await fetch((`/api/User/${userEmail}/Project/`), headers)
-  .then(response => response.json()
+  .then(response => response.json())
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
     }
 
     return data.body
-}))
+  })
 }
+
 export async function getProjectInfo(project_id) {
   let oAuthToken = getCookie("cr_id_token")
 
@@ -311,7 +337,6 @@ export async function getProjectInfo(project_id) {
   return await fetch((`/api/Project/${project_id}/`), headers)
   .then(response => response.json()
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
@@ -339,13 +364,69 @@ export async function getProjectDocuments(proj_id) {
   return await fetch((`/api/Document/${proj_id}/`), headers)
   .then(response => response.json())
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
     }
 
     return data.body
+  })
+}
+
+export async function getProjectTree(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Project/${proj_id}/getFolderTree/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+
+    return data.body
+  })
+}
+
+export async function createFolder(folder_name, proj_id, parent_folder_id) {
+
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "folder_name" : folder_name,
+      "parent_folder" : parent_folder_id,
+    }),
+  };
+
+  return await fetch((`/api/Folder/${proj_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+
+    return data
   })
 }
 
@@ -364,6 +445,8 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
   let headers = {
     method: "POST",
     mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
     headers: {
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
@@ -388,7 +471,8 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
     }
 
     return data.body
-  })
+  });
+
 }
 
 /**
@@ -405,6 +489,8 @@ export async function getCommentSuggestion(code, language) {
   let headers = {
     method: "POST",
     mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
     headers: {
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
@@ -425,5 +511,59 @@ export async function getCommentSuggestion(code, language) {
     }
 
     return data.body
+  })
+}
+  
+
+export async function addGitHubToken(token) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "github_token" : token,
+    })
+  };
+
+  return await fetch((`/api/Github/addToken`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data
+  })
+}
+
+export async function hasGitHubToken() {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Github/userHasGithub/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data
   })
 }
