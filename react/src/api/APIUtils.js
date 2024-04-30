@@ -308,7 +308,7 @@ export async function getUserProjects(userEmail) {
   };
 
   return await fetch((`/api/User/${userEmail}/Project/`), headers)
-  .then(response => response.json()
+  .then(response => response.json())
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
@@ -316,8 +316,9 @@ export async function getUserProjects(userEmail) {
     }
 
     return data.body
-}))
+  })
 }
+
 export async function getProjectInfo(project_id) {
   let oAuthToken = getCookie("cr_id_token")
 
