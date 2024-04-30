@@ -523,12 +523,12 @@ def getDocument(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #if not userExists(idInfo["email"]):
-    #    return {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
+    if not userExists(idInfo["email"]):
+       return {
+               "success": False,
+               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
+               "body":{}
+       }
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
@@ -1049,6 +1049,27 @@ def addGithubToken():
     return {"success":True,
             "reason": "",
         }
+
+#checks whether authenticated user has github connected
+@app.route('/api/Github/userHasGithub/', methods = ["GET"])
+def getUserGithubStatus():
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    user = getUserInfo(idInfo["email"])
+    if user == None:
+        return {"success":False, "reason":"User does not exist"}
+    return {"success:":True, "reason":"", "body": user["github_token"] != None}
 
 #needs auth because everything does lmao
 #needs "ownername", "reponame", github repo is ownername/reponame, they must be separated or else it doesn't register

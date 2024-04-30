@@ -1,20 +1,32 @@
 import React, { useEffect, useState } from "react";
 import ReviewWindow from "./ReviewWindow";
 import SnapshotSelector from "./SnapshotSelector";
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useLocation } from 'react-router';
 import { createSnapshotForDocument } from "../api/APIUtils";
+import { EXTENSION_TO_LANGUAGE_MAP } from "../utils/programLanguageMapping";
 
 export default function MainWindow( props ) {
 
   const [comments, setComments] =  useState([])
   const [snapshots, setSnapshots] = useState([])
   const [hasUpdatedCode, setHasUpdatedCode] = useState(false)
-  
+  const [editorLanguage, setEditorLanguage] = useState("")
+
   const [dataToUpload, setDataToUpload] = useState(null) // Null until set to a string value
 
-  const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
+  const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams();
 
-  const navigate = useNavigate()
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Handle Setting Program Language that document uses
+  useEffect(() => {
+    let extensionName = location.state.documentName.split('.')[1].toLowerCase()
+    extensionName = EXTENSION_TO_LANGUAGE_MAP[extensionName]
+
+    setEditorLanguage(extensionName)
+  }, [location.state.documentName])
+
   const handleCreateSnapshotClick = async () => {
     if (!dataToUpload) {
       console.log("No Data To Upload")
@@ -30,34 +42,24 @@ export default function MainWindow( props ) {
     
   }
 
-  const DisplaySnapshotCreateButton = () => {
-
-
-
-    return (
-    <div className=" m-5 text-textcolor text-xl ">
-      <button className="p-3 rounded-lg border-2 transition-all duration-300
-       hover:bg-alternative m-1" onClick={handleCreateSnapshotClick}>
-        Add New Snapshot
-      </button> 
-    </div>
-      
-  )}
-
-  useEffect(() => {
-    console.log(hasUpdatedCode, "SWTG")
-  }, [hasUpdatedCode])
+  const DisplaySnapshotCreateButton = () => (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300
+        hover:bg-alternative m-1" onClick={handleCreateSnapshotClick}>
+          Add New Snapshot
+        </button> 
+      </div>
+  )
 
   if (props.isLoggedIn) {
-    // console.log(snapshots)
-    // console.log(hasUpdatedCode)
     return(
       <div className="h-screen">
         <div className="flex">
           <SnapshotSelector
             comments={comments}
             snapshots={snapshots}
-            setSnapshots={setSnapshots}/>
+            setSnapshots={setSnapshots}
+            fileExtensionName={location.state.documentName}/>
 
           {hasUpdatedCode ? <DisplaySnapshotCreateButton/> : null}
         </div>
@@ -68,11 +70,9 @@ export default function MainWindow( props ) {
           userData={props.userData}
           latestSnapshotData={snapshots[snapshots.length - 1]}
           setHasUpdatedCode={setHasUpdatedCode}
-          setDataToUpload={setDataToUpload}/>
-          
-         
+          setDataToUpload={setDataToUpload}
+          editorLanguage={editorLanguage}/>
       </div>
-
     )
   }
   
