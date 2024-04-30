@@ -21,9 +21,13 @@ export default function MainWindow( props ) {
       return
     }
 
+    
     let response = await createSnapshotForDocument(project_id, document_id, dataToUpload)
-    console.log(response)
-    navigate(0)
+    if (response === null)
+      return
+      
+    navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${response}`)
+    
   }
 
   const DisplaySnapshotCreateButton = () => {
