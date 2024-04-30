@@ -399,6 +399,7 @@ export async function getProjectTree(proj_id) {
 }
 
 export async function createFolder(folder_name, proj_id, parent_folder_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -427,6 +428,91 @@ export async function createFolder(folder_name, proj_id, parent_folder_id) {
     return data
   })
 }
+
+/**
+ * @param {string} code The entire code in the document/snapshot
+ * @param {string} highlightedCode A substring of the code that will be changed
+ * @param {number} startLine Starting line # of highlighted code
+ * @param {number} endLine Ending line # of highlighted code
+ * @param {string} comment A suggestion on what to do with the highlighted code
+ * @param {string} language The coding language used
+ * @returns {string} The code implementation based on the suggestion
+*/
+export async function getCodeImplementation(code, highlightedCode, startLine, endLine, comment, language) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "code": code,
+      "highlightedCode": highlightedCode,
+      "startLine": startLine,
+      "endLine": endLine,
+      "comment": comment,
+      "language": language
+    })
+  };
+
+  return await fetch((`/api/llm/code-implementation`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return highlightedCode
+    }
+
+    return data.body
+  });
+
+}
+
+/**
+ * @param {string} code The entire code in the document/snapshot
+ * @param {string} language The coding language used
+ * @returns {object[]} A list of JSON objects that have keys startLine, endLine, and suggestion.
+ * startLine: number - line # to begin highlight
+ * endLine: number - line # to stop highlight
+ * suggestion: string - Suggestion on how to improve the highlighted section of code
+*/
+export async function getCommentSuggestion(code, language) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "code": code,
+      "language": language
+    })
+  };
+
+  return await fetch((`/api/llm/comment-suggestion`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return []
+    }
+
+    return data.body
+  })
+}
+  
 
 export async function addGitHubToken(token) {
   let oAuthToken = getCookie("cr_id_token")
