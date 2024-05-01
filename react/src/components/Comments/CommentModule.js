@@ -5,8 +5,8 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData,
-  editorLanguage, editorCode, editorModel}) {
+  start , end, comments, setComments, userData, latestSnapshotData,
+  editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
@@ -15,8 +15,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   const [userDataLocal] = useState(userData);
   
   useEffect(() => {
-    console.log(start, end, comments, document_id)
-
     const fetchData = async () => {
       try {
         let allComments = []
@@ -40,10 +38,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     }
   }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
-  useEffect(() => {
-    console.log("comment Updated")
-  }, [comments])
-
   function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
   };
@@ -51,7 +45,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   async function handleNewCommentSubmit() {
     try {
       console.log(snapshotId)
-      if (snapshotId != null) {
+      if (snapshotId !== null) {
         console.log("adding comment ...", userDataLocal)
 
         // ToDo Handle Nested Comments in future
@@ -108,10 +102,12 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           }).filter((comment) => {
             return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId))
           })}
+          latestSnapshotData={latestSnapshotData}
           listLineJump={moduleLineJump}
           editorLanguage={editorLanguage}
           editorCode={editorCode}
-          editorModel={editorModel}
+          checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+          getHighlightedCode={getHighlightedCode}
         />
         
       </div>

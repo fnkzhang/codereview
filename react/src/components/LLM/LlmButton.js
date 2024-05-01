@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
 
 
-export default function LlmButton( { fileCode, comment }) {
+export default function LlmButton( { editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode,
+  highlightStartX, highlightStartY, highlightEndX, highlightEndY } ) {
   
   useEffect(() => {
 
   }, [])
 
-  const handleCreateSuggestion = () => {
+  const handleCreateSuggestion = async () => {
     // Popup new suggestion
-    console.log("Clicked")
+    console.log(editorLanguage, editorCode  , checkIfCanGetLLMCode());
+    console.log(getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY));
   }
 
   

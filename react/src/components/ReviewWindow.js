@@ -8,8 +8,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
 
-  const [editorModel, setEditorModel] = useState(null);
-
   const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
   const [updatedCode, setCode] = useState(null);
@@ -119,6 +117,47 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     }
   }
 
+  /**
+   * 
+   * @param {int} highlightStartX 
+   * @param {int} highlightStartY 
+   * @param {int} highlightEndX 
+   * @param {int} highlightEndY 
+   * @returns {string}
+   */
+  function getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
+    if (left_snapshot_id != right_snapshot_id)
+      return ""
+
+    if (left_snapshot_id != latestSnapshotData?.snapshot_id?.toString())
+      return ""
+    
+    let originalEditor = editorRef.current
+
+    const range = {
+      startLineNumber: highlightStartY,
+      startColumn: highlightStartX,
+      endLineNumber: highlightEndY,
+      endColumn: highlightEndX
+    };
+
+    if (originalEditor === null)
+      return
+    
+    return originalEditor.getOriginalEditor().getModel().getValueInRange(range)
+  }
+
+  // LEFT AND RIGHT SNAPSHOT MUST BE SAME AND LATEST VERSION
+  function checkIfCanGetLLMCode() {
+    if (left_snapshot_id != right_snapshot_id)
+      return false
+
+    if (left_snapshot_id != latestSnapshotData?.snapshot_id?.toString())
+      return false
+
+    return true
+  }
+
   if (editorLoading) {
     return (
       <div>
@@ -170,7 +209,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
               })
-              
+
               // Add the onChange event listener to the editor instance
               const onChangeHandler = () => {
                 const updatedCode = editor.getModifiedEditor().getValue();
@@ -179,7 +218,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
 
               editor.onDidUpdateDiff(onChangeHandler);
 
-              setEditorModel(editor.getModifiedEditor().getModel())
               setEditorReady(true)
             }}
           />
@@ -195,9 +233,12 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             comments={comments}
             setComments={setComments}
             userData={userData}
+            latestSnapshotData={latestSnapshotData}
             editorLanguage={editorLanguage}
             editorCode={updatedCode}
-            editorModel={editorModel}
+            checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+            getHighlightedCode={getHighlightedCode}
+            // Pass Functions for comments to call
           />
         </div>
       </div>

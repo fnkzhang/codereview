@@ -4,9 +4,9 @@ import { Card } from "flowbite-react";
 import React from 'react';
 import LlmButton from '../LLM/LlmButton';
 
-function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID, 
+function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID, latestSnapshotData,
   highlightStartX, highlightStartY, highlightEndX, highlightEndY, isResolved,
-  editorLanguage, editorCode, editorModel
+  editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode
 }) {
   async function handleResolve() {
     console.log("RESOLVING COMMENT")
@@ -17,15 +17,7 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
     console.log(result)
 
   }
-  const range = {
-    startLineNumber: 0,
-    startColumn: 0,
-    endLineNumber: 3, 
-    endColumn: 5
-  };
-  //todo GET RANGE FOR LLM
-  //console.log(editorModel.getValueInRange(range))
-  console.log(highlightStartX, highlightEndX, highlightStartY, highlightEndY)
+
   function Buttons () {
     if (!isResolved) {
       return (
@@ -42,13 +34,21 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
             Jump to Line
           </button>
         </div>
-        <div>
-          <LlmButton
-            highlightedCode=""
-            editorLanguage={editorLanguage}
-            editorCode={editorCode}
-          />
-        </div>
+
+        {latestSnapshotData?.snapshot_id === snapshotID ? (
+            <div>
+              <LlmButton
+                editorLanguage={editorLanguage}
+                editorCode={editorCode}
+                checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+                getHighlightedCode={getHighlightedCode}
+                highlightStartX={highlightStartX}
+                highlightStartY={highlightStartY}
+                highlightEndX={highlightEndX}
+                highlightEndY={highlightEndY}
+              />
+          </div>
+        ) : null}
       </div>
 
       )
