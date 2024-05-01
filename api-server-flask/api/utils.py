@@ -438,8 +438,8 @@ def fetchFromCloudStorage(blobName:str):
         Name of the blob to retrieve.
     '''
     try:
-
-        blobContents = cloudStorageCache.get(blobName)
+        from cacheUtils import getCloudStorageCache
+        blobContents = getCloudStorageCache().get(blobName)
         if blobContents is None:
             blobContents = getBlob(blobName)
             print('uncached\n\n\n')
@@ -447,7 +447,7 @@ def fetchFromCloudStorage(blobName:str):
             print('cached\n\n\n')
         
         if blobContents is not None:
-            cloudStorageCache.set(blobName, blobContents)
+            getCloudStorageCache().set(blobName, blobContents)
         
         return blobContents
     except Exception as e:
