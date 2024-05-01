@@ -1,7 +1,8 @@
 import React from 'react';
 import Comment from './Comments.js';
 
-function CommentList ({ setCommentsLoading, comments, listLineJump }) {
+function CommentList ({ setCommentsLoading, comments, listLineJump,
+  editorLanguage, editorCode, editorModel }) {
   if (!Array.isArray(comments)) {
     return null
   }
@@ -34,6 +35,9 @@ function CommentList ({ setCommentsLoading, comments, listLineJump }) {
           highlightEndX={comment.highlight_end_x}
           highlightEndY={comment.highlight_end_y}
           isResolved={comment.is_resolved}
+          editorLanguage={editorLanguage}
+          editorCode={editorCode}
+          editorModel={editorModel}
         />
       ))}
     </div>

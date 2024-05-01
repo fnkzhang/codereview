@@ -7,6 +7,9 @@ import { useParams } from 'react-router';
 export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
+
+  const [editorModel, setEditorModel] = useState(null);
+
   const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
   const [updatedCode, setCode] = useState(null);
@@ -167,7 +170,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
               })
-
+              
               // Add the onChange event listener to the editor instance
               const onChangeHandler = () => {
                 const updatedCode = editor.getModifiedEditor().getValue();
@@ -176,6 +179,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
 
               editor.onDidUpdateDiff(onChangeHandler);
 
+              setEditorModel(editor.getModifiedEditor().getModel())
               setEditorReady(true)
             }}
           />
@@ -191,6 +195,9 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             comments={comments}
             setComments={setComments}
             userData={userData}
+            editorLanguage={editorLanguage}
+            editorCode={updatedCode}
+            editorModel={editorModel}
           />
         </div>
       </div>

@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData}) {
+  start , end, comments, setComments, userData,
+  editorLanguage, editorCode, editorModel}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
@@ -108,7 +109,11 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
             return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId))
           })}
           listLineJump={moduleLineJump}
+          editorLanguage={editorLanguage}
+          editorCode={editorCode}
+          editorModel={editorModel}
         />
+        
       </div>
       <div className="Comment-submit-section">
         <label className="text-textcolor">Add a new comment:</label>
@@ -119,7 +124,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button className="text-textcolor border border-alternative border-2 m-1 w-full transition duration-300 hover:bg-altBackground rounded"
+        <button className="text-textcolor border-alternative border-2 m-1 w-full transition duration-300 hover:bg-altBackground rounded"
           type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
       </div>
     </div>
