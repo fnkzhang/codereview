@@ -8,6 +8,8 @@ export default function ProjectCreation( props ) {
 
   const [projectName, setProjectName] = useState("");
   const [importFromGitHub, setImportFromGitHub] = useState(false);
+  const [gitRepo, setGitRepo] = useState("");
+  const [repoBranch, setRepoBranch] = useState("");
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
@@ -53,15 +55,11 @@ export default function ProjectCreation( props ) {
       )
     }
 
-    const handleCheckboxChange = (event) => {
-      setImportFromGitHub(event.target.checked); // Update isChecked state with checkbox value
-    };
-
     if (!importFromGitHub) {
       return (
-        <div className="flex max-w-md flex-col gap-4" id="checkbox">
+        <div className="flex mt-3 max-w-md flex-col gap-4" id="checkbox">
           <div className="flex items-center gap-2">
-            <Checkbox onChange={handleCheckboxChange} id="accept"/>
+            <Checkbox onChange={(e) => {setImportFromGitHub(e.target.checked)}} id="accept"/>
             <Label htmlFor="accept" className="flex">
               Import project contents from GitHub.
             </Label>
@@ -71,15 +69,22 @@ export default function ProjectCreation( props ) {
     }
 
     return (
-      <div className="flex max-w-md flex-col gap-4" id="checkbox">
+      <div className="flex mt-3 max-w-md flex-col gap-4" id="checkbox">
         <div className="flex items-center gap-2">
-          <Checkbox onChange={handleCheckboxChange} id="accept" defaultChecked/>
+          <Checkbox onChange={(e) => {setImportFromGitHub(e.target.checked)}} id="accept" defaultChecked/>
           <Label htmlFor="accept" className="flex">
             Import project contents from GitHub.
           </Label>
         </div>
         <div>
-          The box is checked.
+          <div className="mb-3 block">
+            <Label className="text-2xl" value="Repository Name"/>
+          </div>
+          <TextInput className="text-black shadow-white" placeholder="Name of GitHub Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow/>
+          <div className="mb-3 block">
+            <Label className="text-2xl" value="Branch Name"/>
+          </div>
+          <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow/>
         </div>
       </div>
     );
