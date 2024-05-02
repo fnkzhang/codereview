@@ -13,6 +13,7 @@ import { Navbar } from 'flowbite-react';
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [connected, setConnected] = useState(false)
   const [userData, setUserData] = useState(null)
 
   return (
@@ -35,6 +36,8 @@ function App() {
                 setIsLoggedIn={setIsLoggedIn}
                 userData={userData}
                 setUserData={setUserData}
+                connected={connected}
+                setConnected={setConnected}
               />
             </Navbar.Brand>
           </div>

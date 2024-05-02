@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { hasGitHubToken } from "../../api/APIUtils";
 
-export default function GitHubStatus () {
+export default function GitHubStatus ( props ) {
   const [loading, setLoading] = useState(true)
-  const [connected, setConnected] = useState(false)
   const GitHub_Client_ID = "5a5dc22f1c77bd1ee081"
 
   useEffect( () => {
@@ -13,7 +12,7 @@ export default function GitHubStatus () {
 
       console.log(result)
       if (result.body === true) {
-        setConnected(true)
+        props.setConnected(true)
       }
     }
 
@@ -29,8 +28,10 @@ export default function GitHubStatus () {
       }
     }
 
-    if (loading) {
+    if (loading && !props.connected) {
       sendData()
+    } else {
+      setLoading(false)
     }
   })
 
@@ -40,7 +41,7 @@ export default function GitHubStatus () {
     </div>)
   }
 
-  if (connected) {
+  if (props.connected) {
     return(<div>
       Connected to GitHub
     </div>)
