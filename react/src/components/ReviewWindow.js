@@ -4,11 +4,11 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorLanguage}) {
+export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
 
-  const [editorReady, setEditorReady] = useState(false);
+  //const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
   const [updatedCode, setCode] = useState(null);
 
