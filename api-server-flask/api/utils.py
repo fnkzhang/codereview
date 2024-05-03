@@ -29,6 +29,14 @@ from cacheUtils import cloudStorageCache, publishTopicUpdate
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
+with open('github_oath_credentials.json') as creds:
+    creds = json.load(creds)
+    github_client_id = creds["client-id"]
+    github_client_secret = creds["client-secret"]
+
+g = Github()
+gapp = g.get_oauth_application(github_client_id, github_client_secret)
+
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')

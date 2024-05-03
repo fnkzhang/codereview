@@ -1022,7 +1022,7 @@ def deleteComment(comment_id):
         "reason": "Successful Delete"
     }
 #needs auth because everything does lmao
-#put token in the body in "github_token"
+#put code in the body in "github_code"
 @app.route('/api/Github/addToken', methods=["POST"])
 def addGithubToken():
     headers = request.headers
@@ -1040,9 +1040,10 @@ def addGithubToken():
         }
 
     body = request.get_json()
-    token = body["github_token"]
+    code = body["github_code"]
+    token = gapp.get_access_token(code)
     with engine.connect() as conn:
-        stmt = update(models.User).where(models.User.user_email == idInfo["email"]).values(github_token = token)
+        stmt = update(models.User).where(models.User.user_email == idInfo["email"]).values(github_token = token.token)
         conn.execute(stmt)
         conn.commit()
     return {"success":True,
@@ -1132,7 +1133,7 @@ def pullFromBranch(proj_id):
     repo = g.get_repo(body["repository"])
     project = getProjectInfo(proj_id)
     folders = getAllProjectFolders(proj_id)
-    pathToFolderID = []
+    pathToFolderID = {}
     pathToFolderID[""] = project["root_folder"]
     contents = repo.get_contents("", body["branch"])
     updated_files = []

@@ -528,7 +528,7 @@ export async function addGitHubToken(token) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      "github_token" : token,
+      "github_code" : token,
     })
   };
 
