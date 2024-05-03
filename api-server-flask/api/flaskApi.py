@@ -1297,7 +1297,7 @@ def pullToNewProject():
         #
     body = request.get_json()
     user = getUserInfo(idInfo["email"])
-    success, rv = getBranches(token, body["repository"])
+    success, rv = getBranches(user["github_token"], body["repository"])
     if (not success):
         return {"success":False,
                 "reason": str(rv)}
@@ -1352,7 +1352,7 @@ def pullToExistingProject(proj_id):
 
     body = request.get_json()
     user = getUserInfo(idInfo["email"])
-    success, rv = getBranches(token, body["repository"])
+    success, rv = getBranches(user["github_token"], body["repository"])
     if (not success):
         return {"success":False,
                 "reason": str(rv)}
@@ -1404,7 +1404,6 @@ def pullToExistingProject(proj_id):
         deleteDocumentUtil(doc_to_delete)
     for folder_to_delete in folders_to_delete:
         deleteFolderUtil(folder_to_delete)
-    deleteProjectDeletedDocuments(proj_id)
     return {"success":True, "reason":"", "body":updated_files}
 
 #needs "branch" in arguments, for example /api/Github/12345/getNonexistent/?owner_name=fnkzhang&repo_name=coderaview&branch=main
