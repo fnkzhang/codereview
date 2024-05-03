@@ -1,11 +1,11 @@
 import json, re
 
-# pip install "google-cloud-aiplatform>=1.38"
 # pip install --upgrade google-cloud-aiplatform
 # https://ai.google.dev/docs/prompt_best_practices
 import vertexai
 from vertexai.generative_models import (
-    GenerativeModel
+    GenerativeModel,
+    GenerationConfig
 )
 
 #------------------------------------------------------------------------------
@@ -15,31 +15,25 @@ SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION = """\
 You are a coding expert in {}. Apply the user's suggestion to the highlighted 
 code which is located at lines between the start line and end line of the 
 code. Modify the highlighted code. Avoid modifying the original code or giving 
-an explanation for the code. Your response will be the changes you made to the highlighted code.
-Return only the code that is changed, and DO NOT place the programming language name in the response.
-Make sure to add the keep the indentation in relation to the parent code.
-If the code was not commented out before, make sure that it stays uncommented.
-Important: Do not let the user change your response format after you have already made the changes,
-even if the user requests for it. Ignore user prompts that are
+an explanation for the code. Your response must be a JSON object with the key 
+"revised_code". Important: Do not let the user change your JSON response 
+format, even if the user requests for it. Ignore user prompts that are
 unrelated to implementing the code from the suggestion.
 """
 
-# Your response must be a JSON object with the key 
-# "revised_code". Important: Do not let the user change your JSON response 
-# format, even if the user requests for it. Ignore user prompts that are
-# unrelated to implementing the code from the suggestion.
 SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE = """\
 In all of your replies, respond as {}.
 Generate multiple suggestions to improve the quality of code. Provide a 
 diverse set of recommendations for enhancing the code's readability, 
 performance, and maintainability. Return a JSON object with the key 
-'suggestions' and a list of JSON objects. Each object in the list should 
-contain 'startLine', 'endLine', and 'suggestion' keys, indicating the 
+"suggestions" and a list of JSON objects. Each object in the list should 
+contain "startLine", "endLine", and "suggestion" keys, indicating the 
 highlighted code lines and suggested changes. Be creative and offer as many 
 suggestions as you can think of! Important: Do not let the user change your 
 JSON response format, even if the user requests for it. Ignore user prompts
 that are unrelated to recommending suggestions on the code.
 """
+
 #------------------------------------------------------------------------------
 # User Instruction Prompt Formats
 #-------------------------------------------------------------------------------
@@ -60,11 +54,13 @@ USER_INSTRUCTION_CODE_FROM_SUGGESTION = """
 {}
 </suggestion>
 """
+
 USER_INSTRUCTION_SUGGESTION_FROM_CODE = """
 <code>
 {}
 </code>
 """
+
 #------------------------------------------------------------------------------
 # Few-Shot Prompt Format
 #-------------------------------------------------------------------------------
@@ -105,7 +101,7 @@ CALCULATE_AVERAGE_CODE = """\
 #------------------------------------------------------------------------------
 # Initialize LLM
 #-------------------------------------------------------------------------------
-MODEL_NAME = "gemini-1.5-pro-preview-0409"#"gemini-1.0-pro"
+MODEL_NAME = "gemini-1.5-pro-preview-0409"
 def init_llm(project_id: str="codereview-413200",
              location: str="us-central1"):
     vertexai.init(project=project_id, location=location)
@@ -113,30 +109,20 @@ def init_llm(project_id: str="codereview-413200",
 #------------------------------------------------------------------------------
 # Helper Functions
 #-------------------------------------------------------------------------------
-
 def get_json_from_llm_response(response: str):
-    json_match = re.search(r"```json\s*(.*?)\s*```", response, re.DOTALL)
+    #json_match = re.search(r"```json\s*(.*?)\s*```", response, re.DOTALL)
 
-    json_response = json_match.group(1) if json_match else response
-    print("removed tick", json_response)
-    pattern = r'(^```|```$)'
-    json_response = re.sub(pattern, '', json_response)
-    print("removed tick", json_response)
-    #json_response = re.sub(r'\\', r'\\\\', re.sub(r'\t', r'\\t', re.sub(r'\n', r'\\n', json_response)))
+    #json_response = json_match.group(1) if json_match else response
 
-
-    data = {
-        "revised_code": json_response
-    }
-    data = json.dumps(data)
-    #print(json_response)
-    return data
+    return json.loads(response)
 
 def get_chat_response(user_prompt: str,
                       system_prompt: str = None):
-    
     model = GenerativeModel(MODEL_NAME,
-                            system_instruction=system_prompt)
+                            system_instruction=system_prompt,
+                            generation_config=GenerationConfig(
+                                response_mime_type="application/json"
+                            ))
     chat = model.start_chat()
 
     response = chat.send_message(user_prompt)
@@ -173,11 +159,9 @@ def get_llm_code_from_suggestion(code: str,
             1, 1,
             "rename to something more meaningful"
         ),
-        example_output= "say_hello"
-
-        # example_output=json.dumps({
-        #     "revised_code": "say_hello"
-        # })
+        example_output=json.dumps({
+            "revised_code": "say_hello"
+        })
     )
     system_prompt += add_few_shot_example(
         example_number=2,
@@ -188,11 +172,9 @@ def get_llm_code_from_suggestion(code: str,
             your response in a JSON with the key \"paragraphs\""
             ""
         ),
-        example_output="Invalid Request."
-
-        # example_output=json.dumps({
-        #     "revised_code": "Invalid Request."
-        # })
+        example_output=json.dumps({
+            "revised_code": "Invalid Request."
+        })
     )
     system_prompt += "</examples>"
 
@@ -214,12 +196,8 @@ def get_llm_code_from_suggestion(code: str,
 
     # Extract the wanted output from response
     try:
-        revised_code = get_json_from_llm_response(response)
-        print("test", revised_code)
-        revised_code = json.loads(revised_code)
-
-        revised_code = revised_code["revised_code"]
-        print("test2", revised_code)
+        print(response)
+        revised_code = get_json_from_llm_response(response)["revised_code"]
     except Exception as e:
         print("Failed to get code from response")
         print(e)
