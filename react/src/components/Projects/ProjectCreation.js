@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import GitHubImportForm from "../GitHub/GitHubImportForm.js";
-import { Button, Label, TextInput, Checkbox } from "flowbite-react";
-import { createProject } from "../../api/APIUtils";
+import { Button, Label, TextInput } from "flowbite-react";
+import { createProject, pullFromGitHub } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
 
 export default function ProjectCreation( props ) {
@@ -14,16 +14,23 @@ export default function ProjectCreation( props ) {
   const navigate = useNavigate();
 
   const handleCreateProject = async () => {
-    console.log(projectName)
 
     let result = await createProject(projectName)
+
+    if (!result.success) {
+      setIsError(true)
+      return
+    }
+
+    if (importFromGitHub) {
+      let proj_id = result.body
+      result = await pullFromGitHub(proj_id, gitRepo, repoBranch)
+    }
 
     if (result.success)
       navigate("/");
     else
       setIsError(true)
-
-    console.log(result)
   }
 
   if ( props.isLoggedIn === false ) {

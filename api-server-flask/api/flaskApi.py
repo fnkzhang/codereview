@@ -1107,7 +1107,7 @@ def getRepoBranchesFromGithub(ownername, reponame):
 #needs auth
 #put repository path in "repository" and branch in "branch"
 #format -> repository = "fnkzhang/codereview", branch = "main"
-@app.route('/api/Github/Pull/<proj_id>', methods=["GET"])
+@app.route('/api/Github/Pull/<proj_id>', methods=["POST"])
 def pullFromBranch(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -1129,7 +1129,7 @@ def pullFromBranch(proj_id):
     user = getUserInfo(idInfo["email"])
 
     g = Github(auth = Auth.Token(user["github_token"]))
-    repo = g.get_repo(repository)
+    repo = g.get_repo(body["repository"])
     project = getProjectInfo(proj_id)
     folders = getAllProjectFolders(proj_id)
     pathToFolderID = []
