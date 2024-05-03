@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import GitHubStatus from "../GitHub/GitHubStatus";
+import GitHubImportForm from "../GitHub/GitHubImportForm.js";
 import { Button, Label, TextInput, Checkbox } from "flowbite-react";
 import { createProject } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
@@ -36,60 +36,6 @@ export default function ProjectCreation( props ) {
     )
   }
 
-  function ImportFromGitHub () {
-
-    if (!props.connected) {
-      return(
-        <div className="text-textcolor">
-          Connect to a GutHub account in order to import a project's contents.
-          <div className="flex items-center justify-center text-center">
-            <div className="border border-offwhite border-1 bg-alternative transition-colors 
-              duration-200 hover:bg-slate-500 w-1/3 rounded">
-              <GitHubStatus
-                connected={props.connected}
-                setConnected={props.setConnected}
-              />
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    if (!importFromGitHub) {
-      return (
-        <div className="flex mt-3 max-w-md flex-col gap-4" id="checkbox">
-          <div className="flex items-center gap-2">
-            <Checkbox onChange={(e) => {setImportFromGitHub(e.target.checked)}} id="accept"/>
-            <Label htmlFor="accept" className="flex">
-              Import project contents from GitHub.
-            </Label>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex mt-3 max-w-md flex-col gap-4" id="checkbox">
-        <div className="flex items-center gap-2">
-          <Checkbox onChange={(e) => {setImportFromGitHub(e.target.checked)}} id="accept" defaultChecked/>
-          <Label htmlFor="accept" className="flex">
-            Import project contents from GitHub.
-          </Label>
-        </div>
-        <div>
-          <div className="mb-3 block">
-            <Label className="text-2xl" value="Repository Name"/>
-          </div>
-          <TextInput className="text-black shadow-white" placeholder="Name of GitHub Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow/>
-          <div className="mb-3 block">
-            <Label className="text-2xl" value="Branch Name"/>
-          </div>
-          <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow/>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex justify-center mt-20">
       <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
@@ -101,7 +47,16 @@ export default function ProjectCreation( props ) {
             <Label className="text-2xl" value="Project Name"/>
           </div>
           <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setProjectName(e.target.value)} shadow/>
-          <ImportFromGitHub/>
+          <GitHubImportForm
+            connected={props.connected}
+            setConnected={props.setConnected}
+            importFromGitHub={importFromGitHub}
+            setImportFromGitHub={setImportFromGitHub}
+            gitRepo={gitRepo}
+            setGitRepo={setGitRepo}
+            repoBranch={repoBranch}
+            setRepoBranch={setRepoBranch}
+          />
         </div>
 
         {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
