@@ -375,7 +375,7 @@ def getFolder(proj_id, folder_id):
     #credentials (of user that already has access to project)
     #email (user to add to project)
     #role (role name)
-    #permissions (integer that represents perms, so far anything greater than 0 is everything)
+    #permissions (integer that represents perms)
 @app.route('/api/Project/<proj_id>/addUser/', methods=["POST"])
 def addUser(proj_id):
     inputBody = request.get_json()
@@ -393,7 +393,7 @@ def addUser(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or body["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     with engine.connect() as conn:
         if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
@@ -994,7 +994,7 @@ def resolveComment(comment_id):
             "reason": "Failed to Authenticate"
         }
     proj_id = getCommentProject(comment_id)
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 and getProjectInfo(proj_id)["author_email"] != idInfo["email"]):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 or getProjectInfo(proj_id)["author_email"] != idInfo["email"]):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     resolveCommentHelperFunction(comment_id)
 
@@ -1131,7 +1131,7 @@ def editComment(comment_id):
             "reason": "Invalid Request"
         }
     proj_id = getCommentProject(comment_id)
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 and getCommentInfo(comment_id)["author_email"] != idInfo["email"]):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 or getCommentInfo(comment_id)["author_email"] != idInfo["email"]):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     # Query
@@ -1174,7 +1174,7 @@ def deleteComment(comment_id):
             "reason": "Failed to Authenticate"
         }
     proj_id = getCommentProject(comment_id)
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 and getCommentInfo(comment_id)["author_email"] != idInfo["email"]):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 or getCommentInfo(comment_id)["author_email"] != idInfo["email"]):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
  
     # Query
@@ -1616,6 +1616,11 @@ def getProjectFolderTree(proj_id):
 
 # EXAMPLE:
 # curl -X GET http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function."}'
+
+#in body:
+    #highlighted_code = code that the comment highlighted
+    #code = entire code
+    #comment = commented text
 @app.route("/api/llm/code-implementation", methods=["GET"])
 def implement_code_changes_from_comment():
     data = request.get_json()
