@@ -53,7 +53,11 @@ export default function ProjectList( props ) {
         return ( 
           <div className="flex flex-wrap">
             {
-              userProjects.map( (project, index) => {
+              userProjects.sort((a, b) => {
+                  // If boolean component is equal, sort by date
+                  return (new Date(b.date_modified)) - (new Date(a.date_modified));
+                })
+                .map( (project, index) => {
                 if(project === -1)
                   return null
 
