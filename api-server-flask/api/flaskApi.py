@@ -1347,7 +1347,7 @@ def pullToExistingProject(proj_id):
             "reason": "Failed to Authenticate"
         }
         #
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     body = request.get_json()
