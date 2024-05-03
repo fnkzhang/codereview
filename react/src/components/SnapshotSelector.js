@@ -9,7 +9,6 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
     const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
 
-    //const [snapshots, setSnapshots] = useState([])
     const navigate = useNavigate()
 
     const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
@@ -23,21 +22,26 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
             setSnapshots(result.body)
 
           snapshots.forEach((snapshot, index) => {
-            if(snapshot.snapshot_id === left_snapshot_id)
-              selectedLeftSnapshotIndex(index)
-            if(snapshot.snapshot_id === right_snapshot_id)
-              selectedRightSnapshotIndex(index)
+            if(snapshot.snapshot_id.toString() === left_snapshot_id)
+              setSelectedLeftSnapshotIndex(index)
+            if(snapshot.snapshot_id.toString() === right_snapshot_id)
+              setSelectedRightSnapshotIndex(index)
           });
         }
 
         grabSnapshots()
 
         
-    }, [document_id])
+    }, [document_id, editorReady])
 
-    useEffect(() => {
-      console.log("LOADING PAGE")
-    }, [editorReady])
+    // useEffect(() => {
+    //   snapshots.forEach((snapshot, index) => {
+    //     if(snapshot.snapshot_id === left_snapshot_id)
+    //       selectedLeftSnapshotIndex(index)
+    //     if(snapshot.snapshot_id === right_snapshot_id)
+    //       selectedRightSnapshotIndex(index)
+    //   });
+    // }, [editorReady])
 
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
