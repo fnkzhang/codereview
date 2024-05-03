@@ -1,12 +1,12 @@
 import { resolveComment } from '../../api/APIUtils';
 import SubCommentList from './SubCommentList';
 import { Card } from "flowbite-react";
-import React from 'react';
+import React, { useEffect } from 'react';
 import LlmButton from '../LLM/LlmButton';
 
 function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID, latestSnapshotData,
   highlightStartX, highlightStartY, highlightEndX, highlightEndY, isResolved,
-  editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode
+  editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode
 }) {
   async function handleResolve() {
     console.log("RESOLVING COMMENT")
@@ -17,6 +17,7 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
     console.log(result)
 
   }
+  
 
   function Buttons () {
     if (!isResolved) {
@@ -40,12 +41,14 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
               <LlmButton
                 editorLanguage={editorLanguage}
                 editorCode={editorCode}
+                commentText={text}
                 checkIfCanGetLLMCode={checkIfCanGetLLMCode}
                 getHighlightedCode={getHighlightedCode}
                 highlightStartX={highlightStartX}
                 highlightStartY={highlightStartY}
                 highlightEndX={highlightEndX}
                 highlightEndY={highlightEndY}
+                updateHighlightedCode={updateHighlightedCode}
               />
           </div>
         ) : null}

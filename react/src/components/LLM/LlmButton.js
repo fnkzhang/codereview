@@ -1,19 +1,28 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
+import { getCodeImplementation } from "../../api/APIUtils";
 
 
-export default function LlmButton( { editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode,
-  highlightStartX, highlightStartY, highlightEndX, highlightEndY } ) {
-  
-  useEffect(() => {
+export default function LlmButton( { editorLanguage, editorCode, commentText, checkIfCanGetLLMCode, getHighlightedCode,
+  highlightStartX, highlightStartY, highlightEndX, highlightEndY, updateHighlightedCode } ) {
+    
+  const [isError, setIsError] = useState(false)
 
-  }, [])
+  const handleCreateSuggestion = async () => {  
+    if (!checkIfCanGetLLMCode()) {
+      setIsError(true)
+      return
+    }
 
-  const handleCreateSuggestion = async () => {
-    // Popup new suggestion
-    console.log(editorLanguage, editorCode  , checkIfCanGetLLMCode());
-    console.log(getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY));
+    let highlightedCode = getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY)
+    console.log(highlightedCode)
+    let result = await getCodeImplementation(editorCode, highlightedCode,
+      highlightStartY, highlightEndY, commentText, editorLanguage)
+    console.log(result)
+
+    updateHighlightedCode(result, highlightedCode);
   }
 
+  //const DisplayErroMessage()
   
   return (
     <div>

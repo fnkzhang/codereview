@@ -126,10 +126,10 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
    * @returns {string}
    */
   function getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
-    if (left_snapshot_id != right_snapshot_id)
+    if (left_snapshot_id !== right_snapshot_id)
       return ""
 
-    if (left_snapshot_id != latestSnapshotData?.snapshot_id?.toString())
+    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
       return ""
     
     let originalEditor = editorRef.current
@@ -146,13 +146,32 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     
     return originalEditor.getOriginalEditor().getModel().getValueInRange(range)
   }
+  function updateHighlightedCode(codeToReplace, highlightCodeString) {
+    if (left_snapshot_id !== right_snapshot_id)
+    return ""
+
+    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
+      return ""
+    
+    let originalEditor = editorRef.current
+
+    if (originalEditor === null)
+      return
+
+    let editorCode = originalEditor.getOriginalEditor().getModel().getValue()
+
+    editorCode = editorCode.replace(highlightCodeString, codeToReplace);
+    
+    setCode(editorCode)
+
+  }
 
   // LEFT AND RIGHT SNAPSHOT MUST BE SAME AND LATEST VERSION
   function checkIfCanGetLLMCode() {
-    if (left_snapshot_id != right_snapshot_id)
+    if (left_snapshot_id !== right_snapshot_id)
       return false
 
-    if (left_snapshot_id != latestSnapshotData?.snapshot_id?.toString())
+    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
       return false
 
     return true
@@ -238,6 +257,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             editorCode={updatedCode}
             checkIfCanGetLLMCode={checkIfCanGetLLMCode}
             getHighlightedCode={getHighlightedCode}
+            updateHighlightedCode={updateHighlightedCode}
             // Pass Functions for comments to call
           />
         </div>

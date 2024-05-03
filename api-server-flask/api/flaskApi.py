@@ -1274,7 +1274,7 @@ def implement_code_changes_from_comment():
         suggestion=comment,
         language=language
     )
-
+    
     if response is None:
         return {
             "success": False,
