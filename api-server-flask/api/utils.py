@@ -346,6 +346,24 @@ def createNewSnapshot(proj_id, doc_id, item):
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
         return snapshot_id
+
+
+
+
+def getSnapshotProject(snapshot_id):
+    try:
+        with engine.connect() as conn:
+            stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
+            snapshot = conn.execute(stmt)
+            doc_id = snapshot.first().associated_document_id
+
+            stmt = select(models.Document).where(models.Document.doc_id == doc_id)
+            document = conn.execute(stmt)
+            proj_id = document.first().associated_proj_id
+            return proj_id
+    except:
+        return None
+
 def getSnapshotPath(snapshot_id):
     try:
         with engine.connect() as conn:
@@ -365,6 +383,16 @@ def getSnapshotInfo(snapshot_id):
         stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
         snapshot = conn.execute(stmt).first()
         return snapshot._asdict()
+
+def getCommentInfo(comment_id):
+    with engine.connect() as conn:
+        stmt = select(models.Comment).where(models.Comment.comment_id == comment_id)
+        comment = conn.execute(stmt).first()
+        return comment._asdict()
+
+def getCommentProject(comment_id):
+    return getSnapshotProject(getCommentInfo(comment_id)["snapshot_id"])
+
 def getSnapshotContentUtil(snapshot_id):
     blob = getBlob(getSnapshotPath(snapshot_id))
     return blob
@@ -384,7 +412,6 @@ def deleteSnapshotUtil(snapshot_id):
 
 def deleteDocumentUtil(doc_id):
     try:
-        createNewDeletedDocument(doc_id)
         with engine.connect() as conn:
             stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
             snapshots = conn.execute(stmt)
@@ -397,20 +424,13 @@ def deleteDocumentUtil(doc_id):
     except Exception as e:
         return False, e
 
-def deleteDeletedDocumentUtil(doc_id):
+def renameDocumentUtil(doc_id, doc_name):
     try:
         with engine.connect() as conn:
-            stmt = delete(models.DeletedDocument).where(models.DeletedDocument.doc_id == doc_id)
-            conn.execute(stmt)
-            conn.commit()
-        return True, "No Error"
-    except Exception as e:
-        return False, e
-
-def deleteProjectDeletedDocuments(proj_id):
-    try:
-        with engine.connect() as conn:
-            stmt = delete(models.DeletedDocument).where(models.DeletedDocument.associated_proj_id == proj_id)
+            stmt = (update(models.Document)
+                .where(models.Document.doc_id == doc_id)
+                .values(name=doc_name)
+                )
             conn.execute(stmt)
             conn.commit()
         return True, "No Error"
@@ -438,6 +458,42 @@ def deleteFolderUtil(folder_id):
     except Exception as e:
         return False, e
 
+def renameFolderUtil(folder_id, folder_name):
+    try:
+        with engine.connect() as conn:
+            stmt = (update(models.Folder)
+                .where(models.Folder.folder_id == folder_id)
+                .values(name=folder_name)
+                )
+            conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
+
+
+def createNewProject(proj_name, owner):
+    pid = createID()
+    root_folder_id = createNewFolder('root', 0, pid)
+    with engine.connect() as conn:
+        projstmt = insert(models.Project).values(
+                proj_id = pid,
+                name = proj_name,
+                author_email = owner,
+                root_folder = root_folder_id
+        )
+    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
+        relationstmt = insert(models.UserProjectRelation).values(
+                user_email = owner,
+                proj_id = pid,
+                role = "Owner",
+                permissions = 15
+        )
+        conn.execute(projstmt)
+        conn.execute(relationstmt)
+        conn.commit()
+    return pid
+
 def deleteProjectUtil(proj_id):
     try:
         with engine.connect() as conn:
@@ -447,6 +503,19 @@ def deleteProjectUtil(proj_id):
             stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
             conn.execute(stmt)
             stmt = delete(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
+            conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
+
+def renameProjectUtil(proj_id, proj_name):
+    try:
+        with engine.connect() as conn:
+            stmt = (update(models.Project)
+                .where(models.Project.proj_id == proj_id)
+                .values(name=proj_name)
+                )
             conn.execute(stmt)
             conn.commit()
         return True, "No Error"

@@ -192,7 +192,7 @@ def getAllUserProjects(user_email):
         "body": projects
         }
 
-#put project name in body
+#put project name in body in "project_name"
 @app.route('/api/Project/createProject/', methods = ["POST"])
 def createProject():
     headers = request.headers
@@ -209,27 +209,7 @@ def createProject():
             "reason": "Failed to Authenticate"
         }
     body = request.get_json()
-    proj_name = body["project_name"]
-    pid = createID()
-    root_folder_id = createNewFolder('root', 0, pid)
-    with engine.connect() as conn:
-        projstmt = insert(models.Project).values(
-                proj_id = pid,
-                name = proj_name,
-                author_email = idInfo["email"],
-                root_folder = root_folder_id
-        )
-    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
-        relationstmt = insert(models.UserProjectRelation).values(
-                user_email = idInfo["email"],
-                proj_id = pid,
-                role = "Owner",
-                permissions = 15
-        )
-        conn.execute(projstmt)
-        conn.execute(relationstmt)
-        conn.commit()
-        
+    pid = createNewProject(body["project_name"], idInfo["email"])
     return {
         "success": True,
         "reason": "",
@@ -267,6 +247,47 @@ def getProject(proj_id):
         "reason": "",
         "body": projectData
     }
+
+#body: put new name in "proj_name"
+@app.route('/api/Project/<proj_id>/rename/', methods=["POST"])
+def renameProject(proj_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    try:
+        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "document doesn't exist"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    # Query
+    rv, e = renameProjectUtil(proj_id, body["proj_name"])
+    if(not rv):
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+
+    return {
+        "success": True,
+        "reason": "Successful Rename"
+    }
+
+
 @app.route('/api/Document/<proj_id>/GetDocuments/', methods = ["GET"])
 def getProjectDocuments(proj_id):
     headers = request.headers
@@ -282,13 +303,6 @@ def getProjectDocuments(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    #if not userExists(idInfo["email"]):
-    #    return {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
@@ -322,7 +336,7 @@ def createFolder(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
     folder_id = createNewFolder(inputBody["folder_name"], inputBody["parent_folder"], proj_id)
@@ -476,18 +490,8 @@ def createSnapshot(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #todo:make this a function
-    #if not userExists(idInfo["email"]):
-    #    retData = {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
-    #    return jsonify(retData)
-
-    # if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
-    #     return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    ##########################
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"])
     return {
         "success": True,
@@ -510,7 +514,6 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
@@ -545,7 +548,7 @@ def createDocument(proj_id):
             "reason": "Failed to Authenticate"
         }
     
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     if "parent_folder" not in inputBody:
         folder = getProjectInfo(proj_id)["root_folder"]
@@ -579,8 +582,15 @@ def moveDocument(doc_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    try:
+        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "document doesn't exist"
+        }
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     folder = inputBody["parent_folder"]
     if not moveDocumentUtil(doc_id, folder):
@@ -614,8 +624,14 @@ def moveFolder(folder_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+    try:
+        proj_id = getFolderInfo(folder_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "folder doesn't exist"
+        }
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     parent_folder = inputBody["parent_folder"]
     if not moveFolderUtil(folder_id, parent_folder):
@@ -647,12 +663,6 @@ def getAllDocumentSnapshots(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #if not userExists(idInfo["email"]):
-    #    return {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
@@ -677,13 +687,6 @@ def getDocument(proj_id, doc_id):
             "reason": "Failed to Authenticate"
         }
 
-    #if not userExists(idInfo["email"]):
-    #    return {
-    #            "success": False,
-    #            "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-    #            "body":{}
-    #    }
-
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
@@ -705,7 +708,9 @@ def deleteSnapshot(snapshot_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
+    proj_id = getSnapshotProject(snapshot_id)
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
     rv, e = deleteSnapshotUtil(snapshot_id)
     if(not rv):
@@ -734,6 +739,16 @@ def deleteDocument(doc_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    try:
+        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "document doesn't exist"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     # Query
     rv, e = deleteDocumentUtil(doc_id)
@@ -746,6 +761,44 @@ def deleteDocument(doc_id):
     return {
         "success": True,
         "reason": "Successful Delete"
+    }
+#body: put new name in "doc_name"
+@app.route('/api/Document/<doc_id>/rename/', methods=["POST"])
+def renameDocument(doc_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    try:
+        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "document doesn't exist"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2): 
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    # Query
+    rv, e = renameDocumentUtil(doc_id, body["doc_name"])
+    if(not rv):
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+
+    return {
+        "success": True,
+        "reason": "Successful Rename"
     }
 
 @app.route('/api/Folder/<folder_id>/', methods=["DELETE"])
@@ -763,6 +816,16 @@ def deleteFolder(folder_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    try:
+        proj_id = getFolderInfo(folder_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "folder doesn't exist"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     # Query
     rv, e = deleteFolderUtil(folder_id)
@@ -776,6 +839,47 @@ def deleteFolder(folder_id):
         "success": True,
         "reason": "Successful Delete"
     }
+
+#body: put new name in "folder_name"
+@app.route('/api/Folder/<folder_id>/rename/', methods=["POST"])
+def renameFolder(folder_id):
+    # Authentication
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+
+    if authenticate() is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    try:
+        proj_id = getFolderInfo(folder_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "folder doesn't exist"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+    # Query
+    rv, e = renameFolderUtil(folder_id, body["folder_name"])
+    if(not rv):
+        return {
+            "success": False,
+            "reason": str(e)
+        }
+
+    return {
+        "success": True,
+        "reason": "Successful Rename"
+    }
+
 @app.route('/api/Project/<proj_id>/', methods=["DELETE"])
 def deleteProject(proj_id):
     # Authentication
@@ -791,7 +895,8 @@ def deleteProject(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
     rv, e = deleteProjectUtil(proj_id)
     if(not rv):
@@ -827,6 +932,9 @@ def createComment(snapshot_id):
             "success": False,
             "reason": "Invalid Request"
         }
+    proj_id = getSnapshotProject(snapshot_id)
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     # Query
     with Session() as session:
@@ -885,7 +993,9 @@ def resolveComment(comment_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
+    proj_id = getCommentProject(comment_id)
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 and getProjectInfo(proj_id)["author_email"] != idInfo["email"]):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     resolveCommentHelperFunction(comment_id)
 
     return {
@@ -913,6 +1023,9 @@ def getCommentsOnSnapshot(snapshot_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    proj_id = getSnapshotProject(snapshot_id)
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     # Query
     commentsList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshot_id)
@@ -947,12 +1060,10 @@ def getAllCommentsForDocument(document_id):
             "reason": "Failed to Authenticate",
         }
     
-    if not userExists(idInfo["email"]):
-        return {
-                "success": False,
-                "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-        }
-    
+    proj_id = getDocumentInfo(document_id)["associated_proj_id"]
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     listOfSnapshotIDs = []
     foundSnapshots = getAllDocumentSnapshotsInOrder(document_id)
 
@@ -978,7 +1089,10 @@ def getAllCommentsForDocument(document_id):
 def getSubcommentsOnComment(comment_id):
     # authenticate
     # query cloud sql
-    
+    proj_id = getCommentProject(comment_id)
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     # temporary
     retArray = []
     for i in range(5):
@@ -1016,7 +1130,10 @@ def editComment(comment_id):
             "success": False,
             "reason": "Invalid Request"
         }
-    
+    proj_id = getCommentProject(comment_id)
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 and getCommentInfo(comment_id)["author_email"] != idInfo["email"]):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
     # Query
     try:
         with Session() as session:
@@ -1056,7 +1173,10 @@ def deleteComment(comment_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    
+    proj_id = getCommentProject(comment_id)
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 1 and getCommentInfo(comment_id)["author_email"] != idInfo["email"]):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+ 
     # Query
     try:
         with Session() as session:
@@ -1156,10 +1276,63 @@ def getGithubRepositoryBranches():
         }
 
 #needs auth
+#body: put repository path in "repository" and branch in "branch"
+#body: put project_name in "project_name"
+#format -> repository = "fnkzhang/codereview", branch = "main"
+@app.route('/api/Github/PullToNewProject/', methods=["POST"])
+def pullToNewProject():
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+        #
+    body = request.get_json()
+    user = getUserInfo(idInfo["email"])
+    success, rv = getBranches(token, body["repository"])
+    if (not success):
+        return {"success":False,
+                "reason": str(rv)}
+    if body["branch"] not in rv:
+        return {"success":False,
+                "reason": "branch does not exist"}
+    proj_id = createNewProject(body["project_name"], idInfo["email"])
+    g2 = Github(auth = Auth.Token(user["github_token"]))
+    repo = g2.get_repo(body["repository"])
+    project = getProjectInfo(proj_id)
+    pathToFolderID = {}
+    pathToFolderID[""] = project["root_folder"]
+    contents = repo.get_contents("", body["branch"])
+    updated_files = []
+    while contents:
+        file_content = contents.pop(0)
+        index = file_content.path.rfind('/')
+        if index < 0:
+            path = ""
+        else:
+            path = file_content.path[:index]
+        if file_content.type == "dir":
+            contents.extend(repo.get_contents(file_content.path))
+            folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
+            pathToFolderID[file_content.path] = folder_id
+        else:
+            doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode())
+    return {"success":True, "reason":"", "body":proj_id}
+
+
+#needs auth
 #put repository path in "repository" and branch in "branch"
 #format -> repository = "fnkzhang/codereview", branch = "main"
-@app.route('/api/Github/<proj_id>/Pull/', methods=["POST"])
-def pullFromBranch(proj_id):
+@app.route('/api/Github/<proj_id>/PullToExistingProject/', methods=["POST"])
+def pullToExistingProject(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -1233,41 +1406,6 @@ def pullFromBranch(proj_id):
         deleteFolderUtil(folder_to_delete)
     deleteProjectDeletedDocuments(proj_id)
     return {"success":True, "reason":"", "body":updated_files}
-
-@app.route('/api/DeletedDocuments/<proj_id>/', methods=["GET"])
-def getProjectDeletedDocuments(proj_id):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-    with engine.connect() as conn:
-        stmt = select(models.DeletedDocument).where(models.DeletedDocument.associated_proj_id == int(proj_id))
-
-        results = conn.execute(stmt)
-
-        arrayOfDocuments = []
-
-        for row in results:
-            arrayOfDeletedDocuments.append(row._asdict())
-
-    return {
-        "success": True,
-        "reason": "",
-        "body": arrayOfDeletedDocuments
-    }
 
 #needs "branch" in arguments, for example /api/Github/12345/getNonexistent/?owner_name=fnkzhang&repo_name=coderaview&branch=main
 @app.route('/api/Github/<proj_id>/getNonexistent/', methods=["GET"])
