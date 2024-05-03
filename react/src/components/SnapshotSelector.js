@@ -33,16 +33,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
 
         
     }, [document_id, editorReady])
-
-    // useEffect(() => {
-    //   snapshots.forEach((snapshot, index) => {
-    //     if(snapshot.snapshot_id === left_snapshot_id)
-    //       selectedLeftSnapshotIndex(index)
-    //     if(snapshot.snapshot_id === right_snapshot_id)
-    //       selectedRightSnapshotIndex(index)
-    //   });
-    // }, [editorReady])
-
+    
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
       navigate(`/Project/${project_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`,  {state: {documentName: fileExtensionName}})
