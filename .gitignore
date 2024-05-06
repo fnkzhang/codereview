@@ -7,4 +7,8 @@ googlecreds.json
 
 api-server-flask/api/googlecreds.json
 
+api-server-flask/api/github_oath_credentials.json
+
+api-server-flask/cr_cache
+
 api-server-flask/api/test/__pycache__

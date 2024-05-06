@@ -20,11 +20,11 @@ from github import Auth
 
 import models
 
-from cacheUtils import cloudStorageCache, publishTopicUpdate
-
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
 os.environ["GCLOUD_PROJECT"] = "codereview-413200"
 CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
+
+from cacheUtils import cloudStorageCache, publishTopicUpdate
 
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
@@ -36,9 +36,18 @@ with open('github_oath_credentials.json') as creds:
 g = Github()
 gapp = g.get_oauth_application(github_client_id, github_client_secret)
 
+with open('github_oath_credentials.json') as creds:
+    creds = json.load(creds)
+    github_client_id = creds["client-id"]
+    github_client_secret = creds["client-secret"]
+
+g = Github()
+gapp = g.get_oauth_application(github_client_id, github_client_secret)
+
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
+    print("Uploading to", blobName)
     blob = bucket.blob(blobName)
     blob.upload_from_string(data = item, content_type='application/json')
     
@@ -215,6 +224,7 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
         )
         conn.execute(stmt)
         conn.commit()
+
     createNewSnapshot(proj_id, doc_id, item)
     return doc_id
 
@@ -226,17 +236,10 @@ def moveDocumentUtil(doc_id, parent_folder):
         )
         conn.execute(stmt)
         conn.commit()
-
-        path = getDocumentPath(doc_id)
-        document = getDocumentInfo(doc_id)
-        conn.execute(stmt)
-        conn.commit()
     return parent_folder
 
 def moveFolderUtil(folder_id, parent_folder):
     with engine.connect() as conn:
-        stmt = select(models.Folder).where(models.Folder.parent_folder == folder_id)
-        childFolders = conn.execute(stmt)
         stmt = (update(models.Folder)
         .where(models.Folder.folder_id == folder_id)
         .values(parent_folder = parent_folder)
@@ -627,17 +630,22 @@ def fetchFromCloudStorage(blobName:str):
       blobName:
         Name of the blob to retrieve.
     '''
-    blobContents = cloudStorageCache.get(blobName)
-    if blobContents is None:
-        blobContents = getBlob(blobName)
-        print('uncached\n\n\n')
-    else:
-        print('cached\n\n\n')
-    
-    if blobContents is not None:
-        cloudStorageCache.set(blobName, blobContents)
-    
-    return blobContents
+    try:
+        from cacheUtils import getCloudStorageCache
+        blobContents = getCloudStorageCache().get(blobName)
+        if blobContents is None:
+            blobContents = getBlob(blobName)
+            print('uncached\n\n\n')
+        else:
+            print('cached\n\n\n')
+        
+        if blobContents is not None:
+            getCloudStorageCache().set(blobName, blobContents)
+        
+        return blobContents
+    except Exception as e:
+        print(e)
+        return None
 
 def publishCloudStorageUpdate(blobName: str):
     '''

@@ -5,7 +5,7 @@ import { getUserProjects } from "../../api/APIUtils";
 
 import { Card } from "flowbite-react"
 
-export default function ProjectList( userData ) {
+export default function ProjectList( props ) {
 
     const [userProjects, setUserProjects] = useState([])
     const [loading, setLoading] = useState(true);
@@ -15,13 +15,13 @@ export default function ProjectList( userData ) {
     useEffect(() => {
       // Grab User Data
       async function grabProjectData() {
-        let projArray = await getUserProjects(userData.userData["email"])
+        let projArray = await getUserProjects(props.userData.email)
         setUserProjects(projArray)
         setLoading(false)
       } 
 
       grabProjectData()
-    }, [userData])
+    }, [props])
 
     // Clicking on project will redirect to project page to select documents
     const handleProjectClick = (id) => {
@@ -53,7 +53,11 @@ export default function ProjectList( userData ) {
         return ( 
           <div className="flex flex-wrap">
             {
-              userProjects.map( (project, index) => {
+              userProjects.sort((a, b) => {
+                  // If boolean component is equal, sort by date
+                  return (new Date(b.date_modified)) - (new Date(a.date_modified));
+                })
+                .map( (project, index) => {
                 if(project === -1)
                   return null
 

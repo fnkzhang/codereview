@@ -1,6 +1,8 @@
-from flaskApi import app
+from app import get_app
 from flask_caching import Cache
 from google.cloud import pubsub_v1
+
+from flask import Flask
 
 #------------------------------------------------------------------------------
 # Pub/Sub
@@ -102,9 +104,15 @@ def initSharedCache(topic_id: str,
         Unique identifier of the updated resource. Must be the same as the
         key used to cache the resource.
     '''
-    cache = Cache(app, config=cacheConfig)
+    cache = Cache(get_app(__name__), config=cacheConfig)
     subscribeToTopicUpdate(topic_id, cache)
     
     return cache
 
-cloudStorageCache = initSharedCache("cloud-storage-updates", GCLOUD_STORAGE_CACHE_CONFIG)
+cloudStorageCache = None
+def getCloudStorageCache():
+    global cloudStorageCache
+    if cloudStorageCache is None:
+        cloudStorageCache = initSharedCache("cloud-storage-updates",
+                                            GCLOUD_STORAGE_CACHE_CONFIG)
+    return cloudStorageCache

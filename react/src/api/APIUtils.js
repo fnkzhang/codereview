@@ -58,12 +58,16 @@ export async function deleteProject(proj_id) {
 
 }
 
-export async function createDoc(bodyContents, proj_id, doc_id) {
+export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
-    data: bodyContents
+    document_name: documentName,
+    data: documentData,
+    project_id: proj_id,
+    parent_folder_id: parent_folder_id
   }
+  
   let headers = {
     method: "POST",
     mode: "cors",
@@ -75,7 +79,7 @@ export async function createDoc(bodyContents, proj_id, doc_id) {
     },
     body: JSON.stringify(bodyData)
   }
-  return await fetch((`/api/Document/${proj_id}/${doc_id}/create`), headers)
+  return await fetch((`/api/Document/${proj_id}/`), headers)
     .then(response => response.json())
 }
 
@@ -95,6 +99,31 @@ export async function getDocSnapshot(proj_id, doc_id, snap_id) {
 
   return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}/`), headers)
     .then(response => response.json())
+}
+export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data) {
+  let oAuthToken = getCookie("cr_id_token")
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "data": snapshot_data
+    })
+  }
+
+  // Fail = Null
+  // Success = SnapshotID
+  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/`), headers)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success)
+        return data.body
+      return null
+    })
+    .catch(error => console.log(error))
 }
 
 // snapshot_id: int
@@ -128,6 +157,7 @@ export async function createComment(snapshot_id, author_email, reply_to_id, cont
 
   return await fetch(`/api/Snapshot/${snapshot_id}/comment/create`, headers)
     .then(response => response.json())
+
 }
 
 //
@@ -243,7 +273,7 @@ export async function deleteComment(comment_id) {
     .then(response => response.json())
 }
 
-export async function getAllSnapshotsFromDocument(document_id) {
+export async function getAllSnapshotsFromDocument(project_id, document_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -258,7 +288,7 @@ export async function getAllSnapshotsFromDocument(document_id) {
 
   };
 
-    return await fetch((`/api/Document/0/${document_id}/getSnapshotId/`), headers)
+    return await fetch((`/api/Document/${project_id}/${document_id}/getSnapshotId/`), headers)
       .then(response => response.json())
 }
 
@@ -278,17 +308,17 @@ export async function getUserProjects(userEmail) {
   };
 
   return await fetch((`/api/User/${userEmail}/Project/`), headers)
-  .then(response => response.json()
+  .then(response => response.json())
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
     }
 
     return data.body
-}))
+  })
 }
+
 export async function getProjectInfo(project_id) {
   let oAuthToken = getCookie("cr_id_token")
 
@@ -307,7 +337,6 @@ export async function getProjectInfo(project_id) {
   return await fetch((`/api/Project/${project_id}/`), headers)
   .then(response => response.json()
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
@@ -335,12 +364,235 @@ export async function getProjectDocuments(proj_id) {
   return await fetch((`/api/Document/${proj_id}/`), headers)
   .then(response => response.json())
   .then(data => {
-    console.log(data)
     if (data.success === false) {
       console.log("FAILED" + data.reason)
       return data.body
     }
 
     return data.body
+  })
+}
+
+export async function getProjectTree(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Project/${proj_id}/getFolderTree/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+
+    return data.body
+  })
+}
+
+export async function createFolder(folder_name, proj_id, parent_folder_id) {
+
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "folder_name" : folder_name,
+      "parent_folder" : parent_folder_id,
+    }),
+  };
+
+  return await fetch((`/api/Folder/${proj_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+
+    return data
+  })
+}
+
+/**
+ * @param {string} code The entire code in the document/snapshot
+ * @param {string} highlightedCode A substring of the code that will be changed
+ * @param {number} startLine Starting line # of highlighted code
+ * @param {number} endLine Ending line # of highlighted code
+ * @param {string} comment A suggestion on what to do with the highlighted code
+ * @param {string} language The coding language used
+ * @returns {string} The code implementation based on the suggestion
+*/
+export async function getCodeImplementation(code, highlightedCode, startLine, endLine, comment, language) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "code": code,
+      "highlightedCode": highlightedCode,
+      "startLine": startLine,
+      "endLine": endLine,
+      "comment": comment,
+      "language": language
+    })
+  };
+
+  return await fetch((`/api/llm/code-implementation`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return highlightedCode
+    }
+
+    return data.body
+  });
+
+}
+
+/**
+ * @param {string} code The entire code in the document/snapshot
+ * @param {string} language The coding language used
+ * @returns {object[]} A list of JSON objects that have keys startLine, endLine, and suggestion.
+ * startLine: number - line # to begin highlight
+ * endLine: number - line # to stop highlight
+ * suggestion: string - Suggestion on how to improve the highlighted section of code
+*/
+export async function getCommentSuggestion(code, language) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "code": code,
+      "language": language
+    })
+  };
+
+  return await fetch((`/api/llm/comment-suggestion`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return []
+    }
+
+    return data.body
+  })
+}
+  
+
+export async function addGitHubToken(token) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "github_code" : token,
+    })
+  };
+
+  return await fetch((`/api/Github/addToken`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data
+  })
+}
+
+export async function hasGitHubToken() {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Github/userHasGithub/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data
+  })
+}
+
+export async function pullFromGitHub(proj_id, repo_name, branch_name) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "repository" : repo_name,
+      "branch" : branch_name,
+    })
+  };
+
+  return await fetch((`/api/Github/Pull/${proj_id}`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data
   })
 }
