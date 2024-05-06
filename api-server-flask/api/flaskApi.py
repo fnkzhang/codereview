@@ -1282,27 +1282,6 @@ def addGithubToken():
             "reason": "",
         }
 
-#checks whether authenticated user has github connected
-@app.route('/api/Github/userHasGithub/', methods = ["GET"])
-def getUserGithubStatus():
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    user = getUserInfo(idInfo["email"])
-    if user == None:
-        return {"success":False, "reason":"User does not exist"}
-    return {"success:":True, "reason":"", "body": user["github_token"] != None}
-
 #needs auth because everything does lmao
 #needs parameter, ex ..../getRepositoryBranches/?repository=fnkzhang/codereview
 @app.route('/api/Github/getRepositoryBranches/', methods=["GET"])
