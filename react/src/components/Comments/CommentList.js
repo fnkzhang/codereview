@@ -1,7 +1,10 @@
 import React from 'react';
 import Comment from './Comments.js';
 
-function CommentList ({ setCommentsLoading, comments, listLineJump }) {
+function CommentList ({ setCommentsLoading, comments, latestSnapshotData, listLineJump,
+  editorLanguage, editorCode, 
+  checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
+
   if (!Array.isArray(comments)) {
     return null
   }
@@ -28,12 +31,18 @@ function CommentList ({ setCommentsLoading, comments, listLineJump }) {
             timeZoneName: 'short',
           })}
           snapshotID={comment.snapshot_id}
+          latestSnapshotData={latestSnapshotData}
           commentLineJump={listLineJump}
           highlightStartX={comment.highlight_start_x}
           highlightStartY={comment.highlight_start_y}
           highlightEndX={comment.highlight_end_x}
           highlightEndY={comment.highlight_end_y}
           isResolved={comment.is_resolved}
+          editorLanguage={editorLanguage}
+          editorCode={editorCode}
+          checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+          getHighlightedCode={getHighlightedCode}
+          updateHighlightedCode={updateHighlightedCode}
         />
       ))}
     </div>

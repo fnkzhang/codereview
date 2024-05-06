@@ -528,7 +528,7 @@ export async function addGitHubToken(token) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      "github_token" : token,
+      "github_code" : token,
     })
   };
 
@@ -558,6 +558,35 @@ export async function hasGitHubToken() {
   };
 
   return await fetch((`/api/Github/userHasGithub/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return data.body
+    }
+    return data
+  })
+}
+
+export async function pullFromGitHub(proj_id, repo_name, branch_name) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "repository" : repo_name,
+      "branch" : branch_name,
+    })
+  };
+
+  return await fetch((`/api/Github/Pull/${proj_id}`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {

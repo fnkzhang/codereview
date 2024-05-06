@@ -4,10 +4,11 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorLanguage}) {
+export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
-  const [editorReady, setEditorReady] = useState(false);
+
+  //const [editorReady, setEditorReady] = useState(false);
   const [initialCode, setInit] = useState(null);
   const [updatedCode, setCode] = useState(null);
 
@@ -116,6 +117,66 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     }
   }
 
+  /**
+   * 
+   * @param {int} highlightStartX 
+   * @param {int} highlightStartY 
+   * @param {int} highlightEndX 
+   * @param {int} highlightEndY 
+   * @returns {string}
+   */
+  function getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
+    if (left_snapshot_id !== right_snapshot_id)
+      return ""
+
+    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
+      return ""
+    
+    let originalEditor = editorRef.current
+
+    const range = {
+      startLineNumber: highlightStartY,
+      startColumn: highlightStartX,
+      endLineNumber: highlightEndY,
+      endColumn: highlightEndX
+    };
+
+    if (originalEditor === null)
+      return
+    
+    return originalEditor.getOriginalEditor().getModel().getValueInRange(range)
+  }
+  function updateHighlightedCode(codeToReplace, highlightCodeString) {
+    if (left_snapshot_id !== right_snapshot_id)
+    return ""
+
+    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
+      return ""
+    
+    let originalEditor = editorRef.current
+
+    if (originalEditor === null)
+      return
+
+    let editorCode = originalEditor.getOriginalEditor().getModel().getValue()
+
+    editorCode = editorCode.replace(highlightCodeString, codeToReplace);
+    
+    setCode(editorCode)
+
+  }
+
+  // LEFT AND RIGHT SNAPSHOT MUST BE SAME AND LATEST VERSION
+  function checkIfCanGetLLMCode() {
+    if (left_snapshot_id !== right_snapshot_id)
+      return false
+
+    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
+      return false
+
+    return true
+  }
+
   if (editorLoading) {
     return (
       <div>
@@ -191,6 +252,13 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             comments={comments}
             setComments={setComments}
             userData={userData}
+            latestSnapshotData={latestSnapshotData}
+            editorLanguage={editorLanguage}
+            editorCode={updatedCode}
+            checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+            getHighlightedCode={getHighlightedCode}
+            updateHighlightedCode={updateHighlightedCode}
+            // Pass Functions for comments to call
           />
         </div>
       </div>

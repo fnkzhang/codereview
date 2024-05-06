@@ -13,6 +13,7 @@ import { Navbar } from 'flowbite-react';
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [connected, setConnected] = useState(false)
   const [userData, setUserData] = useState(null)
 
   return (
@@ -35,6 +36,8 @@ function App() {
                 setIsLoggedIn={setIsLoggedIn}
                 userData={userData}
                 setUserData={setUserData}
+                connected={connected}
+                setConnected={setConnected}
               />
             </Navbar.Brand>
           </div>
@@ -43,9 +46,11 @@ function App() {
           {/*<Route exact path="/" element={<ReviewWindow/>} /> */}
           <Route path="/" element={<UserHomePage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="/Project/Create" element={<ProjectCreation/>}/>
           <Route path="/Project/:project_id" element={<ProjectPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
+          <Route path="/Project/Create" element={<ProjectCreation
+            isLoggedIn={isLoggedIn} userData={userData}
+            connected={connected} setConnected={setConnected}/>}/>
           <Route path="/Project/Delete/:project_id/" element={<ProjectDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/:parent_folder_id/Document/Create" element={<DocumentCreation/>}/>

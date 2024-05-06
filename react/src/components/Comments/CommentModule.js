@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData}) {
+  start , end, comments, setComments, userData, latestSnapshotData,
+  editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
@@ -14,8 +15,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   const [userDataLocal] = useState(userData);
   
   useEffect(() => {
-    console.log(start, end, comments, document_id)
-
     const fetchData = async () => {
       try {
         let allComments = []
@@ -39,10 +38,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     }
   }, [commentsLoading, leftSnapshotId, rightSnapshotId])
 
-  useEffect(() => {
-    console.log("comment Updated")
-  }, [comments])
-
   function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
   };
@@ -50,7 +45,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   async function handleNewCommentSubmit() {
     try {
       console.log(snapshotId)
-      if (snapshotId != null) {
+      if (snapshotId !== null) {
         console.log("adding comment ...", userDataLocal)
 
         // ToDo Handle Nested Comments in future
@@ -107,8 +102,15 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           }).filter((comment) => {
             return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId))
           })}
+          latestSnapshotData={latestSnapshotData}
           listLineJump={moduleLineJump}
+          editorLanguage={editorLanguage}
+          editorCode={editorCode}
+          checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+          getHighlightedCode={getHighlightedCode}
+          updateHighlightedCode={updateHighlightedCode}
         />
+        
       </div>
       <div className="Comment-submit-section">
         <label className="text-textcolor">Add a new comment:</label>
@@ -119,7 +121,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           onChange={handleCommentFieldChange}
         ></textarea>
         <br />
-        <button className="text-textcolor border border-alternative border-2 m-1 w-full transition duration-300 hover:bg-altBackground rounded"
+        <button className="text-textcolor border-alternative border-2 m-1 w-full transition duration-300 hover:bg-altBackground rounded"
           type="submit" onClick={handleNewCommentSubmit}>Submit Comment</button>
       </div>
     </div>

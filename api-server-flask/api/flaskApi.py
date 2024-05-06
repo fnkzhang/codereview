@@ -499,6 +499,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
         
     blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
+    print(blob)
     return {
         "success": True,
         "reason": "",
@@ -1021,7 +1022,7 @@ def deleteComment(comment_id):
         "reason": "Successful Delete"
     }
 #needs auth because everything does lmao
-#put token in the body in "github_token"
+#put code in the body in "github_code"
 @app.route('/api/Github/addToken', methods=["POST"])
 def addGithubToken():
     headers = request.headers
@@ -1039,9 +1040,10 @@ def addGithubToken():
         }
 
     body = request.get_json()
-    token = body["github_token"]
+    code = body["github_code"]
+    token = gapp.get_access_token(code)
     with engine.connect() as conn:
-        stmt = update(models.User).where(models.User.user_email == idInfo["email"]).values(github_token = token)
+        stmt = update(models.User).where(models.User.user_email == idInfo["email"]).values(github_token = token.token)
         conn.execute(stmt)
         conn.commit()
     return {"success":True,
@@ -1106,7 +1108,7 @@ def getRepoBranchesFromGithub(ownername, reponame):
 #needs auth
 #put repository path in "repository" and branch in "branch"
 #format -> repository = "fnkzhang/codereview", branch = "main"
-@app.route('/api/Github/Pull/<proj_id>', methods=["GET"])
+@app.route('/api/Github/Pull/<proj_id>', methods=["POST"])
 def pullFromBranch(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -1128,10 +1130,10 @@ def pullFromBranch(proj_id):
     user = getUserInfo(idInfo["email"])
 
     g = Github(auth = Auth.Token(user["github_token"]))
-    repo = g.get_repo(repository)
+    repo = g.get_repo(body["repository"])
     project = getProjectInfo(proj_id)
     folders = getAllProjectFolders(proj_id)
-    pathToFolderID = []
+    pathToFolderID = {}
     pathToFolderID[""] = project["root_folder"]
     contents = repo.get_contents("", body["branch"])
     updated_files = []
@@ -1273,7 +1275,7 @@ def implement_code_changes_from_comment():
         suggestion=comment,
         language=language
     )
-
+    
     if response is None:
         return {
             "success": False,

@@ -3,9 +3,9 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from 'jwt-decode';
 import { Dropdown, Avatar } from 'flowbite-react';
 import getCookie, { deleteCookie } from "../utils/utils";
-import GitHubStatus from "./GitHub/GitHubStatus"
+import GitHubStatus from "./GitHub/GitHubStatus";
 
-export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData } ){
+export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData, connected, setConnected} ){
 
     const verifyLogin = useCallback(async (credentialResponse) => {
         let oAuthToken = credentialResponse.credential
@@ -139,7 +139,10 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
         >
           <Dropdown.Item className="bg-background" onClick={handleLogout}>Logout</Dropdown.Item>
           <Dropdown.Item className="bg-background">
-            <GitHubStatus/>
+            <GitHubStatus
+              connected={connected}
+              setConnected={setConnected}
+            />
           </Dropdown.Item>
         </Dropdown>
         {displayProfileImage()}

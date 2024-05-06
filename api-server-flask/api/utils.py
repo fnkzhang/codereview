@@ -29,6 +29,14 @@ from cacheUtils import cloudStorageCache, publishTopicUpdate
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
 
+with open('github_oath_credentials.json') as creds:
+    creds = json.load(creds)
+    github_client_id = creds["client-id"]
+    github_client_secret = creds["client-secret"]
+
+g = Github()
+gapp = g.get_oauth_application(github_client_id, github_client_secret)
+
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
@@ -438,8 +446,8 @@ def fetchFromCloudStorage(blobName:str):
         Name of the blob to retrieve.
     '''
     try:
-
-        blobContents = cloudStorageCache.get(blobName)
+        from cacheUtils import getCloudStorageCache
+        blobContents = getCloudStorageCache().get(blobName)
         if blobContents is None:
             blobContents = getBlob(blobName)
             print('uncached\n\n\n')
@@ -447,7 +455,7 @@ def fetchFromCloudStorage(blobName:str):
             print('cached\n\n\n')
         
         if blobContents is not None:
-            cloudStorageCache.set(blobName, blobContents)
+            getCloudStorageCache().set(blobName, blobContents)
         
         return blobContents
     except Exception as e:

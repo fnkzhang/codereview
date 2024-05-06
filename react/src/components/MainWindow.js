@@ -14,6 +14,8 @@ export default function MainWindow( props ) {
 
   const [dataToUpload, setDataToUpload] = useState(null) // Null until set to a string value
 
+  const [editorReady, setEditorReady] = useState(false)
+
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams();
 
   const location = useLocation();
@@ -25,7 +27,7 @@ export default function MainWindow( props ) {
     extensionName = EXTENSION_TO_LANGUAGE_MAP[extensionName]
 
     setEditorLanguage(extensionName)
-  }, [location.state.documentName])
+  }, [location.state.documentName ])
 
   const handleCreateSnapshotClick = async () => {
     if (!dataToUpload) {
@@ -33,12 +35,12 @@ export default function MainWindow( props ) {
       return
     }
 
-    
     let response = await createSnapshotForDocument(project_id, document_id, dataToUpload)
+
     if (response === null)
       return
       
-    navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${response}`)
+    navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${response}`, {state: {documentName: location.state.documentName}})
     
   }
 
@@ -59,7 +61,9 @@ export default function MainWindow( props ) {
             comments={comments}
             snapshots={snapshots}
             setSnapshots={setSnapshots}
-            fileExtensionName={location.state.documentName}/>
+            fileExtensionName={location.state.documentName}
+            editorReady={editorReady}
+            />
 
           {hasUpdatedCode ? <DisplaySnapshotCreateButton/> : null}
         </div>
@@ -69,6 +73,8 @@ export default function MainWindow( props ) {
           setComments={setComments}
           userData={props.userData}
           latestSnapshotData={snapshots[snapshots.length - 1]}
+          editorReady={editorReady}
+          setEditorReady={setEditorReady}
           setHasUpdatedCode={setHasUpdatedCode}
           setDataToUpload={setDataToUpload}
           editorLanguage={editorLanguage}/>
