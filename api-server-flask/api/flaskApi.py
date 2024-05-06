@@ -1393,8 +1393,6 @@ def pullToExistingProject(proj_id):
             if document != None:
                 doc_id = document["doc_id"]
                 if file_content.decoded_content != getDocumentLastSnapshotContent(doc_id):
-                    print(file_content.decoded_content)
-                    print(getDocumentLastSnapshotContent(doc_id))
                     createNewSnapshot(proj_id, doc_id, file_content.decoded_content)
                     updated_files.append(doc_id)
                 docs_to_delete.remove(doc_id)

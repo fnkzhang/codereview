@@ -195,14 +195,6 @@ def getDocumentInfo(doc_id):
             return None
         return foundDocument._asdict()
 
-def getDeletedDocumentInfo(doc_id):
-    with engine.connect() as conn:
-        stmt = select(models.DeletedDocument).where(models.DeletedDocument.doc_id == doc_id)
-        foundDocument = conn.execute(stmt).first()
-        if foundDocument == None:
-            return None
-        return foundDocument._asdict()
-
 
 def getDocumentInfoViaLocation(name, parent_folder):
     with engine.connect() as conn:
@@ -228,8 +220,6 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
 
 def moveDocumentUtil(doc_id, parent_folder):
     with engine.connect() as conn:
-        if not createNewDeletedDocument(doc_id):
-            return -1
         stmt = (update(models.Document)
         .where(models.Document.doc_id == doc_id)
         .values(parent_folder = parent_folder)
@@ -245,14 +235,8 @@ def moveDocumentUtil(doc_id, parent_folder):
 
 def moveFolderUtil(folder_id, parent_folder):
     with engine.connect() as conn:
-        stmt = select(models.Document).where(models.Document.parent_folder == folder_id)
-        childDocuments = conn.execute(stmt)
-        for document in childDocuments:
-            moveDocumentUtil(document.doc_id, folder_id)
         stmt = select(models.Folder).where(models.Folder.parent_folder == folder_id)
         childFolders = conn.execute(stmt)
-        for folder in childFolders:
-            moveFolderUtil(folder.folder_id, folder_id)
         stmt = (update(models.Folder)
         .where(models.Folder.folder_id == folder_id)
         .values(parent_folder = parent_folder)
@@ -260,21 +244,6 @@ def moveFolderUtil(folder_id, parent_folder):
         conn.execute(stmt)
         conn.commit()
     return parent_folder
-
-def createNewDeletedDocument(doc_id):
-    document = getDocumentInfo(doc_id)
-    path = getDocumentPath(doc_id)
-    if document == None:
-        return -1
-    with engine.connect() as conn:
-        stmt = insert(models.DeletedDocument).values(
-                doc_id = doc_id,
-                associated_proj_id = document["associated_proj_id"],
-                path = path
-            )
-        conn.execute(stmt)
-        conn.commit()
-    return doc_id
 
 def getDocumentPath(doc_id):
     document = getDocumentInfo(doc_id)
