@@ -354,6 +354,8 @@ def getSnapshotInfo(snapshot_id):
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
         snapshot = conn.execute(stmt).first()
+        if snapshot == None:
+            return None
         return snapshot._asdict()
 
 def getCommentInfo(comment_id):
