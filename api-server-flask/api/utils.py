@@ -28,6 +28,13 @@ from cacheUtils import cloudStorageCache, publishTopicUpdate
 
 engine = connectCloudSql()
 Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
+with open('github_oath_credentials.json') as creds:
+    creds = json.load(creds)
+    github_client_id = creds["client-id"]
+    github_client_secret = creds["client-secret"]
+
+g = Github()
+gapp = g.get_oauth_application(github_client_id, github_client_secret)
 
 with open('github_oath_credentials.json') as creds:
     creds = json.load(creds)
@@ -50,7 +57,7 @@ def getBlob(blobName):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
-    return blob.download_as_text()
+    return blob.download_as_bytes() #.download_as_text()
 
 def deleteBlob(blobName):
     storage_client = storage.Client()
@@ -131,7 +138,64 @@ def getAllProjectDocuments(proj_id):
             arrayOfDocuments.append(row._asdict())
         
         return arrayOfDocuments
-    
+
+def getGithubProjectDocumentsAsPaths(repo, branch, token):
+    g2 = Github(auth = Auth.Token(token))
+    repo = g2.get_repo(repo)
+    try:
+        contents = repo.get_contents("", branch)
+    except:
+        return []
+    githubfiles = []
+    while contents:
+        file_content = contents.pop(0)
+        if file_content.type == "dir":
+            contents.extend(repo.get_contents(file_content.path))
+        else:
+            print(file_content.path)
+            githubfiles.append(file_content.path)
+    return githubfiles
+
+def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
+    allGithubFiles = set(getGithubProjectDocumentsAsPaths(repo, branch, token))
+    projectDocuments = getAllProjectDocuments(proj_id)
+    projectDocumentPaths = set([getDocumentPath(document['doc_id']) for document in projectDocuments])
+    nonexistant = list(allGithubFiles - projectDocumentPaths)
+    return nonexistant
+def assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs):
+    tree_elements = []
+    for deletedDocumentPath in deletedDocumentPaths:
+        tree_elements.append(InputGitTreeElement(path = deletedDocumentPath,
+                mode = "100644",
+                type = "blob",
+                sha = None
+            ))
+    for snapshotID in snapshotIDs:
+        snapshot = getSnapshotInfo(snapshotID)
+        document = getDocumentInfo(snapshot["associated_document_id"])
+        blob = repo.create_git_blob(
+                content = getSnapshotContentUtil(snapshotID),
+                encoding = 'utf-8',
+                )
+        tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
+                mode = "100644",
+                type = "blob",
+                sha = blob.sha
+            ))
+    return tree_elements
+
+def assembleGithubComments(snapshotIDs):
+    githubComments = []
+    for snapshotID in snapshotIDs:
+        doc_id = getSnapshotInfo(snapshotID)["associated_document_id"]
+        documentPaths = getDocumentPath(doc_id)
+        commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID )
+        for comment in commentList:
+            if comment["is_resolved"] == False:
+                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + highlight_start_y + ' to Line ' + highlight_end_y + '\n'+ comment.content)
+    return githubComments   
+
+
 def getDocumentInfo(doc_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
@@ -139,6 +203,7 @@ def getDocumentInfo(doc_id):
         if foundDocument == None:
             return None
         return foundDocument._asdict()
+
 
 def getDocumentInfoViaLocation(name, parent_folder):
     with engine.connect() as conn:
@@ -162,6 +227,36 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
 
     createNewSnapshot(proj_id, doc_id, item)
     return doc_id
+
+def moveDocumentUtil(doc_id, parent_folder):
+    with engine.connect() as conn:
+        stmt = (update(models.Document)
+        .where(models.Document.doc_id == doc_id)
+        .values(parent_folder = parent_folder)
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return parent_folder
+
+def moveFolderUtil(folder_id, parent_folder):
+    with engine.connect() as conn:
+        stmt = (update(models.Folder)
+        .where(models.Folder.folder_id == folder_id)
+        .values(parent_folder = parent_folder)
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return parent_folder
+
+def getDocumentPath(doc_id):
+    document = getDocumentInfo(doc_id)
+    paths = getProjectFoldersAsPaths(document["associated_proj_id"])
+    return paths[document["parent_folder"]] + document["name"]
+
+def getFolderPath(folder_id):
+    folder = getFolderInfo(folder_id)
+    paths = getProjectFoldersAsPaths(folder["associated_proj_id"])
+    return paths[folder["parent_folder"]] + folder["name"]
 
 def getFolderInfo(folder_id):
     with engine.connect() as conn:
@@ -223,6 +318,24 @@ def createNewSnapshot(proj_id, doc_id, item):
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
         return snapshot_id
+
+
+
+
+def getSnapshotProject(snapshot_id):
+    try:
+        with engine.connect() as conn:
+            stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
+            snapshot = conn.execute(stmt)
+            doc_id = snapshot.first().associated_document_id
+
+            stmt = select(models.Document).where(models.Document.doc_id == doc_id)
+            document = conn.execute(stmt)
+            proj_id = document.first().associated_proj_id
+            return proj_id
+    except:
+        return None
+
 def getSnapshotPath(snapshot_id):
     try:
         with engine.connect() as conn:
@@ -241,7 +354,19 @@ def getSnapshotInfo(snapshot_id):
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
         snapshot = conn.execute(stmt).first()
+        if snapshot == None:
+            return None
         return snapshot._asdict()
+
+def getCommentInfo(comment_id):
+    with engine.connect() as conn:
+        stmt = select(models.Comment).where(models.Comment.comment_id == comment_id)
+        comment = conn.execute(stmt).first()
+        return comment._asdict()
+
+def getCommentProject(comment_id):
+    return getSnapshotProject(getCommentInfo(comment_id)["snapshot_id"])
+
 def getSnapshotContentUtil(snapshot_id):
     blob = getBlob(getSnapshotPath(snapshot_id))
     return blob
@@ -268,7 +393,19 @@ def deleteDocumentUtil(doc_id):
                 deleteSnapshotUtil(snapshot.snapshot_id)
             stmt = delete(models.Document).where(models.Document.doc_id == doc_id)
             conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
 
+def renameDocumentUtil(doc_id, doc_name):
+    try:
+        with engine.connect() as conn:
+            stmt = (update(models.Document)
+                .where(models.Document.doc_id == doc_id)
+                .values(name=doc_name)
+                )
+            conn.execute(stmt)
             conn.commit()
         return True, "No Error"
     except Exception as e:
@@ -295,6 +432,42 @@ def deleteFolderUtil(folder_id):
     except Exception as e:
         return False, e
 
+def renameFolderUtil(folder_id, folder_name):
+    try:
+        with engine.connect() as conn:
+            stmt = (update(models.Folder)
+                .where(models.Folder.folder_id == folder_id)
+                .values(name=folder_name)
+                )
+            conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
+
+
+def createNewProject(proj_name, owner):
+    pid = createID()
+    root_folder_id = createNewFolder('root', 0, pid)
+    with engine.connect() as conn:
+        projstmt = insert(models.Project).values(
+                proj_id = pid,
+                name = proj_name,
+                author_email = owner,
+                root_folder = root_folder_id
+        )
+    #permissions is a placeholder value for owner because we only have 1 perm rn but hey it's 1111
+        relationstmt = insert(models.UserProjectRelation).values(
+                user_email = owner,
+                proj_id = pid,
+                role = "Owner",
+                permissions = 15
+        )
+        conn.execute(projstmt)
+        conn.execute(relationstmt)
+        conn.commit()
+    return pid
+
 def deleteProjectUtil(proj_id):
     try:
         with engine.connect() as conn:
@@ -304,6 +477,19 @@ def deleteProjectUtil(proj_id):
             stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
             conn.execute(stmt)
             stmt = delete(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
+            conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
+
+def renameProjectUtil(proj_id, proj_name):
+    try:
+        with engine.connect() as conn:
+            stmt = (update(models.Project)
+                .where(models.Project.proj_id == proj_id)
+                .values(name=proj_name)
+                )
             conn.execute(stmt)
             conn.commit()
         return True, "No Error"
@@ -352,14 +538,14 @@ def isValidRequest(parameters, requiredKeys):
 
     return True
 
+
 #repository = "user/reponame", aka just github style
 def getBranches(token, repository):
     try:
         auth = Auth.Token(token)
-        g = Github(auth=auth)
-        g.get_user().login
+        g2 = Github(auth=auth)
         
-        repo = g.get_repo(repository)
+        repo = g2.get_repo(repository)
         branches = list(repo.get_branches())
         branchnames = []
         for branch in branches:
@@ -367,6 +553,7 @@ def getBranches(token, repository):
         return True, branchnames
     except Exception as e:
         return False, e
+
 def getAllFolderContents(folder_id):
     with engine.connect() as conn:
         stmt = select(models.Folder).where(models.Folder.parent_folder == folder_id)
@@ -409,9 +596,9 @@ def getFolderPathsFromList(folder_id, current_path,list_of_folders):
             list_of_folders.remove(folder)
             foldersInFolder.append(folder)
     for folder in foldersInFolder:
-            folderpath = current_path + folder["name"] + '/'
-            folderIDToPath[folder["folder_id"]] = folderpath
-            folderIDToPath.update(getFolderPathsFromList(folder["folder_id"], folderpath, list_of_folders))
+        folderpath = current_path + folder["name"] + '/'
+        folderIDToPath[folder["folder_id"]] = folderpath
+        folderIDToPath.update(getFolderPathsFromList(folder["folder_id"], folderpath, list_of_folders))
     return folderIDToPath
 
 def getProjectFoldersAsPaths(proj_id):
