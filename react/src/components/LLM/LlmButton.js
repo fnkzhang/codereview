@@ -4,7 +4,8 @@ import { getCodeImplementation } from "../../api/APIUtils";
 
 export default function LlmButton( { editorLanguage, editorCode, commentText, checkIfCanGetLLMCode, getHighlightedCode,
   highlightStartX, highlightStartY, highlightEndX, highlightEndY, updateHighlightedCode } ) {
-    
+  
+  //Todo Display Error Message When LLM Fails
   const [isError, setIsError] = useState(false)
 
   const handleCreateSuggestion = async () => {  
