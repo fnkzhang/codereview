@@ -18,17 +18,13 @@ export default function ProjectCreation( props ) {
   const handleCreateProject = async () => {
 
     setWorking(true)
-    let result = await createProject(projectName)
 
-    if (!result.success) {
-      setWorking(false)
-      setIsError(true)
-      return
-    }
+    let result = null;
 
     if (importFromGitHub) {
-      let proj_id = result.body
-      result = await pullFromGitHub(proj_id, gitRepo, repoBranch)
+      result = await pullFromGitHub(projectName, gitRepo, repoBranch)
+    } else {
+      result = await createProject(projectName)
     }
 
     if (result.success)

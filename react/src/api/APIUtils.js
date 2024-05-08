@@ -639,7 +639,7 @@ export async function hasGitHubToken() {
   })
 }
 
-export async function pullFromGitHub(proj_id, repo_name, branch_name) {
+export async function pullFromGitHub(proj_name, repo_name, branch_name) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -654,10 +654,11 @@ export async function pullFromGitHub(proj_id, repo_name, branch_name) {
     body: JSON.stringify({
       "repository" : repo_name,
       "branch" : branch_name,
+      "project_name" : proj_name,
     })
   };
 
-  return await fetch((`/api/Github/Pull/${proj_id}`), headers)
+  return await fetch((`/api/Github/PullToNewProject/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
