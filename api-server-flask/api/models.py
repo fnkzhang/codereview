@@ -86,9 +86,3 @@ class Folder(Base):
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
     parent_folder = Column(Integer, primary_key=True)
-
-class DeletedDocument(Base):
-    __tablename__ = "deleteddocuments"
-    doc_id = Column(Integer, primary_key=True)
-    associated_proj_id = Column(Integer)
-    path = Column(Text)
