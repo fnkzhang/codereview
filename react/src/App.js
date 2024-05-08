@@ -55,7 +55,8 @@ function App() {
           <Route path="/Project/Delete/:project_id/" element={<ProjectDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/Export/:project_id/" element={<ProjectExport
-            isloggedIn={isLoggedIn} userData={userData}/>}/>
+            isloggedIn={isLoggedIn} userData={userData}
+            connected={connected} setConnected={setConnected}/>}/>
           <Route path="/Project/:project_id/Permissions" element={<PermissionPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/:parent_folder_id/Document/Create" element={<DocumentCreation/>}/>
