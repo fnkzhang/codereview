@@ -256,23 +256,24 @@ def renameProject(proj_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
         }
     try:
-        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+        proj_id = getProjectInfo(proj_id)
     except:
         return {
             "success": False,
-            "reason": "document doesn't exist"
+            "reason": "project doesn't exist"
         }
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
+    body = request.get_json()
     rv, e = renameProjectUtil(proj_id, body["proj_name"])
     if(not rv):
         return {
@@ -390,8 +391,8 @@ def addUser(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or body["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+    
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     with engine.connect() as conn:
         if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
@@ -704,8 +705,8 @@ def deleteSnapshot(snapshot_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -735,8 +736,8 @@ def deleteDocument(doc_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -774,8 +775,8 @@ def renameDocument(doc_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -791,6 +792,7 @@ def renameDocument(doc_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2): 
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
+    body = request.get_json()
     rv, e = renameDocumentUtil(doc_id, body["doc_name"])
     if(not rv):
         return {
@@ -812,8 +814,8 @@ def deleteFolder(folder_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -852,8 +854,8 @@ def renameFolder(folder_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -870,6 +872,7 @@ def renameFolder(folder_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     # Query
+    body = request.get_json()
     rv, e = renameFolderUtil(folder_id, body["folder_name"])
     if(not rv):
         return {
@@ -891,8 +894,8 @@ def deleteProject(proj_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -921,8 +924,8 @@ def createComment(snapshot_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -988,8 +991,8 @@ def resolveComment(comment_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -1018,8 +1021,8 @@ def getCommentsOnSnapshot(snapshot_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -1113,7 +1116,7 @@ def getAllDocumentsFromProject(proj_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
 
-    arrayOfDocuments = getAllDocumentsForProject(proj_id)
+    arrayOfDocuments = getAllProjectDocuments(proj_id)
     return {
         "success": True,
         "reason": "-",
@@ -1124,6 +1127,19 @@ def getAllDocumentsFromProject(proj_id):
 @app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
 def getSubcommentsOnComment(comment_id):
     # authenticate
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided"
+        }
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
     # query cloud sql
     proj_id = getCommentProject(comment_id)
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
@@ -1153,8 +1169,8 @@ def editComment(comment_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -1203,8 +1219,8 @@ def deleteComment(comment_id):
             "success": False,
             "reason": "Invalid Token Provided"
         }
-
-    if authenticate() is None:
+    idInfo = authenticate()
+    if idInfo is None:
         return {
             "success":False,
             "reason": "Failed to Authenticate"
@@ -1531,7 +1547,7 @@ def pushToExistingBranch(proj_id):
     commit = repo.get_branch(body["branch"]).commit
     allcomments = assembleGithubComments(snapshotIDs)
     for comment in allcomments:
-        com.create_comment(body=comment)
+        commit.create_comment(body=comment)
     return {"success":True, "reason":"", "body":updated_files}
 
 
@@ -1580,7 +1596,8 @@ def pushToNewBranch(proj_id):
     body = request.get_json()
     snapshotIDs = body["snapshots"]
     deletedDocumentPaths = body["deletedDocuments"]
-    tree_elements = assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs)
+    branch_sha = repo.get_branch(body["oldbranch"]).commit.sha
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
     try:
         new_tree = repo.create_git_tree(
             tree = tree_elements,
@@ -1600,7 +1617,7 @@ def pushToNewBranch(proj_id):
     commit = repo.get_branch(body["branch"]).commit
     allcomments = assembleGithubComments(snapshotIDs)
     for comment in allcomments:
-        com.create_comment(body=comment)
+        commit.create_comment(body=comment)
     return {"success":True, "reason":"", "body":updated_files}
 
 @app.route('/api/testo/', methods=["POST"])
