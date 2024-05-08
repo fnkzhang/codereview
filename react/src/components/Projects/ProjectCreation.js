@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import GitHubImportForm from "../GitHub/GitHubImportForm.js";
+import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { createProject, pullFromGitHub } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
@@ -10,14 +11,17 @@ export default function ProjectCreation( props ) {
   const [importFromGitHub, setImportFromGitHub] = useState(false);
   const [gitRepo, setGitRepo] = useState("");
   const [repoBranch, setRepoBranch] = useState("");
+  const [working, setWorking] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
   const handleCreateProject = async () => {
 
+    setWorking(true)
     let result = await createProject(projectName)
 
     if (!result.success) {
+      setWorking(false)
       setIsError(true)
       return
     }
@@ -30,6 +34,7 @@ export default function ProjectCreation( props ) {
     if (result.success)
       navigate("/");
     else
+      setWorking(false)
       setIsError(true)
   }
 
@@ -68,6 +73,10 @@ export default function ProjectCreation( props ) {
 
         {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
         <Button onClick={handleCreateProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500">Create</Button>
+
+        <div className="flex justify-center">
+          <LoadingSpinner active={working}/>
+        </div>
       </form>
     </div>
   )
