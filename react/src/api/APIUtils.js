@@ -58,6 +58,77 @@ export async function deleteProject(proj_id) {
 
 }
 
+export async function addUserToProject(proj_id, emailToAdd, roleNameForEmail, permissionLevel) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let bodyData = {
+    "email": emailToAdd,
+    "role": roleNameForEmail,
+    "permissions": permissionLevel
+  }
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(bodyData)
+  }
+
+  return await fetch((`/api/Project/${proj_id}/addUserAdmin/`), headers)
+    .then(response => response.json())
+
+}
+
+export async function changeExistingUserPermission() {
+
+}
+
+export async function removeUserFromProject(proj_id, emailToRemove) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let bodyData = {
+    "email": emailToRemove,
+  }
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(bodyData)
+  }
+
+  return await fetch((`/api/Project/${proj_id}/removeUser/`), headers)
+    .then(response => response.json())
+}
+
+export async function getAllUsersWithPermissionForProject(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+
+  return await fetch((`/api/Project/${proj_id}/Users/`), headers)
+    .then(response => response.json())
+    .then(data => data.body)
+    .catch(error => console.log(error))
+}
+
 export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")

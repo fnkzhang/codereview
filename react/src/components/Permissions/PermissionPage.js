@@ -1,16 +1,47 @@
-import React, { userState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router";
+import { getProjectInfo, getAllUsersWithPermissionForProject } from "../../api/APIUtils";
 
 export default function PermissionPage() {
 
 
-  let [projectName, setProjectName] = useState("")
+  let [projectName, setProjectName] = useState("");
 
+  let [projectUsers, setProjectUsers] = useState([]);
+
+  const {project_id} = useParams();
+
+  // Set Data For Page on Load
   useEffect(() => {
-    
-  }) 
+    const getProjectData = async () => {
+      let projectData = await getProjectInfo(project_id);
+      setProjectName(projectData.name);
+    }
+
+    const getCurrentProjectUsers = async () => {
+      let projectUserResponse = await getAllUsersWithPermissionForProject(project_id)
+      setProjectUsers(projectUserResponse)
+    }
+
+    getProjectData()
+    getCurrentProjectUsers()
+  }, [project_id]) 
+
+
   return (
-    <div>
-      <h3>Project: {projectName}</h3>
+    <div className="text-textcolor text-2xl">
+      <header>
+        <h3>Project: {projectName}</h3>
+      </header>
+
+      <section>
+        
+      </section>
+      <aside className="float-right">
+        {projectUsers.map((user) => {
+          return <li key={user.name}>{user.name}</li>
+        })}
+      </aside>
     </div>
   )
 }

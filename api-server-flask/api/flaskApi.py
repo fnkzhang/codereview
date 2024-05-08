@@ -381,6 +381,7 @@ def addUser(proj_id):
             )
         conn.execute(relationstmt)
         conn.commit()
+
     return {"success": True, "reason":"N/A", "body": {}}
 
 #just addUser but you don't need to be a valid user lol, test function remove later
@@ -428,18 +429,80 @@ def removeUser(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    try:
+        #3 is placeholder value since we only have read permission
+        if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
+            return {"success": False, "reason":"Invalid Permissions", "body":{}}
+        
+        with engine.connect() as conn:
+            relationstmt = delete(models.UserProjectRelation).where(
+                models.UserProjectRelation.user_email == inputBody["email"],
+                proj_id == proj_id
+            )
+            
+            conn.execute(relationstmt)
+            conn.commit()
 
-    #3 is placeholder value since we only have read permission
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    with engine.connect() as conn:
-        relationstmt = delete(models.UserProjectRelation).where(
-            models.UserProjectRelation.user_email == inputBody["email"],
-            proj_id == proj_id
-        )
-        conn.execute(relationstmt)
-        conn.commit()
-    return {"success": True, "reason":"N/A", "body": {}}
+        return {"success": True, "reason":"N/A", "body": {}}
+        
+    except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
+    # End OF Func
+    
+# Get UserData With Access to Project
+@app.route('/api/Project/<proj_id>/Users/', methods=["GET"])
+def getUsersWithAccessToProject(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    try:
+        # Get All Users Data that Has Relationship to project id
+        with engine.connect() as conn:
+            emailsWithAccessToProjectStmt = select(models.UserProjectRelation.user_email).where(
+                models.UserProjectRelation.proj_id == proj_id
+            )
+
+            userEmailResult = conn.execute(emailsWithAccessToProjectStmt)
+
+            userDataList = []
+
+            for userEmailTuple in userEmailResult:
+                userEmail = userEmailTuple[0]
+                getUserDataStmt = select(models.User).where(models.User.user_email == userEmail)
+                userSearchResult = conn.execute(getUserDataStmt).first()
+
+                userDataList.append(userSearchResult._asdict())
+
+            conn.commit()
+
+            return {
+                "success": True,
+                "reason": "",
+                "body": userDataList
+            }
+        
+    except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
+    # End Of Func
 
 # Data Passed in body while project and document id passed in url
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
