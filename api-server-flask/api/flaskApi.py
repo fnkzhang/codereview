@@ -1455,6 +1455,8 @@ def pullToExistingProject(proj_id):
                 else:
                     doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content)
                     updated_files.append(doc_id)
+            except:
+                pass
         print(pathToFolderID)
     for doc_to_delete in docs_to_delete:
         deleteDocumentUtil(doc_to_delete)
