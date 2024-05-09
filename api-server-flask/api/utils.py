@@ -74,6 +74,10 @@ def deleteBlobsInDirectory(location):
     for blob in blobs:
         blob.delete()
     return True
+
+def getTime():
+    return datetime.now()
+
 def setUserProjPermissions(email, pid, r, perms):
     with engine.connect() as conn:
         stmt = insert(models.UserProjectRelation).values(
@@ -162,7 +166,7 @@ def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
     projectDocumentPaths = set([getDocumentPath(document['doc_id']) for document in projectDocuments])
     nonexistant = list(allGithubFiles - projectDocumentPaths)
     return nonexistant
-def assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs):
+def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs):
     tree_elements = []
     for deletedDocumentPath in deletedDocumentPaths:
         tree_elements.append(InputGitTreeElement(path = deletedDocumentPath,
@@ -188,11 +192,11 @@ def assembleGithubComments(snapshotIDs):
     githubComments = []
     for snapshotID in snapshotIDs:
         doc_id = getSnapshotInfo(snapshotID)["associated_document_id"]
-        documentPaths = getDocumentPath(doc_id)
+        documentPath = getDocumentPath(doc_id)
         commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID )
         for comment in commentList:
             if comment["is_resolved"] == False:
-                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + highlight_start_y + ' to Line ' + highlight_end_y + '\n'+ comment.content)
+                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + comment.highlight_start_y + ' to Line ' + comment.highlight_end_y + '\n'+ comment.content)
     return githubComments   
 
 
