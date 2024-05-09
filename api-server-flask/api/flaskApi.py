@@ -1376,7 +1376,10 @@ def pullToNewProject():
             folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
             pathToFolderID[file_content.path] = folder_id
         else:
-            doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content)
+            try:
+                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode())
+            except:
+                pass
     return {"success":True, "reason":"", "body":proj_id}
 
 
@@ -1442,15 +1445,16 @@ def pullToExistingProject(proj_id):
             pathToFolderID[file_content.path] = folder_id
         else:
             document = getDocumentInfoViaLocation(file_content.name, pathToFolderID[path])
-            if document != None:
-                doc_id = document["doc_id"]
-                if file_content.decoded_content != getDocumentLastSnapshotContent(doc_id):
-                    createNewSnapshot(proj_id, doc_id, file_content.decoded_content)
+            try:
+                if document != None:
+                    doc_id = document["doc_id"]
+                    if file_content.decoded_content != getDocumentLastSnapshotContent(doc_id):
+                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content)
+                        updated_files.append(doc_id)
+                    docs_to_delete.remove(doc_id)
+                else:
+                    doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content)
                     updated_files.append(doc_id)
-                docs_to_delete.remove(doc_id)
-            else:
-                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content)
-                updated_files.append(doc_id)
         print(pathToFolderID)
     for doc_to_delete in docs_to_delete:
         deleteDocumentUtil(doc_to_delete)
