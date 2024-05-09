@@ -473,7 +473,7 @@ def getUsersWithAccessToProject(proj_id):
     try:
         # Get All Users Data that Has Relationship to project id
         with engine.connect() as conn:
-            emailsWithAccessToProjectStmt = select(models.UserProjectRelation.user_email).where(
+            emailsWithAccessToProjectStmt = select(models.UserProjectRelation.user_email, models.UserProjectRelation.role).where(
                 models.UserProjectRelation.proj_id == proj_id
             )
 
@@ -483,10 +483,15 @@ def getUsersWithAccessToProject(proj_id):
 
             for userEmailTuple in userEmailResult:
                 userEmail = userEmailTuple[0]
+                userRole = userEmailTuple[1]
+
                 getUserDataStmt = select(models.User).where(models.User.user_email == userEmail)
                 userSearchResult = conn.execute(getUserDataStmt).first()
-
-                userDataList.append(userSearchResult._asdict())
+                
+                # Add User Role To Return Data
+                returnDict = userSearchResult._asdict()
+                returnDict["userRole"] = userRole
+                userDataList.append(returnDict)
 
             conn.commit()
 

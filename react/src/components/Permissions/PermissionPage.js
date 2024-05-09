@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { getProjectInfo, getAllUsersWithPermissionForProject } from "../../api/APIUtils";
+import { TextInput } from "flowbite-react";
 
 export default function PermissionPage() {
 
@@ -35,12 +36,16 @@ export default function PermissionPage() {
       </header>
 
       <section>
-        
+        <TextInput placeholder="Existing User Email" shadow/>
       </section>
+
       <aside className="float-right">
-        {projectUsers.map((user) => {
-          return <li key={user.name}>{user.name}</li>
-        })}
+        <h3>Existing Users</h3>
+        <ul>
+          {projectUsers.map((user) => {
+            return <li key={user.name}>{user.name}</li>
+          })}      
+        </ul>
       </aside>
     </div>
   )
