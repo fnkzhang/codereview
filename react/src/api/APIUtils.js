@@ -504,7 +504,7 @@ export async function getCodeImplementation2(code, language, startLine, endLine,
     })
   };
 
-  return await fetch((`/api/llm/code-implementation`), headers)
+  return await fetch((`/api/llm/code-implementation-2`), headers)
   .then(response => response.json())
   .then(data => {
     console.log(data)
