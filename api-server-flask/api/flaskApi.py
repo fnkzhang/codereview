@@ -1211,41 +1211,6 @@ def getAllCommentsForDocument(document_id):
         "body": listOfComments
     }
 
-@app.route('/api/Document/<proj_id>/GetDocuments', methods=["GET"])
-def getAllDocumentsFromProject(proj_id):
-    headers = request.headers
-
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-            "success":False,
-            "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    
-    if not userExists(idInfo["email"]):
-       return {
-               "success": False,
-               "reason": "Account does not exist, stop trying to game the system by connecting to backend not through the frontend",
-               "body":{}
-       }
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    
-
-    arrayOfDocuments = getAllProjectDocuments(proj_id)
-    return {
-        "success": True,
-        "reason": "-",
-        "body": arrayOfDocuments
-    }
-
 # Comment POST, GET, PUT, DELETE
 @app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
 def getSubcommentsOnComment(comment_id):

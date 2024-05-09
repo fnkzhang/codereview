@@ -27,11 +27,12 @@ export default function ProjectCreation( props ) {
       result = await createProject(projectName)
     }
 
-    if (result.success)
+    if (result.success) {
       navigate("/");
-    else
+    } else {
       setWorking(false)
       setIsError(true)
+    }
   }
 
   if ( props.isLoggedIn === false ) {

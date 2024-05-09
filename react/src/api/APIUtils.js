@@ -383,9 +383,7 @@ export async function getUserProjects(userEmail) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data.body
   })
 }
@@ -410,7 +408,6 @@ export async function getProjectInfo(project_id) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
     return data.body
   }))
@@ -432,14 +429,12 @@ export async function getProjectDocuments(proj_id) {
     },
   };
 
-  return await fetch((`/api/Document/${proj_id}/`), headers)
+  return await fetch((`/api/Document/${proj_id}/GetDocuments/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data.body
   })
 }
@@ -463,9 +458,7 @@ export async function getProjectTree(proj_id) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data.body
   })
 }
@@ -494,9 +487,7 @@ export async function createFolder(folder_name, proj_id, parent_folder_id) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data
   })
 }
@@ -608,7 +599,6 @@ export async function addGitHubToken(token) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
     return data
   })
@@ -633,7 +623,30 @@ export async function hasGitHubToken() {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
+    }
+    return data
+  })
+}
+
+export async function getDeletedDocuments( proj_id, repo_name, branch_name ) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Github/${proj_id}/getNonexistent/?repository=${encodeURIComponent(repo_name)}&branch=${encodeURIComponent(branch_name)}`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
     }
     return data
   })
@@ -663,7 +676,37 @@ export async function pullFromGitHub(proj_name, repo_name, branch_name) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
+    }
+    return data
+  })
+}
+
+export async function pushToExistingBranch(proj_id, repo_name, branch_name, deletedDocuments, snapshots, message) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "repository" : repo_name,
+      "branch" : branch_name,
+      "deletedDocuments" : deletedDocuments,
+      "snapshots" : snapshots,
+      "message" : message,
+    })
+  };
+
+  return await fetch((`/api/Github/${proj_id}/PushToExisting/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
     }
     return data
   })
