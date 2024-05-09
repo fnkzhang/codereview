@@ -1,14 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
+import { Navbar } from 'flowbite-react';
 import Oauth from './components/Oauth.js';
 import UserHomePage from './components/UserHomePage.js';
 import MainWindow from './components/MainWindow.js';
 import ProjectPage from './components/ProjectPage.js';
 import ProjectCreation from './components/Projects/ProjectCreation.js';
 import ProjectDeletion from './components/Projects/ProjectDeletion.js';
+import ProjectExport from './components/Projects/ProjectExport.js';
 import DocumentCreation from './components/Documents/DocumentCreation.js';
 import FolderCreation from './components/Folders/FolderCreation.js';
-import { Navbar } from 'flowbite-react';
 import PermissionPage from './components/Permissions/PermissionPage.js';
 
 function App() {
@@ -44,7 +45,6 @@ function App() {
           </div>
         </Navbar>
         <Routes>
-          {/*<Route exact path="/" element={<ReviewWindow/>} /> */}
           <Route path="/" element={<UserHomePage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id" element={<ProjectPage
@@ -54,9 +54,11 @@ function App() {
             connected={connected} setConnected={setConnected}/>}/>
           <Route path="/Project/Delete/:project_id/" element={<ProjectDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
+          <Route path="/Project/Export/:project_id/" element={<ProjectExport
+            isloggedIn={isLoggedIn} userData={userData}
+            connected={connected} setConnected={setConnected}/>}/>
           <Route path="/Project/:project_id/Permissions" element={<PermissionPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-
           <Route path="/Project/:project_id/:parent_folder_id/Document/Create" element={<DocumentCreation/>}/>
           <Route path="/Project/:project_id/:parent_folder_id/Folder/Create" element={<FolderCreation/>}/>
           <Route path="/Document/:document_id/" /> 
