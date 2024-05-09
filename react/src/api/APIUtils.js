@@ -478,6 +478,49 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
 /**
  * @param {string} code The entire code in the document/snapshot
  * @param {string} language The coding language used
+ * @param {number} startLine Starting line # of highlighted code
+ * @param {number} endLine Ending line # of highlighted code
+ * @param {string} comment A suggestion on what to do with the highlighted code
+ * @returns {string} The entire code with the comment suggestion implemented
+*/
+export async function getCodeImplementation2(code, language, startLine, endLine, comment) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "code": code,
+      "language": language,
+      "startLine": startLine,
+      "endLine": endLine,
+      "comment": comment
+    })
+  };
+
+  return await fetch((`/api/llm/code-implementation`), headers)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return code
+    }
+
+    return data.body
+  });
+
+}
+
+/**
+ * @param {string} code The entire code in the document/snapshot
+ * @param {string} language The coding language used
  * @returns {object[]} A list of JSON objects that have keys startLine, endLine, and suggestion.
  * startLine: number - line # to begin highlight
  * endLine: number - line # to stop highlight
