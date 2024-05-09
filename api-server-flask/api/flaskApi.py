@@ -1614,7 +1614,7 @@ def pushToExistingBranch(proj_id):
     body = request.get_json()
     snapshotIDs = body["snapshots"]
     deletedDocumentPaths = body["deletedDocuments"]
-    tree_elements = assembleGithubTreeElements(deletedDocumentPaths, snapshotIDs)
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
     branch_sha = repo.get_branch(body["branch"]).commit.sha
     try:
         new_tree = repo.create_git_tree(

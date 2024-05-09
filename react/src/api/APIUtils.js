@@ -702,6 +702,8 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
     })
   };
 
+  console.log(deletedDocuments, snapshots)
+
   return await fetch((`/api/Github/${proj_id}/PushToExisting/`), headers)
   .then(response => response.json())
   .then(data => {
