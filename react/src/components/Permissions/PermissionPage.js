@@ -161,7 +161,8 @@ export default function PermissionPage( props ) {
             <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-all duration-200
             mt-5 w-full  hover:bg-slate-500"
               onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}>Add User</Button>
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}>Add User</Button>
 
             {/* <Dropdown label=""/> */}
             
