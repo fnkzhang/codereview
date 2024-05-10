@@ -148,7 +148,7 @@ def get_llm_code_from_suggestion(code: str,
                                  suggestion: str,
                                  language: str):
     # Configure System Prompt
-    system_prompt = SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION.format(language)
+    system_prompt = SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION.format(language=language)
 
     # Provide Few-Shot Examples on how the LLM should respond
     system_prompt += "<examples>\n"
