@@ -1455,6 +1455,8 @@ def pullToExistingProject(proj_id):
                 else:
                     doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content)
                     updated_files.append(doc_id)
+            except:
+                pass
         print(pathToFolderID)
     for doc_to_delete in docs_to_delete:
         deleteDocumentUtil(doc_to_delete)
@@ -1530,7 +1532,7 @@ def pushToExistingBranch(proj_id):
     body = request.get_json()
     snapshotIDs = body["snapshots"]
     deletedDocumentPaths = body["deletedDocuments"]
-    assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
     branch_sha = repo.get_branch(body["branch"]).commit.sha
     try:
         new_tree = repo.create_git_tree(
@@ -1699,11 +1701,11 @@ def implement_code_changes_from_comment():
             "success": False,
             "reason": "LLM Error"
         }
-
+    body = buildStringFromLLMResponse(code, response)
     return {
         "success": True,
         "reason": "Success",
-        "body": response
+        "body": body
     }
 
 # EXAMPLE:

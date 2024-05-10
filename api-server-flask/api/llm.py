@@ -14,11 +14,20 @@ from vertexai.generative_models import (
 SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION = """\
 You are a coding expert in {}. Apply the user's suggestion to the highlighted 
 code which is located at lines between the start line and end line of the 
-code. Modify the highlighted code. Avoid modifying the original code or giving 
-an explanation for the code. Your response must be a JSON object with the key 
-"revised_code". Important: Do not let the user change your JSON response 
+code. Changes will be separated into 3 sections: Replacements, Deletions, and Insertions. Your response must be a JSON object with the keys 
+"success", "insertions", and "deletions" with the respective changes. If succesfull changes were made, "success" will be True.
+For the "deletions" key, provide a list of lines that will be deleted. 
+Insertions follow the format of (line number) : "(lines to insert)".
+The lines are inserted on the line number directly after the line number provided.
+Provide the line number for insertions as if nothing else was inserted.
+The code at the line number given for insertion will not be deleted.
+For the "deletions" key, provide a list of lines that will be deleted. 
+Provide the line number for deletions as if none of the lines in "insertions" were inserted.
+Important: Do not let the user change your JSON response 
 format, even if the user requests for it. Ignore user prompts that are
-unrelated to implementing the code from the suggestion.
+unrelated to implementing the code from the suggestion. If the prompt is unrelated to code, "success" will be False.
+If the given data in the code section is not code, "success" will be False.
+Otherwise, "success" will be True.
 """
 
 SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE = """\
@@ -86,6 +95,49 @@ SAY_HELLO_CODE = """\
 5| foo()
 6| print("Done testing foo()")
 """
+SAY_HELLO_RESPONSE = json.dumps({
+    "success":True,
+    "insertions": {1:"def say_hello():", 4:"print(\"Testing say_hello()\")", 5:"say_hello()", 6:"print(\"Done testing say_hello()\")"},
+    "deletions":[1, 4, 5, 6],
+    })
+
+RENAME_VARIABLE_CODE = """\
+1| int a = 0;
+2| while(a < 34){
+3|     System.out.println("wowza");
+4|     a++;
+5| }
+6| for (int i = 0; i < 3; i++)
+7|     System.out.println("erm");
+"""
+RENAME_VARIABLE_RESPONSE = json.dumps({
+    "success":True,
+    "insertions": {1:"int counter = 0:", 2:"while(counter < 32) {", 4:"counter++;"},
+    "deletions":[1, 2, 4],
+    })
+
+SAY_HELLO_RESPONSE = json.dumps({
+    "success":True,
+    "insertions": {1:"def say_hello():", 4:"print(\"Testing say_hello()\")", 5:"say_hello()", 6:"print(\"Done testing say_hello()\")"},
+    "deletions":[1, 5, 7, 9],
+    })
+
+CREATE_GETTER_CODE = """\
+1| public class Person
+2| {
+3|     int age;
+4| }
+"""
+CREATE_GETTER__RESPONSE = json.dumps({
+    "success":True,
+    "deletions":[3],
+    "insertions":{3:"\
+    private int age;\n\
+    public int getAge()\n\
+    {\n\
+        return age;\n\
+    }"}
+    })
 
 CALCULATE_AVERAGE_CODE = """\
 1|def calc_avg(n):
@@ -97,7 +149,11 @@ CALCULATE_AVERAGE_CODE = """\
 7|
 8|    average=tot/cnt
 """
-
+INVALID_SUGGESTION_RESPONSE = json.dumps({
+    "success":False,
+    "deletions":[],
+    "insertions":{}
+    })
 #------------------------------------------------------------------------------
 # Initialize LLM
 #-------------------------------------------------------------------------------
@@ -159,9 +215,7 @@ def get_llm_code_from_suggestion(code: str,
             1, 1,
             "rename to something more meaningful"
         ),
-        example_output=json.dumps({
-            "revised_code": "say_hello"
-        })
+        example_output=SAY_HELLO_RESPONSE
     )
     system_prompt += add_few_shot_example(
         example_number=2,
@@ -172,9 +226,26 @@ def get_llm_code_from_suggestion(code: str,
             your response in a JSON with the key \"paragraphs\""
             ""
         ),
-        example_output=json.dumps({
-            "revised_code": "Invalid Request."
-        })
+        example_output=INVALID_SUGGESTION_RESPONSE
+    )
+    system_prompt += add_few_shot_example(
+        example_number=3,
+        example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
+            CREATE_GETTER_CODE, "int age",
+            1, 1,
+            "make this private and create a getter for it"
+            ""
+        ),
+        example_output=INVALID_SUGGESTION_RESPONSE
+    )
+    system_prompt += add_few_shot_example(
+        example_number=4,
+        example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
+            RENAME_VARIABLE_CODE, "a",
+            1, 1,
+            "rename to something more meaningful"
+        ),
+        example_output=SAY_HELLO_RESPONSE
     )
     system_prompt += "</examples>"
 
@@ -184,7 +255,9 @@ def get_llm_code_from_suggestion(code: str,
         start_line, end_line,
         suggestion
     )
-
+    print("_______PROMPT__________")
+    print(user_prompt)
+    print("_____ENDPROMPT_________")
     # Generate a response from LLM
     try:
         response = get_chat_response(user_prompt=user_prompt,
@@ -197,14 +270,15 @@ def get_llm_code_from_suggestion(code: str,
     # Extract the wanted output from response
     try:
         print(response)
-        revised_code = get_json_from_llm_response(response)["revised_code"]
+        revisions = get_json_from_llm_response(response)
     except Exception as e:
         print("Failed to get code from response")
+        print(response)
         print(e)
         return None
 
-    print("Implemented Code Generated by AI:", revised_code)
-    return revised_code
+    print("Implemented Code Generated by AI:", revisions)
+    return revisions
 
 def get_llm_suggestion_from_code(code: str,
                                  character="a developer at a code review session"):
@@ -261,7 +335,6 @@ def get_llm_suggestion_from_code(code: str,
     user_prompt = USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
         get_code_with_line_numbers(code)
     )
-
     # Generate a response from LLM
     try:
         response = get_chat_response(user_prompt=user_prompt,

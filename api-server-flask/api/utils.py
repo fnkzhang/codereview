@@ -702,3 +702,29 @@ def filterCommentsByPredicate(predicate):
             commentsList = None
     
     return commentsList
+
+def buildStringFromLLMResponse(code, response):
+    success = response["success"]
+    if success == False:
+        return "waow, this failed!"
+    insertions = convertKeysToInt(response["insertions"])
+    deletions = response["deletions"]
+    codeList = code.split('\n')
+    builtString = ""
+    for i in range(len(codeList)+1):
+        if i not in deletions:
+            if i > 0:
+                builtString = builtString + codeList[i-1]
+                if i < len(codeList) or insertions.get(i) != None:
+                    builtString = builtString + '\n'
+        if insertions.get(i) != None:
+            builtString = builtString + insertions.get(i)
+            if i < len(codeList) or insertions.get(i) != None:
+                builtString = builtString + '\n'
+    return builtString
+
+def convertKeysToInt(somedict):
+    rv = {}
+    for key in somedict.keys():
+        rv[int(key)] = somedict[key]
+    return rv
