@@ -166,6 +166,7 @@ def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
     projectDocumentPaths = set([getDocumentPath(document['doc_id']) for document in projectDocuments])
     nonexistant = list(allGithubFiles - projectDocumentPaths)
     return nonexistant
+
 def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs):
     tree_elements = []
     for deletedDocumentPath in deletedDocumentPaths:
