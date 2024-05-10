@@ -1,7 +1,8 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import { Card } from "flowbite-react"
-import { getAllSnapshotsFromDocument, getProjectInfo, getProjectTree } from "../api/APIUtils"
+import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getProjectTree } from "../api/APIUtils"
+import { IsUserAllowedToShare } from "../utils/permissionChecker"
 
 // Display Documents For Project
 export default function ProjectPage( props ) {
@@ -14,6 +15,7 @@ export default function ProjectPage( props ) {
   const { project_id } = useParams()
   const navigate = useNavigate()
 
+  const [userPermissionLevel, setUserPermissionLevel] = useState(0);
 
   // Grab Documents if logged in and userdata
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function ProjectPage( props ) {
       try {
         await Promise.all([
           grabProjectData(),
-          grabProjectTree()
+          grabProjectTree(),
         ])
       } catch (error) {
         console.log(error)
@@ -42,10 +44,31 @@ export default function ProjectPage( props ) {
       }
     }
 
+   
+
     if (loading) {
       fetchData()
     }
   }, [project_id])
+
+  useEffect(() => {
+    if (props.userData === null)
+      return;
+    async function getUserPermissionLevel() {
+
+      let searchResult = await getAllUsersWithPermissionForProject(project_id);
+
+      for (let i = 0; i < searchResult.length; i++) {
+        let userData = searchResult.at(i)
+        if (userData.user_email === props.userData.email) {
+          setUserPermissionLevel(userData.userPermissionLevel);    
+          console.log(userData);  
+          break;
+        }
+      }
+    }
+    getUserPermissionLevel();
+  }, [props.userData])
 
   function handleFolderClick (folder) {
     setFolderStack([...folderStack, folder])
@@ -183,7 +206,23 @@ export default function ProjectPage( props ) {
       </div>
     )
   }
-  
+
+  function DisplayShareButton() {
+    if (props.userData === null)
+      return null
+
+    if (!IsUserAllowedToShare(userPermissionLevel))
+      return;
+
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1"
+        onClick={() => navigate(`/Project/${project_id}/Share/`)}>
+          Share
+        </button>        
+      </div>
+    )
+  }
   function DisplayUploadDocumentButton() {
     return (
       <div className="text-textcolor text-xl">
@@ -217,6 +256,8 @@ export default function ProjectPage( props ) {
       </div>
     )  
   }
+
+
 
   if( props.isLoggedIn === false ) {
     return (
@@ -255,6 +296,7 @@ export default function ProjectPage( props ) {
         <DisplayDeleteButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>
+        <DisplayShareButton/>
       </div>
       <DisplayFolderBox/>
       <DisplayDocumentBox/>

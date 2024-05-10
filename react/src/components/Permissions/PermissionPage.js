@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject } from "../../api/APIUtils";
 import { Label, TextInput, Button, Dropdown } from "flowbite-react";
-
 export default function PermissionPage( props ) {
 
   let [userToAddEmail, setUserToAddEmail] = useState("");

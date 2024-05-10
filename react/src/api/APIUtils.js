@@ -129,6 +129,10 @@ export async function getAllUsersWithPermissionForProject(proj_id) {
     .catch(error => console.log(error))
 }
 
+export async function getUserPermissionForProject(proj_id, userEmail) {
+
+}
+
 export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
