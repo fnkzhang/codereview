@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject } from "../../api/APIUtils";
-import { Label, TextInput, Button, Dropdown } from "flowbite-react";
-import LoadingSpinner from "../Loading/LoadingSpinner";
+import { Label, TextInput, Button } from "flowbite-react";
 
 export default function PermissionPage( props ) {
 
   let [userToAddEmail, setUserToAddEmail] = useState("");
   let [projectName, setProjectName] = useState("");
   let [projectUsers, setProjectUsers] = useState([]);
-  let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
+  //let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
 
   let [isLoading, setIsLoading] = useState(true)
   // Todo Checks user permission value to determine if user can do actions / be on this page
@@ -52,9 +51,10 @@ export default function PermissionPage( props ) {
         setIsLoading(false)
       }
     }
+
     fetchData()
 
-  }, [project_id, props.isLoggedIn]) 
+  }, [project_id, props]) 
 
 
   const handleAddUserEmailToProject = async () => {
@@ -63,7 +63,7 @@ export default function PermissionPage( props ) {
       return;
     }
 
-    let result = await addUserToProject(project_id, userToAddEmail, "OwnerPart2", 12)
+    let result = await addUserToProject(project_id, userToAddEmail, "Editor", 12)
 
 
     if(!result.success) {
@@ -96,6 +96,20 @@ export default function PermissionPage( props ) {
     
     return false;
   }
+  
+  const handleMouseDown = (e) => {
+    let button = e.target;
+    console.log(button);
+    button.classList.remove("scale-100")
+    button.classList.add("scale-110");
+  }
+
+  const handleMouseUp = (e) => {
+    let button = e.target;
+    console.log(button);
+    button.classList.remove("scale-110");
+    button.classList.add("scale-100")
+  }
 
   function ProjectUserDisplay({projectUsers, isLoading, props}) {
     return (
@@ -113,8 +127,8 @@ export default function PermissionPage( props ) {
                 </li>
 
                 {canRemoveUsers && props.userData.email !== user.user_email ? (                    
-                <button className="bg-alternative transition-colors duration-200
-                    hover:bg-red-800/75 rounded text-md p-1" onClick={() => handleRemoveUsersFromProject(user.user_email)}>
+                <button className="bg-alternative transition-colors duration-200 hover:bg-red-800/75 rounded text-md p-1" 
+                        onClick={() => handleRemoveUsersFromProject(user.user_email)}>
                   Remove
                 </button> ) : (null)}
 
@@ -144,8 +158,10 @@ export default function PermissionPage( props ) {
               onChange={(e) => setUserToAddEmail(e.target.value)} shadow/>
 
             {isError ? (<p className="text-red-600 text-xl">Could not add user to project</p>) : null}
-            <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-colors duration-200
-            mt-5 w-full  hover:bg-slate-500">Add User</Button>
+            <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-all duration-200
+            mt-5 w-full  hover:bg-slate-500"
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}>Add User</Button>
 
             {/* <Dropdown label=""/> */}
             

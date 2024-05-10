@@ -19,6 +19,7 @@ export default function ProjectPage( props ) {
 
   // Grab Documents if logged in and userdata
   useEffect(() => {
+
     async function grabProjectData() {
       let result = await getProjectInfo(project_id)
     
@@ -44,13 +45,16 @@ export default function ProjectPage( props ) {
       }
     }
 
-   
+    
 
-    if (loading) {
+    if (loading)
       fetchData()
-    }
-  }, [project_id])
+    else
+      return
 
+  }, [project_id, loading])
+
+  // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
       return;
@@ -68,7 +72,7 @@ export default function ProjectPage( props ) {
       }
     }
     getUserPermissionLevel();
-  }, [props.userData])
+  }, [props.userData, project_id])
 
   function handleFolderClick (folder) {
     setFolderStack([...folderStack, folder])
@@ -210,7 +214,7 @@ export default function ProjectPage( props ) {
   function DisplayShareButton() {
     if (props.userData === null)
       return null
-
+    // Make Sure user has permision to share before allowing them to share
     if (!IsUserAllowedToShare(userPermissionLevel))
       return;
 
