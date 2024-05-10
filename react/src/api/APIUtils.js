@@ -697,12 +697,12 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
       "repository" : repo_name,
       "branch" : branch_name,
       "deletedDocuments" : deletedDocuments,
-      "snapshots" : snapshots,
+      "snapshots" : JSON.stringify(snapshots),
       "message" : message,
     })
   };
 
-  console.log(deletedDocuments, snapshots)
+  console.log("Request Contents", headers)
 
   return await fetch((`/api/Github/${proj_id}/PushToExisting/`), headers)
   .then(response => response.json())
@@ -710,6 +710,7 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
     if (data.success === false) {
       console.log("FAILED" + data.reason)
     }
+    console.log("Request Contents", headers)
     return data
   })
 }

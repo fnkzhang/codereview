@@ -1613,6 +1613,7 @@ def pushToExistingBranch(proj_id):
     folderIDToPath = getProjectFoldersAsPaths(proj_id)
     body = request.get_json()
     snapshotIDs = body["snapshots"]
+    print(snapshotIDs)
     deletedDocumentPaths = body["deletedDocuments"]
     tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
     branch_sha = repo.get_branch(body["branch"]).commit.sha
