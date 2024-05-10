@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router";
-import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject } from "../../api/APIUtils";
+import { useParams, useNavigate } from "react-router";
+import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject } from "../../api/APIUtils";
 import { Label, TextInput, Button, Dropdown } from "flowbite-react";
+import LoadingSpinner from "../Loading/LoadingSpinner";
+
 export default function PermissionPage( props ) {
 
   let [userToAddEmail, setUserToAddEmail] = useState("");
@@ -9,11 +11,13 @@ export default function PermissionPage( props ) {
   let [projectUsers, setProjectUsers] = useState([]);
   let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
 
+  let [isLoading, setIsLoading] = useState(true)
   // Todo Checks user permission value to determine if user can do actions / be on this page
 
   let [isError, setIsError] = useState(false);
   let [canRemoveUsers, setCanRemoveUsers] = useState(false);
 
+  const navigate = useNavigate();
   const {project_id} = useParams();
 
   // Set Data For Page on Load
@@ -35,9 +39,21 @@ export default function PermissionPage( props ) {
       setProjectUsers(projectUserResponse)
       console.log(projectUserResponse);
     }
+    async function fetchData() {
+      try {
+        await Promise.all([
+          getProjectData(),
+          getCurrentProjectUsers(),
+        ])
+      }
+      catch (error) {
+        console.log(error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchData()
 
-    getProjectData()
-    getCurrentProjectUsers()
   }, [project_id, props.isLoggedIn]) 
 
 
@@ -49,10 +65,27 @@ export default function PermissionPage( props ) {
 
     let result = await addUserToProject(project_id, userToAddEmail, "OwnerPart2", 12)
 
-    if(!result.success)
+
+    if(!result.success) {
       setIsError(true)
+      return;
+    }
 
     console.log(result);
+    navigate(0)
+  }
+
+  const handleRemoveUsersFromProject = async (emailToRemove) => {
+    console.log(emailToRemove);
+    let result = await removeUserFromProject(project_id, emailToRemove)
+
+    if(!result.success) {
+      setIsError(true)
+      return;
+    }
+
+    console.log(result);
+    navigate(0)
   }
 
   function isValidEmailString(email) {
@@ -62,6 +95,35 @@ export default function PermissionPage( props ) {
       return true
     
     return false;
+  }
+
+  function ProjectUserDisplay({projectUsers, isLoading, props}) {
+    return (
+      <div>
+        <h3>Existing Users</h3>
+        <br/>
+        {isLoading ? <h3>Loading</h3> : null}
+
+        <ul>
+          {projectUsers.map((user, index) => {
+            return (
+              <div className="flex justify-stretch m-2" key={user.name + " " + index}>
+                <li className="border rounded-md p-4 mr-1" >
+                  {user.name} : {user.userRole}
+                </li>
+
+                {canRemoveUsers && props.userData.email !== user.user_email ? (                    
+                <button className="bg-alternative transition-colors duration-200
+                    hover:bg-red-800/75 rounded text-md p-1" onClick={() => handleRemoveUsersFromProject(user.user_email)}>
+                  Remove
+                </button> ) : (null)}
+
+            </div>
+            )
+          })}    
+        </ul>
+      </div>
+    )
   }
 
   if(props.isLoggedIn)
@@ -86,28 +148,12 @@ export default function PermissionPage( props ) {
             mt-5 w-full  hover:bg-slate-500">Add User</Button>
 
             {/* <Dropdown label=""/> */}
+            
           </section>
-
+          
           <aside  className="w/1/3 text-textcolor text-2xl float-right bg-altBackground
-            m-5 mt-16 p-20 pt-10 rounded">
-            <h3>Existing Users</h3>
-            <ul>
-              {projectUsers.map((user, index) => {
-                return (
-                  <div className="flex justify-end m-2" key={user.name + " " + index}>
-                    <li className="border rounded-md p-4 mr-1" >
-                      {user.name} : {user.userRole}
-                    </li>
-                    {canRemoveUsers ? (                    
-                      <button className="bg-alternative transition-colors duration-200
-                          hover:bg-slate-500 rounded text-md p-1">
-                      Remove
-                    </button> ) : (null)}
-
-                 </div>
-                )
-              })}    
-            </ul>
+          m-5 mt-16 p-20 pt-10 rounded">
+            <ProjectUserDisplay projectUsers={projectUsers} isLoading={isLoading}props={props}/>
           </aside>
         </div>
 
