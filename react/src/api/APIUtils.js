@@ -65,7 +65,7 @@ export async function createDocument(documentName, proj_id, documentData, parent
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
-    document_name: documentName,
+    doc_name: documentName,
     data: documentData,
     project_id: proj_id,
     parent_folder_id: parent_folder_id
