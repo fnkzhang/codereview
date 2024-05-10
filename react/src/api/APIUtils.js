@@ -34,8 +34,11 @@ export async function createProject(projectName) {
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
     }
+	body: JSON.stringify({
+      "data": projectName
+    })
   }
-  return await fetch((`/api/Project/${projectName}/`), headers)
+  return await fetch((`/api/Project/createProject/`), headers)
     .then(response => response.json())
 
 }
