@@ -12,7 +12,7 @@ from vertexai.generative_models import (
 # System Instruction Prompts
 #-------------------------------------------------------------------------------
 SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION = """\
-You are a coding expert in {}. Apply the user's suggestion to the highlighted 
+You are a coding expert in {language}. Apply the user's suggestion to the highlighted 
 code which is located at lines between the start line and end line of the 
 code. Modify the highlighted code. Avoid modifying the original code or giving 
 an explanation for the code. Your response must be a JSON object with the key 
@@ -22,7 +22,7 @@ unrelated to implementing the code from the suggestion.
 """
 
 SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE = """\
-You are a coding expert in {}.
+You are a coding expert in {language}.
 Generate multiple suggestions to improve the quality of code. Provide a 
 diverse set of recommendations for enhancing the code's readability, 
 performance, and maintainability. Return a JSON object with the key 
@@ -257,6 +257,7 @@ def get_llm_code_from_suggestion_2(code: str,
     
     # Extract the wanted output from response
     try:
+        print(response)
         revised_code = get_json_from_llm_response(response)["revised_code"]
     except Exception as e:
         print("Failed to get code from response")
@@ -270,7 +271,7 @@ def get_llm_code_from_suggestion_2(code: str,
 def get_llm_suggestion_from_code(code: str,
                                  language: str):
     # Configure System Prompt
-    system_prompt = SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE.format(language)
+    system_prompt = SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE.format(language=language)
 
     # Provide Few-Shot Examples on how the LLM should respond
     system_prompt += "<examples>\n"
