@@ -133,7 +133,7 @@ export async function createDocument(documentName, proj_id, documentData, parent
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
-    document_name: documentName,
+    doc_name: documentName,
     data: documentData,
     project_id: proj_id,
     parent_folder_id: parent_folder_id
@@ -697,12 +697,10 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
       "repository" : repo_name,
       "branch" : branch_name,
       "deletedDocuments" : deletedDocuments,
-      "snapshots" : JSON.stringify(snapshots),
+      "snapshots" : snapshots,
       "message" : message,
     })
   };
-
-  console.log("Request Contents", headers)
 
   return await fetch((`/api/Github/${proj_id}/PushToExisting/`), headers)
   .then(response => response.json())
