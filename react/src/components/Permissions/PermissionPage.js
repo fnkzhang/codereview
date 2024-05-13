@@ -14,6 +14,8 @@ export default function PermissionPage( props ) {
   // Todo Checks user permission value to determine if user can do actions / be on this page
 
   let [isError, setIsError] = useState(false);
+  let [errorString, setErrorString] = useState("");
+
   let [canRemoveUsers, setCanRemoveUsers] = useState(false);
 
   const navigate = useNavigate();
@@ -55,6 +57,8 @@ export default function PermissionPage( props ) {
     setUserToAddEmail("")
     setProjectUsers([])
     setIsError(false)
+    setErrorString("")
+
     fetchData()
 
   }, [project_id, props, isLoading]) 
@@ -63,13 +67,16 @@ export default function PermissionPage( props ) {
   const handleAddUserEmailToProject = async () => {
     if (!isValidEmailString(userToAddEmail)) {
       setIsError(true)
+      setErrorString("Not Valid Email")
       return;
     }
 
     let result = await addUserToProject(project_id, userToAddEmail, "Editor", 12)
 
-
-    if(!result.success) {
+    console.log(result);
+    
+    if(!result.success  ) {
+      setErrorString(result.reason)
       setIsError(true)
       return;
     }
@@ -92,8 +99,9 @@ export default function PermissionPage( props ) {
   }
 
   function isValidEmailString(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+    console.log(email);
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+    console.log(emailRegex.test(email));
     if (emailRegex.test(email))
       return true
     
@@ -158,7 +166,7 @@ export default function PermissionPage( props ) {
             <TextInput className=" text-black shadow-white text-5xl w-full" placeholder="User Email" sizing="lg" 
               onChange={(e) => setUserToAddEmail(e.target.value)} shadow/>
 
-            {isError ? (<p className="text-red-600 text-xl">Could not add user to project</p>) : null}
+            {isError ? (<p className="text-red-600 text-xl">{errorString}</p>) : null}
             <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-all duration-200
             mt-5 w-full  hover:bg-slate-500"
               onMouseDown={handleMouseDown}
