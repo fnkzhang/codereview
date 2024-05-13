@@ -51,10 +51,13 @@ export default function PermissionPage( props ) {
         setIsLoading(false)
       }
     }
-
+    
+    setUserToAddEmail("")
+    setProjectUsers([])
+    setIsError(false)
     fetchData()
 
-  }, [project_id, props]) 
+  }, [project_id, props, isLoading]) 
 
 
   const handleAddUserEmailToProject = async () => {
@@ -72,7 +75,7 @@ export default function PermissionPage( props ) {
     }
 
     console.log(result);
-    navigate(0)
+    setIsLoading(true)
   }
 
   const handleRemoveUsersFromProject = async (emailToRemove) => {
@@ -85,7 +88,7 @@ export default function PermissionPage( props ) {
     }
 
     console.log(result);
-    navigate(0)
+    setIsLoading(true)
   }
 
   function isValidEmailString(email) {
@@ -99,14 +102,12 @@ export default function PermissionPage( props ) {
   
   const handleMouseDown = (e) => {
     let button = e.target;
-    console.log(button);
     button.classList.remove("scale-100")
     button.classList.add("scale-110");
   }
 
   const handleMouseUp = (e) => {
     let button = e.target;
-    console.log(button);
     button.classList.remove("scale-110");
     button.classList.add("scale-100")
   }
