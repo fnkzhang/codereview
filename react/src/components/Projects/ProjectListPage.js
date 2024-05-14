@@ -5,7 +5,7 @@ import { getUserProjects } from "../../api/APIUtils";
 
 import { Card } from "flowbite-react"
 
-export default function ProjectList( props ) {
+export default function ProjectListPage( props ) {
 
     const [userProjects, setUserProjects] = useState([])
     const [loading, setLoading] = useState(true);

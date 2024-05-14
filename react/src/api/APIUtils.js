@@ -33,9 +33,9 @@ export async function createProject(projectName) {
     headers: {
       "Authorization": oAuthToken,
       "Content-Type": "application/json"
-    }
-	body: JSON.stringify({
-      "data": projectName
+    },
+    body: JSON.stringify({
+      "project_name": projectName
     })
   }
   return await fetch((`/api/Project/createProject/`), headers)
@@ -61,11 +61,86 @@ export async function deleteProject(proj_id) {
 
 }
 
+export async function addUserToProject(proj_id, emailToAdd, roleNameForEmail, permissionLevel) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let bodyData = {
+    "email": emailToAdd,
+    "role": roleNameForEmail,
+    "permissions": permissionLevel
+  }
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(bodyData)
+  }
+
+  return await fetch((`/api/Project/${proj_id}/addUserAdmin/`), headers)
+    .then(response => response.json())
+
+}
+
+export async function changeExistingUserPermission() {
+
+}
+
+export async function removeUserFromProject(proj_id, emailToRemove) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let bodyData = {
+    "email": emailToRemove,
+  }
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(bodyData)
+  }
+
+  return await fetch((`/api/Project/${proj_id}/removeUser/`), headers)
+    .then(response => response.json())
+}
+
+export async function getAllUsersWithPermissionForProject(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+
+  return await fetch((`/api/Project/${proj_id}/Users/`), headers)
+    .then(response => response.json())
+    .then(data => data.body)
+    .catch(error => console.log(error))
+}
+
+export async function getUserPermissionForProject(proj_id, userEmail) {
+
+}
+
 export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
-    document_name: documentName,
+    doc_name: documentName,
     data: documentData,
     project_id: proj_id,
     parent_folder_id: parent_folder_id
@@ -315,9 +390,7 @@ export async function getUserProjects(userEmail) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data.body
   })
 }
@@ -342,7 +415,6 @@ export async function getProjectInfo(project_id) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
     return data.body
   }))
@@ -364,14 +436,12 @@ export async function getProjectDocuments(proj_id) {
     },
   };
 
-  return await fetch((`/api/Document/${proj_id}/`), headers)
+  return await fetch((`/api/Document/${proj_id}/GetDocuments/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data.body
   })
 }
@@ -395,9 +465,7 @@ export async function getProjectTree(proj_id) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data.body
   })
 }
@@ -426,9 +494,7 @@ export async function createFolder(folder_name, proj_id, parent_folder_id) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
-
     return data
   })
 }
@@ -540,7 +606,6 @@ export async function addGitHubToken(token) {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
     return data
   })
@@ -565,13 +630,36 @@ export async function hasGitHubToken() {
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
     return data
   })
 }
 
-export async function pullFromGitHub(proj_id, repo_name, branch_name) {
+export async function getDeletedDocuments( proj_id, repo_name, branch_name ) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Github/${proj_id}/getNonexistent/?repository=${encodeURIComponent(repo_name)}&branch=${encodeURIComponent(branch_name)}`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data
+  })
+}
+
+export async function pullFromGitHub(proj_name, repo_name, branch_name) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -586,16 +674,48 @@ export async function pullFromGitHub(proj_id, repo_name, branch_name) {
     body: JSON.stringify({
       "repository" : repo_name,
       "branch" : branch_name,
+      "project_name" : proj_name,
     })
   };
 
-  return await fetch((`/api/Github/Pull/${proj_id}`), headers)
+  return await fetch((`/api/Github/PullToNewProject/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
-      return data.body
     }
+    return data
+  })
+}
+
+export async function pushToExistingBranch(proj_id, repo_name, branch_name, deletedDocuments, snapshots, message) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "repository" : repo_name,
+      "branch" : branch_name,
+      "deletedDocuments" : deletedDocuments,
+      "snapshots" : snapshots,
+      "message" : message,
+    })
+  };
+
+  return await fetch((`/api/Github/${proj_id}/PushToExisting/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    console.log("Request Contents", headers)
     return data
   })
 }
