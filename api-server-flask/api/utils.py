@@ -197,7 +197,7 @@ def assembleGithubComments(snapshotIDs):
         commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID )
         for comment in commentList:
             if comment["is_resolved"] == False:
-                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + comment.highlight_start_y + ' to Line ' + comment.highlight_end_y + '\n'+ comment.content)
+                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + str(comment["highlight_start_y"]) + ' to Line ' + str(comment["highlight_end_y"])+ '\n'+ str(comment["content"]))
     return githubComments   
 
 

@@ -1529,6 +1529,7 @@ def pushToExistingBranch(proj_id):
     repo = g2.get_repo(body["repository"])
     updated_files = []
     folderIDToPath = getProjectFoldersAsPaths(proj_id)
+    print(folderIDToPath)
     body = request.get_json()
     snapshotIDs = body["snapshots"]
     deletedDocumentPaths = body["deletedDocuments"]
