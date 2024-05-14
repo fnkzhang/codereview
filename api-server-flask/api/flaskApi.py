@@ -1619,6 +1619,7 @@ def pushToExistingBranch(proj_id):
     repo = g2.get_repo(body["repository"])
     updated_files = []
     folderIDToPath = getProjectFoldersAsPaths(proj_id)
+    print(folderIDToPath)
     body = request.get_json()
     snapshotIDs = body["snapshots"]
     deletedDocumentPaths = body["deletedDocuments"]
@@ -1791,11 +1792,11 @@ def implement_code_changes_from_comment():
             "success": False,
             "reason": "LLM Error"
         }
-
+    body = buildStringFromLLMResponse(code, response)
     return {
         "success": True,
         "reason": "Success",
-        "body": response
+        "body": body
     }
 
 # EXAMPLE:
