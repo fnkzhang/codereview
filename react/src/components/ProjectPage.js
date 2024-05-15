@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router"
 import { Card } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getProjectTree } from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
+import BackButton from "./BackButton"
 
 // Display Documents For Project
 export default function ProjectPage( props ) {
@@ -297,6 +298,7 @@ export default function ProjectPage( props ) {
         <DisplayNavigateParentFolderButton/>
       </div>
       <div className="flex">
+        <BackButton/>
         <DisplayDeleteButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>

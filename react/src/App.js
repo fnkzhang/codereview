@@ -29,7 +29,7 @@ function App() {
                 <p>Code Review</p>
               </Navbar.Brand>
           </div>
-
+          
           <div className='flex flex-1 justify-around align-middle'>
             <Navbar.Brand href="/" active>Home</Navbar.Brand>
             <Navbar.Brand>
