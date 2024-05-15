@@ -1799,38 +1799,6 @@ def implement_code_changes_from_comment():
         "body": body
     }
 
-from llm import get_llm_code_from_suggestion_2
-# curl -X POST http://127.0.0.1:5000/api/llm/code-implementation-2 -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "startLine": 1, "endLine": 2, "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function.", "language": "Python"}'
-# curl -X POST http://127.0.0.1:5000/api/llm/code-implementation-2 -H 'Content-Type: application/json' -d '{"code": "x = 5\ny = 10\nsum = x + y\nprint(sum)\nz = 10\nsum = sum + 2 # adds 2 to sum", "startLine": 3, "endLine": 3, "comment": "Rename 'sum' to 'total'", "language": "Python"}'
-@app.route("/api/llm/code-implementation-2", methods=["POST"])
-def implement_code_changes_from_comment_2():
-    data = request.get_json()
-    code = data.get("code")
-    language = data.get("language")
-    start_line = data.get("startLine")
-    end_line = data.get("endLine")
-    comment = data.get("comment")
-
-    response = get_llm_code_from_suggestion_2(
-        code=code,
-        language=language,
-        start_line=start_line,
-        end_line=end_line,
-        suggestion=comment
-    )
-    
-    if response is None:
-        return {
-            "success": False,
-            "reason": "LLM Error"
-        }
-
-    return {
-        "success": True,
-        "reason": "Success",
-        "body": response
-    }
-
 # EXAMPLE:
 # curl -X POST http://127.0.0.1:5000/api/llm/comment-suggestion -H 'Content-Type: application/json' -d '{"code": "#include <ioteam>\n\nint main() {\n    int num = 4;\n    switch(num) {\n        case 4:\n            std::cout << \"4\" << std::endl;\n            break;\n        default:\n            std::cout << \"not 4\" << std::edl\n            break;\n    }\n    return 0;\n}", "language": "C++"}'
 @app.route("/api/llm/comment-suggestion", methods=["POST"])

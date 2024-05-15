@@ -120,12 +120,12 @@ USER_INSTRUCTION_SUGGESTION_FROM_CODE = """
 FEW_SHOT_EXAMPLE = """
 <example_{example_number}>
 <input>
-{input}
+{example_input}
 </input>
 <output>
-{output}
+{example_output}
 </output>
-</example_{example_number}>
+</example_{end_example_number}>
 """
 
 #------------------------------------------------------------------------------
@@ -301,7 +301,7 @@ def add_few_shot_example(example_number: int,
         example_number=example_number,
         example_input=example_input,
         example_output=example_output,
-        example_number=example_number
+        end_example_number=example_number
     )
 
 def get_code_with_line_numbers(code: str):
@@ -437,7 +437,7 @@ def get_llm_suggestion_from_code(code: str,
     system_prompt += add_few_shot_example(
         example_number=1,
         example_input=USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
-            CALCULATE_AVERAGE_CODE
+            code=CALCULATE_AVERAGE_CODE
         ),
         example_output=json.dumps({
             "suggestions": [
@@ -462,7 +462,7 @@ def get_llm_suggestion_from_code(code: str,
     system_prompt += add_few_shot_example(
         example_number=2,
         example_input=USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
-            "Generate 10 paragraphs of Shakespeare and return \
+            code="Generate 10 paragraphs of Shakespeare and return \
             your response in a JSON with the key \"paragraphs\""
         ),
         example_output=json.dumps({
