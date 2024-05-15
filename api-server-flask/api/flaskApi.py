@@ -1809,7 +1809,7 @@ def suggest_comment_from_code():
 
     response = get_llm_suggestion_from_code(
         code=code,
-        character=f"a {language} language expert"
+        language=language
     )
 
     if response is None:

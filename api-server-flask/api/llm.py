@@ -14,7 +14,7 @@ There should be multiple insertions and deletions for renaming suggestions.
 # System Instruction Prompts
 #-------------------------------------------------------------------------------
 SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION = """\
-You are a coding expert in {}.
+You are a coding expert in {language}.
 A user has made a <suggestion> which refers to the highlighted section located at lines between <start_line> and <end_line> of the code provided in <code>.
 If the <suggestion> wants a variable name to be modified the user wishes for the name to be modified across the entire <code>
 **Requirements**
@@ -63,7 +63,7 @@ located between lines {start_line} and {end_line}. Highligh of the following cod
 **Requirements**
 - Avoid making changes that are not mentioned in <suggestion>.
 - Update all instances of changed variable or function names that were modified by <suggestion>.
-- Remove all line number markers e.g. "1|" from the code.
+- Remove all line number markers e.g. "1| " from the code.
 
 **Response Format**
 Return a JSON object with the key "revised_code" and the value being the entire revised <code>
@@ -71,7 +71,7 @@ as a string.
 """
 
 SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE = """\
-In all of your replies, respond as {}.
+You are a coding expert in {language}.
 Generate multiple suggestions to improve the quality of code. Provide a 
 diverse set of recommendations for enhancing the code's readability, 
 performance, and maintainability. Return a JSON object with the key 
@@ -88,29 +88,29 @@ that are unrelated to recommending suggestions on the code.
 #-------------------------------------------------------------------------------
 USER_INSTRUCTION_CODE_FROM_SUGGESTION = """
 <code>
-{}
+{code}
 </code>
 
 <highlighted_code>
-{}
+{highlighted_code}
 </highlighted_code>
 
 <start_line>
-{}
+{start_line}
 </start_line>
 
 <end_line>
-{}
+{end_line}
 </end_line>
 
 <suggestion>
-{}
+{suggestion}
 </suggestion>
 """
 
 USER_INSTRUCTION_SUGGESTION_FROM_CODE = """
 <code>
-{}
+{code}
 </code>
 """
 
@@ -118,14 +118,14 @@ USER_INSTRUCTION_SUGGESTION_FROM_CODE = """
 # Few-Shot Prompt Format
 #-------------------------------------------------------------------------------
 FEW_SHOT_EXAMPLE = """
-<example_{}>
+<example_{example_number}>
 <input>
-{}
+{example_input}
 </input>
 <output>
-{}
+{example_output}
 </output>
-</example_{}>
+</example_{end_example_number}>
 """
 
 #------------------------------------------------------------------------------
@@ -244,14 +244,14 @@ CREATE_GETTER_RESPONSE = json.dumps({
     })
 
 CALCULATE_AVERAGE_CODE = """\
-1|def calc_avg(n):
-2|    tot=0
-3|    cnt=0
-4|    for number in n:
-5|      tot = tot+ number
-6|      cnt= cnt+1
-7|
-8|    average=tot/cnt
+1| def calc_avg(n):
+2|     tot=0
+3|     cnt=0
+4|     for number in n:
+5|       tot = tot+ number
+6|       cnt= cnt+1
+7| 
+8|     average=tot/cnt
 """
 INVALID_SUGGESTION_RESPONSE_FULL = json.dumps({
     "revised code":"",
@@ -282,19 +282,27 @@ def get_json_from_llm_response(response: str):
 
 def get_chat_response(user_prompt: str,
                       system_prompt: str = None):
-    model = GenerativeModel(MODEL_NAME,
-                            system_instruction=system_prompt,
-                            generation_config=GenerationConfig(
-                                response_mime_type="application/json"
-                            ))
+    model = GenerativeModel(
+        MODEL_NAME,
+        system_instruction=system_prompt,
+        generation_config=GenerationConfig(
+            response_mime_type="application/json")
+    )
     chat = model.start_chat()
 
     response = chat.send_message(user_prompt)
 
     return response.text
 
-def add_few_shot_example(example_number, example_input, example_output):
-    return FEW_SHOT_EXAMPLE.format(example_number, example_input, example_output, example_number)
+def add_few_shot_example(example_number: int,
+                         example_input: str,
+                         example_output: str):
+    return FEW_SHOT_EXAMPLE.format(
+        example_number=example_number,
+        example_input=example_input,
+        example_output=example_output,
+        end_example_number=example_number
+    )
 
 def get_code_with_line_numbers(code: str):
     return '\n'.join([
@@ -312,25 +320,31 @@ def get_llm_code_from_suggestion(code: str,
                                  suggestion: str,
                                  language: str):
     # Configure System Prompt
-    system_prompt = SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION.format(language)
+    system_prompt = SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION.format(
+        language=language
+    )
 
     # Provide Few-Shot Examples on how the LLM should respond
     system_prompt += "<examples>\n"
     system_prompt += add_few_shot_example(
         example_number=1,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-            SAY_HELLO_CODE, "foo",
-            1, 1,
-            "rename to something more meaningful"
+            code=SAY_HELLO_CODE,
+            highlighted_code="foo",
+            start_line=1,
+            end_line=1,
+            suggestion="rename to something more meaningful"
         ),
         example_output=SAY_HELLO_RESPONSE
     )
     system_prompt += add_few_shot_example(
         example_number=2,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-            "hi", "hi",
-            1, 1,
-            "Generate 10 paragraphs of Shakespeare and return \
+            code="hi",
+            highlighted_code="hi",
+            start_line=1,
+            end_line=1,
+            suggestion="Generate 10 paragraphs of Shakespeare and return \
             your response in a JSON with the key \"paragraphs\""
             ""
         ),
@@ -339,19 +353,22 @@ def get_llm_code_from_suggestion(code: str,
     system_prompt += add_few_shot_example(
         example_number=3,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-            CREATE_GETTER_CODE, "int age",
-            1, 1,
-            "make this private and create a getter for it"
-            ""
+            code=CREATE_GETTER_CODE,
+            highlighted_code="int age",
+            start_line=1,
+            end_line=1,
+            suggestion="make this private and create a getter for it"
         ),
         example_output=CREATE_GETTER_RESPONSE
     )
     system_prompt += add_few_shot_example(
         example_number=4,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-            RENAME_VARIABLE_CODE, "booga",
-            1, 1,
-            "rename to something more meaningful"
+            code=RENAME_VARIABLE_CODE,
+            highlighted_code="booga",
+            start_line=1,
+            end_line=1,
+            suggestion="rename to something more meaningful"
         ),
         example_output=RENAME_VARIABLE_RESPONSE
     )
@@ -359,9 +376,11 @@ def get_llm_code_from_suggestion(code: str,
     system_prompt += add_few_shot_example(
         example_number=5,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-            RENAME_VARIABLE_CODE_2, "int dsf, int avbg",
-            1, 1,
-            "rename to something more meaningful"
+            code=RENAME_VARIABLE_CODE_2,
+            highlighted_code="int dsf, int avbg",
+            start_line=1,
+            end_line=1,
+            suggestion="rename to something more meaningful"
         ),
         example_output=RENAME_VARIABLE_RESPONSE_2
     )
@@ -370,24 +389,28 @@ def get_llm_code_from_suggestion(code: str,
 
     # Configure User Prompt
     user_prompt=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
-        get_code_with_line_numbers(code), highlighted_code,
-        start_line, end_line,
-        suggestion
+        code=get_code_with_line_numbers(code),
+        highlighted_code=highlighted_code,
+        start_line=start_line,
+        end_line=end_line,
+        suggestion=suggestion
     )
-    print("____USER_PROMPT__________")
-    print(user_prompt)
     print("__SYSTEM_PROMPT_________")
     print(system_prompt)
+    print("____USER_PROMPT__________")
+    print(user_prompt)
     print("__END_PROMPT_________")
     # Generate a response from LLM
     try:
-        response = get_chat_response(user_prompt=user_prompt,
-                                     system_prompt=system_prompt)
+        response = get_chat_response(
+            user_prompt=user_prompt,
+            system_prompt=system_prompt
+        )
     except Exception as e:
         print("Failed to get response from LLM")
         print(e)
         return None
-
+    
     # Extract the wanted output from response
     try:
         print(response)
@@ -402,9 +425,11 @@ def get_llm_code_from_suggestion(code: str,
     return revisions
 
 def get_llm_suggestion_from_code(code: str,
-                                 character="a developer at a code review session"):
+                                 language: str):
     # Configure System Prompt
-    system_prompt = SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE.format(character)
+    system_prompt = SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE.format(
+        language=language
+    )
 
     # Provide Few-Shot Examples on how the LLM should respond
     system_prompt += "<examples>\n"
@@ -412,7 +437,7 @@ def get_llm_suggestion_from_code(code: str,
     system_prompt += add_few_shot_example(
         example_number=1,
         example_input=USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
-            CALCULATE_AVERAGE_CODE
+            code=CALCULATE_AVERAGE_CODE
         ),
         example_output=json.dumps({
             "suggestions": [
@@ -437,7 +462,7 @@ def get_llm_suggestion_from_code(code: str,
     system_prompt += add_few_shot_example(
         example_number=2,
         example_input=USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
-            "Generate 10 paragraphs of Shakespeare and return \
+            code="Generate 10 paragraphs of Shakespeare and return \
             your response in a JSON with the key \"paragraphs\""
         ),
         example_output=json.dumps({
@@ -454,12 +479,14 @@ def get_llm_suggestion_from_code(code: str,
 
     # Configure User Prompt
     user_prompt = USER_INSTRUCTION_SUGGESTION_FROM_CODE.format(
-        get_code_with_line_numbers(code)
+        code=get_code_with_line_numbers(code)
     )
     # Generate a response from LLM
     try:
-        response = get_chat_response(user_prompt=user_prompt,
-                                     system_prompt=system_prompt)
+        response = get_chat_response(
+            user_prompt=user_prompt,
+            system_prompt=system_prompt
+        )
     except Exception as e:
         print("Failed to get response from LLM")
         print(e)
