@@ -7,6 +7,8 @@ from cloudSql import *
 from utils.commentUtils import *
 from utils.miscUtils import *
 from utils.snapshotUtils import *
+from utils.projectUtils import *
+from utils.userAndPermissionsUtils import *
 
 import models 
 
@@ -36,7 +38,7 @@ def createComment(snapshot_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    comment_id = createNewComment(snapshot_id, body["author_email"], int(body["reply_to_id"]), int(body["reply_to_id"]), int(body["highlight_start_x"]), int(body["highlight_start_y"]), int(body["highlight_end_x"]), int(body["highlight_end_y"]), is_resolved = body["is_resolved"])
+    comment_id = createNewComment(snapshot_id, body["author_email"], int(body["reply_to_id"]), body["content"], int(body["highlight_start_x"]), int(body["highlight_start_y"]), int(body["highlight_end_x"]), int(body["highlight_end_y"]), is_resolved = body["is_resolved"])
     print("Successful Write Comment")
     return {
         "success": True,

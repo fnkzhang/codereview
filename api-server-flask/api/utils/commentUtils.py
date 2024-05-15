@@ -14,14 +14,14 @@ def createNewComment(snapshot_id, author_email, reply_to_id, content, highlight_
         session.add(models.Comment(
             comment_id = comment_id,
             snapshot_id = snapshot_id,
-            author_email = body["author_email"],
-            reply_to_id = int(body["reply_to_id"]),
-            content = body["content"],
-            highlight_start_x = int(body["highlight_start_x"]),
-            highlight_start_y = int(body["highlight_start_y"]),
-            highlight_end_x = int(body["highlight_end_x"]),
-            highlight_end_y = int(body["highlight_end_y"]),
-            is_resolved = body["is_resolved"]
+            author_email = author_email,
+            reply_to_id = reply_to_id,
+            content = content,
+            highlight_start_x = highlight_start_x,
+            highlight_start_y = highlight_start_y,
+            highlight_end_x = highlight_end_x,
+            highlight_end_y = highlight_end_y,
+            is_resolved = is_resolved
 
         ))
         session.commit()
