@@ -374,11 +374,6 @@ def get_llm_code_from_suggestion(code: str,
         start_line, end_line,
         suggestion
     )
-    print("____USER_PROMPT__________")
-    print(user_prompt)
-    print("__SYSTEM_PROMPT_________")
-    print(system_prompt)
-    print("__END_PROMPT_________")
     # Generate a response from LLM
     try:
         response = get_chat_response(user_prompt=user_prompt,

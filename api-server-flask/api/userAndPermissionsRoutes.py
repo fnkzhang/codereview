@@ -10,8 +10,8 @@ from utils.projectUtils import *
 
 # Return body has array of project Data
 # Array can contain -1 value indicating missing references
-@app.route('/api/User/<user_email>/Project/', methods = ["GET"])
-def getAllUserProjects(user_email):
+@app.route('/api/User/Project/', methods = ["GET"])
+def getAllUserProjects():
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -25,14 +25,9 @@ def getAllUserProjects(user_email):
             "success": False,
             "reason": "Failed to Authenticate"
         }
-    if idInfo["email"] != user_email:
-        return {
-            "success": False,
-            "reason": "User does not match email"
-            }
-    allPermissions = getAllUserProjPermissionsForUser(user_email)
+    allPermissions = getAllUserProjPermissionsForUser(idInfo["email"])
     if allPermissions == -1:
-        return {"projects": "None"}
+        return {"projects": None}
     projects = []
 
     for permission in allPermissions:
