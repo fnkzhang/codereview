@@ -36,14 +36,6 @@ with open('github_oath_credentials.json') as creds:
 g = Github()
 gapp = g.get_oauth_application(github_client_id, github_client_secret)
 
-with open('github_oath_credentials.json') as creds:
-    creds = json.load(creds)
-    github_client_id = creds["client-id"]
-    github_client_secret = creds["client-secret"]
-
-g = Github()
-gapp = g.get_oauth_application(github_client_id, github_client_secret)
-
 def uploadBlob(blobName, item):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
@@ -166,6 +158,7 @@ def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
     projectDocumentPaths = set([getDocumentPath(document['doc_id']) for document in projectDocuments])
     nonexistant = list(allGithubFiles - projectDocumentPaths)
     return nonexistant
+
 def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs):
     tree_elements = []
     for deletedDocumentPath in deletedDocumentPaths:
@@ -196,7 +189,7 @@ def assembleGithubComments(snapshotIDs):
         commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID )
         for comment in commentList:
             if comment["is_resolved"] == False:
-                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + comment.highlight_start_y + ' to Line ' + comment.highlight_end_y + '\n'+ comment.content)
+                githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + str(comment["highlight_start_y"]) + ' to Line ' + str(comment["highlight_end_y"])+ '\n'+ str(comment["content"]))
     return githubComments   
 
 
@@ -702,3 +695,29 @@ def filterCommentsByPredicate(predicate):
             commentsList = None
     
     return commentsList
+
+def buildStringFromLLMResponse(code, response):
+    success = response["success"]
+    if success == False:
+        return "waow, this failed!"
+    insertions = convertKeysToInt(response["insertions"])
+    deletions = response["deletions"]
+    codeList = code.split('\n')
+    builtString = ""
+    for i in range(len(codeList)+1):
+        if i not in deletions:
+            if i > 0:
+                builtString = builtString + codeList[i-1]
+                if i < len(codeList) or insertions.get(i) != None:
+                    builtString = builtString + '\n'
+        if insertions.get(i) != None:
+            builtString = builtString + insertions.get(i)
+            if i < len(codeList) or insertions.get(i) != None:
+                builtString = builtString + '\n'
+    return builtString
+
+def convertKeysToInt(somedict):
+    rv = {}
+    for key in somedict.keys():
+        rv[int(key)] = somedict[key]
+    return rv

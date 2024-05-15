@@ -394,26 +394,46 @@ def addUser(proj_id):
     
     if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    with engine.connect() as conn:
-        if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
-            relationstmt = insert(models.UserProjectRelation).values(
-                    user_email = inputBody["email"],
-                    proj_id = proj_id,
+    
+    try:
+        # Check If User Exists First
+        with engine.connect() as conn:
+            userSearchStmt = select(models.User).where(
+                models.User.user_email == inputBody["email"]
+                )
+            
+            numberFound = conn.execute(userSearchStmt).rowcount
+            if numberFound <= 0:
+                return {
+                    "success": False,
+                    "reason": "Could Not Find Email"
+                }
+            
+            if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
+                relationstmt = insert(models.UserProjectRelation).values(
+                        user_email = inputBody["email"],
+                        proj_id = proj_id,
+                        role = inputBody["role"],
+                        permissions = inputBody["permissions"]
+                )
+            else:
+                relationstmt = update(models.UserProjectRelation).where(
+                    models.UserProjectRelation.user_email == inputBody["email"],
+                    models.UserProjectRelation.proj_id == proj_id
+                ).values(
                     role = inputBody["role"],
                     permissions = inputBody["permissions"]
-            )
-        else:
-            relationstmt = update(models.UserProjectRelation).where(
-                models.UserProjectRelation.user_email == inputBody["email"],
-                models.UserProjectRelation.proj_id == proj_id
-            ).values(
-                role = inputBody["role"],
-                permissions = inputBody["permissions"]
-            )
-        conn.execute(relationstmt)
-        conn.commit()
-    return {"success": True, "reason":"N/A", "body": {}}
+                )
+            conn.execute(relationstmt)
+            conn.commit()
 
+        return {"success": True, "reason":"N/A", "body": {}}
+    except Exception as e:
+        print("Error: ", e)
+        return {
+            "success": False,
+            "reason": "Could Not Find Email"
+        }
 #just addUser but you don't need to be a valid user lol, test function remove later
 #still needs:
     #email (user to add to project)
@@ -422,26 +442,62 @@ def addUser(proj_id):
 @app.route('/api/Project/<proj_id>/addUserAdmin/', methods=["POST"])
 def addUserAdmin(proj_id):
     inputBody = request.get_json()
-    with engine.connect() as conn:
-        if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
-            relationstmt = insert(models.UserProjectRelation).values(
-                    user_email = inputBody["email"],
-                    proj_id = proj_id,
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    try :
+
+        with engine.connect() as conn:
+            userSearchStmt = select(models.User).where(
+                models.User.user_email == inputBody["email"]
+                )
+            
+            numberFound = conn.execute(userSearchStmt).rowcount
+            if numberFound <= 0:
+                return {
+                    "success": False,
+                    "reason": "Could Not Find Email"
+                }
+            
+            if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
+                relationstmt = insert(models.UserProjectRelation).values(
+                        user_email = inputBody["email"],
+                        proj_id = proj_id,
+                        role = inputBody["role"],
+                        permissions = inputBody["permissions"]
+                )
+            else:
+                relationstmt = update(models.UserProjectRelation).where(
+                    models.UserProjectRelation.user_email == inputBody["email"],
+                    proj_id == proj_id
+                ).values(
                     role = inputBody["role"],
                     permissions = inputBody["permissions"]
-            )
-        else:
-            relationstmt = update(models.UserProjectRelation).where(
-                models.UserProjectRelation.user_email == inputBody["email"],
-                proj_id == proj_id
-            ).values(
-                role = inputBody["role"],
-                permissions = inputBody["permissions"]
-            )
+                )
 
-        conn.execute(relationstmt)
-        conn.commit()
-    return {"success": True, "reason":"N/A", "body": {}}
+            conn.execute(relationstmt)
+            conn.commit()
+        return {"success": True, "reason":"N/A", "body": {}}
+    except Exception as e:
+        print("Error: ", e)
+        return {
+            "success": False,
+            "reason": "Could Not Add Email"
+        }
 
 @app.route('/api/Project/<proj_id>/removeUser/', methods=["POST"])
 def removeUser(proj_id):
@@ -459,18 +515,87 @@ def removeUser(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    try:
+        #3 is placeholder value since we only have read permission
+        if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
+            return {"success": False, "reason":"Invalid Permissions", "body":{}}
+        
+        with engine.connect() as conn:
+            relationstmt = delete(models.UserProjectRelation).where(
+                models.UserProjectRelation.user_email == inputBody["email"],
+                proj_id == proj_id
+            )
+            
+            conn.execute(relationstmt)
+            conn.commit()
 
-    #3 is placeholder value since we only have read permission
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    with engine.connect() as conn:
-        relationstmt = delete(models.UserProjectRelation).where(
-            models.UserProjectRelation.user_email == inputBody["email"],
-            proj_id == proj_id
-        )
-        conn.execute(relationstmt)
-        conn.commit()
-    return {"success": True, "reason":"N/A", "body": {}}
+        return {"success": True, "reason":"N/A", "body": {}}
+        
+    except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
+    # End OF Func
+    
+# Get UserData With Access to Project returns models.User + Role name as dictionary in body
+@app.route('/api/Project/<proj_id>/Users/', methods=["GET"])
+def getUsersWithAccessToProject(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    try:
+        # Get All Users Data that Has Relationship to project id
+        with engine.connect() as conn:
+            emailsWithAccessToProjectStmt = select(models.UserProjectRelation.user_email, models.UserProjectRelation.role, models.UserProjectRelation.permissions).where(
+                models.UserProjectRelation.proj_id == proj_id
+            )
+
+            userEmailResult = conn.execute(emailsWithAccessToProjectStmt)
+
+            userDataList = []
+
+            for userEmailTuple in userEmailResult:
+                userEmail = userEmailTuple[0]
+                userRole = userEmailTuple[1]
+                userPermissionLevel = userEmailTuple[2]
+
+                getUserDataStmt = select(models.User).where(models.User.user_email == userEmail)
+                userSearchResult = conn.execute(getUserDataStmt).first()
+                
+                # Add User Role To Return Data
+                returnDict = userSearchResult._asdict()
+                returnDict["userRole"] = userRole
+                returnDict["userPermissionLevel"] = userPermissionLevel
+                userDataList.append(returnDict)
+
+            conn.commit()
+
+            return {
+                "success": True,
+                "reason": "",
+                "body": userDataList
+            }
+        
+    except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
+    # End Of Func
 
 # Data Passed in body while project and document id passed in url
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
@@ -1494,10 +1619,11 @@ def pushToExistingBranch(proj_id):
     repo = g2.get_repo(body["repository"])
     updated_files = []
     folderIDToPath = getProjectFoldersAsPaths(proj_id)
+    print(folderIDToPath)
     body = request.get_json()
     snapshotIDs = body["snapshots"]
     deletedDocumentPaths = body["deletedDocuments"]
-    assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
     branch_sha = repo.get_branch(body["branch"]).commit.sha
     try:
         new_tree = repo.create_git_tree(
@@ -1666,11 +1792,11 @@ def implement_code_changes_from_comment():
             "success": False,
             "reason": "LLM Error"
         }
-
+    body = buildStringFromLLMResponse(code, response)
     return {
         "success": True,
         "reason": "Success",
-        "body": response
+        "body": body
     }
 
 from llm import get_llm_code_from_suggestion_2

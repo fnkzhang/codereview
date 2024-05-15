@@ -1,4 +1,4 @@
-import ProjectList  from "./Projects/ProjectList";
+import ProjectListPage  from "./Projects/ProjectListPage";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { addGitHubToken } from "../api/APIUtils";
@@ -65,7 +65,7 @@ export default function UserHomePage( props ) {
     return (
       <div>          
         <div className="m-5">
-          <ProjectList
+          <ProjectListPage
             isLoggedIn={props.isLoggedIn}
             userData={props.userData}
           />
