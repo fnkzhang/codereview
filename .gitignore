@@ -1,5 +1,5 @@
 /.venv
-api-server-flask/api/__pycache__
+api-server-flask/api/__pycache__/
 
 api-server-flask/api/dbEnv.py
 
@@ -11,4 +11,6 @@ api-server-flask/api/github_oath_credentials.json
 
 api-server-flask/cr_cache
 
-api-server-flask/api/test/__pycache__
+api-server-flask/api/test/__pycache__/
+
+api-server-flask/api/utils/__pycache__/

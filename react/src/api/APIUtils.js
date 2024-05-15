@@ -436,7 +436,7 @@ export async function getProjectDocuments(proj_id) {
     },
   };
 
-  return await fetch((`/api/Document/${proj_id}/GetDocuments/`), headers)
+  return await fetch((`/api/Project/${proj_id}/GetDocuments/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
