@@ -51,7 +51,7 @@ def fetchFromCloudStorage(blobName:str):
         Name of the blob to retrieve.
     '''
     try:
-        from cacheUtils import getCloudStorageCache
+        from utils.cacheUtils import getCloudStorageCache
         blobContents = getCloudStorageCache().get(blobName)
         if blobContents is None:
             blobContents = getBlob(blobName)

@@ -8,7 +8,7 @@ from utils.snapshotUtils import *
 from utils.commentUtils import *
 from utils.miscUtils import *
 from utils.buckets import *
-
+from utils.userAndPermissionsUtils import *
 import models
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])

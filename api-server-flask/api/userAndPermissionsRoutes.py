@@ -6,6 +6,7 @@ from flask import request, jsonify
 from cloudSql import *
 from utils.miscUtils import *
 from utils.userAndPermissionsUtils import *
+from utils.projectUtils import *
 
 # Return body has array of project Data
 # Array can contain -1 value indicating missing references
@@ -71,7 +72,34 @@ def addUser(proj_id):
         return {"success": False, "reason":"Cannot add another Owner", "body":{}}
     if (permissions < 0):
         return {"success": False, "reason":"Invalid Permission Level", "body":{}}
-    return {"success": setUserProjPermissions(email, pid, r, perms), "reason":"N/A", "body": {}}
+    return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A", "body": {}}
+
+#needs sections in body
+    #credentials (of user that already has access to project)
+    #email (user to make owner)
+@app.route('/api/Project/<proj_id>/transferOwnership/', methods=["POST"])
+def transferProjectOwnership(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    return {"success": changeProjectOwner(inputBody["email"], proj_id), "reason":"N/A", "body": {}}
+
+#just addUser but you don't need to be a valid user lol, test function remove later
+
 
 #just addUser but you don't need to be a valid user lol, test function remove later
 #still needs:

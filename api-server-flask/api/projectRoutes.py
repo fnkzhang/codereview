@@ -8,6 +8,7 @@ from utils.projectUtils import *
 from utils.documentUtils import *
 from utils.folderUtils import *
 from utils.miscUtils import *
+from utils.userAndPermissionsUtils import *
 
 import models
 
