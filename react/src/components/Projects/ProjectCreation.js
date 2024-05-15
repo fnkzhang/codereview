@@ -4,6 +4,7 @@ import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { createProject, pullFromGitHub } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
+import BackButton from "../BackButton.js";
 
 export default function ProjectCreation( props ) {
 
@@ -48,8 +49,13 @@ export default function ProjectCreation( props ) {
   if(props.isLoggedIn) 
     return (
       <div className="flex justify-center mt-20">
-        <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
+
+        <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
           <div>
+            <BackButton/>
+          </div>
+
+          <div className="p-20 pt-10">
             <div className="mb-5 block">
               <Label className="text-3xl" value="Create a New Project"/>
             </div>
@@ -67,15 +73,16 @@ export default function ProjectCreation( props ) {
               repoBranch={repoBranch}
               setRepoBranch={setRepoBranch}
             />
+
+            {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
+            <Button onClick={handleCreateProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-2">Create</Button>
+
+            <div className="flex justify-center">
+              <LoadingSpinner active={working}/>
+            </div>
           </div>
 
-          {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
-          <Button onClick={handleCreateProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500">Create</Button>
-
-          <div className="flex justify-center">
-            <LoadingSpinner active={working}/>
-          </div>
-        </form>
+        </div>
       </div>
     )
 
