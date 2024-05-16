@@ -90,7 +90,7 @@ def getProjectFoldersAsPaths(proj_id):
     folders = getAllProjectFolders(proj_id)
     folderIDToPath = {}
     folders = [folder for folder in folders if folder["parent_folder"] > 0]
-    folderIDToPath = getFolderPathsFromList(project["root_folder"], "/", folders)
+    folderIDToPath = getFolderPathsFromList(project["root_folder"], "", folders)
     folderIDToPath[project["root_folder"]] = ""
     return folderIDToPath
 
