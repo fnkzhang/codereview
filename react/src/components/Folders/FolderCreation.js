@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LoadingSpinner from "../Loading/LoadingSpinner";
 import { Button, Label, TextInput } from "flowbite-react";
 import { useNavigate, useParams } from "react-router";
 import { createFolder } from "../../api/APIUtils";
@@ -7,7 +8,7 @@ import BackButton from "../BackButton";
 export default function FolderCreation( props ) {
 
   const [folderName, setFolderName] = useState("");
-
+  const [working, setWorking] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
@@ -15,16 +16,17 @@ export default function FolderCreation( props ) {
 
 
   const handleCreateFolder = async () =>  {
-    console.log(folderName, project_id, parent_folder_id)
+
+    setWorking(true)
 
     let result = await createFolder(folderName, project_id, parent_folder_id)
-    console.log(result)
     
-    if (result.success)
-      navigate(-1);
-
-    console.log(result)
-    setIsError(true)
+    if (result.success) {
+      navigate(`/Project/${project_id}/`)
+    } else {
+      setWorking(false)
+      setIsError(true)
+    }
   }
 
   if ( props.isLoggedIn === false ) {
@@ -44,20 +46,22 @@ export default function FolderCreation( props ) {
       </div>
       <div className="flex justify-center mt-20">
         <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
-          <div className="mt-5 p-20 pt-2">
-            <div>
-              <div className="mb-5 block">
-                <Label className="text-3xl" value="New Folder"/>
-              </div>
-              <div className="mb-3 block">
-                <Label className="text-2xl" value="Folder Name"/>
-              </div>
-              <TextInput className="text-black shadow-white" placeholder="Name of Folder" sizing="lg" onChange={(e) => setFolderName(e.target.value)} shadow/>
+          <div className="p-20 pt-10">
+            <div className="mb-5 block">
+              <Label className="text-3xl" value="New Folder"/>
             </div>
+            <div className="mb-3 block">
+              <Label className="text-2xl" value="Folder Name"/>
+            </div>
+            <TextInput className="text-black shadow-white" placeholder="Name of Folder" sizing="lg" onChange={(e) => setFolderName(e.target.value)} shadow/>
 
             {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Folder</p>) : null}
-            <Button onClick={handleCreateFolder} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-2">Create</Button>            
+            <Button onClick={handleCreateFolder} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Create</Button>
+
+            <div className="flex justify-center">
+              <LoadingSpinner active={working}/>
             </div>
+          </div>
         </div>
       </div>
     </div>
