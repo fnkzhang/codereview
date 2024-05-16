@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject } from "../../api/APIUtils";
-import { Label, TextInput, Button } from "flowbite-react";
+import { Label, TextInput, Button, Dropdown } from "flowbite-react";
 import BackButton from "../BackButton";
 
 export default function PermissionPage( props ) {
@@ -136,11 +136,21 @@ export default function PermissionPage( props ) {
                   {user.name} : {user.userRole}
                 </li>
 
-                {canRemoveUsers && props.userData.email !== user.user_email ? (                    
-                <button className="bg-alternative transition-colors duration-200 hover:bg-red-800/75 rounded text-md p-1" 
-                        onClick={() => handleRemoveUsersFromProject(user.user_email)}>
-                  Remove
-                </button> ) : (null)}
+                {canRemoveUsers && props.userData.email !== user.user_email ? ( 
+                  <Dropdown lablel="" dismissOnClick={false} placement="right" inline className="p-0 m-0">
+                    <div className="bg-alternative">
+                      <Dropdown.Item>Promote To Owner</Dropdown.Item>
+                      <Dropdown.Item>Remove</Dropdown.Item>
+                    </div>
+
+                  </Dropdown>
+
+                  // <button className="bg-alternative transition-colors duration-200 hover:bg-red-800/75 rounded text-md p-1" 
+                  //         onClick={() => handleRemoveUsersFromProject(user.user_email)}>
+                  //   Remove
+                  // </button> 
+                
+                ) : (null)}
 
             </div>
             )
@@ -168,7 +178,7 @@ export default function PermissionPage( props ) {
                 <div className="mb-5">
                   <Label className="text-textcolor text-3xl" value="Add Users To The Project"/>
                 </div>
-
+            
                 <TextInput className=" text-black shadow-white text-5xl w-full" placeholder="User Email" sizing="lg" 
                   onChange={(e) => setUserToAddEmail(e.target.value)} shadow/>
 
@@ -177,7 +187,7 @@ export default function PermissionPage( props ) {
                 mt-5 w-full  hover:bg-slate-500"
                   onMouseDown={handleMouseDown}
                   onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}>Add User</Button>
+                  onMouseLeave={handleMouseUp}>Share</Button>
 
               </div>
 
@@ -187,7 +197,7 @@ export default function PermissionPage( props ) {
             
             <aside  className="w/1/3 text-textcolor text-xl float-right bg-altBackground
             m-5 mt-16 p-20 pt-10 rounded shadow-md shadow-[gray] ">
-              <ProjectUserDisplay projectUsers={projectUsers} isLoading={isLoading}props={props}/>
+              <ProjectUserDisplay projectUsers={projectUsers} isLoading={isLoading} props={props}/>
             </aside>
           </div>
         </div>
