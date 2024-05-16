@@ -35,6 +35,7 @@ def getUserGithubStatus():
         return {"success":False, "reason":"User does not exist"}
     try:
         g2 = Github(auth = Auth.Token(user["github_token"]))
+        g2.get_user().login
         return {"success:":True, "reason":"", "body": user["github_token"] != None}
     except Exception as e:
         print(e)
