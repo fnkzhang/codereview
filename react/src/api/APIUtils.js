@@ -140,8 +140,7 @@ export async function promoteEmailToProjectOwner(proj_id, currentOwnerEmail, new
   let oAuthToken = getCookie("cr_id_token")
 
   const body = {
-    "email": currentOwnerEmail,
-    "newEmail": newOwnerEmail
+    "email": newOwnerEmail
   }
 
   let headers = {
@@ -156,7 +155,7 @@ export async function promoteEmailToProjectOwner(proj_id, currentOwnerEmail, new
     body: JSON.stringify(body)
   }
 
-  return await fetch((`/api/Project/${proj_id}/promoteOwner/`), headers)
+  return await fetch((`/api/Project/${proj_id}/transferOwnership/`), headers)
     .then(response => response.json())
     .catch(error => console.log(error))
 }
