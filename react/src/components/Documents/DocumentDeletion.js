@@ -80,7 +80,7 @@ export default function DcoumentDeletion(props) {
                         </div>
                         <TextInput
                             className="text-black shadow-white"
-                            placeholder="Name of Project"
+                            placeholder="Name of Document"
                             sizing="lg"
                             onChange={(e) => setInputDocumentName(e.target.value)}
                             shadow
