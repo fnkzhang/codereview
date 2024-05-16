@@ -1,3 +1,16 @@
+from app import get_app
+app = get_app(__name__)
+
+from flask import request, jsonify
+try:
+    from test.testRoutes import test_llm
+except:
+    pass
+
+from projectRoutes import *
+from folderRoutes import *
+from documentRoutes import *
+from snapshotRoutes import *
 from commentRoutes import *
 from llmRoutes import *
 from githubRoutes import *
@@ -13,4 +26,3 @@ def afterRequest(response):
 def defaultRoute():
     #print('what', file=sys.stderr)
     return "test"
-
