@@ -75,7 +75,7 @@ export default function PermissionPage( props ) {
       return;
     }
 
-    let result = await addUserToProject(project_id, userToAddEmail, "Editor", 12)
+    let result = await addUserToProject(project_id, userToAddEmail, "Editor", 3)
 
     console.log(result);
     
