@@ -159,7 +159,6 @@ export async function promoteEmailToProjectOwner(proj_id, currentOwnerEmail, new
     .then(response => response.json())
     .catch(error => console.log(error))
 }
-
 export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
