@@ -69,7 +69,9 @@ export default function PermissionPage( props ) {
   }, [project_id, props, isLoading]) 
 
 
-  const handleAddUserEmailToProject = async () => {
+  const handleAddUserEmailToProject = async (e) => {
+    e.preventDefault()
+    e.target.reset()
     if (!isValidEmailString(userToAddEmail)) {
       setIsError(true)
       setErrorString("Not Valid Email")
@@ -195,23 +197,33 @@ export default function PermissionPage( props ) {
           <div className="flex justify-center">
             <section className="max-w-lg w-2/3 shadow-md shadow-[gray] 
               text-textcolor bg-altBackground m-5 mt-16 rounded">
-              <div className="p-20 pt-10">
+
+              <form 
+                className="p-20 pt-10" 
+                onSubmit={handleAddUserEmailToProject}
+              >
                 <div className="mb-5">
                   <Label className="text-textcolor text-3xl" value="Add Users To The Project"/>
                 </div>
             
-                <TextInput className=" text-black shadow-white text-5xl w-full" placeholder="User Email" sizing="lg" 
-                  onChange={(e) => setUserToAddEmail(e.target.value)} shadow/>
+                <TextInput 
+                  className=" text-black shadow-white text-5xl w-full" 
+                  placeholder="User Email" 
+                  sizing="lg" 
+                  onChange={(e) => setUserToAddEmail(e.target.value)} 
+                  shadow 
+                  required
+                />
+                  
 
                 {isError ? (<p className="text-red-600 text-xl">{errorString}</p>) : null}
-                <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-all duration-200
+                <Button type="submit" className="bg-alternative transition-all duration-200
                 mt-5 w-full  hover:bg-slate-500"
                   onMouseDown={handleMouseDown}
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}>Share</Button>
 
-              </div>
-
+              </form>
               {/* <Dropdown label=""/> */}
               
             </section>
