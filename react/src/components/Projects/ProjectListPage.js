@@ -29,7 +29,6 @@ export default function ProjectListPage( props ) {
     }
 
     function ProjectDisplayBox({id, name, author, date}) {
-      console.log(id, name)
       return (
         <Card 
           className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"

@@ -16,11 +16,12 @@ export default function ProjectCreation( props ) {
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
-  const handleCreateProject = async () => {
+  const handleCreateProject = async (e) => {
+    e.preventDefault() // Prevent form submission
 
     setWorking(true)
 
-    let result = null;
+    let result = null
 
     if (importFromGitHub) {
       result = await pullFromGitHub(projectName, gitRepo, repoBranch)
@@ -29,7 +30,7 @@ export default function ProjectCreation( props ) {
     }
 
     if (result.success) {
-      navigate("/");
+      navigate("/")
     } else {
       setWorking(false)
       setIsError(true)
@@ -52,15 +53,18 @@ export default function ProjectCreation( props ) {
         <BackButton/>
       </div>
       <div className="flex justify-center mt-20">
-        <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
-          <div className="p-20 pt-10">
+        <form
+          className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
+          onSubmit={handleCreateProject}
+        >
+          <div>
             <div className="mb-5 block">
               <Label className="text-3xl" value="Create a New Project"/>
             </div>
             <div className="mb-3 block">
               <Label className="text-2xl" value="Project Name"/>
             </div>
-            <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setProjectName(e.target.value)} shadow/>
+            <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setProjectName(e.target.value)} shadow required/>
             <GitHubImportForm
               connected={props.connected}
               setConnected={props.setConnected}
@@ -73,13 +77,13 @@ export default function ProjectCreation( props ) {
             />
 
             {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
-            <Button onClick={handleCreateProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Create</Button>
+            <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Create</Button>
 
             <div className="flex justify-center">
               <LoadingSpinner active={working}/>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   )

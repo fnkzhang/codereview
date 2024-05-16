@@ -46,11 +46,11 @@ export default function GitHubImportForm ( props ) {
           <div className="mb-3 block">
             <Label className="text-2xl" value="Repository Name"/>
           </div>
-          <TextInput className="text-black shadow-white" placeholder="Name of GitHub Repository" sizing="lg" onChange={(e) => props.setGitRepo(e.target.value)} shadow/>
+          <TextInput className="text-black shadow-white" placeholder="Name of GitHub Repository" sizing="lg" onChange={(e) => props.setGitRepo(e.target.value)} shadow required/>
           <div className="mb-3 block">
             <Label className="text-2xl" value="Branch Name"/>
           </div>
-          <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => props.setRepoBranch(e.target.value)} shadow/>
+          <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => props.setRepoBranch(e.target.value)} shadow required/>
         </div>
       </div>
     );

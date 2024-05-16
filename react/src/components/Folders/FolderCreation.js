@@ -15,7 +15,8 @@ export default function FolderCreation( props ) {
   const {project_id, parent_folder_id} = useParams();
 
 
-  const handleCreateFolder = async () =>  {
+  const handleCreateFolder = async (e) =>  {
+    e.preventDefault() // Prevent form submission
 
     setWorking(true)
 
@@ -45,24 +46,27 @@ export default function FolderCreation( props ) {
         <BackButton/>
       </div>
       <div className="flex justify-center mt-20">
-        <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
-          <div className="p-20 pt-10">
+        <form
+          className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
+          onSubmit={handleCreateFolder}
+        >
+          <div>
             <div className="mb-5 block">
               <Label className="text-3xl" value="New Folder"/>
             </div>
             <div className="mb-3 block">
               <Label className="text-2xl" value="Folder Name"/>
             </div>
-            <TextInput className="text-black shadow-white" placeholder="Name of Folder" sizing="lg" onChange={(e) => setFolderName(e.target.value)} shadow/>
+            <TextInput className="text-black shadow-white" placeholder="Name of Folder" sizing="lg" onChange={(e) => setFolderName(e.target.value)} shadow required/>
 
             {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Folder</p>) : null}
-            <Button onClick={handleCreateFolder} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Create</Button>
+            <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Create</Button>
 
             <div className="flex justify-center">
               <LoadingSpinner active={working}/>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   )
