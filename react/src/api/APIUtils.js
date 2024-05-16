@@ -445,7 +445,7 @@ export async function getUserProjects(userEmail) {
 
   };
 
-  return await fetch((`/api/User/${userEmail}/Project/`), headers)
+  return await fetch((`/api/User/Project/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
