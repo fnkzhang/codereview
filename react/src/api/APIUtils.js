@@ -81,7 +81,7 @@ export async function addUserToProject(proj_id, emailToAdd, roleNameForEmail, pe
     body: JSON.stringify(bodyData)
   }
 
-  return await fetch((`/api/Project/${proj_id}/addUserAdmin/`), headers)
+  return await fetch((`/api/Project/${proj_id}/addUser/`), headers)
     .then(response => response.json())
 
 }

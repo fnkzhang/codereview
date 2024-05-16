@@ -85,7 +85,7 @@ def setUserProjPermissions(email, proj_id, r, perms):
                     role = r,
                     permissions = perms
             )
-            if(getUserProjPermissions(inputBody["email"], proj_id)) < 0:
+            if(getUserProjPermissions(email, proj_id)) < 0:
                 stmt = insert(models.UserProjectRelation).values(
                         user_email = email,
                         proj_id = proj_id,
@@ -103,7 +103,8 @@ def setUserProjPermissions(email, proj_id, r, perms):
             conn.execute(stmt)
             conn.commit()
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 def changeProjectOwner(email, proj_id):

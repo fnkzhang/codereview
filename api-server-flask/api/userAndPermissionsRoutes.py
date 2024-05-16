@@ -60,10 +60,10 @@ def addUser(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+    permissions = getUserProjPermissions(idInfo["email"], proj_id)
+    if(permissions < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    if (permissions == 5):
+    if (inputBody["permissions"] == 5):
         return {"success": False, "reason":"Cannot add another Owner", "body":{}}
     if (permissions < 0):
         return {"success": False, "reason":"Invalid Permission Level", "body":{}}
