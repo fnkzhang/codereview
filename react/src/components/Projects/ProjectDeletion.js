@@ -16,7 +16,6 @@ export default function ProjectDeletion(props) {
     useEffect(() => {
         async function getProjectData() {
             let result = await getProjectInfo(project_id)
-            console.log(result)
             setProjectName(result.name)
         }
 
@@ -40,7 +39,6 @@ export default function ProjectDeletion(props) {
         }
 
         let result = await deleteProject(project_id)
-        console.log(result)
 
         if (result.success) {
             navigate("/") // Go Home

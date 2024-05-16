@@ -16,7 +16,8 @@ export default function DocumentCreation( props ) {
   const {project_id, parent_folder_id} = useParams();
 
 
-  const handleCreateDocument = async () =>  {
+  const handleCreateDocument = async (e) =>  {
+    e.preventDefault() // Prevent form submission
 
     setWorking(true)
 
