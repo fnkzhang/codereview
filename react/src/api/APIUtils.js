@@ -159,6 +159,7 @@ export async function promoteEmailToProjectOwner(proj_id, currentOwnerEmail, new
     .then(response => response.json())
     .catch(error => console.log(error))
 }
+
 export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
@@ -182,6 +183,42 @@ export async function createDocument(documentName, proj_id, documentData, parent
   }
   return await fetch((`/api/Document/${proj_id}/`), headers)
     .then(response => response.json())
+}
+
+export async function deleteDocument(doc_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "DELETE",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Dcoument/${proj_id}/`), headers)
+    .then(response => response.json())
+}
+
+export async function  getDocumentInfo(proj_id, doc_id) {
+  let oAuthToken = getCookie("cr_id_token")
+  
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+
+  return await fetch((`/api/Document/${proj_id}/${doc_id}/`), headers)
+    .then(response => response.json())
+
 }
 
 export async function getDocSnapshot(proj_id, doc_id, snap_id) {
@@ -408,7 +445,7 @@ export async function getUserProjects(userEmail) {
 
   };
 
-  return await fetch((`/api/User/Project/`), headers)
+  return await fetch((`/api/User/${userEmail}/Project/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
@@ -459,7 +496,7 @@ export async function getProjectDocuments(proj_id) {
     },
   };
 
-  return await fetch((`/api/Project/${proj_id}/GetDocuments/`), headers)
+  return await fetch((`/api/Document/${proj_id}/GetDocuments/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
