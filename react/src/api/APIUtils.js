@@ -715,7 +715,6 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
     if (data.success === false) {
       console.log("FAILED" + data.reason)
     }
-    console.log("Request Contents", headers)
     return data
   })
 }

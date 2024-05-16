@@ -109,9 +109,9 @@ def setUserProjPermissions(email, proj_id, r, perms):
 def changeProjectOwner(email, proj_id):
     try:
         with engine.connect() as conn:
-            stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id, models.UserProjectRelation.permissions == 5)
-            prevOwner = conn.execute(stmt).first()
-            setUserProjPermissions(prevOwner.user_email, proj_id, "Admin", 3)
+            stmt = select(models.Project).where(models.Project.proj_id == proj_id)
+            project = conn.execute(stmt).first()
+            setUserProjPermissions(project.author_email, proj_id, "Admin", 3)
             setUserProjPermissions(email, proj_id, "Owner", 5)
             stmt = update(models.Project).where(
                     models.Project.proj_id == proj_id

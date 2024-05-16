@@ -162,7 +162,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
 
     editorCode = editorCode.replace(highlightCodeString, codeToReplace);
     
-    setCode(editorCode)
+    setCode(codeToReplace)
 
   }
 
