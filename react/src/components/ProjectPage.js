@@ -89,15 +89,15 @@ export default function ProjectPage( props ) {
   function FolderDisplayBox({id, name, folder}) {
     return (
       <Card 
-        className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
+        className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
         onClick={() => handleFolderClick(folder)}
       >
-        <h4 className="text-textcolor text-xl p-1">
-          <span className="font-bold">{name}</span>
+        <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
+          <span className="font-bold text-xl">{name}</span>
         </h4>
         <h4 className="text-textcolor p-1">
-          <span className="font-bold">ID: </span>
-          {id}
+          <span className="font-bold block">ID: </span>
+          <span className="block">{id}</span>
         </h4>
       </Card>
     )
@@ -106,17 +106,20 @@ export default function ProjectPage( props ) {
   function DocumentDisplayBox({id, name, date}) {
     return (
       <Card 
-        className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
+        className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
         onClick={() => handleDocumentClick(id, name)}
       >
-        <h4 className="text-textcolor text-xl p-1">
-          <span className="font-bold">{name} </span>
+        <h4 className="text-textcolor overflow-hidden whitespace-nowrap p-1">
+          <span className="font-bold text-xl">{name} </span>
         </h4>
         <h4 className="text-textcolor p-1">
-          <span className="font-bold">ID: </span>
-          {id}
+        <span className="font-bold block">ID: </span>
+          <span className="block">{id}</span>
         </h4>
-        <h4 className="text-textcolor p-1"><span className="font-bold">Date Modified: </span>{date}</h4>
+        <h4 className="text-textcolor p-1">
+        <span className="font-bold block">Date Modified: </span>
+          <span className="block">{date}</span>
+        </h4>
       </Card>
     )
   }
