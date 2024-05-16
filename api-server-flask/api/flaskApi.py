@@ -538,6 +538,65 @@ def removeUser(proj_id):
                 "reason": str(e)
             }
     # End OF Func
+
+# Take Json with email and newEmail
+@app.route('/api/Project/<proj_id>/promoteOwner/', methods=["POST"])
+def promoteToNewOwner(proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    try:
+        #3 is placeholder value since we only have read permission
+        if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
+            return {"success": False, "reason":"Invalid Permissions", "body":{}}
+        
+        with engine.connect() as conn:
+            # Update Project To new owner
+            projectOwnerUpdateStmt = update(models.Project).where(
+                models.Project.proj_id == proj_id).values(author_email = inputBody["newEmail"])
+            
+            # Update Reduce Owner Role For Project relation
+            userProjRelationUpdateCurrentOwnerStmt = update(models.UserProjectRelation).where(
+                models.UserProjectRelation.user_email == inputBody["email"],
+                proj_id == proj_id,
+            ).values(
+                role = "Editor",
+                permissions = 3
+            )
+
+            # Update Increase New Email Role for Project relation
+            userProjRelationUpdateNewOwnerStmt = update(models.UserProjectRelation).where(
+                models.UserProjectRelation.user_email == inputBody["newEmail"],
+                proj_id == proj_id,     
+            ).values(
+                role = "Owner",
+                permissions = 4
+            )
+
+            conn.execute(projectOwnerUpdateStmt)
+            conn.execute(userProjRelationUpdateCurrentOwnerStmt)
+            conn.execute(userProjRelationUpdateNewOwnerStmt)
+
+            conn.commit()
+
+        return {"success": True, "reason":"N/A", "body": {}}
+    except Exception as e:
+            print("Error: ", e)
+            return {
+                "success": False,
+                "reason": str(e)
+            }
     
 # Get UserData With Access to Project returns models.User + Role name as dictionary in body
 @app.route('/api/Project/<proj_id>/Users/', methods=["GET"])

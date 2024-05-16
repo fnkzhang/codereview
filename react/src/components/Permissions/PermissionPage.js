@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject } from "../../api/APIUtils";
+import { useParams } from "react-router";
+import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject, promoteEmailToProjectOwner } from "../../api/APIUtils";
 import { Label, TextInput, Button, Dropdown } from "flowbite-react";
 import BackButton from "../BackButton";
 
@@ -9,7 +9,7 @@ export default function PermissionPage( props ) {
   let [userToAddEmail, setUserToAddEmail] = useState("");
   let [projectName, setProjectName] = useState("");
   let [projectUsers, setProjectUsers] = useState([]);
-  //let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
+  let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
 
   let [isLoading, setIsLoading] = useState(true)
   // Todo Checks user permission value to determine if user can do actions / be on this page
@@ -19,7 +19,6 @@ export default function PermissionPage( props ) {
 
   let [canRemoveUsers, setCanRemoveUsers] = useState(false);
 
-  const navigate = useNavigate();
   const {project_id} = useParams();
 
   // Set Data For Page on Load
@@ -33,6 +32,8 @@ export default function PermissionPage( props ) {
       if (projectData.author_email === props.userData.email)
         setCanRemoveUsers(true);
 
+
+      setProjectAuthorEmail(projectData.author_email);
       setProjectName(projectData.name);
     }
 
@@ -41,6 +42,7 @@ export default function PermissionPage( props ) {
       setProjectUsers(projectUserResponse)
       console.log(projectUserResponse);
     }
+    
     async function fetchData() {
       try {
         await Promise.all([
@@ -57,6 +59,7 @@ export default function PermissionPage( props ) {
     
     setUserToAddEmail("")
     setProjectUsers([])
+    setCanRemoveUsers(false)
     setIsError(false)
     setErrorString("")
 
@@ -96,6 +99,19 @@ export default function PermissionPage( props ) {
     }
 
     console.log(result);
+    setIsLoading(true)
+  }
+  const handlePromoteToOwner = async (ownerEmail, emailToPromote) => {
+    console.log(ownerEmail, emailToPromote);
+    let result = await promoteEmailToProjectOwner(project_id, ownerEmail, emailToPromote)
+    console.log(result);
+
+    if(!result.success) {
+
+      setIsError(true)
+      return;
+    }
+
     setIsLoading(true)
   }
 
@@ -139,8 +155,8 @@ export default function PermissionPage( props ) {
                 {canRemoveUsers && props.userData.email !== user.user_email ? ( 
                   <Dropdown lablel="" dismissOnClick={false} placement="right" inline className="p-0 m-0">
                     <div className="bg-alternative">
-                      <Dropdown.Item>Promote To Owner</Dropdown.Item>
-                      <Dropdown.Item>Remove</Dropdown.Item>
+                      <Dropdown.Item onClick={() => handlePromoteToOwner(projectAuthorEmail, user.user_email)}>Promote To Owner</Dropdown.Item>
+                      <Dropdown.Item onClick={() => handleRemoveUsersFromProject(user.user_email)}>Remove</Dropdown.Item>
                     </div>
 
                   </Dropdown>
