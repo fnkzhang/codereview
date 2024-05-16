@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
-
+import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { deleteProject, getProjectInfo } from "../../api/APIUtils";
 
@@ -9,7 +9,7 @@ export default function ProjectDeletion( props ) {
     const [projectName, setProjectName] = useState("") // Actual Project Name to compare
     const [inputProjectName, setInputProjectName] = useState("") // Handle Input for project name
     const [isError, setIsError] = useState(false);
-
+    const [working, setWorking] = useState(false);
     const {project_id} = useParams()
     const navigate = useNavigate()
 
@@ -26,6 +26,9 @@ export default function ProjectDeletion( props ) {
     }, [project_id])
 
     const handleDeleteProjectButtonClick = async() => {
+
+        setWorking(true)
+
         if (inputProjectName !== projectName) {
             console.log("INPUT DOESNT MATCH", inputProjectName, projectName)
             return
@@ -34,10 +37,22 @@ export default function ProjectDeletion( props ) {
         let result = await deleteProject(project_id);
         console.log(result)
 
-        if (result.success)
+        if (result.success) {
             navigate("/") // Go Home
-        else 
+        } else {
+            setWorking(false)
             setIsError(true)
+        }
+    }
+
+    if (props.isLoggedIn === false) {
+        return (
+            <div>
+                <div className="m-20 text-center text-textcolor text-2xl">
+                    You must Log in to view this page.
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -56,6 +71,10 @@ export default function ProjectDeletion( props ) {
 
                 {isError ? (<p className="text-red-600 text-xl">Error: Could Not Delete Project</p>) : null}
                 <Button onClick={handleDeleteProjectButtonClick} className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">Delete</Button>
+
+                <div className="flex justify-center">
+                    <LoadingSpinner active={working}/>
+                </div>
             </form>
         </div>
     )

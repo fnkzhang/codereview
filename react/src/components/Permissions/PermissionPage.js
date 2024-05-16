@@ -152,44 +152,45 @@ export default function PermissionPage( props ) {
 
   if(props.isLoggedIn)
     return (
-      <div >
-        <header className="text-textcolor text-3xl">
-          <h3 className="ml-[10%] mt-5">Project: {projectName}</h3>
-        </header>
+      <div>
+        <div>
+          <BackButton/> 
+        </div>
+        <div >
+          <header className="text-textcolor text-3xl">
+            <h3 className="ml-[10%] mt-5">Project: {projectName}</h3>
+          </header>
 
-        <div className="flex justify-center">
-          <section className="max-w-lg w-2/3 shadow-md shadow-[gray] 
-            text-textcolor bg-altBackground m-5 mt-16 rounded">
-            <div>
-              <BackButton/> 
-            </div>
-            <div className="p-20 pt-10">
-              <div className="mb-5">
-                <Label className="text-textcolor text-3xl" value="Add Users To The Project"/>
+          <div className="flex justify-center">
+            <section className="max-w-lg w-2/3 shadow-md shadow-[gray] 
+              text-textcolor bg-altBackground m-5 mt-16 rounded">
+              <div className="p-20 pt-10">
+                <div className="mb-5">
+                  <Label className="text-textcolor text-3xl" value="Add Users To The Project"/>
+                </div>
+
+                <TextInput className=" text-black shadow-white text-5xl w-full" placeholder="User Email" sizing="lg" 
+                  onChange={(e) => setUserToAddEmail(e.target.value)} shadow/>
+
+                {isError ? (<p className="text-red-600 text-xl">{errorString}</p>) : null}
+                <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-all duration-200
+                mt-5 w-full  hover:bg-slate-500"
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}>Add User</Button>
+
               </div>
 
-              <TextInput className=" text-black shadow-white text-5xl w-full" placeholder="User Email" sizing="lg" 
-                onChange={(e) => setUserToAddEmail(e.target.value)} shadow/>
-
-              {isError ? (<p className="text-red-600 text-xl">{errorString}</p>) : null}
-              <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-all duration-200
-              mt-5 w-full  hover:bg-slate-500"
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}>Add User</Button>
-
-            </div>
-
-            {/* <Dropdown label=""/> */}
+              {/* <Dropdown label=""/> */}
+              
+            </section>
             
-          </section>
-          
-          <aside  className="w/1/3 text-textcolor text-xl float-right bg-altBackground
-          m-5 mt-16 p-20 pt-10 rounded shadow-md shadow-[gray] ">
-            <ProjectUserDisplay projectUsers={projectUsers} isLoading={isLoading}props={props}/>
-          </aside>
+            <aside  className="w/1/3 text-textcolor text-xl float-right bg-altBackground
+            m-5 mt-16 p-20 pt-10 rounded shadow-md shadow-[gray] ">
+              <ProjectUserDisplay projectUsers={projectUsers} isLoading={isLoading}props={props}/>
+            </aside>
+          </div>
         </div>
-
       </div>
     )
 

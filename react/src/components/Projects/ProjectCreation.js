@@ -46,51 +46,50 @@ export default function ProjectCreation( props ) {
     )
   }
 
-  if(props.isLoggedIn) 
+  if(props.isLoggedIn === false) 
     return (
-      <div className="flex justify-center mt-20">
-
-        <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
-          <div>
-            <BackButton/>
-          </div>
-
-          <div className="p-20 pt-10">
-            <div className="mb-5 block">
-              <Label className="text-3xl" value="Create a New Project"/>
-            </div>
-            <div className="mb-3 block">
-              <Label className="text-2xl" value="Project Name"/>
-            </div>
-            <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setProjectName(e.target.value)} shadow/>
-            <GitHubImportForm
-              connected={props.connected}
-              setConnected={props.setConnected}
-              importFromGitHub={importFromGitHub}
-              setImportFromGitHub={setImportFromGitHub}
-              gitRepo={gitRepo}
-              setGitRepo={setGitRepo}
-              repoBranch={repoBranch}
-              setRepoBranch={setRepoBranch}
-            />
-
-            {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
-            <Button onClick={handleCreateProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-2">Create</Button>
-
-            <div className="flex justify-center">
-              <LoadingSpinner active={working}/>
-            </div>
-          </div>
-
+      <div>
+        <div className="m-20 text-center text-textcolor text-2xl">
+          You must Log in to view this page.
         </div>
       </div>
     )
 
   return(
     <div>
-      <div className="m-20 text-center text-textcolor text-2xl">
-        You must Log in to view this page.
+      <div>
+        <BackButton/>
       </div>
+    <div className="flex justify-center mt-20">
+      <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
+        <div className="p-20 pt-10">
+          <div className="mb-5 block">
+            <Label className="text-3xl" value="Create a New Project"/>
+          </div>
+          <div className="mb-3 block">
+            <Label className="text-2xl" value="Project Name"/>
+          </div>
+          <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setProjectName(e.target.value)} shadow/>
+          <GitHubImportForm
+            connected={props.connected}
+            setConnected={props.setConnected}
+            importFromGitHub={importFromGitHub}
+            setImportFromGitHub={setImportFromGitHub}
+            gitRepo={gitRepo}
+            setGitRepo={setGitRepo}
+            repoBranch={repoBranch}
+            setRepoBranch={setRepoBranch}
+          />
+
+          {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
+          <Button onClick={handleCreateProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Create</Button>
+
+          <div className="flex justify-center">
+            <LoadingSpinner active={working}/>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
   )
 }

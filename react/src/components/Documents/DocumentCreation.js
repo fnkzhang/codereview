@@ -62,13 +62,12 @@ export default function DocumentCreation() {
   }
 
   return (
-      <div className="flex justify-center mt-20">
-
+    <div>
+      <div>
+        <BackButton/>  
+      </div>
+      <div className="flex justify-center mt-20">\
         <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
-          <div>
-            <BackButton/>  
-          </div>
-
           <div className="mt-5 p-20 pt-2">
             <div>
               <div className="mb-5 block">
@@ -86,6 +85,6 @@ export default function DocumentCreation() {
 
         </div>
       </div>      
-
+    </div>
   )
 }

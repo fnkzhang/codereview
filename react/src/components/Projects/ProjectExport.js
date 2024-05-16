@@ -20,7 +20,6 @@ export default function ProjectExport( props ) {
   
     setWorking(true)
 
-    const resolve = Promise.resolve()
     let deletedDocuments = null
     let documents = null
     let snapshots = []
