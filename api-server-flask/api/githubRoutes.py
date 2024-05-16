@@ -33,7 +33,12 @@ def getUserGithubStatus():
     user = getUserInfo(idInfo["email"])
     if user == None:
         return {"success":False, "reason":"User does not exist"}
-    return {"success:":True, "reason":"", "body": user["github_token"] != None}
+    try:
+        g2 = Github(auth = Auth.Token(user["github_token"]))
+        return {"success:":True, "reason":"", "body": user["github_token"] != None}
+    except Exception as e:
+        print(e)
+        return {"success:":True, "reason":"", "body":False}
 
 #needs auth because everything does lmao
 #put code in the body in "github_code"
