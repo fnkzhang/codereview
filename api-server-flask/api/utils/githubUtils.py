@@ -54,6 +54,7 @@ def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
     projectDocuments = getAllProjectDocuments(proj_id)
     projectDocumentPaths = set([getFolderPath(document['parent_folder']) + document['name'] for document in projectDocuments])
     nonexistant = list(allGithubFiles - projectDocumentPaths)
+    print(nonexistant)
     return nonexistant
 
 def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs):
@@ -82,6 +83,7 @@ def assembleGithubComments(snapshotIDs):
     githubComments = []
     for snapshotID in snapshotIDs:
         doc_id = getSnapshotInfo(snapshotID)["associated_document_id"]
+        document = getDocumentInfo(doc_id)
         documentPath = getFolderPath(document['parent_folder']) + document['name']
         commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID )
         for comment in commentList:

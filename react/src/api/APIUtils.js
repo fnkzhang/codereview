@@ -198,7 +198,7 @@ export async function deleteDocument(doc_id) {
       "Content-Type": "application/json"
     }
   }
-  return await fetch((`/api/Dcoument/${proj_id}/`), headers)
+  return await fetch((`/api/Document/${doc_id}/`), headers)
     .then(response => response.json())
 }
 
