@@ -37,7 +37,11 @@ def implement_code_changes_from_comment():
             "success": False,
             "reason": "LLM Error"
         }
-    
+    if response["success"] == False:
+        return {
+            "success": False,
+            "reason":"Off-topic comment"
+        }
     body = buildStringFromLLMResponse(code, response)
     if body is None:
         return {
