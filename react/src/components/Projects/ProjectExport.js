@@ -5,6 +5,7 @@ import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { getDeletedDocuments, getProjectDocuments, getAllSnapshotsFromDocument, pushToExistingBranch } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
+import BackButton from "../BackButton.js";
 
 export default function ProjectExport( props ) {
 
@@ -76,29 +77,34 @@ export default function ProjectExport( props ) {
   }
 
   return (
-    <div className="flex justify-center mt-20">
-      <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
-        <div>
-          <div className="mb-5 block">
-            <Label className="text-3xl" value="Export Project to GitHub"/>
+    <div>
+      <div>
+        <BackButton/>
+      </div>
+      <div className="flex justify-center mt-20">
+        <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
+          <div>
+            <div className="mb-5 block">
+              <Label className="text-3xl" value="Export Project to GitHub"/>
+            </div>
+            <div className="mb-3 block">
+              <Label className="text-2xl" value="Repository Name"/>
+            </div>
+            <TextInput className="text-black shadow-white" placeholder="Name of Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow/>
+            <div className="mb-3 block">
+              <Label className="text-2xl" value="Branch Name"/>
+            </div>
+            <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow/>
           </div>
-          <div className="mb-3 block">
-            <Label className="text-2xl" value="Repository Name"/>
-          </div>
-          <TextInput className="text-black shadow-white" placeholder="Name of Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow/>
-          <div className="mb-3 block">
-            <Label className="text-2xl" value="Branch Name"/>
-          </div>
-          <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow/>
-        </div>
 
-        {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
-        <Button onClick={handleExportProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500">Export</Button>
+          {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Project</p>) : null}
+          <Button onClick={handleExportProject} className="bg-alternative transition-colors duration-200 hover:bg-slate-500">Export</Button>
 
-        <div className="flex justify-center">
-          <LoadingSpinner active={working}/>
-        </div>
-      </form>
+          <div className="flex justify-center">
+            <LoadingSpinner active={working}/>
+          </div>
+        </form>
+      </div>
     </div>
   )
 

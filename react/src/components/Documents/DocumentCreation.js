@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router";
 
 import { createDocument } from "../../api/APIUtils";
 import BackButton from "../BackButton";
-export default function DocumentCreation() {
+export default function DocumentCreation( props ) {
 
   const [documentName, setDocumentName] = useState("");
   const [documentData, setDocumentData] = useState("");
@@ -59,6 +59,16 @@ export default function DocumentCreation() {
 
     fileReader.readAsText(fileInformation);
 
+  }
+
+  if ( props.isLoggedIn === false ) {
+    return (
+    <div>
+      <div className="m-20 text-center text-textcolor text-2xl">
+        You must Log in to view this page.
+      </div>
+    </div>
+    )
   }
 
   return (

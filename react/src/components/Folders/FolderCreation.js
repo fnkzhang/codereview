@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import { createFolder } from "../../api/APIUtils";
 import BackButton from "../BackButton";
 
-export default function FolderCreation() {
+export default function FolderCreation( props ) {
 
   const [folderName, setFolderName] = useState("");
 
@@ -25,6 +25,16 @@ export default function FolderCreation() {
 
     console.log(result)
     setIsError(true)
+  }
+
+  if ( props.isLoggedIn === false ) {
+    return (
+      <div>
+        <div className="m-20 text-center text-textcolor text-2xl">
+          You must Log in to view this page.
+        </div>
+      </div>
+    )
   }
 
   return (
