@@ -75,8 +75,11 @@ export default function DocumentCreation( props ) {
         <BackButton/>  
       </div>
       <div className="flex justify-center mt-20">
-        <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
-          <div className="mt-5 p-20 pt-2">
+        <form
+          className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
+          onSubmit={handleCreateDocument}
+        >
+          <div>
             <div>
               <div className="mb-5 block">
                 <Label className="text-3xl" value="New Document"/>
@@ -84,17 +87,17 @@ export default function DocumentCreation( props ) {
               <div className="mb-3 block">
                 <Label className="text-2xl" value="Upload Code File"/>
               </div>
-              <FileInput helperText="Text File Containing Code" onChange={handleFileUpload} />
+              <FileInput helperText="Text File Containing Code" onChange={handleFileUpload} required/>
             </div>
 
             {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Document</p>) : null}
-            <Button onClick={handleCreateDocument} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Upload Document</Button>
+            <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Upload Document</Button>
 
             <div className="flex justify-center">
               <LoadingSpinner active={working}/>
             </div>
           </div>
-        </div>
+        </form>
       </div>      
     </div>
   )

@@ -1,41 +1,45 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { deleteProject, getProjectInfo } from "../../api/APIUtils";
 import BackButton from "../BackButton.js";
 
-export default function ProjectDeletion( props ) {
-    
-    const [projectName, setProjectName] = useState("") // Actual Project Name to compare
-    const [inputProjectName, setInputProjectName] = useState("") // Handle Input for project name
+export default function ProjectDeletion(props) {
+    const [projectName, setProjectName] = useState(""); // Actual Project Name to compare
+    const [inputProjectName, setInputProjectName] = useState(""); // Handle Input for project name
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
-    const {project_id} = useParams()
-    const navigate = useNavigate()
+    const { project_id } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function getProjectData() {
             let result = await getProjectInfo(project_id)
-
-            console.log(result);
+            console.log(result)
             setProjectName(result.name)
-
         }
 
-        getProjectData();
+        getProjectData()
     }, [project_id])
 
-    const handleDeleteProjectButtonClick = async() => {
+    const handleDeleteProjectButtonClick = async (e) => {
+        e.preventDefault() // Prevent form submission
 
         setWorking(true)
 
-        if (inputProjectName !== projectName) {
-            console.log("INPUT DOESNT MATCH", inputProjectName, projectName)
+        if (inputProjectName === "") {
+            setWorking(false)
             return
         }
 
-        let result = await deleteProject(project_id);
+        if (inputProjectName !== projectName) {
+            alert("Input Does Not Match Project Name")
+            setWorking(false)
+            return
+        }
+
+        let result = await deleteProject(project_id)
         console.log(result)
 
         if (result.success) {
@@ -44,7 +48,7 @@ export default function ProjectDeletion( props ) {
             setWorking(false)
             setIsError(true)
         }
-    }
+    };
 
     if (props.isLoggedIn === false) {
         return (
@@ -53,32 +57,48 @@ export default function ProjectDeletion( props ) {
                     You must Log in to view this page.
                 </div>
             </div>
-        )
+        );
     }
 
     return (
         <div>
             <div>
-                <BackButton/>
+                <BackButton />
             </div>
             <div className="flex justify-center mt-20">
-                <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
+                <form
+                    className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
+                    onSubmit={handleDeleteProjectButtonClick}
+                >
                     <div>
                         <div className="mb-3 block">
-                            <Label className="text-2xl" value="Are you sure you want to delete this project?"/>
+                            <Label className="text-2xl" value="Are you sure you want to delete this project?" />
                         </div>
 
                         <div className="mb-3 block">
-                            <Label className="text-2xl">Please type <strong className="text-red-500">{projectName}</strong> into the text field.</Label>
+                            <Label className="text-2xl">
+                                Please type <strong className="text-red-500">{projectName}</strong> into the text field.
+                            </Label>
                         </div>
-                        <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setInputProjectName(e.target.value)} shadow/>
+                        <TextInput
+                            className="text-black shadow-white"
+                            placeholder="Name of Project"
+                            sizing="lg"
+                            onChange={(e) => setInputProjectName(e.target.value)}
+                            shadow
+                            required
+                        />
                     </div>
 
-                    {isError ? (<p className="text-red-600 text-xl">Error: Could Not Delete Project</p>) : null}
-                    <Button onClick={handleDeleteProjectButtonClick} className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">Delete</Button>
+                    {isError ? (
+                        <p className="text-red-600 text-xl">Error: Could Not Delete Project</p>
+                    ) : null}
+                    <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">
+                        Delete
+                    </Button>
 
                     <div className="flex justify-center">
-                        <LoadingSpinner active={working}/>
+                        <LoadingSpinner active={working} />
                     </div>
                 </form>
             </div>
