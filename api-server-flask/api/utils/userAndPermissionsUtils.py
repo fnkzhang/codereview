@@ -118,9 +118,10 @@ def changeProjectOwner(email, proj_id):
                 ).values(
                     author_email = email
                 )
-            conn.execute(tmt)
+            conn.execute(stmt)
             conn.commit()
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
