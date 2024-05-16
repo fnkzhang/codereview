@@ -391,12 +391,12 @@ def addUser(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    
-    try:
-        # Check If User Exists First
+
+    try :
+
         with engine.connect() as conn:
             userSearchStmt = select(models.User).where(
                 models.User.user_email == inputBody["email"]
@@ -419,21 +419,22 @@ def addUser(proj_id):
             else:
                 relationstmt = update(models.UserProjectRelation).where(
                     models.UserProjectRelation.user_email == inputBody["email"],
-                    models.UserProjectRelation.proj_id == proj_id
+                    proj_id == proj_id
                 ).values(
                     role = inputBody["role"],
                     permissions = inputBody["permissions"]
                 )
+
             conn.execute(relationstmt)
             conn.commit()
-
         return {"success": True, "reason":"N/A", "body": {}}
     except Exception as e:
         print("Error: ", e)
         return {
             "success": False,
-            "reason": "Could Not Find Email"
+            "reason": "Could Not Add Email"
         }
+
 #just addUser but you don't need to be a valid user lol, test function remove later
 #still needs:
     #email (user to add to project)
@@ -456,7 +457,7 @@ def addUserAdmin(proj_id):
             "reason": "Failed to Authenticate"
         }
     
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
     try :
