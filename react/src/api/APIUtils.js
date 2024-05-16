@@ -97,7 +97,7 @@ export async function removeUserFromProject(proj_id, emailToRemove) {
     "email": emailToRemove,
   }
   let headers = {
-    method: "POST",
+    method: "DELETE",
     mode: "cors",
     withCredentials: true,
     credentials: 'include',
