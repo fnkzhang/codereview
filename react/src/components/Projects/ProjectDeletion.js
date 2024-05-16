@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { deleteProject, getProjectInfo } from "../../api/APIUtils";
+import BackButton from "../BackButton.js";
 
 export default function ProjectDeletion( props ) {
     
@@ -56,26 +57,31 @@ export default function ProjectDeletion( props ) {
     }
 
     return (
-        <div className="flex justify-center mt-20">
-            <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
-                <div>
-                    <div className="mb-3 block">
-                        <Label className="text-2xl" value="Are you sure you want to delete this project?"/>
+        <div>
+            <div>
+                <BackButton/>
+            </div>
+            <div className="flex justify-center mt-20">
+                <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
+                    <div>
+                        <div className="mb-3 block">
+                            <Label className="text-2xl" value="Are you sure you want to delete this project?"/>
+                        </div>
+
+                        <div className="mb-3 block">
+                            <Label className="text-2xl">Please type <strong className="text-red-500">{projectName}</strong> into the text field.</Label>
+                        </div>
+                        <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setInputProjectName(e.target.value)} shadow/>
                     </div>
 
-                    <div className="mb-3 block">
-                        <Label className="text-2xl">Please type <strong className="text-red-500">{projectName}</strong> into the text field.</Label>
+                    {isError ? (<p className="text-red-600 text-xl">Error: Could Not Delete Project</p>) : null}
+                    <Button onClick={handleDeleteProjectButtonClick} className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">Delete</Button>
+
+                    <div className="flex justify-center">
+                        <LoadingSpinner active={working}/>
                     </div>
-                    <TextInput className="text-black shadow-white" placeholder="Name of Project" sizing="lg" onChange={(e) => setInputProjectName(e.target.value)} shadow/>
-                </div>
-
-                {isError ? (<p className="text-red-600 text-xl">Error: Could Not Delete Project</p>) : null}
-                <Button onClick={handleDeleteProjectButtonClick} className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">Delete</Button>
-
-                <div className="flex justify-center">
-                    <LoadingSpinner active={working}/>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     )
 }

@@ -197,6 +197,15 @@ export default function ProjectPage( props ) {
       </div>)
   }
 
+  function DisplayExportButton() {
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        onClick={() => navigate(`/Project/Export/${project_id}/`)}>Export Project</button>
+      </div>
+    )
+  }
+
   function DisplayDeleteButton() {
     if (props.userData === null)
       return null
@@ -299,6 +308,7 @@ export default function ProjectPage( props ) {
       </div>
       <div className="flex">
         <BackButton/>
+        <DisplayExportButton/>
         <DisplayDeleteButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>

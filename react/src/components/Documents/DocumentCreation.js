@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-
+import LoadingSpinner from "../Loading/LoadingSpinner";
 import { Button, Label, FileInput } from "flowbite-react";
-
 import { useNavigate, useParams } from "react-router";
-
 import { createDocument } from "../../api/APIUtils";
 import BackButton from "../BackButton";
-export default function DocumentCreation() {
+export default function DocumentCreation( props ) {
 
   const [documentName, setDocumentName] = useState("");
   const [documentData, setDocumentData] = useState("");
-
+  const [working, setWorking] = useState(false)
   const [isUploadedFile, setIsUploadedFile] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
@@ -19,21 +17,21 @@ export default function DocumentCreation() {
 
 
   const handleCreateDocument = async () =>  {
+
+    setWorking(true)
+
     if (!isUploadedFile)
       return;
 
-    console.log(documentName, project_id, documentData, parent_folder_id)
-
     //Todo handle folder in future
     let result = await createDocument(documentName, project_id, documentData, parent_folder_id)
-    console.log(result)
     
-    if (result.success)
-      navigate(-1);
-
-    console.log(result)
-    setIsError(true)
-
+    if (result.success) {
+      navigate(`/Project/${project_id}/`)
+    } else {
+      setWorking(false)
+      setIsError(true)
+    }
   }
 
 
@@ -61,12 +59,22 @@ export default function DocumentCreation() {
 
   }
 
+  if ( props.isLoggedIn === false ) {
+    return (
+    <div>
+      <div className="m-20 text-center text-textcolor text-2xl">
+        You must Log in to view this page.
+      </div>
+    </div>
+    )
+  }
+
   return (
     <div>
       <div>
         <BackButton/>  
       </div>
-      <div className="flex justify-center mt-20">\
+      <div className="flex justify-center mt-20">
         <div className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground rounded">
           <div className="mt-5 p-20 pt-2">
             <div>
@@ -79,10 +87,13 @@ export default function DocumentCreation() {
               <FileInput helperText="Text File Containing Code" onChange={handleFileUpload} />
             </div>
 
-            {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Document For File</p>) : null}
-            <Button onClick={handleCreateDocument} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full">Upload Document</Button>            
-          </div>
+            {isError ? (<p className="text-red-600 text-xl">Error: Could Not Create Document</p>) : null}
+            <Button onClick={handleCreateDocument} className="bg-alternative transition-colors duration-200 hover:bg-slate-500 w-full mt-3 mb-3">Upload Document</Button>
 
+            <div className="flex justify-center">
+              <LoadingSpinner active={working}/>
+            </div>
+          </div>
         </div>
       </div>      
     </div>
