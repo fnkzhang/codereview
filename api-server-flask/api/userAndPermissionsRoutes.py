@@ -131,9 +131,11 @@ def removeUser(proj_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+        permissions = getUserProjPermissions(idInfo["email"], proj_id)
+        if(permissions < 3 or getUserProjPermissions(inputBody["email"], proj_id) > getUserProjPermissions(idInfo["email"], proj_id)):
+
             return {"success": False, "reason":"Invalid Permissions", "body":{}}
-        if (getUserProjPermissions(idInfo["email"], proj_id) == 5):
+        if (getUserProjPermissions(inputBody["email"], proj_id) == 5):
             return {"success": False, "reason":"Cannot remove Owner", "body":{}}
         deleteUser(inputBody["email"], proj_id)
         return {"success": True, "reason":"N/A", "body": {}}

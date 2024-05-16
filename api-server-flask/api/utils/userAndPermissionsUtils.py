@@ -32,9 +32,8 @@ def createNewUser(user_email, name):
 def deleteUser(user_email, proj_id):
     with engine.connect() as conn:
         relationstmt = delete(models.UserProjectRelation).where(
-            models.UserProjectRelation.user_email == user_email,
-            proj_id == proj_id
-        )
+            models.UserProjectRelation.user_email == user_email).where(
+            models.UserProjectRelation.proj_id == proj_id)
 
         conn.execute(relationstmt)
         conn.commit()
