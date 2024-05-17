@@ -4,10 +4,12 @@ app = get_app(__name__)
 from flask import request, jsonify
 
 from cloudSql import *
+from utils.projectUtils import *
 from utils.documentUtils import *
 from utils.folderUtils import *
 from utils.miscUtils import *
 from utils.userAndPermissionsUtils import *
+from utils.commitUtils import *
 from utils.commitDocSnapUtils import *
 from utils.commitLocationUtils import *
 
@@ -95,7 +97,7 @@ def checkIfNewerCommitExists(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     workingCommit = getUserWorkingCommitInProject(proj_id, idInfo["email"])
-    if commit_id == None:
+    if workingCommit == None:
         return {"success": False, "reason":"no working commit", "body":{}}
     newestCommit = getProjectLastCommittedCommit(proj_id)
     success = datetime.fromisoformat(workingCommit["date_created"]) > datetime.fromisoformat(newestCommit["date_committed"])
@@ -117,11 +119,12 @@ def getCommitDifferences(commit_id1, commit_id2):
             "reason": "Failed to Authenticate"
         }
     body = request.get_json()
+    proj_id = getCommitInfo(commit_id1)["proj_id"]
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     commit1Uniques, commit2Uniques = getCommitLocationDifferencesUtil(commit_id1, commit_id2)
     commit1snaps, commit2snaps = getCommitDiffSnapshotsUtil(commit_id1, commit_id2)
-    return {"success":True, "reason":"", "body": {"commit1UniqueItems":commit1Uniques, "commit2UniqueItems":commit2Uniques, "SnapshotDiffs": {"commit1":commit1snaps, "commit2":commit2snaps}
+    return {"success":True, "reason":"", "body": {"commit1UniqueItems":commit1Uniques, "commit2UniqueItems":commit2Uniques, "snapshotDiffs": {"commit1":commit1snaps, "commit2":commit2snaps}}}
 
 #mainly to add stuff from other commits during merge
 #can also be used to update location/snapshots from them ig
@@ -149,6 +152,7 @@ def bulkAddToCommit(dst_commit_id, src_commit_id):
             "reason": "Failed to Authenticate"
         }
     body = request.get_json()
+    proj_id = getCommitInfo(dst_commit_id)["proj_id"]
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
@@ -160,6 +164,37 @@ def bulkAddToCommit(dst_commit_id, src_commit_id):
         if item["is_folder"] == False:
             commitDocSnap = getCommitDocumentSnapshot(itemId, src_commit_id)
             addSnapshotToCommit(commitDocSnap["snapshot_id"], itemId, dst_commit_id)
+    return {"success":True, "reason":""}
+
+#put ids of things to delete in "items"
+@app.route('/api/Commit/<commit_id>/bulkDelete/', methods = ["DELETE"])
+def bulkDeleteFromCommit(commit_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    body = request.get_json()
+    proj_id = getCommitInfo(commit_id)["proj_id"]
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
+        return {"success": False, "reason":"Working Commit Already Exists For User", "body":{}}
+    itemsIds = body["items"]
+    for itemId in itemsIds:
+        item = getItemCommitLocation(itemId, commit_id)
+        if item["is_folder"] == False:
+            deleteDocumentFromCommit(itemId, commit_id)
+        else:
+            deleteFolderFromCommit(itemId, commit_id)
     return {"success":True, "reason":""}
 
 #no checks will just commit
@@ -211,14 +246,14 @@ def deleteWorkingCommit(proj_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        commit_id = getWorkingCommit(proj_id, idInfo["email"])["commit_id"]
+        commit_info = getUserWorkingCommitInProject(proj_id, idInfo["email"])["commit_id"]
     except:
         return {"success":False, "reason":"working commit doesn't exist"}
 
     if(idInfo["email"] != commit_info["author_email"]):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
-    rv, e = deleteCommitUtil(commit_id)
+    rv, e = deleteCommit(commit_info["commit_id"])
     if(not rv):
         return {
             "success": False,

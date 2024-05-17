@@ -3,6 +3,7 @@ from utils.folderUtils import *
 from utils.documentUtils import *
 from utils.snapshotUtils import * 
 from utils.miscUtils import *
+from utils.commitUtils import *
 import models
 
 def getProjectInfo(proj_id):
@@ -30,7 +31,8 @@ def createNewProject(proj_name, owner):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
-    createNewCommit(pid, email)
+    commit_id = createNewCommit(pid, owner)
+    commitACommit(commit_id)
     return pid
 
 def purgeProjectUtil(proj_id):
@@ -133,7 +135,7 @@ def getProjectLastCommittedCommit(proj_id):
 
 def getUserWorkingCommitInProject(proj_id, email):
     with engine.connect() as conn:
-        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.date_committed == None)
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.author_email == email, models.Commit.date_committed == None)
         commit = conn.execute(stmt).first()
         if commit == None:
             return None

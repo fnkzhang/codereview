@@ -42,9 +42,8 @@ def getDocument(proj_id, doc_id, commit_id):
     #data (text you want in the document)
     #doc_name (name of document)
     #parent_folder (folder you're making it in), if not in request will put in root folder
-    #commit_id (commit that you're creating the document on)
-@app.route('/api/Document/<proj_id>/', methods=["POST"])
-def createDocument(proj_id):
+@app.route('/api/Document/<proj_id>/<commit_id>', methods=["POST"])
+def createDocument(proj_id, commit_id):
     inputBody = request.get_json()
     headers = request.headers
 
@@ -143,7 +142,7 @@ def renameDocument(doc_id, commit_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
     body = request.get_json()
-    rv, e = renameDocumentUtil(doc_id, body["doc_name"])
+    rv, e  = renameItem(doc_id, body["doc_name"], commit_id)
     if(not rv):
         return {
             "success": False,

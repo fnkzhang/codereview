@@ -51,7 +51,7 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
                     models.CommitDocumentSnapshotRelation.commit_id == commit_id).values(
                     snapshot_id = snapshot_id
             )
-            stmt = models.CommitDocumentSnapshotRelation).where(
+            stmt = select(models.CommitDocumentSnapshotRelation).where(
                     models.CommitDocumentSnapshotRelation.snap_id == snap)
             result = conn.execute(stmt).first()
             if result == None:
@@ -62,9 +62,9 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
 
 def commitACommit(commit_id):
     with engine.connect() as conn:
-        stmt = (update(models.Commit)
-        .where(models.Commit.commit_id == commit_id)
-        .values(date_committed == func.now())
+        stmt = (update(models.Commit).where(
+            models.Commit.commit_id == commit_id).values(
+            date_committed == func.now())
         )
         conn.execute(stmt)
         conn.commit()
@@ -113,7 +113,7 @@ def getCommitSharedItemIdsUtil(commit_id1, commit_id2):
     for itemId in commit1Items:
         if itemId in commit2Items:
             sharedIds.append(itemId)
-    return shared
+    return sharedIds
 
 def getCommitDiffSnapshotsUtil(commit_id1, commit_id2):
     shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
@@ -141,7 +141,7 @@ def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
                 commit1Uniques.append(getFolderInfo(item, commit_id1))
             else: 
                 commit1Uniques.append(getDocumentInfo(item, commit_id1))
-    for itemId in commit2tems:
+    for itemId in commit2Items:
         if itemId not in commit1Items:
             item = getItemCommitLocation(itemId)
             if item["is_folder"] == True:
