@@ -51,7 +51,7 @@ def deleteDocumentFromCommit(doc_id, commit_id):
         stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
 
         conn.execute(stmt)
-        stmt = select(models.Snapshot).where(models.Snapshot.og_commit_id == commit_id, models.Snapshot.associated_docid == doc_id)
+        stmt = select(models.Snapshot).where(models.Snapshot.og_commit_id == commit_id, models.Snapshot.associated_doc_id == doc_id)
         snaps = conn.execute(stmt)
         for snap in snaps:
             deleteSnapshotUtil(snap.snapshot_id)
