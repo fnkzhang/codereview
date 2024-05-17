@@ -125,6 +125,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
 
     function handleLogout() {
         deleteCookie("cr_id_token")
+        setConnected(false)
         setIsLoggedIn(false)
     }
     

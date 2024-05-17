@@ -3,14 +3,14 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.api
-        image: react-flask-app-api
+        image: backend
         environment:
             - GOOGLE_APPLICATION_CREDENTIALS=googlecreds.json
     client:
         build:
             context: .
             dockerfile: Dockerfile.client
-        image: react-flask-app-client
+        image: frontend
         ports:
             - "3001:80"
 

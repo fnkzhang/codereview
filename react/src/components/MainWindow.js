@@ -55,7 +55,7 @@ export default function MainWindow( props ) {
 
   if (props.isLoggedIn) {
     return(
-      <div className="h-screen">
+      <div className="">
         <div className="flex">
           <SnapshotSelector
             comments={comments}

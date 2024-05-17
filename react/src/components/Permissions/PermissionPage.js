@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject } from "../../api/APIUtils";
-import { Label, TextInput, Button } from "flowbite-react";
+import { useParams } from "react-router";
+import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject, promoteEmailToProjectOwner } from "../../api/APIUtils";
+import { Label, TextInput, Button, Dropdown } from "flowbite-react";
+import LoadingSpinner from "../Loading/LoadingSpinner";
+import BackButton from "../BackButton";
 
 export default function PermissionPage( props ) {
 
   let [userToAddEmail, setUserToAddEmail] = useState("");
-  let [projectName, setProjectName] = useState("");
+  let [projectName, setProjectName] = useState(null);
   let [projectUsers, setProjectUsers] = useState([]);
-  //let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
+  let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
 
   let [isLoading, setIsLoading] = useState(true)
   // Todo Checks user permission value to determine if user can do actions / be on this page
@@ -18,7 +20,6 @@ export default function PermissionPage( props ) {
 
   let [canRemoveUsers, setCanRemoveUsers] = useState(false);
 
-  const navigate = useNavigate();
   const {project_id} = useParams();
 
   // Set Data For Page on Load
@@ -32,6 +33,8 @@ export default function PermissionPage( props ) {
       if (projectData.author_email === props.userData.email)
         setCanRemoveUsers(true);
 
+
+      setProjectAuthorEmail(projectData.author_email);
       setProjectName(projectData.name);
     }
 
@@ -55,7 +58,8 @@ export default function PermissionPage( props ) {
     }
     
     setUserToAddEmail("")
-    setProjectUsers([])
+    // setProjectUsers([])
+    setCanRemoveUsers(false)
     setIsError(false)
     setErrorString("")
 
@@ -64,14 +68,16 @@ export default function PermissionPage( props ) {
   }, [project_id, props, isLoading]) 
 
 
-  const handleAddUserEmailToProject = async () => {
+  const handleAddUserEmailToProject = async (e) => {
+    e.preventDefault()
+    e.target.reset()
     if (!isValidEmailString(userToAddEmail)) {
       setIsError(true)
       setErrorString("Not Valid Email")
       return;
     }
 
-    let result = await addUserToProject(project_id, userToAddEmail, "Editor", 12)
+    let result = await addUserToProject(project_id, userToAddEmail, "Editor", 3)
 
     console.log(result);
     
@@ -95,6 +101,19 @@ export default function PermissionPage( props ) {
     }
 
     console.log(result);
+    setIsLoading(true)
+  }
+  const handlePromoteToOwner = async (ownerEmail, emailToPromote) => {
+    console.log(ownerEmail, emailToPromote);
+    let result = await promoteEmailToProjectOwner(project_id, ownerEmail, emailToPromote)
+    console.log(result);
+
+    if(!result.success) {
+
+      setIsError(true)
+      return;
+    }
+
     setIsLoading(true)
   }
 
@@ -123,28 +142,33 @@ export default function PermissionPage( props ) {
   function ProjectUserDisplay({projectUsers, isLoading, props}) {
     return (
       <div>
-        <h3>Existing Users</h3>
+        <h3 className="text-3xl">Existing Users</h3>
         <br/>
-        {isLoading ? <h3>Loading</h3> : null}
+          {isLoading ? <LoadingSpinner active={true}/> : (
+            <ul>
+              {projectUsers.map((user, index) => {
+                return (
+                  <div className="flex justify-stretch m-2" key={user.name + " " + index}>
+                    <li className="border rounded-md p-4 mr-1" >
+                      {user.name} : {user.userRole}
+                    </li>
 
-        <ul>
-          {projectUsers.map((user, index) => {
-            return (
-              <div className="flex justify-stretch m-2" key={user.name + " " + index}>
-                <li className="border rounded-md p-4 mr-1" >
-                  {user.name} : {user.userRole}
-                </li>
+                    {canRemoveUsers && props.userData.email !== user.user_email ? ( 
+                      <Dropdown lablel="" dismissOnClick={false} placement="right" inline className="p-0 m-0">
+                        <div className="bg-alternative">
+                          <Dropdown.Item onClick={() => handlePromoteToOwner(projectAuthorEmail, user.user_email)}>Promote To Owner</Dropdown.Item>
+                          <Dropdown.Item onClick={() => handleRemoveUsersFromProject(user.user_email)}>Remove</Dropdown.Item>
+                        </div>
 
-                {canRemoveUsers && props.userData.email !== user.user_email ? (                    
-                <button className="bg-alternative transition-colors duration-200 hover:bg-red-800/75 rounded text-md p-1" 
-                        onClick={() => handleRemoveUsersFromProject(user.user_email)}>
-                  Remove
-                </button> ) : (null)}
+                      </Dropdown>
 
-            </div>
-            )
-          })}    
-        </ul>
+                    ) : (null)}
+
+                </div>
+                )
+              })}    
+            </ul>
+          )}                
       </div>
     )
   }
@@ -152,37 +176,62 @@ export default function PermissionPage( props ) {
   if(props.isLoggedIn)
     return (
       <div>
-        <header className="text-textcolor text-5xl">
-          <h3 className="ml-[10%] mt-5">Project: {projectName}</h3>
-        </header>
-
-        <div className="flex justify-center">
-          <section className="max-w-lg w-2/3 
-            text-textcolor bg-altBackground m-5 mt-16 p-20 pt-10 rounded">
-            <div className="mb-5">
-              <Label className="text-textcolor text-3xl" value="Add Users To The Project"/>
-            </div>
-
-            <TextInput className=" text-black shadow-white text-5xl w-full" placeholder="User Email" sizing="lg" 
-              onChange={(e) => setUserToAddEmail(e.target.value)} shadow/>
-
-            {isError ? (<p className="text-red-600 text-xl">{errorString}</p>) : null}
-            <Button onClick={handleAddUserEmailToProject} className="bg-alternative transition-all duration-200
-            mt-5 w-full  hover:bg-slate-500"
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}>Add User</Button>
-
-            {/* <Dropdown label=""/> */}
-            
-          </section>
-          
-          <aside  className="w/1/3 text-textcolor text-2xl float-right bg-altBackground
-          m-5 mt-16 p-20 pt-10 rounded">
-            <ProjectUserDisplay projectUsers={projectUsers} isLoading={isLoading}props={props}/>
-          </aside>
+        <div>
+          <BackButton/> 
         </div>
+        <div >
+          <header className="text-textcolor text-3xl">
+            <div className="flex align-middle">
+              <h3 className="ml-[10%] mt-5">Project:{projectName !== null ? (" " + projectName) : null}</h3>
+              <div className="ml-5 mt-7">
+                {projectName !== null ?  null : <LoadingSpinner active={true}/> }                
+              </div>
 
+            </div>
+            
+
+          </header>
+
+          <div className="flex justify-center">
+            <section className="max-w-lg w-2/3 shadow-md shadow-[gray] 
+              text-textcolor bg-altBackground m-5 mt-16 rounded">
+
+              <form 
+                className="p-20 pt-10" 
+                onSubmit={handleAddUserEmailToProject}
+              >
+                <div className="mb-5">
+                  <Label className="text-textcolor text-3xl" value="Add Users To The Project"/>
+                </div>
+            
+                <TextInput 
+                  className=" text-black shadow-white text-5xl w-full" 
+                  placeholder="User Email" 
+                  sizing="lg" 
+                  onChange={(e) => setUserToAddEmail(e.target.value)} 
+                  shadow 
+                  required
+                />
+                  
+
+                {isError ? (<p className="text-red-600 text-xl">{errorString}</p>) : null}
+                <Button type="submit" className="bg-alternative transition-all duration-200
+                mt-5 w-full  hover:bg-slate-500"
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}>Share</Button>
+
+              </form>
+              {/* <Dropdown label=""/> */}
+              
+            </section>
+            
+            <aside  className="w-1/3 text-textcolor text-xl float-right bg-altBackground
+            m-5 mt-16 p-20 pt-10 rounded shadow-md shadow-[gray] ">
+              <ProjectUserDisplay projectUsers={projectUsers} isLoading={isLoading} props={props}/>
+            </aside>
+          </div>
+        </div>
       </div>
     )
 

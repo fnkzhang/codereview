@@ -4,6 +4,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY ./react/package.json ./react/yarn.lock ./
 COPY ./react/src ./src
 COPY ./react/public ./public
+COPY ./react/tailwind.config.js ./
 RUN yarn install
 RUN yarn build
 

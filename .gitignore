@@ -5,10 +5,10 @@ api-server-flask/api/dbEnv.py
 
 googlecreds.json
 
-api-server-flask/api/googlecreds.json
-
-api-server-flask/api/github_oath_credentials.json
+api-server-flask/api/credentials/*
 
 api-server-flask/cr_cache
 
 api-server-flask/api/test/__pycache__
+
+api-server-flask/api/utils/__pycache__

@@ -2,43 +2,43 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
-import { deleteProject, getProjectInfo } from "../../api/APIUtils";
+import { deleteDocument, getDocumentInfo } from "../../api/APIUtils";
 import BackButton from "../BackButton.js";
 
-export default function ProjectDeletion(props) {
-    const [projectName, setProjectName] = useState(""); // Actual Project Name to compare
-    const [inputProjectName, setInputProjectName] = useState(""); // Handle Input for project name
+export default function DcoumentDeletion(props) {
+    const [documentName, setDocumentName] = useState("");
+    const [inputDocumentName, setInputDocumentName] = useState("");
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
-    const { project_id } = useParams();
+    const { project_id, document_id } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
-        async function getProjectData() {
-            let result = await getProjectInfo(project_id)
-            setProjectName(result.name)
+        async function getDocumentData() {
+            let result = await getDocumentInfo(document_id)
+            setDocumentName(result.name)
         }
 
-        getProjectData()
-    }, [project_id])
+        getDocumentData()
+    }, [project_id, document_id])
 
-    const handleDeleteProjectButtonClick = async (e) => {
+    const handleDeleteDocumentButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 
         setWorking(true)
 
-        if (inputProjectName === "") {
+        if (inputDocumentName === "") {
             setWorking(false)
             return
         }
 
-        if (inputProjectName !== projectName) {
-            alert("Input Does Not Match Project Name")
+        if (inputDocumentName !== documentName) {
+            alert("Input Does Not Match Document Name")
             setWorking(false)
             return
         }
 
-        let result = await deleteProject(project_id)
+        let result = await deleteDocument(document_id)
 
         if (result.success) {
             navigate("/") // Go Home
@@ -66,11 +66,11 @@ export default function ProjectDeletion(props) {
             <div className="flex justify-center mt-20">
                 <form
                     className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
-                    onSubmit={handleDeleteProjectButtonClick}
+                    onSubmit={handleDeleteDocumentButtonClick}
                 >
                     <div>
                         <div className="mb-3 block">
-                            <Label className="text-2xl" value="Are you sure you want to delete this project?" />
+                            <Label className="text-2xl" value="Are you sure you want to delete this document?" />
                         </div>
 
                         <div className="mb-3 block">
@@ -80,16 +80,16 @@ export default function ProjectDeletion(props) {
                         </div>
                         <TextInput
                             className="text-black shadow-white"
-                            placeholder="Name of Project"
+                            placeholder="Name of Document"
                             sizing="lg"
-                            onChange={(e) => setInputProjectName(e.target.value)}
+                            onChange={(e) => setInputDocumentName(e.target.value)}
                             shadow
                             required
                         />
                     </div>
 
                     {isError ? (
-                        <p className="text-red-600 text-xl">Error: Could Not Delete Project</p>
+                        <p className="text-red-600 text-xl">Error: Could Not Delete Document</p>
                     ) : null}
                     <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">
                         Delete

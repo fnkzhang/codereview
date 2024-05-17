@@ -29,21 +29,22 @@ export default function ProjectListPage( props ) {
     }
 
     function ProjectDisplayBox({id, name, author, date}) {
-      console.log(id, name)
       return (
         <Card 
-          className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
+          className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
           onClick={() => handleProjectClick(id)}
         >
-          <h4 className="text-textcolor w-1/3 p-1">
-            <span className="font-bold">Project Name: </span>
-            {author}/{name}
+          <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
+            <span className="font-bold text-xl">{author}/{name}</span>
           </h4>
-          <h4 className="text-textcolor w-1/3 p-1">
-            <span className="font-bold">Project ID: </span>
-            {id}
+          <h4 className="text-textcolor p-1">
+            <span className="font-bold block">Project ID: </span>
+            <span className="block"> {id} </span>
           </h4>
-          <h4 className="text-textcolor w-1/3 p-1"><span className="font-bold">Date Modified: </span>{date}</h4>
+          <h4 className="text-textcolor p-1">
+            <span className="font-bold">Date Modified: </span>
+            <span className="block"> {date} </span>
+          </h4>
         </Card>
       )
     }

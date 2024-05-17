@@ -1,5 +1,5 @@
 import json, re
-
+from utils.miscUtils import *
 # pip install --upgrade google-cloud-aiplatform
 # https://ai.google.dev/docs/prompt_best_practices
 import vertexai
@@ -7,9 +7,7 @@ from vertexai.generative_models import (
     GenerativeModel,
     GenerationConfig
 )
-'''When renaming objects, apply the change to all lines that have instances of those objects.
-There should be multiple insertions and deletions for renaming suggestions.
-'''
+
 #------------------------------------------------------------------------------
 # System Instruction Prompts
 #-------------------------------------------------------------------------------
@@ -39,19 +37,6 @@ Return an empty string on 1 condition:
     1. If the comments are entirely unrelated to programming or the <code> given.
 """
 
-'''
-**Formatting**
-Changes will be separated into 2 sections: Insertions and Deletions.
-Your response must be a JSON object with the keys "success", "insertions", and "deletions" with the respective changes.
-For the "insertions" key, provide a dictionary of line insertions that follow the format of (line number) : "(lines to insert)".
-The lines are inserted on the line number directly after the line number provided.
-There can be multiple insertions.
-Follow line spacing and formatting of <code> for the inserted lines.
-
-'''
-'''
-    2. If the given data in the <code> section is not code.
-'''
 SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION_2 = """\
 You are a code modification tool for {language} that applies a <suggestion> to code
 located between lines {start_line} and {end_line}. Highligh of the following code:
@@ -144,15 +129,6 @@ SAY_HELLO_RESPONSE = json.dumps({
     "insertions": {1:"def say_hello():", 4:"print(\"Testing say_hello()\")", 5:"say_hello()", 6:"print(\"Done testing say_hello()\")"},
     "deletions":[1, 4, 5, 6],
     })
-SAY_HELLO_RESPONSE_FULL = json.dumps({
-    "revised_code":
-    "def say_hello():\
-        print(\"Hello World!\")\
-\
-     print(\"Testing say_hello()\")\
-     say_hello()\
-     print(\"Done testing say_hello()\")"
-    })
 
 
 RENAME_VARIABLE_CODE = """\
@@ -165,17 +141,6 @@ RENAME_VARIABLE_CODE = """\
 7| for (int i = 0; i < 3; i++)
 8|     System.out.println("erm");
 """
-RENAME_VARIABLE_RESPONSE_FULL = json.dumps({
-    "revised_code": 
-    "int counter = 0:\
-     while(counter < 34)\
-        System.out.println(\"wowza\");\
-        counter++\
-     }\
-     counter = 6055;\
-     for (int i = 0; i < 3; i++)\
-        System.out.println(\"erm\");"
-    })
 
 RENAME_VARIABLE_RESPONSE = json.dumps({
     "success":True,
@@ -193,15 +158,6 @@ RENAME_VARIABLE_CODE_2 = """\
 7|     return arr
 8| }
 """
-RENAME_VARIABLE_RESPONSE_2_FULL = json.dumps({
-    "revised_code" : "public static int[] createArrayWithSizeAndValueFlankedByTwo(int dsf, int avbg){\"\
-    int[] arr = new int[size+2];\
-    for(int i = 0; i < size; i++)\
-        arr[i+1] = default;\
-    arr[0] = 2;\
-    arr[default] = 2;\
-    return arr;\
-}"})
 
 RENAME_VARIABLE_RESPONSE_2 = json.dumps({
     "success":True,
@@ -220,17 +176,6 @@ CREATE_GETTER_CODE = """\
 3|     int age;
 4| }
 """
-CREATE_GETTER_RESPONSE_FULL = json.dumps({
-    "revised_code":"""
-public class Person
-{
-    private int age;
-    public int getAge()
-    {
-        return age;
-    }
-}"""
-    })
 
 CREATE_GETTER_RESPONSE = json.dumps({
     "success":True,
@@ -253,9 +198,6 @@ CALCULATE_AVERAGE_CODE = """\
 7| 
 8|     average=tot/cnt
 """
-INVALID_SUGGESTION_RESPONSE_FULL = json.dumps({
-    "revised code":"",
-    })
 
 INVALID_SUGGESTION_RESPONSE = json.dumps({
     "success":False,
@@ -283,10 +225,11 @@ def get_json_from_llm_response(response: str):
 def get_chat_response(user_prompt: str,
                       system_prompt: str = None):
     model = GenerativeModel(
-        MODEL_NAME,
+        model_name=MODEL_NAME,
         system_instruction=system_prompt,
         generation_config=GenerationConfig(
-            response_mime_type="application/json")
+            response_mime_type="application/json"
+        )
     )
     chat = model.start_chat()
 
@@ -355,8 +298,8 @@ def get_llm_code_from_suggestion(code: str,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
             code=CREATE_GETTER_CODE,
             highlighted_code="int age",
-            start_line=1,
-            end_line=1,
+            start_line=3,
+            end_line=3,
             suggestion="make this private and create a getter for it"
         ),
         example_output=CREATE_GETTER_RESPONSE
@@ -366,8 +309,8 @@ def get_llm_code_from_suggestion(code: str,
         example_input=USER_INSTRUCTION_CODE_FROM_SUGGESTION.format(
             code=RENAME_VARIABLE_CODE,
             highlighted_code="booga",
-            start_line=1,
-            end_line=1,
+            start_line=6,
+            end_line=6,
             suggestion="rename to something more meaningful"
         ),
         example_output=RENAME_VARIABLE_RESPONSE
@@ -395,11 +338,6 @@ def get_llm_code_from_suggestion(code: str,
         end_line=end_line,
         suggestion=suggestion
     )
-    print("__SYSTEM_PROMPT_________")
-    print(system_prompt)
-    print("____USER_PROMPT__________")
-    print(user_prompt)
-    print("__END_PROMPT_________")
     # Generate a response from LLM
     try:
         response = get_chat_response(

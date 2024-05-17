@@ -1,9 +1,18 @@
 from google.cloud.sql.connector import Connector, IPTypes
 
 import sqlalchemy
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, update, delete, DateTime, Text
+
 import pymysql
 
+from sqlalchemy.sql import func
+from sqlalchemy.orm import sessionmaker
+
+import os
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials/googlecreds.json"
+os.environ["GCLOUD_PROJECT"] = "codereview-413200"
+CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 def connectCloudSql() -> sqlalchemy.engine.base.Engine:
     instance_connection_name = "codereview-413200:us-central1:cr-cloudsql-db"
@@ -33,3 +42,7 @@ def connectCloudSql() -> sqlalchemy.engine.base.Engine:
     )
     print("Finished Connecting")
     return pool
+
+engine = connectCloudSql()
+Session = sessionmaker(engine) # https://docs.sqlalchemy.org/en/20/orm/session_basics.html
+

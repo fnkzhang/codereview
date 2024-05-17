@@ -81,7 +81,7 @@ export async function addUserToProject(proj_id, emailToAdd, roleNameForEmail, pe
     body: JSON.stringify(bodyData)
   }
 
-  return await fetch((`/api/Project/${proj_id}/addUserAdmin/`), headers)
+  return await fetch((`/api/Project/${proj_id}/addUser/`), headers)
     .then(response => response.json())
 
 }
@@ -97,7 +97,7 @@ export async function removeUserFromProject(proj_id, emailToRemove) {
     "email": emailToRemove,
   }
   let headers = {
-    method: "POST",
+    method: "DELETE",
     mode: "cors",
     withCredentials: true,
     credentials: 'include',
@@ -135,7 +135,30 @@ export async function getAllUsersWithPermissionForProject(proj_id) {
 export async function getUserPermissionForProject(proj_id, userEmail) {
 
 }
+export async function promoteEmailToProjectOwner(proj_id, currentOwnerEmail, newOwnerEmail) {
+  ///api/Project/<proj_id>/promoteOwner
+  let oAuthToken = getCookie("cr_id_token")
 
+  const body = {
+    "email": newOwnerEmail
+  }
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  }
+
+  return await fetch((`/api/Project/${proj_id}/transferOwnership/`), headers)
+    .then(response => response.json())
+    .catch(error => console.log(error))
+}
 export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
@@ -143,7 +166,7 @@ export async function createDocument(documentName, proj_id, documentData, parent
     doc_name: documentName,
     data: documentData,
     project_id: proj_id,
-    parent_folder_id: parent_folder_id
+    parent_folder: parent_folder_id
   }
   
   let headers = {
@@ -159,6 +182,42 @@ export async function createDocument(documentName, proj_id, documentData, parent
   }
   return await fetch((`/api/Document/${proj_id}/`), headers)
     .then(response => response.json())
+}
+
+export async function deleteDocument(doc_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "DELETE",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Document/${doc_id}/`), headers)
+    .then(response => response.json())
+}
+
+export async function  getDocumentInfo(proj_id, doc_id) {
+  let oAuthToken = getCookie("cr_id_token")
+  
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+
+  return await fetch((`/api/Document/${proj_id}/${doc_id}/`), headers)
+    .then(response => response.json())
+
 }
 
 export async function getDocSnapshot(proj_id, doc_id, snap_id) {
@@ -385,7 +444,7 @@ export async function getUserProjects(userEmail) {
 
   };
 
-  return await fetch((`/api/User/${userEmail}/Project/`), headers)
+  return await fetch((`/api/User/Project/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
@@ -436,7 +495,7 @@ export async function getProjectDocuments(proj_id) {
     },
   };
 
-  return await fetch((`/api/Document/${proj_id}/GetDocuments/`), headers)
+  return await fetch((`/api/Project/${proj_id}/GetDocuments/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
@@ -715,7 +774,6 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
     if (data.success === false) {
       console.log("FAILED" + data.reason)
     }
-    console.log("Request Contents", headers)
     return data
   })
 }
