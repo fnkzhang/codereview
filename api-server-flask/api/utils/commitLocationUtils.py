@@ -33,3 +33,32 @@ def createItemCommitLocation(item_id, commit_id, name, parent_folder, is_folder)
         conn.commit()
     return True
 
+def renameItem(item_id, item_name, commit_id):
+    try:
+        with engine.connect() as conn:
+            stmt = (update(models.ItemCommitLocation)
+                .where(models.ItemCommitLocation.item_id == item_id)
+                .where(models.ItemCommitLocation.commit_id == commit_id)
+                .values(name=item_name)
+                )
+            conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
+
+def moveItem(item_id, parent_folder, commit_id):
+    try:
+        with engine.connect() as conn:
+            stmt = (update(models.ItemCommitLocation)
+                .where(models.ItemCommitLocation.item_id == item_id)
+                .where(models.ItemCommitLocation.commit_id == commit_id)
+                .values(parent_folder=parent_folder)
+                )
+            conn.execute(stmt)
+            conn.commit()
+        return True, "No Error"
+    except Exception as e:
+        return False, e
+
+

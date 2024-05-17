@@ -44,6 +44,7 @@ def getCommitDocumentSnapshotPairs(commit_id):
     }
 
 #put last commit_id in "last_commit", if none, don't put any
+#will fail if user already has a working non-resolved commit
 @app.route('/api/Commit/<proj_id>/createCommit/', methods = ["POST"])
 def createCommit(proj_id):
     headers = request.headers
@@ -62,6 +63,8 @@ def createCommit(proj_id):
     body = request.get_json()
     if(getUserProjPermissions(idInfo["email"], proj_id) < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
+        return {"success": False, "reason":"Working Commit Already Exists For User", "body":{}}
     if "last_commit" in body:
         last_commit = None
     else:
@@ -75,8 +78,8 @@ def createCommit(proj_id):
 
 #probably used if someone is halfway through a commit and wants to kill it
 #will fail if commit is already resolved
-@app.route('/api/Commit/<commit_id>/', methods=["DELETE"])
-def deleteWWorkingCommit(commit_id):
+@app.route('/api/Commit/<proj_id>/workingCommit/', methods=["DELETE"])
+def deleteWorkingCommit(proj_id):
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -91,9 +94,9 @@ def deleteWWorkingCommit(commit_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        commit_info = getCommitInfo(commit_id)
+        commit_id = getWorkingCommit(proj_id, idInfo["email"])["commit_id"]
     except:
-        return {"success":False, "reason":"commit doesn't exist"}
+        return {"success":False, "reason":"working commit doesn't exist"}
 
     if(idInfo["email"] != commit_info["author_email"]):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
@@ -136,4 +139,35 @@ def getCommitFolderTree(commit_id):
             "body":foldertree
             }
 
+@app.route('/api/Commit/<proj_id>/workingCommit', methods = ["GET"])
+def getUserWorkingCommitForProject(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    commit = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+
+    if commit == None:
+        return {
+            "success": False,
+            "reason": "no working commit"
+        }
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": commit
+    }
 

@@ -23,7 +23,7 @@ def createNewCommit(proj_id, email, last_commit):
             createItemCommitLocation(item["item_id"], commit_id, item["name"], item["parent_folder"], item["is_folder"])
         root_folder_id = getCommitInfo(commit_id)["root_folder"]
     else:
-        root_folder_id = createNewFolder('root', 0, pid, commit_id)
+        root_folder_id = createNewFolder('root', 0, proj_id, commit_id)
     with engine.connect() as conn:
         stmt = insert(models.Commit).values(
                 proj_id = proj_id,
@@ -70,6 +70,19 @@ def deleteCommit(commit_id):
                 models.ItemCommitLocation.commit_id == commit_id
         )
         conn.execute(stmt)
+
+        stmt = select(models.Document).where(
+                models.Document.og_commit_id == commit_id)
+        docs = conn.execute(stmt)
+        for doc in docs:
+            purgeDocumentUtil(doc.doc_id)
+
+        stmt = select(models.Folder).where(
+                models.Folder.og_commit_id == commit_id)
+        folds = conn.execute(stmt)
+        for fold in folds:
+            purgeFolderUtil(fold.folder_id)
+
         stmt = select(models.Snapshot).where(
                 models.Snapshot.og_commit_id == commit_id)
         snaps = conn.execute(stmt)

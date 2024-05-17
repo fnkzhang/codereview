@@ -86,7 +86,7 @@ def deleteProject(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
-    rv, e = deleteProjectUtil(proj_id)
+    rv, e = purgeProjectUtil(proj_id)
     if(not rv):
         return {
             "success": False,
@@ -138,6 +138,34 @@ def renameProject(proj_id):
         "reason": "Successful Rename"
     }
 
+@app.route('/api/Project/<proj_id>/GetCommits/', methods = ["GET"])
+def getProjectResolvedCommits(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+
+    arrayOfCommits = getAllResolvedProjectCommitsInOrder(proj_id)
+    return {
+        "success": True,
+        "reason": "",
+        "body": arrayOfCommits
+    }
+
+#discontinued for now
 @app.route('/api/Project/<proj_id>/GetDocuments/', methods = ["GET"])
 def getProjectDocuments(proj_id):
     headers = request.headers
@@ -164,30 +192,4 @@ def getProjectDocuments(proj_id):
         "reason": "",
         "body": arrayOfDocuments
     }
-
-@app.route('/api/Project/<proj_id>/getFolderTree/',methods=["GET"])
-def getProjectFolderTree(proj_id):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-    project = getProjectInfo(proj_id)
-    foldertree = getFolderTree(project["root_folder"])
-    return {
-            "success":True,
-            "reason": "",
-            "body":foldertree
-            }
 

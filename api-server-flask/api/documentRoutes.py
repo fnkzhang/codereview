@@ -13,8 +13,9 @@ from utils.miscUtils import *
 
 import models
 
-@app.route('/api/Document/<proj_id>/<doc_id>/', methods=["GET"])
-def getDocument(proj_id, doc_id):
+#commit_id is info about the doc in the commit you're in
+@app.route('/api/Document/<proj_id>/<doc_id>/<commit_id>/', methods=["GET"])
+def getDocument(proj_id, doc_id, commit_id):
     print(request)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -32,7 +33,7 @@ def getDocument(proj_id, doc_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    info = getDocumentInfo(doc_id)
+    info = getDocumentInfo(doc_id, commit_id)
     return {"success": True, "reason":"", "body": info}
 
 #requires
@@ -41,6 +42,7 @@ def getDocument(proj_id, doc_id):
     #data (text you want in the document)
     #doc_name (name of document)
     #parent_folder (folder you're making it in), if not in request will put in root folder
+    #commit_id (commit that you're creating the document on)
 @app.route('/api/Document/<proj_id>/', methods=["POST"])
 def createDocument(proj_id):
     inputBody = request.get_json()
@@ -65,15 +67,16 @@ def createDocument(proj_id):
         folder = getProjectInfo(proj_id)["root_folder"]
     else:
         folder = inputBody["parent_folder"]
-    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"])
+    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"], commit_id)
     return {
         "success": True,
         "reason": "",
         "body": doc_id
     }
 
-@app.route('/api/Document/<doc_id>/', methods=["DELETE"])
-def deleteDocument(doc_id):
+#commit_id in the url is just the commit you're deleting the document from
+@app.route('/api/Document/<doc_id>/<commit_id>/', methods=["DELETE"])
+def deleteDocument(doc_id, commit_id):
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -99,7 +102,7 @@ def deleteDocument(doc_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     # Query
-    rv, e = deleteDocumentUtil(doc_id)
+    rv, e = deleteDocumentFromCommit(doc_id, commit_id)
     if(not rv):
         return {
             "success": False,
@@ -112,8 +115,9 @@ def deleteDocument(doc_id):
     }
 
 #body: put new name in "doc_name"
-@app.route('/api/Document/<doc_id>/rename/', methods=["POST"])
-def renameDocument(doc_id):
+#commit_id in url is commit you're changing the name of
+@app.route('/api/Document/<doc_id>/<commit_id>/rename/', methods=["POST"])
+def renameDocument(doc_id, commit_id):
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -128,7 +132,7 @@ def renameDocument(doc_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+        proj_id = getDocumentInfo(doc_id, commit_id)["associated_proj_id"]
     except:
         return {
             "success": False,
@@ -155,8 +159,9 @@ def renameDocument(doc_id):
     #credentials in headers
     #In body:
     #parent_folder (folder you're moving it to
-@app.route('/api/Document/<doc_id>/move/', methods=["POST"])
-def moveDocument(doc_id):
+#commit id in url is commit you're doing action on blah blah you get the idea
+@app.route('/api/Document/<doc_id>/<commit_id>/move/', methods=["POST"])
+def moveDocument(doc_id, commit_id):
     inputBody = request.get_json()
     headers = request.headers
 
@@ -173,7 +178,7 @@ def moveDocument(doc_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+        proj_id = getDocumentInfo(doc_id, commit_id)["associated_proj_id"]
     except:
         return {
             "success": False,
@@ -183,7 +188,7 @@ def moveDocument(doc_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     folder = inputBody["parent_folder"]
-    if not moveDocumentUtil(doc_id, folder):
+    if not moveItem(doc_id, folder, commit_id):
         return {"success": False,
                 "reason":"invalid document"
                 }
@@ -193,6 +198,7 @@ def moveDocument(doc_id):
         "body": ""
     }
 
+#we have og_commit_ids for snapshtos so probably display those instead of snapshot 1, 2...github also has garbage as snapshot name so it's fine :)
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
 def getAllDocumentSnapshots(proj_id, doc_id):
     headers = request.headers

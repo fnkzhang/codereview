@@ -38,7 +38,6 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
         stmt = insert(models.Document).values(
             doc_id = doc_id,
             name = document_name,
-            parent_folder = parent_folder,
             associated_proj_id = proj_id
         )
         conn.execute(stmt)
@@ -50,7 +49,12 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
 def deleteDocumentFromCommit(doc_id, commit_id):
     with engine.connect() as conn:
         stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
+
         conn.execute(stmt)
+        stmt = select(models.Snapshot).where(models.Snapshot.og_commit_id == commit_id, models.Snapshot.associated_docid == doc_id)
+        snaps = conn.execute(stmt)
+        for snap in snaps:
+            deleteSnapshotUtil(snap.snapshot_id)
         conn.commit()
     return True
 
@@ -81,11 +85,17 @@ def getAllDocumentSnapshotsInOrder(doc_id):
             listOfSnapshots.append(row._asdict())
 
         return listOfSnapshots
-
+def getDocumentLastSnapshot(doc_id):
+    try:
+        snapshot = getAllDocumentSnapshotsInOrder(doc_id)[-1]
+        return snapshot
+    except:
+        return None
+    
 def getDocumentLastSnapshotContent(doc_id):
-    snapshot = getAllDocumentSnapshotsInOrder(doc_id)[-1]
+    snapshot = getDocumentLastSnapshot(doc_id)
     if snapshot == None:
-        return False
+        return None
     snapshotContents = getBlob(getSnapshotPath(snapshot["snapshot_id"]))
     return snapshotContents
 

@@ -51,6 +51,12 @@ def createNewFolder(folder_name, parent_folder, proj_id, commit_id):
     return folder_id
 
 def deleteFolderFromCommit(folder_id, commit_id):
+    contents = getAllFolderContents(folder_id, commit_id)
+    for doc in contents["documents"]:
+        deleteDocumentFromCommit(doc["doc_id"], commit_id)
+    for folder in contents["folders"]:
+        deleteFolderFromCommit(doc["folder_id"], commit_id)
+
     with engine.connect() as conn:
         stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == folder_id, models.ItemCommitLocation.commit_id == commit_id)
         conn.execute(stmt)
@@ -62,15 +68,6 @@ def purgeFolderUtil(folder_id):
     try:
         with engine.connect() as conn:
 
-            stmt = select(models.Document).where(models.Document.parent_folder == folder_id)
-            documents = conn.execute(stmt)
-            for document in documents:
-                deleteDocumentUtil(document.doc_id)
-
-            stmt = select(models.Folder).where(models.Folder.parent_folder ==folder_id)
-            folders = conn.execute(stmt)
-            for folder in folders:
-                deleteFolderUtil(folder.folder_id)
             stmt = delete(models.Folder).where(models.Folder.folder_id == folder_id)
             conn.execute(stmt)
 

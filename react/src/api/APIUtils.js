@@ -201,7 +201,7 @@ export async function deleteDocument(doc_id) {
     .then(response => response.json())
 }
 
-export async function  getDocumentInfo(proj_id, doc_id) {
+export async function  getDocumentInfo(proj_id, doc_id, commit_id) {
   let oAuthToken = getCookie("cr_id_token")
   
   let headers = {
@@ -215,7 +215,7 @@ export async function  getDocumentInfo(proj_id, doc_id) {
     }
   }
 
-  return await fetch((`/api/Document/${proj_id}/${doc_id}/`), headers)
+  return await fetch((`/api/Document/${proj_id}/${doc_id}/${commit_id}`), headers)
     .then(response => response.json())
 
 }
