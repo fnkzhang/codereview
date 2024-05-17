@@ -39,8 +39,8 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     }
 
 # Data Passed in body while project and document id passed in url
-@app.route('/api/Snapshot/<proj_id>/<doc_id>/', methods=["POST"])
-def createSnapshot(proj_id, doc_id):
+@app.route('/api/Snapshot/<proj_id>/<doc_id>/<commit_id>/', methods=["POST"])
+def createSnapshot(proj_id, doc_id, commit_id):
     print("Creating Snapshot", proj_id, doc_id)
     inputBody = request.get_json()
     headers = request.headers
@@ -60,7 +60,7 @@ def createSnapshot(proj_id, doc_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"])
+    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"], commit_id)
     return {
         "success": True,
         "reason": "",
