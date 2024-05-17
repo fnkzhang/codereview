@@ -34,6 +34,7 @@ class User(Base):
     name = Column(String(50))
     #username = Column(String(50)) #unsure if user_id is necessary if username is already unique
     date_joined = Column(DateTime(timezone=True), server_default=func.now())
+    last_opened = Column(DateTime(timezone=True), server_default=func.now())
     github_token = Column(String(50))
 
 class Project(Base):
@@ -62,11 +63,6 @@ class Snapshot(Base):
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
 
-class DiffSnapshotRelation(Base):
-    __tablename__ = "diffsnapshotrelation"
-    snapshot_id = Column(Integer, primary_key=True)
-    diff_id = Column(Integer, primary_key=True)
-    
 class Document(Base):
     __tablename__ = "documents"
     doc_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
@@ -86,3 +82,15 @@ class Folder(Base):
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
     parent_folder = Column(Integer, primary_key=True)
+class Commit(Base):
+    __tablename__ = "commits"
+    parent_commit_id = Column(Integer, primary_key=True)
+    author_email = Column(String(50), nullable=False)
+    commit_id = Column(Integer, primary_key=True)    
+    proj_id = Column(Integer)
+    date_created = Column(DateTime(timezone=True), server_default=func.now())
+
+class SnapshotCommitRelation(Base):
+    __tablename__ = "diffsnapshotrelation"
+    commit_id = Column(Integer)
+    snapshot_id = Column(Integer)

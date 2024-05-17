@@ -74,6 +74,7 @@ def resolveComment(comment_id):
             "reason": "Failed to Authenticate"
         }
     proj_id = getCommentProject(comment_id)
+    print(comment_id)
     if(getUserProjPermissions(idInfo["email"], proj_id) < 1 or getProjectInfo(proj_id)["author_email"] != idInfo["email"]):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     resolveCommentHelperFunction(comment_id)
