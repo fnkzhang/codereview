@@ -122,8 +122,12 @@ def getCommitDiffSnapshotsUtil(commit_id1, commit_id2):
     for itemId in shared:
         item = getItemCommitLocation(itemId, commit_id1)
         if item["is_folder"] == False:
-            snap = getCommitDocumentSnapshot(itemId, commit_id1)
-    pass
+            commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
+            commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
+            commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
+            commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
+    return commit1snaps, commit2snaps
+
 def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
     commit1Items = getAllCommitItemIds(commit_id1)
     commit2Items = getAllCommitItemIds(commit_id2)
@@ -137,12 +141,6 @@ def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
                 commit1Uniques.append(getFolderInfo(item, commit_id1))
             else: 
                 commit1Uniques.append(getDocumentInfo(item, commit_id1))
-        else:
-            item = getItemCommitLocation(itemId)
-            if item["is_folder"] == True:
-                shared.append(getFolderInfo(item, commit_id1))
-            else:
-                shared.append(getDocumentInfo(item, commit_id1))
     for itemId in commit2tems:
         if itemId not in commit1Items:
             item = getItemCommitLocation(itemId)
@@ -150,7 +148,7 @@ def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
                 commit2Uniques.append(getFolderInfo(item, commit_id2))
             else:
                 commit2Uniques.append(getDocumentInfo(item, commit_id2))
-    return commit1Uniques, commit2Uniques, shared
+    return commit1Uniques, commit2Uniques
 
 
 def getAllCommitItems(commit_id):
