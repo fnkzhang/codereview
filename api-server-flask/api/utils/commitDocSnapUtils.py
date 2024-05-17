@@ -11,7 +11,7 @@ def getCommitDocumentSnapshot(doc_id, commit_id):
         #needs to happen because you can only call result.first() once
         relation = result.first()
         if relation == None:
-            return -1
+            return None
         return relation.snapshot_id
 
 def getAllCommitDocumentSnapshotRelation(commit_id):

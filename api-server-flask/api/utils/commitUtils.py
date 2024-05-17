@@ -5,6 +5,7 @@ from utils.snapshotUtils import *
 from utils.commitDocSnapUtils import *
 from utils.commitLocationUtils import *
 from utils.miscUtils import *
+from sqlalchemy.sql import func
 import models
 
 def getCommitInfo(commit_id):
@@ -38,7 +39,7 @@ def createNewCommit(proj_id, email, last_commit):
 def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
     with engine.connect() as conn:
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
-        if snap == -1:
+        if snap == None:
             stmt = insert(models.CommitDocumentSnapshotRelation).values(
                     snapshot_id = snapshot_id,
                     commit_id = commit_id,
@@ -50,6 +51,11 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
                     models.CommitDocumentSnapshotRelation.commit_id == commit_id).values(
                     snapshot_id = snapshot_id
             )
+            stmt = models.CommitDocumentSnapshotRelation).where(
+                    models.CommitDocumentSnapshotRelation.snap_id == snap)
+            result = conn.execute(stmt).first()
+            if result == None:
+                deleteSnapshotUtil(snap)
         conn.execute(stmt)
         conn.commit()
     return True
@@ -58,7 +64,7 @@ def commitACommit(commit_id):
     with engine.connect() as conn:
         stmt = (update(models.Commit)
         .where(models.Commit.commit_id == commit_id)
-        .values(is_resolved=True)
+        .values(date_committed == func.now())
         )
         conn.execute(stmt)
         conn.commit()
@@ -100,6 +106,53 @@ def removeItemFromCommit(item_id, commit_id):
         conn.commit()
     return True
 
+def getCommitSharedItemIdsUtil(commit_id1, commit_id2):
+    commit1Items = getAllCommitItemIds(commit_id1)
+    commit2Items = getAllCommitItemIds(commit_id2)
+    sharedIds = []
+    for itemId in commit1Items:
+        if itemId in commit2Items:
+            sharedIds.append(itemId)
+    return shared
+
+def getCommitDiffSnapshotsUtil(commit_id1, commit_id2):
+    shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
+    commit1snaps = {}
+    commit2snaps = {}
+    for itemId in shared:
+        item = getItemCommitLocation(itemId, commit_id1)
+        if item["is_folder"] == False:
+            snap = getCommitDocumentSnapshot(itemId, commit_id1)
+    pass
+def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
+    commit1Items = getAllCommitItemIds(commit_id1)
+    commit2Items = getAllCommitItemIds(commit_id2)
+    commit1Uniques = []
+    commit2Uniques = []
+    sharedIds = []
+    for itemId in commit1Items:
+        if itemId not in commit2Items:
+            item = getItemCommitLocation(itemId)
+            if item["is_folder"] == True:
+                commit1Uniques.append(getFolderInfo(item, commit_id1))
+            else: 
+                commit1Uniques.append(getDocumentInfo(item, commit_id1))
+        else:
+            item = getItemCommitLocation(itemId)
+            if item["is_folder"] == True:
+                shared.append(getFolderInfo(item, commit_id1))
+            else:
+                shared.append(getDocumentInfo(item, commit_id1))
+    for itemId in commit2tems:
+        if itemId not in commit1Items:
+            item = getItemCommitLocation(itemId)
+            if item["is_folder"] == True:
+                commit2Uniques.append(getFolderInfo(item, commit_id2))
+            else:
+                commit2Uniques.append(getDocumentInfo(item, commit_id2))
+    return commit1Uniques, commit2Uniques, shared
+
+
 def getAllCommitItems(commit_id):
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(
@@ -111,7 +164,17 @@ def getAllCommitItems(commit_id):
             itemArray.append(row._asdict())
         return itemArray
 
+def getAllCommitItemIds(commit_id):
+    with engine.connect() as conn:
+        stmt = select(models.ItemCommitLocation).where(
+                models.ItemCommitLocation.commit_id == commit_id
+        )
+        results = conn.execute(stmt)
+        itemArray = []
+        for row in results:
+            itemArray.append(row.item_id)
+        return itemArray
+
 def getCommitTree(commit_id):
     root_folder = getCommitInfo(commit_id)["root_folder"]
     return getFolderTree(root_folder, commit_id)
-    

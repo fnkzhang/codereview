@@ -95,6 +95,7 @@ class Commit(Base):
     commit_id = Column(Integer, primary_key=True)    
     proj_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
+    date_committed = Column(DateTime(timezone=True))
     root_folder = Column(Integer)
 
 class CommitDocumentSnapshotRelation(Base):

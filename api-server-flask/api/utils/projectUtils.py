@@ -113,9 +113,9 @@ def getAllProjectCommits(proj_id):
         return listOfCommits
 
 # Returns Array of Dictionaries
-def getAllResolvedProjectCommitsInOrder(proj_id):
+def getAllCommittedProjectCommitsInOrder(proj_id):
     with engine.connect() as conn:
-        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.is_resolved == True).order_by(models.Commit.date_created.asc())
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.date_committed != None).order_by(models.Commit.date_committed.asc())
         foundCommits = conn.execute(stmt)
 
         listOfCommits = []
@@ -125,15 +125,15 @@ def getAllResolvedProjectCommitsInOrder(proj_id):
 
         return listOfCommits
 
-def getProjectLastResolvedCommit(proj_id):
+def getProjectLastCommittedCommit(proj_id):
     try:
-        return getAllProjectResolvedSnapshotsInOrder(proj_id)[-1]
+        return getAllCommittedProjectCommitsInOrder(proj_id)[-1]
     except:
         return None
 
 def getUserWorkingCommitInProject(proj_id, email):
     with engine.connect() as conn:
-        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.is_resolved == False)
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.date_committed == None)
         commit = conn.execute(stmt).first()
         if commit == None:
             return None

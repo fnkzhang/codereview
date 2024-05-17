@@ -139,7 +139,7 @@ def renameProject(proj_id):
     }
 
 @app.route('/api/Project/<proj_id>/GetCommits/', methods = ["GET"])
-def getProjectResolvedCommits(proj_id):
+def getProjectCommittedCommits(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -158,7 +158,7 @@ def getProjectResolvedCommits(proj_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
 
-    arrayOfCommits = getAllResolvedProjectCommitsInOrder(proj_id)
+    arrayOfCommits = getAllCommittedProjectCommitsInOrder(proj_id)
     return {
         "success": True,
         "reason": "",
