@@ -32,6 +32,7 @@ def createNewProject(proj_name, owner):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
+    createNewCommit(proj_id, email)
     return pid
 
 def deleteProjectUtil(proj_id):
@@ -94,4 +95,21 @@ def getProjectFoldersAsPaths(proj_id):
     folderIDToPath[project["root_folder"]] = ""
     return folderIDToPath
 
+# Returns Array of Dictionaries
+def getAllResolvedProjectCommitsInOrder(proj_id):
+    with engine.connect() as conn:
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.is_resolved == True).order_by(models.Commit.date_created.asc())
+        foundSnapshots = conn.execute(stmt)
 
+        listOfCommits = []
+
+        for row in foundCommits:
+            listOfCommits.append(row._asdict())
+
+        return listOfCommits
+
+def getProjectLastResolvedCommit(proj_id):
+    try:
+        return getAllProjectResolvedSnapshotsInOrder(proj_id)[-1]
+    except:
+        return None

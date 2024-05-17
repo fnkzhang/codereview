@@ -14,7 +14,7 @@ def getSnapshotInfo(snapshot_id):
         return snapshot._asdict()
 
 #puts documentname as snapshot name until that changes
-def createNewSnapshot(proj_id, doc_id, item):
+def createNewSnapshot(proj_id, doc_id, data, commit_id):
     with engine.connect() as conn:
 
         stmt = select(models.Document).where(
@@ -28,12 +28,13 @@ def createNewSnapshot(proj_id, doc_id, item):
         stmt = insert(models.Snapshot).values(
             snapshot_id = snapshot_id,
             associated_document_id = doc_id,
-            name = doc_name
+            name = doc_name,
+            og_commit_id = commit_id
         )
         conn.execute(stmt)
         conn.commit()
 
-        uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), item)
+        uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), data)
         return snapshot_id
 
 def getSnapshotProject(snapshot_id):
@@ -75,6 +76,10 @@ def deleteSnapshotUtil(snapshot_id):
             stmt = delete(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
             conn.execute(stmt)
             stmt = delete(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
+            conn.execute(stmt)
+            stmt = delete(models.CommitDocumentSnapshotRelation).where(
+                models.CommitDocumentSnapshotRelation.commit_id == commit_id
+            )
             conn.execute(stmt)
             conn.commit()
         return True, "No Error"

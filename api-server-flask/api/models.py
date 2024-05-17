@@ -59,7 +59,7 @@ class Snapshot(Base):
     snapshot_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
     # Allow us to find snapshots associated with document
     associated_document_id = Column(Integer) 
-    name = Column(String(50))
+    og_commit_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -68,29 +68,35 @@ class Document(Base):
     doc_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
     # Allow us to find project the document is associated with
     associated_proj_id = Column(Integer)
-    name = Column(String(50), primary_key=True)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    parent_folder = Column(Integer)
+
+class ItemCommitLocation(Base):
+    __tablename__ = "commititemlocation"
+    item_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
+    parent_folder = Column(Integer, primary_key=True)
+    commit_id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    #true if folder, false if document
+    is_folder = Column(Boolean, primary_key=True)
 
 class Folder(Base):
     __tablename__ = "folders"
     folder_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
-    name = Column(String(50))
-
     associated_proj_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    parent_folder = Column(Integer, primary_key=True)
+
 class Commit(Base):
     __tablename__ = "commits"
-    parent_commit_id = Column(Integer, primary_key=True)
     author_email = Column(String(50), nullable=False)
     commit_id = Column(Integer, primary_key=True)    
     proj_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
+    root_folder = Column(Integer)
 
-class SnapshotCommitRelation(Base):
-    __tablename__ = "diffsnapshotrelation"
-    commit_id = Column(Integer)
+class CommitDocumentSnapshotRelation(Base):
+    __tablename__ = "docsnapshotrelation"
+    doc_id = Column(Integer, primary_key=True)
+    commit_id = Column(Integer, primary_key=True)
     snapshot_id = Column(Integer)

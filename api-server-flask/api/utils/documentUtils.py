@@ -2,27 +2,37 @@ from cloudSql import *
 from utils.buckets import *
 from utils.snapshotUtils import *
 from utils.commentUtils import *
+from utils.commitDocSnapUtils import *
+from utils.commitLocationUtils import *
 
 from utils.miscUtils import *
 import models
 
-def getDocumentInfo(doc_id):
+def getDocumentInfo(doc_id, commit_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
         foundDocument = conn.execute(stmt).first()
         if foundDocument == None:
             return None
+        commit_data = getItemCommitLocation(doc_id, commit_id)
+        foundDocument = foundDocument._asdict()
+        foundDocument["parent_folder"] = commit_data["parent_folder"]
+        foundDocument["name"] = commit_data["name"]
         return foundDocument._asdict()
 
-def getDocumentInfoViaLocation(name, parent_folder):
+def getDocumentInfoViaLocation(name, parent_folder, commit_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.name == name, models.Document.parent_folder == parent_folder)
         foundDocument = conn.execute(stmt).first()
         if foundDocument == None:
             return None
+        foundDocument = foundDocument._asdict()
+        commit_data = getItemCommitLocation(foundDocument["doc_id"], commit_id)
+        foundDocument["parent_folder"] = commit_data["parent_folder"]
+        foundDocument["name"] = commit_data["name"]
         return foundDocument._asdict()
 
-def createNewDocument(document_name, parent_folder, proj_id, item):
+def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
     doc_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
@@ -33,11 +43,19 @@ def createNewDocument(document_name, parent_folder, proj_id, item):
         )
         conn.execute(stmt)
         conn.commit()
-
-    createNewSnapshot(proj_id, doc_id, item)
+    createItemCommitLocation(doc_id, commit_id, document_name, parent_folder, False)
+    createNewSnapshot(proj_id, doc_id, data)
     return doc_id
 
-def deleteDocumentUtil(doc_id):
+def deleteDocumentFromCommit(doc_id, commit_id):
+    with engine.connect() as conn:
+        stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
+        conn.execute(stmt)
+        conn.commit()
+    return True
+
+#only for project deletion
+def purgeDocumentUtil(doc_id):
     try:
         with engine.connect() as conn:
             stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
@@ -50,29 +68,6 @@ def deleteDocumentUtil(doc_id):
         return True, "No Error"
     except Exception as e:
         return False, e
-
-def renameDocumentUtil(doc_id, doc_name):
-    try:
-        with engine.connect() as conn:
-            stmt = (update(models.Document)
-                .where(models.Document.doc_id == doc_id)
-                .values(name=doc_name)
-                )
-            conn.execute(stmt)
-            conn.commit()
-        return True, "No Error"
-    except Exception as e:
-        return False, e
-
-def moveDocumentUtil(doc_id, parent_folder):
-    with engine.connect() as conn:
-        stmt = (update(models.Document)
-        .where(models.Document.doc_id == doc_id)
-        .values(parent_folder = parent_folder)
-        )
-        conn.execute(stmt)
-        conn.commit()
-    return parent_folder
 
 # Returns Array of Dictionaries
 def getAllDocumentSnapshotsInOrder(doc_id):

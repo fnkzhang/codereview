@@ -16,6 +16,7 @@ from llmRoutes import *
 from githubRoutes import *
 from userAndPermissionsRoutes import *
 from authRoutes import *
+from utils.commitUtils import *
 
 @app.after_request
 def afterRequest(response):
