@@ -1,6 +1,7 @@
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text
+from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text, Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
+from reviewStateEnums import reviewStateEnum
 import uuid
 
 class Base(DeclarativeBase):
@@ -71,6 +72,7 @@ class Document(Base):
     og_commit_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
+    state = Column(Enum(reviewStateEnum))
 
 class ItemCommitLocation(Base):
     __tablename__ = "commititemlocation"
