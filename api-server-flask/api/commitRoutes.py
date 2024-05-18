@@ -126,6 +126,31 @@ def getCommitDifferences(commit_id1, commit_id2):
     commit1snaps, commit2snaps = getCommitDiffSnapshotsUtil(commit_id1, commit_id2)
     return {"success":True, "reason":"", "body": {"commit1UniqueItems":commit1Uniques, "commit2UniqueItems":commit2Uniques, "snapshotDiffs": {"commit1":commit1snaps, "commit2":commit2snaps}}}
 
+
+#will also compare commit_id2 snapshots to commit_id1's last commit and remove those
+@app.route('/api/Commit/<commit_id1>/<commit_id2>/getDiff', methods = ["GET"])
+def getCommitDiffCareAboutLast(commit_id1, commit_id2):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    body = request.get_json()
+    proj_id = getCommitInfo(commit_id1)["proj_id"]
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    commit1Uniques, commit2Uniques = getCommitLocationDifferencesUtil(commit_id1, commit_id2)
+    commit1snaps, commit2snaps = getCommitNewerSnapshotsUtil(commit_id1, commit_id2)
+    return {"success":True, "reason":"", "body": {"commit1UniqueItems":commit1Uniques, "commit2UniqueItems":commit2Uniques, "snapshotDiffs": {"commit1":commit1snaps, "commit2":commit2snaps}}}
+
 #mainly to add stuff from other commits during merge
 #can also be used to update location/snapshots from them ig
 #likely used with getcommitdifferences to get uniques from a commit

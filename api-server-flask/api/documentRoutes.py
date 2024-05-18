@@ -221,6 +221,41 @@ def getAllDocumentCommittedSnapshots(proj_id, doc_id):
 
     return {"success": True, "reason":"", "body": foundSnapshots}
 
+#changes a document's snapshot on a specific commit to the given one
+@app.route('/api/Document/<doc_id>/<commit_id>/<snapshot_id>/changeTo/', methods=["POST"])
+def changeDocumentSnapshot(doc_id, commit_id, snapshot_id):
+    inputBody = request.get_json()
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    try:
+        proj_id = getDocumentInfo(doc_id, commit_id)["associated_proj_id"]
+    except:
+        return {
+            "success": False,
+            "reason": "document doesn't exist"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    addSnapshotToCommit(snapshot_id, doc_id, commit_id)
+    return {
+        "success": True,
+        "reason": "",
+        "body": ""
+    }
+
 @app.route('/api/Document/<document_id>/comments/', methods=["GET"])
 def getAllCommentsForDocument(document_id):
     # Authentication

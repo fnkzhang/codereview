@@ -35,6 +35,7 @@ def createNewCommit(proj_id, email, last_commit):
                 commit_id = commit_id,
                 author_email = email,
                 root_folder = root_folder_id
+                last_commit = last_commit
         )
         conn.execute(stmt)
         conn.commit()
@@ -121,6 +122,7 @@ def removeItemFromCommit(item_id, commit_id):
         conn.commit()
     return True
 
+#does not care about last_commit
 def getCommitSharedItemIdsUtil(commit_id1, commit_id2):
     commit1Items = getAllCommitItemIds(commit_id1)
     commit2Items = getAllCommitItemIds(commit_id2)
@@ -130,6 +132,22 @@ def getCommitSharedItemIdsUtil(commit_id1, commit_id2):
             sharedIds.append(itemId)
     return sharedIds
 
+def getCommitNewerSnapshotsUtil(commit_id1, commit_id2):
+    shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
+    commit1snaps = {}
+    commit2snaps = {}
+    last_commit = getCommitInfo(commit_id1)["last_commit"]
+    for itemId in shared:
+        item = getItemCommitLocation(itemId, commit_id1)
+        if item["is_folder"] == False:
+            commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
+            commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
+            lastcommitsnap = getCommitDocumentSnapshot(itemId, last_commit)
+            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"] and lastcommitsnap["snapshot_id"] != commit2["snapshot_id"]:
+                commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
+                commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
+    return commit1snaps, commit2snaps
+
 def getCommitDiffSnapshotsUtil(commit_id1, commit_id2):
     shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
     commit1snaps = {}
@@ -138,9 +156,10 @@ def getCommitDiffSnapshotsUtil(commit_id1, commit_id2):
         item = getItemCommitLocation(itemId, commit_id1)
         if item["is_folder"] == False:
             commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
-            commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
             commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
-            commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
+            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"]:
+                commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
+                commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
     return commit1snaps, commit2snaps
 
 def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
