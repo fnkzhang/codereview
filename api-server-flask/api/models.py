@@ -93,6 +93,7 @@ class Folder(Base):
 class Commit(Base):
     __tablename__ = "commits"
     author_email = Column(String(50), nullable=False)
+    name = Column(Text)
     commit_id = Column(Integer, primary_key=True)    
     proj_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
