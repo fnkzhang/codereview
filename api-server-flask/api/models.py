@@ -62,7 +62,7 @@ class Snapshot(Base):
     og_commit_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    
+
 class Document(Base):
     __tablename__ = "documents"
     doc_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
@@ -98,7 +98,7 @@ class Commit(Base):
     date_committed = Column(DateTime(timezone=True))
     root_folder = Column(Integer)
     last_commit = Column(Integer)
-    state = Column(Enum(reviewStateEnum))
+    #state = Column(Enum(reviewStateEnum))
 
 class CommitDocumentSnapshotRelation(Base):
     __tablename__ = "docsnapshotrelation"

@@ -7,6 +7,7 @@ from utils.commitLocationUtils import *
 from utils.miscUtils import *
 from sqlalchemy.sql import func
 import models
+from reviewStateEnums import reviewStateEnum
 
 def getCommitInfo(commit_id):
     with engine.connect() as conn:
@@ -37,6 +38,7 @@ def createNewCommit(proj_id, email, last_commit):
                 root_folder = root_folder_id,
                 last_commit = last_commit,
                 name = "User Working Commit"
+                state = reviewStateEnum.open
         )
         conn.execute(stmt)
         conn.commit()
@@ -72,6 +74,7 @@ def commitACommit(commit_id, name):
                 models.Commit.commit_id == commit_id).values(
                 date_committed = func.now(),
                 name = name
+                #state = reviewStateEnum.reviewed
         )
 
         conn.execute(stmt)

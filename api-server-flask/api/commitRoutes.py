@@ -77,6 +77,7 @@ def createCommit(proj_id):
         "reason": "",
         "body": commit_id
     }
+
 #checks if there are commits newer than the user's current working commit
 @app.route('/api/Commit/<proj_id>/checkIfNewer/', methods = ["GET"])
 def checkIfNewerCommitExists(proj_id):
@@ -245,7 +246,9 @@ def commitCommit(commit_id):
     proj_id = commit["proj_id"]
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
     commit_id = commitACommit(commit_id, name)
+
     return {
         "success": True,
         "reason": "",
