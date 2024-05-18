@@ -454,7 +454,7 @@ export async function getUserProjects(userEmail) {
   })
 }
 
-export async function getProjectInfo(project_id) {
+export async function getProjectInfo(proj_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -469,7 +469,7 @@ export async function getProjectInfo(project_id) {
 
   };
 
-  return await fetch((`/api/Project/${project_id}/`), headers)
+  return await fetch((`/api/Project/${proj_id}/`), headers)
   .then(response => response.json()
   .then(data => {
     if (data.success === false) {
@@ -505,7 +505,7 @@ export async function getProjectDocuments(proj_id) {
   })
 }
 
-export async function getProjectTree(proj_id) {
+export async function getFolderTree(commit_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -519,13 +519,13 @@ export async function getProjectTree(proj_id) {
     },
   };
 
-  return await fetch((`/api/Project/${proj_id}/getFolderTree/`), headers)
+  return await fetch((`/api/Commit/${commit_id}/getFolderTree/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
     }
-    return data.body
+    return data
   })
 }
 
@@ -769,6 +769,30 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
   };
 
   return await fetch((`/api/Github/${proj_id}/PushToExisting/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data
+  })
+}
+
+export async function getCommits(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+  };
+
+  return await fetch((`/api/Project/${proj_id}/GetCommits/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {

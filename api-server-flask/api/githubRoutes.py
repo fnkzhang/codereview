@@ -150,7 +150,7 @@ def pullToNewProject():
                 doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode(), commit_id)
             except Exception as e:
                 pass
-    commitACommit(commit_id)
+    commitACommit(commit_id, "Pulled from branch " + body["branch"] + " of " + body["repository"])
     return {"success":True, "reason":"", "body":proj_id}
 
 #needs auth
@@ -244,7 +244,8 @@ def pullToExistingProject(proj_id):
     print(len(updated_files), len(docs_to_delete), len(folders_to_delete))
     if len(updated_files) > 0 or len(docs_to_delete) > 0 or len(folders_to_delete) > 0:
         print(commit)
-        commitACommit(commit_id)
+        commitACommit(commit_id, "Pulled from branch " + body["branch"] + " of " + body["repository"])
+
     else:
         deleteCommit(commit_id)
     return {"success":True, "reason":"", "body":updated_files}

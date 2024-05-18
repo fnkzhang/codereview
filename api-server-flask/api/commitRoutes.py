@@ -223,6 +223,7 @@ def bulkDeleteFromCommit(commit_id):
     return {"success":True, "reason":""}
 
 #no checks will just commit
+#in body: requires commit name in "name"
 @app.route('/api/Commit/<commit_id>/commitCommit/', methods = ["POST"])
 def commitCommit(commit_id):
     headers = request.headers
@@ -239,11 +240,12 @@ def commitCommit(commit_id):
             "reason": "Failed to Authenticate"
         }
     body = request.get_json()
+    name = body["name"]
     commit = getCommentInfo(commit_id)
     proj_id = commit["proj_id"]
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    commit_id = commitACommit(commit_id)
+    commit_id = commitACommit(commit_id, name)
     return {
         "success": True,
         "reason": "",

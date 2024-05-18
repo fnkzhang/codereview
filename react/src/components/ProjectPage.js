@@ -1,7 +1,8 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import { Card } from "flowbite-react"
-import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getProjectTree } from "../api/APIUtils"
+import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
+  getCommits } from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import BackButton from "./BackButton"
 
@@ -12,6 +13,7 @@ export default function ProjectPage( props ) {
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
   const [projectName, setProjectName] = useState(null)
   const [folderStack, setFolderStack] = useState(null)
+  const [commits, setCommits] = useState(null)
 
   const { project_id } = useParams()
   const navigate = useNavigate()
@@ -22,22 +24,31 @@ export default function ProjectPage( props ) {
   useEffect(() => {
 
     async function grabProjectData() {
-      let result = await getProjectInfo(project_id)
+      const result = await getProjectInfo(project_id)
     
       setProjectOwnerEmail(result.author_email)
       setProjectName(result.name)
     }
 
-    async function grabProjectTree() {
-      const projectTree = await getProjectTree(project_id)
-      setFolderStack([projectTree])
+    let commitArray = null
+    async function grabCommits() {
+      await getCommits(project_id).then( result => {
+        commitArray = result.body
+      })
+      .then( async () => { await getFolderTree(commitArray[0].commit_id).then( result => {
+          setFolderStack([result.body])
+        })
+      })
+      .then(
+        setCommits(commitArray),
+      )
     }
 
     async function fetchData() {
       try {
         await Promise.all([
           grabProjectData(),
-          grabProjectTree(),
+          grabCommits(),
         ])
       } catch (error) {
         console.log(error)
@@ -45,8 +56,6 @@ export default function ProjectPage( props ) {
         setLoading(false)
       }
     }
-
-    
 
     if (loading)
       fetchData()
@@ -66,8 +75,7 @@ export default function ProjectPage( props ) {
       for (let i = 0; i < searchResult.length; i++) {
         let userData = searchResult.at(i)
         if (userData.user_email === props.userData.email) {
-          setUserPermissionLevel(userData.userPermissionLevel);    
-          console.log(userData);  
+          setUserPermissionLevel(userData.userPermissionLevel);      
           break;
         }
       }
@@ -273,8 +281,6 @@ export default function ProjectPage( props ) {
       </div>
     )  
   }
-
-
 
   if( props.isLoggedIn === false ) {
     return (

@@ -35,7 +35,8 @@ def createNewCommit(proj_id, email, last_commit):
                 commit_id = commit_id,
                 author_email = email,
                 root_folder = root_folder_id,
-                last_commit = last_commit
+                last_commit = last_commit,
+                name = "User Working Commit"
         )
         conn.execute(stmt)
         conn.commit()
@@ -65,11 +66,12 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
         conn.commit()
     return True
 
-def commitACommit(commit_id):
+def commitACommit(commit_id, name):
     with engine.connect() as conn:
         stmt = update(models.Commit).where(
                 models.Commit.commit_id == commit_id).values(
-                date_committed = func.now()
+                date_committed = func.now(),
+                name = name
         )
 
         conn.execute(stmt)
