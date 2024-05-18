@@ -38,13 +38,8 @@ def signUp():
             "reason": "Failed to Authenticate"
         }
 
-    if userExists(idInfo["email"]):
-        return {
-                "success": False,
-                "reason": "Account already exists",
-                "body":{}
-        }
-    createNewUser(idInfo["email"], idInfo["name"])
+    if userExists(idInfo["email"]) == False:
+        createNewUser(idInfo["email"], idInfo["name"])
     return {
             "success":True,
             "reason": "N/A",
