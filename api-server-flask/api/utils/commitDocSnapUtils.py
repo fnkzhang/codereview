@@ -33,12 +33,6 @@ def createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id):
                     models.CommitDocumentSnapshotRelation.commit_id == commit_id).values(
                     snapshot_id = snapshot_id
             )
-            stmt = conn.execute(stmt)
-            stmt = select(models.CommitDocumentSnapshotRelation).where(
-                    models.CommitDocumentSnapshotRelation.snapshot_id == snap)
-            result = conn.execute(stmt).first()
-            if result == None:
-                deleteSnapshotUtil(snap)
         conn.execute(stmt)
         conn.commit()
     return True
