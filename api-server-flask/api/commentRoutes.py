@@ -121,6 +121,7 @@ def getSubcommentsOnComment(comment_id):
 
     return retArray
 
+@app.route('/api/comments/<comment_id>/edit', methods=["PUT"])
 def editComment(comment_id):
     # Authentication
     headers = request.headers
