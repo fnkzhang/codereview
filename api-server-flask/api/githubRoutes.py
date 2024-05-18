@@ -290,10 +290,10 @@ def pushToNewBranch(proj_id, commit_id):
     folderIDToPath = getCommitFoldersAsPaths(commit_id)
     body = request.get_json()
     documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
-    deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(commit_id)
+    deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(body["repository"], body["oldbranch"], token, commit_id)
     branch_sha = repo.get_branch(body["oldbranch"]).commit.sha
-    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots)
-    if len(tree_elements == 0):
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
+    if len(tree_elements) == 0:
         {"success":False,
                 "reason": "no files to push"}
     try:
@@ -355,9 +355,9 @@ def pushToExistingBranch(proj_id, commit_id):
     folderIDToPath = getCommitFoldersAsPaths(commit_id)
     body = request.get_json()
     documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
-    deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(commit_id)
-    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots)
-    if len(tree_elements == 0):
+    deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(body["repository"], body["branch"], token, commit_id)
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
+    if len(tree_elements) == 0:
         {"success":False,
                 "reason": "no files to push"}
     branch_sha = repo.get_branch(body["branch"]).commit.sha

@@ -51,7 +51,7 @@ def getGithubProjectDocumentsAsPaths(repo, branch, token):
 
 def getCommitNonexistentGithubDocumentsUtil(repo, branch, token, commit_id):
     allGithubFiles = set(getGithubProjectDocumentsAsPaths(repo, branch, token))
-    commitDocuments = getAllCommitItemIdsOfType(commit_id, False)
+    commitDocuments = getAllCommitItemsOfType(commit_id, False)
     projectDocumentPaths = set([getFolderPath(document['parent_folder'], commit_id) + document['name'] for document in commitDocuments])
     nonexistant = list(allGithubFiles - projectDocumentPaths)
     return nonexistant
@@ -64,10 +64,11 @@ def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, docum
                 type = "blob",
                 sha = None
             ))
-    for document in documentSnapshots:
-        document = getDocumentInfo(document, commit_id)
+    print(documentSnapshots)
+    for doc_id in documentSnapshots.keys():
+        document = getDocumentInfo(doc_id, commit_id)
         blob = repo.create_git_blob(
-                content = getSnapshotContentUtil(documentSnapshots[document]),
+                content = getSnapshotContentUtil(documentSnapshots[doc_id]),
                 encoding = 'utf-8',
                 )
         tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
@@ -79,9 +80,9 @@ def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, docum
 
 def assembleGithubComments(documentSnapshots, commit_id):
     githubComments = []
-    for doc_id in documentSnapshots:
+    for doc_id in documentSnapshots.keys():
         document = getDocumentInfo(doc_id, commit_id)
-        documentPath = getFolderPath(document['parent_folder']) + document['name']
+        documentPath = getFolderPath(document['parent_folder'], commit_id) + document['name']
         commentList = filterCommentsByPredicate(models.Comment.snapshot_id == documentSnapshots[doc_id] )
         for comment in commentList:
             if comment["is_resolved"] == False:

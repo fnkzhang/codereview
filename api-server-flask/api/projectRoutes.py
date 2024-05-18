@@ -159,8 +159,7 @@ def getProjectCommittedCommits(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    arrayOfCommits = getProjectLastCommittedCommit(proj_id)
-    #arrayOfCommits = getAllCommittedProjectCommitsInOrder(proj_id)
+    arrayOfCommits = getAllCommittedProjectCommitsInOrder(proj_id)
     return {
         "success": True,
         "reason": "",
