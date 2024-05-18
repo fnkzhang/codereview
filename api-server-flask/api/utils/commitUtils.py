@@ -19,10 +19,14 @@ def getCommitInfo(commit_id):
 def createNewCommit(proj_id, email, last_commit):
     commit_id = createID()
     if last_commit != None:
+        print(last_commit)
         last_commit_items = getAllCommitItems(last_commit)
         for item in last_commit_items:
             createItemCommitLocation(item["item_id"], commit_id, item["name"], item["parent_folder"], item["is_folder"])
-        root_folder_id = getCommitInfo(commit_id)["root_folder"]
+        last_commit_docsnap = getAllCommitDocumentSnapshotRelation(last_commit)
+        for docsnap in last_commit_docsnap:
+            createCommitDocumentSnapshot(docsnap, commit_id, last_commit_docsnap[docsnap])
+        root_folder_id = getCommitInfo(last_commit)["root_folder"]
     else:
         root_folder_id = createNewFolder('root', 0, proj_id, commit_id)
     with engine.connect() as conn:
@@ -52,7 +56,7 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
                     snapshot_id = snapshot_id
             )
             stmt = select(models.CommitDocumentSnapshotRelation).where(
-                    models.CommitDocumentSnapshotRelation.snap_id == snap)
+                    models.CommitDocumentSnapshotRelation.snapshot_id == snap)
             result = conn.execute(stmt).first()
             if result == None:
                 deleteSnapshotUtil(snap)
@@ -62,10 +66,11 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
 
 def commitACommit(commit_id):
     with engine.connect() as conn:
-        stmt = (update(models.Commit).where(
-            models.Commit.commit_id == commit_id).values(
-            date_committed == func.now())
+        stmt = update(models.Commit).where(
+                models.Commit.commit_id == commit_id).values(
+                date_committed = func.now()
         )
+
         conn.execute(stmt)
         conn.commit()
     return True
@@ -74,6 +79,10 @@ def deleteCommit(commit_id):
     with engine.connect() as conn:
         stmt = delete(models.ItemCommitLocation).where(
                 models.ItemCommitLocation.commit_id == commit_id
+        )
+        conn.execute(stmt)
+        stmt = delete(models.CommitDocumentSnapshotRelation).where(
+                models.CommitDocumentSnapshotRelation.commit_id == commit_id
         )
         conn.execute(stmt)
 
@@ -94,7 +103,13 @@ def deleteCommit(commit_id):
         snaps = conn.execute(stmt)
         for snap in snaps:
             deleteSnapshotUtil(snap.snapshot_id)
+        stmt = delete(models.Commit).where(
+                models.Commit.commit_id == commit_id
+        )
+        conn.execute(stmt)
+
         conn.commit()
+    return True
 
 def removeItemFromCommit(item_id, commit_id):
     with engine.connect() as conn:
@@ -162,9 +177,10 @@ def getAllCommitItemsOfType(commit_id, is_folder):
     rv = []
     for item in items:
         if item["is_folder"] == is_folder:
-            rv.append(getFolderInfo(item, commit_id))
-        else:
-            rv.append(getDocumentInfo(item, commit_id))
+            if is_folder == True:
+                rv.append(getFolderInfo(item["item_id"], commit_id))
+            else:
+                rv.append(getDocumentInfo(item["item_id"], commit_id))
     return rv
 
 def getAllCommitItems(commit_id):

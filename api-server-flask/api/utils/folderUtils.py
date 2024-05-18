@@ -21,15 +21,14 @@ def getFolderInfo(folder_id, commit_id):
 
 def getFolderInfoViaLocation(name, parent_folder, commit_id):
     with engine.connect() as conn:
-        stmt = select(models.Folder).where(models.Folder.name == name, models.Folder.parent_folder == parent_folder)
+        stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.name == name, models.ItemCommitLocation.parent_folder == parent_folder, models.ItemCommitLocation.is_folder == True)
+
         foundFolder = conn.execute(stmt).first()
         if foundFolder == None:
             return None
         foundFolder = foundFolder._asdict()
-        commit_data = getItemCommitLocation(foundFolder["folder_id"], commit_id)
-        foundFolder["parent_folder"] = commit_data["parent_folder"]
-        foundFolder["name"] = commit_data["name"]
-        return foundFolder._asdict()
+        folder = getFolderInfo(foundFolder["item_id"], commit_id)
+        return folder
 
 def getFolderPath(folder_id, commit_id):
     folder = getFolderInfo(folder_id, commit_id)
@@ -43,7 +42,8 @@ def createNewFolder(folder_name, parent_folder, proj_id, commit_id):
     with engine.connect() as conn:
         stmt = insert(models.Folder).values(
             folder_id = folder_id,
-            associated_proj_id = proj_id
+            associated_proj_id = proj_id,
+            og_commit_id = commit_id
         )
         conn.execute(stmt)
         conn.commit()

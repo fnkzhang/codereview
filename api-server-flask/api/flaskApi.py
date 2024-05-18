@@ -3,10 +3,10 @@ app = get_app(__name__)
 
 from flask import request, jsonify
 try:
-    from test.testRoutes import test_llm
-except:
+    from testRoutes import *
+except Exception as e:
+    print(e)
     pass
-
 from projectRoutes import *
 from folderRoutes import *
 from documentRoutes import *
@@ -16,7 +16,7 @@ from llmRoutes import *
 from githubRoutes import *
 from userAndPermissionsRoutes import *
 from authRoutes import *
-from utils.commitUtils import *
+from commitRoutes import *
 
 @app.after_request
 def afterRequest(response):

@@ -5,7 +5,7 @@ import models
 
 def getItemCommitLocation(item_id, commit_id):
     with engine.connect() as conn:
-        stmt = select(models.ItemCommitLocation).where(models.ItemCommitFolder.commit_id == commit_id, models.ItemCommitFolder.item_id == item_id)
+        stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.commit_id == commit_id, models.ItemCommitLocation.item_id == item_id)
         result = conn.execute(stmt)
         relation = result.first()
         if relation == None:

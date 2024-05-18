@@ -46,7 +46,6 @@ class Project(Base):
     author_email = Column(String(50))
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    root_folder = Column(Integer)
 
 class UserProjectRelation(Base):
     __tablename__ = "userprojrelation"

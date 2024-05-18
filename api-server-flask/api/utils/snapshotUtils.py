@@ -2,6 +2,7 @@ from cloudSql import *
 from utils.commentUtils import *
 from utils.buckets import *
 from utils.miscUtils import *
+from utils.commitDocSnapUtils import *
 import models
 
 
@@ -16,25 +17,17 @@ def getSnapshotInfo(snapshot_id):
 #puts documentname as snapshot name until that changes
 def createNewSnapshot(proj_id, doc_id, data, commit_id):
     with engine.connect() as conn:
-
-        stmt = select(models.Document).where(
-            models.Document.doc_id == doc_id)
-
-        doc = conn.execute(stmt)#.first()
-
-        doc_name = doc.first().name
-
         snapshot_id = createID()
         stmt = insert(models.Snapshot).values(
             snapshot_id = snapshot_id,
             associated_document_id = doc_id,
-            name = doc_name,
             og_commit_id = commit_id
         )
         conn.execute(stmt)
         conn.commit()
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), data)
+        createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
         return snapshot_id
 
 def getSnapshotProject(snapshot_id):
@@ -78,7 +71,7 @@ def deleteSnapshotUtil(snapshot_id):
             stmt = delete(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
             conn.execute(stmt)
             stmt = delete(models.CommitDocumentSnapshotRelation).where(
-                models.CommitDocumentSnapshotRelation.commit_id == commit_id
+                models.CommitDocumentSnapshotRelation.snapshot_id == snapshot_id
             )
             conn.execute(stmt)
             conn.commit()

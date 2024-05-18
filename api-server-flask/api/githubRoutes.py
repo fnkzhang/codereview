@@ -129,9 +129,10 @@ def pullToNewProject():
     commit_id = createNewCommit(proj_id, idInfo["email"], None)
     g2 = Github(auth = Auth.Token(user["github_token"]))
     repo = g2.get_repo(body["repository"])
+    commit = getCommitInfo(commit_id)
     project = getProjectInfo(proj_id)
     pathToFolderID = {}
-    pathToFolderID[""] = project["root_folder"]
+    pathToFolderID[""] = commit["root_folder"]
     contents = repo.get_contents("", body["branch"])
     while contents:
         file_content = contents.pop(0)
@@ -147,7 +148,7 @@ def pullToNewProject():
         else:
             try:
                 doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode(), commit_id)
-            except:
+            except Exception as e:
                 pass
     commitACommit(commit_id)
     return {"success":True, "reason":"", "body":proj_id}
@@ -155,7 +156,7 @@ def pullToNewProject():
 #needs auth
 #put repository path in "repository" and branch in "branch"
 #format -> repository = "fnkzhang/codereview", branch = "main"
-@app.route('/api/Github/<proj_id>/<commit_id>/PullToExistingProject/', methods=["POST"])
+@app.route('/api/Github/<proj_id>/PullToExistingProject/', methods=["POST"])
 def pullToExistingProject(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -183,20 +184,23 @@ def pullToExistingProject(proj_id):
     if body["branch"] not in rv:
         return {"success":False,
                 "reason": "branch does not exist"}
-    last_commmit = getProjectLastCommittedCommit(proj_id)
-    commit_id = createNewCommit(proj_id, idInfo["email"], last_commmit)
+    last_commit = getProjectLastCommittedCommit(proj_id)["commit_id"]
+    commit_id = createNewCommit(proj_id, idInfo["email"], last_commit)
     g2 = Github(auth = Auth.Token(user["github_token"]))
     repo = g2.get_repo(body["repository"])
     project = getProjectInfo(proj_id)
-    folders = getAllCommitItemsOfType(commit_id, True)
-    documents = getAllCommitItemsOfType(commit_id, False)
+    folders = getAllCommitItemsOfType(last_commit, True)
+    documents = getAllCommitItemsOfType(last_commit, False)
     pathToFolderID = {}
-    pathToFolderID[""] = project["root_folder"]
+    commit = getCommitInfo(commit_id)
+    pathToFolderID[""] = commit["root_folder"]
     contents = repo.get_contents("", body["branch"])
     updated_files = []
     docs_to_delete = [document['doc_id'] for document in documents]
+    print(docs_to_delete)
     folders_to_delete = [folder['folder_id'] for folder in folders]
-    folders_to_delete.remove(project["root_folder"])
+    folders_to_delete.remove(commit["root_folder"])
+    print("____________________________________________________")
     while contents:
         file_content = contents.pop(0)
         index = file_content.path.rfind('/')
@@ -206,32 +210,43 @@ def pullToExistingProject(proj_id):
             path = file_content.path[:index]
         if file_content.type == "dir":
             contents.extend(repo.get_contents(file_content.path))
-            folder = getFolderInfoViaLocation(file_content.name, pathToFolderID[path], commit_id)
+            folder = getFolderInfoViaLocation(file_content.name, pathToFolderID[path], last_commit)
             if folder != None:
                 folder_id = folder["folder_id"]
                 folders_to_delete.remove(folder_id)
             else:
                 folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id, commit_id)
+                updated_files.append(folder_id)
             pathToFolderID[file_content.path] = folder_id
         else:
-            document = getDocumentInfoViaLocation(file_content.name, pathToFolderID[path], commit_id)
+            document = getDocumentInfoViaLocation(file_content.name, pathToFolderID[path], last_commit)
             try:
                 if document != None:
                     doc_id = document["doc_id"]
-                    if file_content.decoded_content != getDocumentLastCommittedSnapshotContent(doc_id):
-                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content, commit_id)
+                    if file_content.decoded_content.decode() != getDocumentLastCommittedSnapshotContent(doc_id):
+                        #print(file_content.decoded_content)
+                        #print("")
+                        #print(getDocumentLastCommittedSnapshotContent(doc_id))
+                        #print("____")
+                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode(), commit_id)
                         updated_files.append(doc_id)
+                    #print(doc_id)
                     docs_to_delete.remove(doc_id)
                 else:
                     doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content, commit_id)
                     updated_files.append(doc_id)
-            except:
-                pass
+            except Exception as e:
+                print(e)
     for doc_to_delete in docs_to_delete:
         deleteDocumentFromCommit(doc_to_delete, commit_id)
     for folder_to_delete in folders_to_delete:
         deleteFolderFromCommit(folder_to_delete, commit_id)
-    commitACommit(commit_id)
+    print(len(updated_files), len(docs_to_delete), len(folders_to_delete))
+    if len(updated_files) > 0 or len(docs_to_delete) > 0 or len(folders_to_delete) > 0:
+        print(commit)
+        commitACommit(commit_id)
+    else:
+        deleteCommit(commit_id)
     return {"success":True, "reason":"", "body":updated_files}
 
 #put repository including owner name in "repository", ex: billingtonbill12/testrepo
