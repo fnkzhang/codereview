@@ -157,7 +157,7 @@ def getCommitDiffCareAboutLast(commit_id1, commit_id2):
 #will update dst commit creation time so it doesn't conflict with the same src commit?
 
 #will copy location and names from src commit if new, pending change->will keep name & location if only updating snapshot
-#in body requires a list labeled "itemIds"
+#in body requires a list labeled "items"
     #list of item_ids to add to the commit, both folders and documents
     #documents will have the snapshot that is in the src commit
 #send empty dict/list if there are no updates/creations/deletions
@@ -223,8 +223,8 @@ def bulkDeleteFromCommit(commit_id):
     return {"success":True, "reason":""}
 
 #no checks will just commit
-@app.route('/api/Commit/<proj_id>/commitCommit/', methods = ["POST"])
-def commitCommit(proj_id):
+@app.route('/api/Commit/<commit_id>/commitCommit/', methods = ["POST"])
+def commitCommit(commit_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -239,15 +239,11 @@ def commitCommit(proj_id):
             "reason": "Failed to Authenticate"
         }
     body = request.get_json()
+    commit = getCommentInfo(commit_id)
+    proj_id = commit["proj_id"]
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
-        return {"success": False, "reason":"Working Commit Already Exists For User", "body":{}}
-    if "last_commit" in body:
-        last_commit = None
-    else:
-        last_commit = body["last_commit"]
-    commit_id = createNewCommit(proj_id, idInfo["email"], last_commit)
+    commit_id = commitACommit(commit_id)
     return {
         "success": True,
         "reason": "",
