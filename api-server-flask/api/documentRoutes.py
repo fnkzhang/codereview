@@ -221,6 +221,32 @@ def getAllDocumentCommittedSnapshots(proj_id, doc_id):
 
     return {"success": True, "reason":"", "body": foundSnapshots}
 
+@app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotIdAndWorking/', methods=["GET"])
+def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    working = getUserWorkingCommitInProject(proj_id)
+    if working != None:
+        foundSnapshots = getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working["commit_id"])
+    else:
+        foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
+    return {"success": True, "reason":"", "body": foundSnapshots}
+
 #changes a document's snapshot on a specific commit to the given one
 @app.route('/api/Document/<doc_id>/<commit_id>/<snapshot_id>/changeTo/', methods=["POST"])
 def changeDocumentSnapshot(doc_id, commit_id, snapshot_id):
