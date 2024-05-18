@@ -157,7 +157,7 @@ def getCommitDiffCareAboutLast(commit_id1, commit_id2):
 #will update dst commit creation time so it doesn't conflict with the same src commit?
 
 #will copy location and names from src commit if new, pending change->will keep name & location if only updating snapshot
-#in body requires a list labeled "itemIds"
+#in body requires a list labeled "items"
     #list of item_ids to add to the commit, both folders and documents
     #documents will have the snapshot that is in the src commit
 #send empty dict/list if there are no updates/creations/deletions
