@@ -6,6 +6,8 @@ from utils.commitDocSnapUtils import *
 from utils.commitLocationUtils import *
 
 from utils.miscUtils import *
+import reviewStateEnums
+
 import models
 
 def getDocumentInfo(doc_id, commit_id):
@@ -44,13 +46,46 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
         stmt = insert(models.Document).values(
             doc_id = doc_id,
             associated_proj_id = proj_id,
-            og_commit_id = commit_id
+            og_commit_id = commit_id,
+            state = reviewStateEnums.open
         )
+
         conn.execute(stmt)
         conn.commit()
     createItemCommitLocation(doc_id, commit_id, document_name, parent_folder, False)
     createNewSnapshot(proj_id, doc_id, data, commit_id)
     return doc_id
+
+def setDocumentOpenForReview(doc_id):
+    with engine.connect() as conn:
+        updateStmt = update(models.Document).where(models.Document.doc_id == doc_id).value(
+            state = reviewStateEnums.open
+        )
+
+        conn.execute(updateStmt)
+        conn.commit()
+    return
+
+def setDocumentAwaitingAuthorResponseForReview(doc_id):
+    with engine.connect() as conn:
+        updateStmt = update(models.Document).where(models.Document.doc_id == doc_id).value(
+            state = reviewStateEnums.reviewed
+        )
+
+        conn.execute(updateStmt)
+        conn.commit()
+    return
+
+# After Set, Review cannot be changed anymore
+def setDocumentFinishedReview(doc_id):
+    with engine.connect() as conn:
+        updateStmt = update(models.Document).where(models.Document.doc_id == doc_id).value(
+            state = reviewStateEnums.closed
+        )
+
+        conn.execute(updateStmt)
+        conn.commit()
+    return   
 
 def deleteDocumentFromCommit(doc_id, commit_id):
     with engine.connect() as conn:

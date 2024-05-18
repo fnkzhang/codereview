@@ -13,6 +13,7 @@ from utils.miscUtils import *
 
 import models
 
+# Get Document with the model data, and parent_folder, and name of the commit in to dict
 #commit_id is info about the doc in the commit you're in
 @app.route('/api/Document/<proj_id>/<doc_id>/<commit_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id, commit_id):
