@@ -1,6 +1,6 @@
 import enum
 
 class reviewStateEnum(enum.Enum):
-    open = 1
-    reviewed = 2
-    closed = 3
+    open = "open"
+    reviewed = "reviewed"
+    closed = "closed"
