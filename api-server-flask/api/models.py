@@ -70,7 +70,6 @@ class Document(Base):
     og_commit_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    state = Column(Enum(reviewStateEnum))
 
 class ItemCommitLocation(Base):
     __tablename__ = "commititemlocation"
@@ -99,6 +98,7 @@ class Commit(Base):
     date_committed = Column(DateTime(timezone=True))
     root_folder = Column(Integer)
     last_commit = Column(Integer)
+    #state = Column(Enum(reviewStateEnum))
 
 class CommitDocumentSnapshotRelation(Base):
     __tablename__ = "docsnapshotrelation"
