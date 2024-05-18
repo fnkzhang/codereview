@@ -90,7 +90,7 @@ def deleteDocument(doc_id, commit_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        proj_id = getDocumentInfo(doc_id, commit_id)["proj_id"]
+        proj_id = getDocumentInfo(doc_id, commit_id)["associated_proj_id"]
     except:
         return {
             "success": False,
