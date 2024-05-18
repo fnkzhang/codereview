@@ -62,6 +62,8 @@ def createProject():
         }
     body = request.get_json()
     pid = createNewProject(body["project_name"], idInfo["email"])
+    commit_id = createNewCommit(pid, idInfo["email"], None)
+    commitACommit(commit_id)
     return {
         "success": True,
         "reason": "",

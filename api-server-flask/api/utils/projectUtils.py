@@ -31,8 +31,6 @@ def createNewProject(proj_name, owner):
         conn.execute(projstmt)
         conn.execute(relationstmt)
         conn.commit()
-    commit_id = createNewCommit(pid, owner)
-    commitACommit(commit_id)
     return pid
 
 def purgeProjectUtil(proj_id):
@@ -91,6 +89,8 @@ def getAllProjectFolders(proj_id):
         for folder in foundFolders:
             folders.append(folder._asdict())
         return folders
+    
+#discontinued
 ##work on this later for github
 def getProjectFoldersAsPaths(proj_id):
     project = getProjectInfo(proj_id)

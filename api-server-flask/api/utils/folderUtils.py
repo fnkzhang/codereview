@@ -84,13 +84,13 @@ def getAllFolderContents(folder_id, commit_id):
         arrayOfDocuments = []
         for item in foundItems:
             if item.is_folder == True:
-                folders.append(getFolderInfo(item.item_id))
+                folders.append(getFolderInfo(item.item_id, commit_id))
             else:
-                arrayOfDocuments.append(getDocumentInfo(item.item_id))
+                arrayOfDocuments.append(getDocumentInfo(item.item_id, commit_id))
         return {"folders": folders, "documents":arrayOfDocuments}
 
 def getFolderTree(folder_id, commit_id):
-    root = getFolderInfo(folder_id)
+    root = getFolderInfo(folder_id, commit_id)
     contents = getAllFolderContents(folder_id, commit_id)
     folders = []
     documents = []

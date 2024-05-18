@@ -133,7 +133,6 @@ def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
     commit2Items = getAllCommitItemIds(commit_id2)
     commit1Uniques = []
     commit2Uniques = []
-    sharedIds = []
     for itemId in commit1Items:
         if itemId not in commit2Items:
             item = getItemCommitLocation(itemId)
@@ -150,6 +149,23 @@ def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
                 commit2Uniques.append(getDocumentInfo(item, commit_id2))
     return commit1Uniques, commit2Uniques
 
+def getAllCommitItemIdsOfType(commit_id, is_folder):
+    items = getAllCommitItems(commit_id)
+    rv = []
+    for item in items:
+        if item["is_folder"] == is_folder:
+            rv.append(item["item_id"])
+    return rv
+
+def getAllCommitItemsOfType(commit_id, is_folder):
+    items = getAllCommitItems(commit_id)
+    rv = []
+    for item in items:
+        if item["is_folder"] == is_folder:
+            rv.append(getFolderInfo(item, commit_id))
+        else:
+            rv.append(getDocumentInfo(item, commit_id))
+    return rv
 
 def getAllCommitItems(commit_id):
     with engine.connect() as conn:
@@ -176,3 +192,12 @@ def getAllCommitItemIds(commit_id):
 def getCommitTree(commit_id):
     root_folder = getCommitInfo(commit_id)["root_folder"]
     return getFolderTree(root_folder, commit_id)
+
+def getCommitFoldersAsPaths(commit_id):
+    project = getCommitInfo(commit_id)
+    folders = getAllCommitItemsOfType(commit_id, True)
+    folderIDToPath = {}
+    folders = [folder for folder in folders if folder["parent_folder"] > 0]
+    folderIDToPath = getFolderPathsFromList(project["root_folder"], "", folders)
+    folderIDToPath[project["root_folder"]] = ""
+    return folderIDToPath

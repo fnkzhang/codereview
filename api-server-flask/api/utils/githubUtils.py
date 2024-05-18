@@ -49,15 +49,14 @@ def getGithubProjectDocumentsAsPaths(repo, branch, token):
             githubfiles.append(file_content.path)
     return githubfiles
 
-def getProjectNonexistentGithubDocumentsUtil(repo, branch, token, proj_id):
+def getCommitNonexistentGithubDocumentsUtil(repo, branch, token, commit_id):
     allGithubFiles = set(getGithubProjectDocumentsAsPaths(repo, branch, token))
-    projectDocuments = getAllProjectDocuments(proj_id)
-    projectDocumentPaths = set([getFolderPath(document['parent_folder']) + document['name'] for document in projectDocuments])
+    commitDocuments = getAllCommitItemIdsOfType(commit_id, False)
+    projectDocumentPaths = set([getFolderPath(document['parent_folder'], commit_id) + document['name'] for document in commitDocuments])
     nonexistant = list(allGithubFiles - projectDocumentPaths)
-    print(nonexistant)
     return nonexistant
 
-def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs):
+def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id):
     tree_elements = []
     for deletedDocumentPath in deletedDocumentPaths:
         tree_elements.append(InputGitTreeElement(path = deletedDocumentPath,
@@ -65,11 +64,10 @@ def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snaps
                 type = "blob",
                 sha = None
             ))
-    for snapshotID in snapshotIDs:
-        snapshot = getSnapshotInfo(snapshotID)
-        document = getDocumentInfo(snapshot["associated_document_id"])
+    for document in documentSnapshots:
+        document = getDocumentInfo(document, commit_id)
         blob = repo.create_git_blob(
-                content = getSnapshotContentUtil(snapshotID),
+                content = getSnapshotContentUtil(documentSnapshots[document]),
                 encoding = 'utf-8',
                 )
         tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
@@ -79,13 +77,12 @@ def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snaps
             ))
     return tree_elements
 
-def assembleGithubComments(snapshotIDs):
+def assembleGithubComments(documentSnapshots, commit_id):
     githubComments = []
-    for snapshotID in snapshotIDs:
-        doc_id = getSnapshotInfo(snapshotID)["associated_document_id"]
-        document = getDocumentInfo(doc_id)
+    for doc_id in documentSnapshots:
+        document = getDocumentInfo(doc_id, commit_id)
         documentPath = getFolderPath(document['parent_folder']) + document['name']
-        commentList = filterCommentsByPredicate(models.Comment.snapshot_id == snapshotID )
+        commentList = filterCommentsByPredicate(models.Comment.snapshot_id == documentSnapshots[doc_id] )
         for comment in commentList:
             if comment["is_resolved"] == False:
                 githubComments.append("Comment From CodeReview\nComment Author:" + comment["author_email"] + "\nDocument:"+documentPath + '\nLine ' + str(comment["highlight_start_y"]) + ' to Line ' + str(comment["highlight_end_y"])+ '\n'+ str(comment["content"]))

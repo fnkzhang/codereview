@@ -90,7 +90,7 @@ def deleteDocument(doc_id, commit_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        proj_id = getDocumentInfo(doc_id)["associated_proj_id"]
+        proj_id = getDocumentInfo(doc_id, commit_id)["proj_id"]
     except:
         return {
             "success": False,
@@ -199,7 +199,7 @@ def moveDocument(doc_id, commit_id):
 
 #we have og_commit_ids for snapshtos so probably display those instead of snapshot 1, 2...github also has garbage as snapshot name so it's fine :)
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
-def getAllDocumentSnapshots(proj_id, doc_id):
+def getAllDocumentCommittedSnapshots(proj_id, doc_id):
     headers = request.headers
 
     if not isValidRequest(headers, ["Authorization"]):
@@ -217,8 +217,7 @@ def getAllDocumentSnapshots(proj_id, doc_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-    foundSnapshots = getAllDocumentSnapshotsInOrder(doc_id)
+    foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
 
     return {"success": True, "reason":"", "body": foundSnapshots}
 
@@ -240,12 +239,12 @@ def getAllCommentsForDocument(document_id):
             "reason": "Failed to Authenticate",
         }
 
-    proj_id = getDocumentInfo(document_id)["associated_proj_id"]
+    proj_id = getDocumentProject(document_id)
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     listOfSnapshotIDs = []
-    foundSnapshots = getAllDocumentSnapshotsInOrder(document_id)
+    foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(document_id)
 
     for snapshot in foundSnapshots:
         # Query

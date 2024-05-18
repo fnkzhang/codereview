@@ -19,7 +19,13 @@ def getDocumentInfo(doc_id, commit_id):
         foundDocument["parent_folder"] = commit_data["parent_folder"]
         foundDocument["name"] = commit_data["name"]
         return foundDocument._asdict()
-
+def getDocumentProject(doc_id):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.doc_id == doc_id)
+        foundDocument = conn.execute(stmt).first()
+        if foundDocument == None:
+            return None
+        return foundDocument["associated_proj_id"]
 def getDocumentInfoViaLocation(name, parent_folder, commit_id):
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.name == name, models.Document.parent_folder == parent_folder)
@@ -43,7 +49,7 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
         conn.execute(stmt)
         conn.commit()
     createItemCommitLocation(doc_id, commit_id, document_name, parent_folder, False)
-    createNewSnapshot(proj_id, doc_id, data)
+    createNewSnapshot(proj_id, doc_id, data, commit_id)
     return doc_id
 
 def deleteDocumentFromCommit(doc_id, commit_id):
@@ -74,25 +80,29 @@ def purgeDocumentUtil(doc_id):
         return False, e
 
 # Returns Array of Dictionaries
-def getAllDocumentSnapshotsInOrder(doc_id):
+def getAllDocumentCommittedSnapshotsInOrder(doc_id):
+    proj_id = getDocumentProject(doc_id)
     with engine.connect() as conn:
-        stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id).order_by(models.Snapshot.date_created.asc())
-        foundSnapshots = conn.execute(stmt)
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.date_committed != None).order_by(models.Commit.date_committed.asc())
+        foundCommits = conn.execute(stmt)
 
         listOfSnapshots = []
 
-        for row in foundSnapshots:
-            listOfSnapshots.append(row._asdict())
-
+        for row in foundCommits:
+            commit = row._asdict()["commit_id"]
+            snapshot = getCommitDocumentSnapshot(doc_id, commit)
+            listOfSnapshots.append(getSnapshotInfo(snapshot))
+        
         return listOfSnapshots
+    
 def getDocumentLastSnapshot(doc_id):
     try:
-        snapshot = getAllDocumentSnapshotsInOrder(doc_id)[-1]
+        snapshot = getAllDocumentCommittedSnapshotsInOrder(doc_id)[-1]
         return snapshot
     except:
         return None
     
-def getDocumentLastSnapshotContent(doc_id):
+def getDocumentLastCommittedSnapshotContent(doc_id):
     snapshot = getDocumentLastSnapshot(doc_id)
     if snapshot == None:
         return None

@@ -126,13 +126,13 @@ def pullToNewProject():
         return {"success":False,
                 "reason": "branch does not exist"}
     proj_id = createNewProject(body["project_name"], idInfo["email"])
+    commit_id = createNewCommit(proj_id, idInfo["email"], None)
     g2 = Github(auth = Auth.Token(user["github_token"]))
     repo = g2.get_repo(body["repository"])
     project = getProjectInfo(proj_id)
     pathToFolderID = {}
     pathToFolderID[""] = project["root_folder"]
     contents = repo.get_contents("", body["branch"])
-    updated_files = []
     while contents:
         file_content = contents.pop(0)
         index = file_content.path.rfind('/')
@@ -142,19 +142,20 @@ def pullToNewProject():
             path = file_content.path[:index]
         if file_content.type == "dir":
             contents.extend(repo.get_contents(file_content.path))
-            folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
+            folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id, commit_id)
             pathToFolderID[file_content.path] = folder_id
         else:
             try:
-                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode())
+                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode(), commit_id)
             except:
                 pass
+    commitACommit(commit_id)
     return {"success":True, "reason":"", "body":proj_id}
 
 #needs auth
 #put repository path in "repository" and branch in "branch"
 #format -> repository = "fnkzhang/codereview", branch = "main"
-@app.route('/api/Github/<proj_id>/PullToExistingProject/', methods=["POST"])
+@app.route('/api/Github/<proj_id>/<commit_id>/PullToExistingProject/', methods=["POST"])
 def pullToExistingProject(proj_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -182,16 +183,17 @@ def pullToExistingProject(proj_id):
     if body["branch"] not in rv:
         return {"success":False,
                 "reason": "branch does not exist"}
+    last_commmit = getProjectLastCommittedCommit(proj_id)
+    commit_id = createNewCommit(proj_id, idInfo["email"], last_commmit)
     g2 = Github(auth = Auth.Token(user["github_token"]))
     repo = g2.get_repo(body["repository"])
     project = getProjectInfo(proj_id)
-    folders = getAllProjectFolders(proj_id)
+    folders = getAllCommitItemsOfType(commit_id, True)
+    documents = getAllCommitItemsOfType(commit_id, False)
     pathToFolderID = {}
     pathToFolderID[""] = project["root_folder"]
     contents = repo.get_contents("", body["branch"])
     updated_files = []
-    documents = getAllProjectDocuments(proj_id)
-    folders = getAllProjectFolders(proj_id)
     docs_to_delete = [document['doc_id'] for document in documents]
     folders_to_delete = [folder['folder_id'] for folder in folders]
     folders_to_delete.remove(project["root_folder"])
@@ -204,67 +206,40 @@ def pullToExistingProject(proj_id):
             path = file_content.path[:index]
         if file_content.type == "dir":
             contents.extend(repo.get_contents(file_content.path))
-            folder = getFolderInfoViaLocation(file_content.name, pathToFolderID[path])
+            folder = getFolderInfoViaLocation(file_content.name, pathToFolderID[path], commit_id)
             if folder != None:
                 folder_id = folder["folder_id"]
                 folders_to_delete.remove(folder_id)
             else:
-                folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id)
+                folder_id = createNewFolder(file_content.name, pathToFolderID[path], proj_id, commit_id)
             pathToFolderID[file_content.path] = folder_id
         else:
-            document = getDocumentInfoViaLocation(file_content.name, pathToFolderID[path])
+            document = getDocumentInfoViaLocation(file_content.name, pathToFolderID[path], commit_id)
             try:
                 if document != None:
                     doc_id = document["doc_id"]
-                    if file_content.decoded_content != getDocumentLastSnapshotContent(doc_id):
-                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content)
+                    if file_content.decoded_content != getDocumentLastCommittedSnapshotContent(doc_id):
+                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content, commit_id)
                         updated_files.append(doc_id)
                     docs_to_delete.remove(doc_id)
                 else:
-                    doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content)
+                    doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content, commit_id)
                     updated_files.append(doc_id)
             except:
                 pass
     for doc_to_delete in docs_to_delete:
-        deleteDocumentUtil(doc_to_delete)
+        deleteDocumentFromCommit(doc_to_delete, commit_id)
     for folder_to_delete in folders_to_delete:
-        deleteFolderUtil(folder_to_delete)
+        deleteFolderFromCommit(folder_to_delete, commit_id)
+    commitACommit(commit_id)
     return {"success":True, "reason":"", "body":updated_files}
 
-#needs "branch" in arguments, for example /api/Github/12345/getNonexistent/?owner_name=fnkzhang&repo_name=coderaview&branch=main
-@app.route('/api/Github/<proj_id>/getNonexistent/', methods=["GET"])
-def getProjectNonexistentGithubDocuments(proj_id):
-    headers = request.headers
-    repository = request.args.get("repository")
-    branch = request.args.get("branch")
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-        #
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    user = getUserInfo(idInfo["email"])
-    token = user["github_token"]
-    documents = getProjectNonexistentGithubDocumentsUtil(repository, branch, token, proj_id)
-    return {"success":True, "reason":"", "body":documents}
-
-#put list of snapshots ID's to push in "snapshots"
-#put list of paths in deletedDocuments, should just be the samae paths as received in 
 #put repository including owner name in "repository", ex: billingtonbill12/testrepo
 #put branchname in "branch"
 #put branch you're building off of into "oldbranch"
 #put commit message in "message", or if we eventually put a generic message that's fine
-@app.route('/api/Github/<proj_id>/PushToNewBranch/', methods=["POST"])
-def pushToNewBranch(proj_id):
+@app.route('/api/Github/<proj_id>/<commit_id>/PushToNewBranch/', methods=["POST"])
+def pushToNewBranch(proj_id, commit_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -297,18 +272,21 @@ def pushToNewBranch(proj_id):
                 "reason": "branch already exists"}
     repo = g2.get_repo(body["repository"])
     updated_files = []
-    folderIDToPath = getProjectFoldersAsPaths(proj_id)
+    folderIDToPath = getCommitFoldersAsPaths(commit_id)
     body = request.get_json()
-    snapshotIDs = body["snapshots"]
-    deletedDocumentPaths = body["deletedDocuments"]
+    documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
+    deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(commit_id)
     branch_sha = repo.get_branch(body["oldbranch"]).commit.sha
-    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots)
+    if len(tree_elements == 0):
+        {"success":False,
+                "reason": "no files to push"}
     try:
         new_tree = repo.create_git_tree(
             tree = tree_elements,
             base_tree = repo.get_git_tree(sha=branch_sha)
             )
-    except Exception as e:
+    except:
         new_tree = repo.create_git_tree(
             tree = tree_elements,
             )
@@ -320,18 +298,16 @@ def pushToNewBranch(proj_id):
     ref = repo.create_git_ref(ref='refs/heads/' + body["branch"], sha = branch_sha)
     ref.edit(sha=commit.sha, force=True)
     commit = repo.get_branch(body["branch"]).commit
-    allcomments = assembleGithubComments(snapshotIDs)
+    allcomments = assembleGithubComments(documentSnapshots, commit_id)
     for comment in allcomments:
         commit.create_comment(body=comment)
     return {"success":True, "reason":"", "body":updated_files}
 
-#put list of snapshots ID's to push in "snapshots"
-#put list of paths in deletedDocuments, should just be the samae paths as received in 
 #put repository including owner name in "repository", ex: billingtonbill12/testrepo
 #put branchname in "branch"
 #put commit message in "message", or if we eventually put a generic message that's fine
-@app.route('/api/Github/<proj_id>/PushToExisting/', methods=["POST"])
-def pushToExistingBranch(proj_id):
+@app.route('/api/Github/<proj_id>/<commit_id>/PushToExisting/', methods=["POST"])
+def pushToExistingBranch(proj_id, commit_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -361,11 +337,14 @@ def pushToExistingBranch(proj_id):
                 "reason": "branch does not exist"}
     repo = g2.get_repo(body["repository"])
     updated_files = []
-    folderIDToPath = getProjectFoldersAsPaths(proj_id)
+    folderIDToPath = getCommitFoldersAsPaths(commit_id)
     body = request.get_json()
-    snapshotIDs = body["snapshots"]
-    deletedDocumentPaths = body["deletedDocuments"]
-    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, snapshotIDs)
+    documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
+    deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(commit_id)
+    tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots)
+    if len(tree_elements == 0):
+        {"success":False,
+                "reason": "no files to push"}
     branch_sha = repo.get_branch(body["branch"]).commit.sha
     try:
         new_tree = repo.create_git_tree(
@@ -384,7 +363,7 @@ def pushToExistingBranch(proj_id):
     ref = repo.get_git_ref(ref='heads/' + body["branch"])
     ref.edit(sha=commit.sha, force=True)
     commit = repo.get_branch(body["branch"]).commit
-    allcomments = assembleGithubComments(snapshotIDs)
+    allcomments = assembleGithubComments(documentSnapshots, commit_id)
     for comment in allcomments:
         commit.create_comment(body=comment)
     return {"success":True, "reason":"", "body":updated_files}

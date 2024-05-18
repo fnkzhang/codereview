@@ -22,4 +22,3 @@ def getAllCommitDocumentSnapshotRelation(commit_id):
         for relation in foundRelations:
             relations[relation.doc_id] = relation.snapshot_id
         return relations
-
