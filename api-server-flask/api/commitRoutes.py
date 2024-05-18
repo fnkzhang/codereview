@@ -224,7 +224,7 @@ def bulkDeleteFromCommit(commit_id):
 
 #no checks will just commit
 @app.route('/api/Commit/<commit_id>/commitCommit/', methods = ["POST"])
-def commitCommit(proj_id):
+def commitCommit(commit_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
