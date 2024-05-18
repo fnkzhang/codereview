@@ -27,7 +27,13 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id):
         conn.commit()
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), data)
+        snap = getCommitDocumentSnapshot(doc_id, commit_id)
         createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
+        stmt = select(models.CommitDocumentSnapshotRelation).where(
+                    models.CommitDocumentSnapshotRelation.snapshot_id == snap)
+        result = conn.execute(stmt).first()
+        if result == None:
+            deleteSnapshotUtil(snap)
         return snapshot_id
 
 def getSnapshotProject(snapshot_id):
