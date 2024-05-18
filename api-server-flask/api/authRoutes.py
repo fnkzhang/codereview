@@ -28,15 +28,9 @@ def authenticator():
     })
 
 #literally just authenticator but it adds a user to the database.
-@app.route('/api/user/signup/', methods = ["POST"])
+@app.route('/api/user/signup', methods = ["POST"])
 def signUp():
     headers = request.headers
-    if (not isValidRequest(headers, ["Authorization"])):
-        return {
-                "success": False,
-                "reason": "Invalid Token Provided"
-        }
-
     idInfo = authenticate()
     if idInfo is None:
         return {
