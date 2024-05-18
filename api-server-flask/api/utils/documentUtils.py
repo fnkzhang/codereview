@@ -96,9 +96,15 @@ def getAllDocumentCommittedSnapshotsInOrder(doc_id):
             snapshot = getCommitDocumentSnapshot(doc_id, commit)
             if snapshot != None:
                 listOfSnapshots.append(getSnapshotInfo(snapshot))
-        if doc_id == 169838887:
-            print(listOfSnapshots)
         return listOfSnapshots
+
+# Returns Array of Dictionaries
+def getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working_commit_id):
+    foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
+    snap = getCommitDocumentSnapshot(doc_id, working_commit_id)
+    if snap != None:
+        foundSnapshots.append(getSnapshotInfo(snap["snapshot_id"]))
+    return foundSnapshots
     
 def getDocumentLastSnapshot(doc_id):
     #try:

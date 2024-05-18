@@ -156,6 +156,7 @@ def pullToNewProject():
 #needs auth
 #put repository path in "repository" and branch in "branch"
 #format -> repository = "fnkzhang/codereview", branch = "main"
+#put commit name in "name"
 @app.route('/api/Github/<proj_id>/PullToExistingProject/', methods=["POST"])
 def pullToExistingProject(proj_id):
     headers = request.headers
@@ -244,7 +245,7 @@ def pullToExistingProject(proj_id):
     print(len(updated_files), len(docs_to_delete), len(folders_to_delete))
     if len(updated_files) > 0 or len(docs_to_delete) > 0 or len(folders_to_delete) > 0:
         print(commit)
-        commitACommit(commit_id, "Pulled from branch " + body["branch"] + " of " + body["repository"])
+        commitACommit(commit_id, body["name"])
 
     else:
         deleteCommit(commit_id)
