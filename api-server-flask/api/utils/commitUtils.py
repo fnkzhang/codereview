@@ -34,7 +34,7 @@ def createNewCommit(proj_id, email, last_commit):
                 proj_id = proj_id,
                 commit_id = commit_id,
                 author_email = email,
-                root_folder = root_folder_id
+                root_folder = root_folder_id,
                 last_commit = last_commit
         )
         conn.execute(stmt)
