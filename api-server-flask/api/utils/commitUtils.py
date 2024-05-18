@@ -38,7 +38,7 @@ def createNewCommit(proj_id, email, last_commit):
                 root_folder = root_folder_id,
                 last_commit = last_commit,
                 name = "User Working Commit"
-                state = reviewStateEnum.open
+                #state = reviewStateEnum.open
         )
         conn.execute(stmt)
         conn.commit()
