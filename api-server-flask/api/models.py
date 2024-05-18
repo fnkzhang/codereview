@@ -99,6 +99,7 @@ class Commit(Base):
     date_committed = Column(DateTime(timezone=True))
     root_folder = Column(Integer)
     last_commit = Column(Integer)
+
 class CommitDocumentSnapshotRelation(Base):
     __tablename__ = "docsnapshotrelation"
     doc_id = Column(Integer, primary_key=True)
