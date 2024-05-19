@@ -1,8 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Dropdown } from "flowbite-react";
 
 export default function CommitDropdown( props ) {
-  console.log(props)
+  const navigate = useNavigate()
   if(props.commits.length !== 0) {
     return (
       <Dropdown 
@@ -11,7 +12,10 @@ export default function CommitDropdown( props ) {
           return (
             <Dropdown.Item 
               key={index}
-              onClick={() => props.setCommit(commit)}
+              onClick={() => {
+                props.setCommit(commit)
+                props.setCommitLoading(true)
+              }}
             >
               <div className="text-textcolor m-1">
                 {commit.name}
