@@ -52,12 +52,12 @@ export default function ProjectPage( props ) {
       }
     }
 
-    if (loading)
+    if (loading && props.isLoggedIn)
       fetchData()
     else
       return
 
-  }, [project_id, loading])
+  }, [project_id, loading, props.isLoggedIn])
 
   useEffect(() => {
 
@@ -69,7 +69,6 @@ export default function ProjectPage( props ) {
           break;
         }
       }
-      console.log(foundCommit)
       return foundCommit
     }
 
@@ -102,12 +101,12 @@ export default function ProjectPage( props ) {
       }
     }
 
-    if ((commitLoading && loading === false) && (commits !== null))
+    if (props.isLoggedIn && commitLoading && (loading === false) && (commits !== null))
       getTree()
     else
       return
 
-  }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading])
+  }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading, props.isLoggedIn])
  
   // Get the user permission level for use on the page
   useEffect(() => {
