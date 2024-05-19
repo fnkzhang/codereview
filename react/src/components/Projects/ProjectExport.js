@@ -26,7 +26,7 @@ export default function ProjectExport( props ) {
     let documents = null
     let snapshots = []
   
-    await getDeletedDocuments(project_id, gitRepo, repoBranch).then((result) => {
+    /*await getDeletedDocuments(project_id, gitRepo, repoBranch).then((result) => {
       if(!result.success){
         setWorking(false)
         setIsError(true)
@@ -49,7 +49,7 @@ export default function ProjectExport( props ) {
         setWorking(false)
         setIsError(true)
       }
-    })})
+    })})*/
   }
 
   if ( props.isLoggedIn === false ) {

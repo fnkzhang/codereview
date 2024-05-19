@@ -56,9 +56,9 @@ function App() {
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/:commit_id" element={<ProjectPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="/Project/Export/:project_id/" element={<ProjectExport
+          {/*<Route path="/Project/Export/:project_id/" element={<ProjectExport
             isLoggedIn={isLoggedIn} userData={userData}
-            connected={connected} setConnected={setConnected}/>}/>
+          connected={connected} setConnected={setConnected}/>}/>*/}
           <Route path="/Project/:project_id/:parent_folder_id/Document/Create" element={<DocumentCreation
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/:parent_folder_id/Folder/Create" element={<FolderCreation

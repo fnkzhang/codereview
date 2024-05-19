@@ -336,7 +336,7 @@ export default function ProjectPage( props ) {
     )
   }
 
-  if (loading) {
+  if (loading || (commitLoading && (commit === null))) {
     return (
       <div>
         <div className="text-textcolor text-center m-20 text-xl">
@@ -344,21 +344,6 @@ export default function ProjectPage( props ) {
         </div>
       </div>
     )
-  }
-
-  if (folderStack === null) {
-    return (
-      <div>
-        <div className="text-textcolor text-center m-20 text-xl">
-          There was an error trying to fetch this commit.
-        </div>
-      </div>
-    )
-  }
-
-  let path = `root/`
-  for (let i = 1; i < folderStack.length; i++) {
-    path += `/${folderStack[i].name}`
   }
 
   if (commitLoading) {
@@ -380,6 +365,11 @@ export default function ProjectPage( props ) {
         </div>
       </div>
     )
+  }
+
+  let path = `root/`
+  for (let i = 1; i < folderStack.length; i++) {
+    path += `/${folderStack[i].name}`
   }
 
   return (
