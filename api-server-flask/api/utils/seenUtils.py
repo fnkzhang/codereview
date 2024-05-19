@@ -6,7 +6,7 @@ import models
 
 def isSnaphotSeenByUser(snapshot_id, user_email):
     with engine.connect() as conn:
-        stmt = select(models.UserUnseenSnapshot).values(
+        stmt = select(models.UserUnseenSnapshot).where(
                 models.UserUnseenSnapshot.snapshot_id == snapshot_id,
                 models.UserUnseenSnapshot.user_email == user_email
                 )
@@ -51,7 +51,7 @@ def setSnapAsSeenForAllProjUsers(snapshot_id, proj_id):
 
 def isSnapshotAllCommentSeenByUser(snapshot_id, user_email):
     with engine.connect() as conn:
-        stmt = select(models.Comment).values(
+        stmt = select(models.Comment).where(
             models.Comment.snapshot_id == snapshot_id
         )
         comments = conn.execute(stmt)
@@ -62,7 +62,7 @@ def isSnapshotAllCommentSeenByUser(snapshot_id, user_email):
         
 def isCommentSeenByUser(comment_id, user_email):
     with engine.connect() as conn:
-        stmt = select(models.UserUnseenComment).values(
+        stmt = select(models.UserUnseenComment).where(
                 models.UserUnseenComment.comment_id == comment_id,
                 models.UserUnseenComment.user_email == user_email
                 )
