@@ -8,6 +8,7 @@ import ProjectPage from './components/ProjectPage.js';
 import ProjectCreation from './components/Projects/ProjectCreation.js';
 import ProjectDeletion from './components/Projects/ProjectDeletion.js';
 import ProjectExport from './components/Projects/ProjectExport.js';
+import CommitDeletion from './components/Commits/CommitDeletion.js';
 import DocumentCreation from './components/Documents/DocumentCreation.js';
 import FolderCreation from './components/Folders/FolderCreation.js';
 import PermissionPage from './components/Permissions/PermissionPage.js';
@@ -54,11 +55,13 @@ function App() {
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/Share" element={<PermissionPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="/Project/:project_id/:commit_id" element={<ProjectPage
+          <Route path="/Project/:project_id/Commit/:commit_id/" element={<ProjectPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          {/*<Route path="/Project/Export/:project_id/" element={<ProjectExport
+          <Route path="/Project/:project_id/Commit/Delete/:commit_id/" element={<CommitDeletion
+            isLoggedIn={isLoggedIn} userData={userData}/>}/>
+          <Route path="/Project/Export/:project_id/" element={<ProjectExport
             isLoggedIn={isLoggedIn} userData={userData}
-          connected={connected} setConnected={setConnected}/>}/>*/}
+            connected={connected} setConnected={setConnected}/>}/>
           <Route path="/Project/:project_id/:parent_folder_id/Document/Create" element={<DocumentCreation
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/:parent_folder_id/Folder/Create" element={<FolderCreation

@@ -74,9 +74,6 @@ export default function ProjectPage( props ) {
 
     async function getTree() {
 
-      if ((commit !== null) && (commit.commit_id === commit_id))
-        return
-
       let folderTreeResult = null
       let commit_val = null
       if (commit == null) {
@@ -98,25 +95,27 @@ export default function ProjectPage( props ) {
         folderTreeResult = await getFolderTree(commit.commit_id)
       }
 
+      folderTreeResult.body.commit_id = commit_val
       setFolderStack([folderTreeResult.body])
-      navigate(`/Project/${project_id}/${commit_val}`)
+      navigate(`/Project/${project_id}/Commit/${commit_val}`)
     }
 
     if (props.isLoggedIn === false)
       return
 
+    if ((commit !== null) && (commit.commit_id === Number(commit_id)))
+      return
+
     if (commitLoading && (loading === false) && (commits !== null)) {
       getTree()
     }
-    console.log(commit)
 
   }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading, props.isLoggedIn, navigate, project_id])
 
   useEffect(() => {
-    if ((folderStack !== null) && (folderStack[0].og_commit_id === commit.commit_id))
+    if (commitLoading && (folderStack !== null) && (folderStack[0].commit_id === commit.commit_id))
       setCommitLoading(false)
-  }, [folderStack, setCommitLoading])
- 
+  }, [folderStack, commitLoading, setCommitLoading])
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
@@ -133,8 +132,11 @@ export default function ProjectPage( props ) {
         }
       }
     }
-    getUserPermissionLevel();
-  }, [props.userData, project_id])
+
+    if (props.isLoggedIn === true)
+      getUserPermissionLevel();
+
+  }, [props.userData, project_id, props.isLoggedIn])
 
   function handleFolderClick (folder) {
     setFolderStack([...folderStack, folder])
@@ -303,21 +305,35 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayCreateCommitButton() {
-    if (commits.some(item => item.date_commited === null))
+    if (commits.some(item => item.date_committed === null))
       return
 
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => {
-          createCommit(project_id, commit.commit_id)
-          setLoading(true)
-        }}>
+          onClick={() => {
+            createCommit(project_id, commit.commit_id)
+            setLoading(true)
+          }}>
           Create Commit
         </button>
       </div>
     )
 
+  }
+
+  function DisplayDeleteWorkingCommitButton() {
+    if (commit.date_committed !== null)
+      return
+
+    return(
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+          onClick={() => navigate(`/Project/${project_id}/Commit/Delete/${commit.commit_id}`)}>
+          Delete Commit
+        </button>
+      </div>
+    )
   }
 
   function DisplayUploadDocumentButton() {
@@ -429,6 +445,7 @@ export default function ProjectPage( props ) {
         <BackButton/>
         <DisplayExportButton/>
         <DisplayDeleteButton/>
+        <DisplayDeleteWorkingCommitButton/>
         <DisplayCreateCommitButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>
