@@ -799,3 +799,30 @@ export async function getCommits(proj_id) {
     return data
   })
 }
+
+export async function createCommit(proj_id, commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "last_commit" : commit_id,
+    })
+  };
+
+  return await fetch((`/api/Commit/${proj_id}/createCommit/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data
+  })
+}

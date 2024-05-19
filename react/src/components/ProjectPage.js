@@ -2,7 +2,7 @@ import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import { Card } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
-  getCommits } from "../api/APIUtils"
+  getCommits, createCommit } from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./BackButton"
@@ -74,39 +74,48 @@ export default function ProjectPage( props ) {
 
     async function getTree() {
 
-      if (commit !== null && commit.commit_id === commit_id)
+      if ((commit !== null) && (commit.commit_id === commit_id))
         return
 
       let folderTreeResult = null
       let commit_val = null
-      if (Number(commit_id) === 0) {
-        commit_val = commits[0].commit_id
-        folderTreeResult = await getFolderTree(commit_val);
-      } else {
-        commit_val = findCommit(Number(commit_id)).commit_id
-        if (commit_val) {
-          folderTreeResult = await getFolderTree(commit_val)
+      if (commit == null) {
+        if (Number(commit_id) === 0) {
+          commit_val = commits[0].commit_id
+          folderTreeResult = await getFolderTree(commit_val);
         } else {
-          console.log("This is an unknown commit_id")
-          return
+          commit_val = findCommit(Number(commit_id)).commit_id
+          if (commit_val) {
+            folderTreeResult = await getFolderTree(commit_val)
+          } else {
+            console.log("This is an unknown commit_id")
+            return
+          }
         }
+        setCommit(findCommit(commit_val))
+      } else {
+        commit_val = commit.commit_id
+        folderTreeResult = await getFolderTree(commit.commit_id)
       }
 
       setFolderStack([folderTreeResult.body])
-      setCommit(findCommit(commit_val))
       navigate(`/Project/${project_id}/${commit_val}`)
-
-      if (commit !== null) {
-        setCommitLoading(false)
-      }
     }
 
-    if (props.isLoggedIn && commitLoading && (loading === false) && (commits !== null))
-      getTree()
-    else
+    if (props.isLoggedIn === false)
       return
 
-  }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading, props.isLoggedIn])
+    if (commitLoading && (loading === false) && (commits !== null)) {
+      getTree()
+    }
+    console.log(commit)
+
+  }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading, props.isLoggedIn, navigate, project_id])
+
+  useEffect(() => {
+    if ((folderStack !== null) && (folderStack[0].og_commit_id === commit.commit_id))
+      setCommitLoading(false)
+  }, [folderStack, setCommitLoading])
  
   // Get the user permission level for use on the page
   useEffect(() => {
@@ -263,10 +272,10 @@ export default function ProjectPage( props ) {
 
   function DisplayDeleteButton() {
     if (props.userData === null)
-      return null
+      return
 
     if (props.userData.email !== projectOwnerEmail)
-      return null
+      return
 
     return (
       <div className="text-textcolor text-xl">
@@ -278,10 +287,10 @@ export default function ProjectPage( props ) {
 
   function DisplayShareButton() {
     if (props.userData === null)
-      return null
+      return
     // Make Sure user has permision to share before allowing them to share
     if (!IsUserAllowedToShare(userPermissionLevel))
-      return;
+      return
 
     return (
       <div className="text-textcolor text-xl">
@@ -292,7 +301,29 @@ export default function ProjectPage( props ) {
       </div>
     )
   }
+
+  function DisplayCreateCommitButton() {
+    if (commits.some(item => item.date_commited === null))
+      return
+
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        onClick={() => {
+          createCommit(project_id, commit.commit_id)
+          setLoading(true)
+        }}>
+          Create Commit
+        </button>
+      </div>
+    )
+
+  }
+
   function DisplayUploadDocumentButton() {
+    if (commit.date_comitted !== null)
+      return
+  
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
@@ -302,6 +333,9 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayCreateFolderButton() {
+    if (commit.date_comitted !== null)
+      return
+
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
@@ -356,6 +390,7 @@ export default function ProjectPage( props ) {
             commits={commits}
             commit={commit}
             setCommit={setCommit}
+            setCommitLoading={setCommitLoading}
           />
         </div>
         <div>
@@ -381,6 +416,7 @@ export default function ProjectPage( props ) {
           commits={commits}
           commit={commit}
           setCommit={setCommit}
+          setCommitLoading={setCommitLoading}
         />
       </div>
       <div className="flex">
@@ -393,6 +429,7 @@ export default function ProjectPage( props ) {
         <BackButton/>
         <DisplayExportButton/>
         <DisplayDeleteButton/>
+        <DisplayCreateCommitButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>
         <DisplayShareButton/>
