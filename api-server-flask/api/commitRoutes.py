@@ -15,6 +15,35 @@ from utils.commitLocationUtils import *
 
 import models
 
+@app.route('/api/Commit/<commit_id>/info/', methods = ["GET"])
+def getCommitInformation(commit_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    try:
+        proj_id = getCommitInfo(commit_id)["proj_id"]
+    except:
+        return {"success":False, "reason":"commit doesn't exist"}
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    info = getCommitInfo(commit_id)
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": info
+    }
+
 #gets a dict with the keys of documents mapping to their snapshot in the commit
 @app.route('/api/Commit/<commit_id>/', methods = ["GET"])
 def getCommitDocumentSnapshotPairs(commit_id):
