@@ -17,7 +17,6 @@ import models
 #commit_id is info about the doc in the commit you're in
 @app.route('/api/Document/<proj_id>/<doc_id>/<commit_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id, commit_id):
-    print(request)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
