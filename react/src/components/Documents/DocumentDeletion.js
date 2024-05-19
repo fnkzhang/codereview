@@ -10,12 +10,12 @@ export default function DcoumentDeletion(props) {
     const [inputDocumentName, setInputDocumentName] = useState("");
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
-    const { project_id, document_id } = useParams();
+    const { project_id, commit_id, document_id } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
         async function getDocumentData() {
-            let result = await getDocumentInfo(document_id)
+            let result = await getDocumentInfo(project_id, commit_id, document_id)
             setDocumentName(result.name)
         }
 
@@ -25,23 +25,24 @@ export default function DcoumentDeletion(props) {
     const handleDeleteDocumentButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 
-        setWorking(true)
+        if (working)
+            return
 
         if (inputDocumentName === "") {
-            setWorking(false)
             return
         }
 
         if (inputDocumentName !== documentName) {
             alert("Input Does Not Match Document Name")
-            setWorking(false)
             return
         }
 
-        let result = await deleteDocument(document_id)
+        setWorking(true)
+
+        let result = await deleteDocument(document_id, commit_id)
 
         if (result.success) {
-            navigate("/") // Go Home
+            navigate(`/Project/${project_id}/Commit/${commit_id}`)
         } else {
             setWorking(false)
             setIsError(true)
@@ -61,7 +62,9 @@ export default function DcoumentDeletion(props) {
     return (
         <div>
             <div>
-                <BackButton />
+                <BackButton
+                    location={`/Project/${project_id}/Commit/${commit_id}`}
+                />
             </div>
             <div className="flex justify-center mt-20">
                 <form
@@ -75,7 +78,7 @@ export default function DcoumentDeletion(props) {
 
                         <div className="mb-3 block">
                             <Label className="text-2xl">
-                                Please type <strong className="text-red-500">{projectName}</strong> into the text field.
+                                Please type <strong className="text-red-500">{documentName}</strong> into the text field.
                             </Label>
                         </div>
                         <TextInput

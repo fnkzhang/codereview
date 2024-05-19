@@ -31,7 +31,7 @@ export default function ProjectListPage( props ) {
     function ProjectDisplayBox({id, name, author, date}) {
       return (
         <Card 
-          className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
+          className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"
           onClick={() => handleProjectClick(id)}
         >
           <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">

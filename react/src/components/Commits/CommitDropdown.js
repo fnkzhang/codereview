@@ -1,9 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Dropdown } from "flowbite-react";
 
 export default function CommitDropdown( props ) {
-  const navigate = useNavigate()
   if(props.commits.length !== 0) {
     return (
       <Dropdown 

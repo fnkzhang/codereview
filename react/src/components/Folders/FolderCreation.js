@@ -23,7 +23,7 @@ export default function FolderCreation( props ) {
     let result = await createFolder(folderName, project_id, commit_id, parent_folder_id)
     
     if (result.success) {
-      navigate(`/Project/${project_id}/`)
+      navigate(`/Project/${project_id}/Commit/${commit_id}`)
     } else {
       setWorking(false)
       setIsError(true)
@@ -43,7 +43,9 @@ export default function FolderCreation( props ) {
   return (
     <div>
       <div>
-        <BackButton/>
+        <BackButton
+          location={`/Project/${project_id}/Commit/${commit_id}`}
+        />
       </div>
       <div className="flex justify-center mt-20">
         <form

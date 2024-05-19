@@ -24,7 +24,7 @@ export default function CommitDeletion(props) {
         }
 
         if (inputCommitName !== commitName) {
-            alert("Input Does Not Match Project Name")
+            alert("Input Does Not Match Commit Name")
             setWorking(false)
             return
         }

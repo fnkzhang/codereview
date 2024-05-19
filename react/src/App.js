@@ -10,6 +10,7 @@ import ProjectDeletion from './components/Projects/ProjectDeletion.js';
 import ProjectExport from './components/Projects/ProjectExport.js';
 import CommitDeletion from './components/Commits/CommitDeletion.js';
 import DocumentCreation from './components/Documents/DocumentCreation.js';
+import DocumentDeletion from './components/Documents/DocumentDeletion.js'
 import FolderCreation from './components/Folders/FolderCreation.js';
 import PermissionPage from './components/Permissions/PermissionPage.js';
 
@@ -63,6 +64,8 @@ function App() {
             isLoggedIn={isLoggedIn} userData={userData}
             connected={connected} setConnected={setConnected}/>}/>
           <Route path="/Project/:project_id/Commit/:commit_id/:parent_folder_id/Document/Create" element={<DocumentCreation
+            isLoggedIn={isLoggedIn} userData={userData}/>}/>
+          <Route path="/Project/:project_id/Commit/:commit_id/Document/Delete/:document_id" element={<DocumentDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/Commit/:commit_id/:parent_folder_id/Folder/Create" element={<FolderCreation
             isLoggedIn={isLoggedIn} userData={userData}/>}/>

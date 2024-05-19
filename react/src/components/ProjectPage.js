@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
-import { Card } from "flowbite-react"
+import { Card, Dropdown } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
   getCommits, createCommit } from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
@@ -142,17 +142,10 @@ export default function ProjectPage( props ) {
     setFolderStack([...folderStack, folder])
   }
 
-  // Clicking on project will redirect to project page to select documents
-  async function handleDocumentClick (document_id, name) {
-    const result = await getAllSnapshotsFromDocument(project_id, document_id)
-    if (result.success)
-      navigate(`/Project/${project_id}/Document/${document_id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`, {state: {documentName: name}})
-  }
-
   function FolderDisplayBox({id, name, folder}) {
     return (
       <Card 
-        className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
+        className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
         onClick={() => handleFolderClick(folder)}
       >
         <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
@@ -167,16 +160,53 @@ export default function ProjectPage( props ) {
   }
 
   function DocumentDisplayBox({id, name, date}) {
+
+    async function handleDocumentClick () {
+      const result = await getAllSnapshotsFromDocument(project_id, id)
+      if (result.success)
+        navigate(`/Project/${project_id}/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
+    }
+
+    function DisplayDocumentOptions() {
+      if (commit.date_committed !== null)
+        return
+
+      return(
+        <Dropdown className="bg-background" inline label="">
+          <Dropdown.Item
+            className="hover:bg-alternative"            
+            onClick={() => handleDocumentClick()}
+          >
+            <div className="text-textcolor m-1">
+              View
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item
+            className="hover:bg-alternative"              
+            onClick={() => navigate(`/Project/${project_id}/Commit/${commit_id}/Document/Delete/${id}`)}
+          >
+            <div className="text-textcolor m-1">
+              Delete
+            </div>
+          </Dropdown.Item>
+        </Dropdown>
+      )
+    }
+
     return (
       <Card 
-        className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
-        onClick={() => handleDocumentClick(id, name)}
+        className="bg-background w-1/4 p-3 m-3"
       >
-        <h4 className="text-textcolor overflow-hidden whitespace-nowrap p-1">
-          <span className="font-bold text-xl">{name} </span>
-        </h4>
+        <div className="w-full flex justify-between">
+          <h4 className="flex flex-col text-textcolor overflow-hidden whitespace-nowrap p-1">
+              <span className="font-bold text-xl">{name} </span>
+          </h4>
+          <div className="text-textcolor flex justify-end px-4 pt-4">
+            <DisplayDocumentOptions/>
+          </div>
+        </div>
         <h4 className="text-textcolor p-1">
-        <span className="font-bold block">ID: </span>
+          <span className="font-bold block">ID: </span>
           <span className="block">{id}</span>
         </h4>
         <h4 className="text-textcolor p-1">
@@ -410,6 +440,12 @@ export default function ProjectPage( props ) {
     return(
       <div>
         <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
+        <div className="flex m-1">
+          <BackButton location={`/`}/>
+          <DisplayExportButton/>
+          <DisplayDeleteButton/>
+          <DisplayShareButton/>
+        </div>
         <div className="flex">
           <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
           <CommitDropdown
@@ -430,12 +466,18 @@ export default function ProjectPage( props ) {
 
   let path = `root/`
   for (let i = 1; i < folderStack.length; i++) {
-    path += `/${folderStack[i].name}`
+    path += `${folderStack[i].name}/`
   }
 
   return (
     <div>
       <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
+      <div className="flex m-1">
+        <BackButton location={`/`}/>
+        <DisplayExportButton/>
+        <DisplayDeleteButton/>
+        <DisplayShareButton/>
+      </div>
       <div className="flex">
         <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
         <CommitDropdown
@@ -445,21 +487,17 @@ export default function ProjectPage( props ) {
           setCommitLoading={setCommitLoading}
         />
       </div>
+      <div className="flex m-1">
+        <DisplayDeleteWorkingCommitButton/>
+        <DisplayCreateCommitButton/>
+        <DisplayUploadDocumentButton/>
+        <DisplayCreateFolderButton/>
+      </div>
       <div className="flex">
         <div className="overflow-x-auto">
           <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">{`${path}`}</h3>
         </div>
         <DisplayNavigateParentFolderButton/>
-      </div>
-      <div className="flex">
-        <BackButton/>
-        <DisplayExportButton/>
-        <DisplayDeleteButton/>
-        <DisplayDeleteWorkingCommitButton/>
-        <DisplayCreateCommitButton/>
-        <DisplayUploadDocumentButton/>
-        <DisplayCreateFolderButton/>
-        <DisplayShareButton/>
       </div>
       <DisplayFolderBox/>
       <DisplayDocumentBox/>

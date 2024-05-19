@@ -201,7 +201,7 @@ export async function deleteDocument(doc_id, commit_id) {
     .then(response => response.json())
 }
 
-export async function  getDocumentInfo(proj_id, doc_id, commit_id) {
+export async function  getDocumentInfo(proj_id, commit_id, doc_id) {
   let oAuthToken = getCookie("cr_id_token")
   
   let headers = {
@@ -215,9 +215,14 @@ export async function  getDocumentInfo(proj_id, doc_id, commit_id) {
     }
   }
 
-  return await fetch((`/api/Document/${proj_id}/${doc_id}/${commit_id}`), headers)
-    .then(response => response.json())
-
+  return await fetch((`/api/Document/${proj_id}/${doc_id}/${commit_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data.body
+  })
 }
 
 export async function getDocSnapshot(proj_id, doc_id, snap_id) {

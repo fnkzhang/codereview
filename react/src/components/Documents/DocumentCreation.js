@@ -28,7 +28,7 @@ export default function DocumentCreation( props ) {
     let result = await createDocument(documentName, project_id, commit_id, documentData, parent_folder_id)
     
     if (result.success) {
-      navigate(`/Project/${project_id}/`)
+      navigate(`/Project/${project_id}/Commit/${commit_id}`)
     } else {
       setWorking(false)
       setIsError(true)
@@ -43,14 +43,11 @@ export default function DocumentCreation( props ) {
 
     setDocumentName(fileInformation.name)
 
-    console.log(fileInformation)
-
     let fileReader = new FileReader();
 
     // Run After Finished Reading File
     fileReader.onloadend = () => {
       fileText = fileReader.result
-      console.log(fileText)
       
       setDocumentData(fileText);
       setIsUploadedFile(true)
@@ -73,7 +70,9 @@ export default function DocumentCreation( props ) {
   return (
     <div>
       <div>
-        <BackButton/>  
+        <BackButton
+          location={`/Project/${project_id}/Commit/${commit_id}`}
+        />  
       </div>
       <div className="flex justify-center mt-20">
         <form
