@@ -62,15 +62,14 @@ export default function ProjectPage( props ) {
   useEffect(() => {
 
     function findCommit (x) {
-      console.log(commits)
-      console.log(x)
       let foundCommit = null
       for (let i = 0; i < commits.length; i++) {
-        if (commits[i].commit_id === x) {
+        if (Number(commits[i].commit_id) === x) {
           foundCommit = commits[i];
           break;
         }
       }
+      console.log(foundCommit)
       return foundCommit
     }
 
@@ -96,14 +95,14 @@ export default function ProjectPage( props ) {
 
       setFolderStack([folderTreeResult.body])
       setCommit(findCommit(commit_val))
-      //navigate(`/Project/${project_id}/${commit_val}`)
+      navigate(`/Project/${project_id}/${commit_val}`)
 
-      if ((commit !== null) && (commits !== null)){
+      if (commit !== null) {
         setCommitLoading(false)
       }
     }
 
-    if (commitLoading && loading === false)
+    if ((commitLoading && loading === false) && (commits !== null))
       getTree()
     else
       return
