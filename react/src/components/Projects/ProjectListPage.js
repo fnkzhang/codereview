@@ -25,7 +25,7 @@ export default function ProjectListPage( props ) {
 
     // Clicking on project will redirect to project page to select documents
     const handleProjectClick = (id) => {
-      navigate(`/Project/${id}`)
+      navigate(`/Project/${id}/0`)
     }
 
     function ProjectDisplayBox({id, name, author, date}) {
