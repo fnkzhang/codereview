@@ -160,6 +160,9 @@ def getProjectCommittedCommits(proj_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     arrayOfCommits = getAllCommittedProjectCommitsInOrder(proj_id)
+    workingCommit = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+    if workingCommit != None:
+        arrayOfCommits.append(workingCommit)
     return {
         "success": True,
         "reason": "",
