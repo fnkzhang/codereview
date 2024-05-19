@@ -93,8 +93,36 @@ def transferProjectOwnership(proj_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     return {"success": changeProjectOwner(inputBody["email"], proj_id), "reason":"N/A", "body": {}}
 
-#just addUser but you don't need to be a valid user lol, test function remove later
+#copies all permissions from one project to this one
+@app.route('/api/Project/<old_proj_id>/<new_proj_id>/importPermissions/', methods = ["POST"])
+def importPermissions(old_proj_id, new_proj_id):
+    inputBody = request.get_json()
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
 
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    permissions = getUserProjPermissions(idInfo["email"], proj_id)
+    if(permissions < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    projowner = getProjectInfo(new_proj_id)["author_email"]
+    projpermissions = getAllUserProjPermissionsForProject(old_proj_id)
+    addedUsers = []
+    for permission in projpermissions:
+        if permission["permissions"] == 5 and permission["user_email"] != projowner:
+            setUserProjPermissions(permission["user_email"], new_proj_id, "Editor", 3)
+        else:
+            setUserProjPermissions(permission["user_email"], new_proj_id, permission["role"], permission["permissions"])
+        addedUsers.append(permission["user_email"])
+    return {"success": True, "reason":"", "body":addedUsers}
 
 #just addUser but you don't need to be a valid user lol, test function remove later
 #still needs:
