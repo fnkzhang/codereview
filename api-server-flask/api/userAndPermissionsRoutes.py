@@ -110,8 +110,8 @@ def importPermissions(old_proj_id, new_proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    permissions = getUserProjPermissions(idInfo["email"], proj_id)
-    if(permissions < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
+    permissions = getUserProjPermissions(idInfo["email"], old_proj_id)
+    if(permissions < 3):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     projowner = getProjectInfo(new_proj_id)["author_email"]
     projpermissions = getAllUserProjPermissionsForProject(old_proj_id)
@@ -132,14 +132,7 @@ def importPermissions(old_proj_id, new_proj_id):
 @app.route('/api/Project/<proj_id>/addUserAdmin/', methods=["POST"])
 def addUserAdmin(proj_id):
     inputBody = request.get_json()
-    headers = request.headers
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    if (permissions == 5):
-        return {"success": False, "reason":"Cannot add another Owner", "body":{}}
-    if (permissions < 0):
-        return {"success": False, "reason":"Invalid Permission Level", "body":{}}
-    return {"success": setUserProjPermissions(email, pid, r, perms), "reason":"N/A", "body": {}}
+    return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A", "body": {}}
 
 #have email in body in "email"
 @app.route('/api/Project/<proj_id>/removeUser/', methods=["DELETE"])

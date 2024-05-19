@@ -98,4 +98,3 @@ def setCommentAsSeen(comment_id, user_email):
         conn.execute(stmt)
         conn.commit()
     return True
-
