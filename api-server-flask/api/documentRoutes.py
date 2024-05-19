@@ -43,7 +43,7 @@ def getDocument(proj_id, doc_id, commit_id):
     #data (text you want in the document)
     #doc_name (name of document)
     #parent_folder (folder you're making it in), if not in request will put in root folder
-@app.route('/api/Document/<proj_id>/<commit_id>', methods=["POST"])
+@app.route('/api/Document/<proj_id>/<commit_id>/', methods=["POST"])
 def createDocument(proj_id, commit_id):
     inputBody = request.get_json()
     headers = request.headers

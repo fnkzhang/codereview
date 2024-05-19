@@ -12,7 +12,7 @@ export default function FolderCreation( props ) {
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
-  const {project_id, parent_folder_id} = useParams();
+  const {project_id, commit_id, parent_folder_id} = useParams();
 
 
   const handleCreateFolder = async (e) =>  {
@@ -20,7 +20,7 @@ export default function FolderCreation( props ) {
 
     setWorking(true)
 
-    let result = await createFolder(folderName, project_id, parent_folder_id)
+    let result = await createFolder(folderName, project_id, commit_id, parent_folder_id)
     
     if (result.success) {
       navigate(`/Project/${project_id}/`)

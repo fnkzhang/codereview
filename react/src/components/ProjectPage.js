@@ -337,25 +337,35 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayUploadDocumentButton() {
-    if (commit.date_comitted !== null)
+    if (commit.date_committed !== null)
       return
   
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${folderStack[folderStack.length - 1].folder_id}/Document/Create`)}>Upload Document</button>
+          onClick={() => 
+            navigate(`/Project/${project_id}/Commit/${commit.commit_id}/${folderStack[folderStack.length - 1].folder_id}/Document/Create`)
+          }
+        >
+          Upload Document
+        </button>
       </div>
     )
   }
 
   function DisplayCreateFolderButton() {
-    if (commit.date_comitted !== null)
+    if (commit.date_committed !== null)
       return
 
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${folderStack[folderStack.length - 1].folder_id}/Folder/Create`)}>Create Folder</button>
+          onClick={() => 
+            navigate(`/Project/${project_id}/Commit/${commit.commit_id}/${folderStack[folderStack.length - 1].folder_id}/Folder/Create`)
+          }
+        >
+          Create Folder
+        </button>
       </div>
     )
   }

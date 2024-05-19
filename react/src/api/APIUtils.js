@@ -159,7 +159,7 @@ export async function promoteEmailToProjectOwner(proj_id, currentOwnerEmail, new
     .then(response => response.json())
     .catch(error => console.log(error))
 }
-export async function createDocument(documentName, proj_id, documentData, parent_folder_id, commit_id) {
+export async function createDocument(documentName, proj_id, commit_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
@@ -529,7 +529,7 @@ export async function getFolderTree(commit_id) {
   })
 }
 
-export async function createFolder(folder_name, proj_id, parent_folder_id, commit_id) {
+export async function createFolder(folder_name, proj_id, commit_id, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
 
@@ -548,7 +548,7 @@ export async function createFolder(folder_name, proj_id, parent_folder_id, commi
     }),
   };
 
-  return await fetch((`/api/Folder/${proj_id}/${commit_id}`), headers)
+  return await fetch((`/api/Folder/${proj_id}/${commit_id}/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
