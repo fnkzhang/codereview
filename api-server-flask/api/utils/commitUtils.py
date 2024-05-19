@@ -236,7 +236,7 @@ def getCommitTree(commit_id):
 
 def getCommitTreeWithSeen(commit_id, email):
     tree = getCommitTree(commit_id)
-    docsnap = getCommitDocumentSnapshot(commit_id)
+    docsnap = getAllCommitDocumentSnapshotRelation(commit_id)
     addToTree(tree, docsnap, email)
     return tree
 
