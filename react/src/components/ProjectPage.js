@@ -84,7 +84,7 @@ export default function ProjectPage( props ) {
         commit_val = commits[0].commit_id
         folderTreeResult = await getFolderTree(commit_val);
       } else {
-        let commit_val = findCommit(Number(commit_id)).commit_id
+        commit_val = findCommit(Number(commit_id)).commit_id
         if (commit_val) {
           folderTreeResult = await getFolderTree(commit_val)
         } else {
