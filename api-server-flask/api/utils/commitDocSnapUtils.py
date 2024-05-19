@@ -32,6 +32,7 @@ def createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id):
         conn.execute(stmt)
         conn.commit()
     return True
+
 def getAllCommitDocumentSnapshotRelation(commit_id):
     with engine.connect() as conn:
         stmt = select(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.commit_id == commit_id)

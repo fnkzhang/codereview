@@ -3,6 +3,7 @@ from utils.commentUtils import *
 from utils.buckets import *
 from utils.miscUtils import *
 from utils.commitDocSnapUtils import *
+from utils.seenUtils import *
 import models
 
 
@@ -32,6 +33,9 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id):
         stmt = select(models.CommitDocumentSnapshotRelation).where(
                     models.CommitDocumentSnapshotRelation.snapshot_id == snap)
         result = conn.execute(stmt).first()
+
+        author = getCommitInfo(commit_id)["author_email"]
+        setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, author, proj_id)
         if result == None:
             deleteSnapshotUtil(snap)
         return snapshot_id
@@ -81,6 +85,8 @@ def deleteSnapshotUtil(snapshot_id):
             )
             conn.execute(stmt)
             conn.commit()
+
+            setSnapAsSeenForAllProjUsers(snapshot_id, proj_id)
         return True, "No Error"
     except Exception as e:
         return False, e
