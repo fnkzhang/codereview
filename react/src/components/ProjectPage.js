@@ -4,18 +4,21 @@ import { Card } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
   getCommits } from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
+import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./BackButton"
 
 // Display Documents For Project
 export default function ProjectPage( props ) {
 
   const [loading, setLoading] = useState(true)
+  const [commitLoading, setCommitLoading] = useState(true)
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
   const [projectName, setProjectName] = useState(null)
   const [folderStack, setFolderStack] = useState(null)
   const [commits, setCommits] = useState(null)
+  const [commit, setCommit] = useState(null)
 
-  const { project_id } = useParams()
+  const { project_id, commit_id } = useParams()
   const navigate = useNavigate()
 
   const [userPermissionLevel, setUserPermissionLevel] = useState(0);
@@ -30,18 +33,10 @@ export default function ProjectPage( props ) {
       setProjectName(result.name)
     }
 
-    let commitArray = null
     async function grabCommits() {
-      await getCommits(project_id).then( result => {
-        commitArray = result.body
-      })
-      .then( async () => { await getFolderTree(commitArray[0].commit_id).then( result => {
-          setFolderStack([result.body])
-        })
-      })
-      .then(
-        setCommits(commitArray),
-      )
+      const commitResult = await getCommits(project_id);
+      const commitArray = commitResult.body;
+      setCommits(commitArray);
     }
 
     async function fetchData() {
@@ -64,6 +59,57 @@ export default function ProjectPage( props ) {
 
   }, [project_id, loading])
 
+  useEffect(() => {
+
+    function findCommit (x) {
+      console.log(commits)
+      console.log(x)
+      let foundCommit = null
+      for (let i = 0; i < commits.length; i++) {
+        if (commits[i].commit_id === x) {
+          foundCommit = commits[i];
+          break;
+        }
+      }
+      return foundCommit
+    }
+
+    async function getTree() {
+
+      if (commit !== null && commit.commit_id === commit_id)
+        return
+
+      let folderTreeResult = null
+      let commit_val = null
+      if (Number(commit_id) === 0) {
+        commit_val = commits[0].commit_id
+        folderTreeResult = await getFolderTree(commit_val);
+      } else {
+        let commit_val = findCommit(Number(commit_id)).commit_id
+        if (commit_val) {
+          folderTreeResult = await getFolderTree(commit_val)
+        } else {
+          console.log("This is an unknown commit_id")
+          return
+        }
+      }
+
+      setFolderStack([folderTreeResult.body])
+      setCommit(findCommit(commit_val))
+      //navigate(`/Project/${project_id}/${commit_val}`)
+
+      if ((commit !== null) && (commits !== null)){
+        setCommitLoading(false)
+      }
+    }
+
+    if (commitLoading && loading === false)
+      getTree()
+    else
+      return
+
+  }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading])
+ 
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
@@ -302,13 +348,53 @@ export default function ProjectPage( props ) {
     )
   }
 
-  let path = `${projectOwnerEmail}/${projectName}`
+  if (folderStack === null) {
+    return (
+      <div>
+        <div className="text-textcolor text-center m-20 text-xl">
+          There was an error trying to fetch this commit.
+        </div>
+      </div>
+    )
+  }
+
+  let path = `root/`
   for (let i = 1; i < folderStack.length; i++) {
     path += `/${folderStack[i].name}`
   }
 
+  if (commitLoading) {
+    return(
+      <div>
+        <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
+        <div className="flex">
+          <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
+          <CommitDropdown
+            commits={commits}
+            commit={commit}
+            setCommit={setCommit}
+          />
+        </div>
+        <div>
+          <div className="text-textcolor text-center m-20 text-xl">
+            Loading...
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
+      <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
+      <div className="flex">
+        <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
+        <CommitDropdown
+          commits={commits}
+          commit={commit}
+          setCommit={setCommit}
+        />
+      </div>
       <div className="flex">
         <div className="overflow-x-auto">
           <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">{`${path}`}</h3>
