@@ -39,7 +39,7 @@ def getDocumentInfoViaLocation(name, parent_folder, commit_id):
         document = getDocumentInfo(foundDocument["item_id"], commit_id)
         return document
 
-def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
+def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, user_email):
     doc_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
@@ -51,7 +51,7 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
         conn.execute(stmt)
         conn.commit()
     createItemCommitLocation(doc_id, commit_id, document_name, parent_folder, False)
-    createNewSnapshot(proj_id, doc_id, data, commit_id)
+    createNewSnapshot(proj_id, doc_id, data, commit_id, user_email)
     return doc_id
 
 def deleteDocumentFromCommit(doc_id, commit_id):

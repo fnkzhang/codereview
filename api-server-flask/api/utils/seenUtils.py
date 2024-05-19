@@ -49,6 +49,17 @@ def setSnapAsSeenForAllProjUsers(snapshot_id, proj_id):
         setSnapshotAsUnseen(snapshot_id, user["user_email"])
     return True
 
+def isSnapshotAllCommentSeenByUser(snapshot_id, user_email):
+    with engine.connect() as conn:
+        stmt = select(models.Comment).values(
+            models.Comment.snapshot_id == snapshot_id
+        )
+        comments = conn.execute(stmt)
+        for comment in comments:
+            if isCommentSeenByUser(comment.comment_id, user_email) == False:
+                return False
+        return True
+        
 def isCommentSeenByUser(comment_id, user_email):
     with engine.connect() as conn:
         stmt = select(models.UserUnseenComment).values(

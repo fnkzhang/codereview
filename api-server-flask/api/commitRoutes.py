@@ -339,7 +339,7 @@ def getCommitFolderTree(commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    foldertree = getCommitTree(commit_id)
+    foldertree = getCommitTreeWithSeen(commit_id, idInfo["email"])
     return {
             "success":True,
             "reason": "",

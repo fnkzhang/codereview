@@ -16,7 +16,7 @@ def getSnapshotInfo(snapshot_id):
         return snapshot._asdict()
 
 #puts documentname as snapshot name until that changes
-def createNewSnapshot(proj_id, doc_id, data, commit_id):
+def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
     with engine.connect() as conn:
         snapshot_id = createID()
         stmt = insert(models.Snapshot).values(
@@ -34,8 +34,7 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id):
                     models.CommitDocumentSnapshotRelation.snapshot_id == snap)
         result = conn.execute(stmt).first()
 
-        author = getCommitInfo(commit_id)["author_email"]
-        setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, author, proj_id)
+        setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, user_email, proj_id)
         if result == None:
             deleteSnapshotUtil(snap)
         return snapshot_id
@@ -85,7 +84,7 @@ def deleteSnapshotUtil(snapshot_id):
             )
             conn.execute(stmt)
             conn.commit()
-
+            proj_id = getSnapshotProject(snapshot_id)
             setSnapAsSeenForAllProjUsers(snapshot_id, proj_id)
         return True, "No Error"
     except Exception as e:

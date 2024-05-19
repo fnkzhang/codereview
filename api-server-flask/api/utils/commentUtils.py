@@ -1,6 +1,7 @@
 from cloudSql import *
 
 from utils.miscUtils import *
+from utils.seenUtils import *
 import models
 
 def getCommentInfo(comment_id):
@@ -8,6 +9,7 @@ def getCommentInfo(comment_id):
         stmt = select(models.Comment).where(models.Comment.comment_id == comment_id)
         comment = conn.execute(stmt).first()
         return comment._asdict()
+    
 def createNewComment(snapshot_id, author_email, reply_to_id, content, highlight_start_x, highlight_start_y, highlight_end_x, highlight_end_y, is_resolved):
     comment_id = createID()
     with Session() as session:
@@ -25,6 +27,8 @@ def createNewComment(snapshot_id, author_email, reply_to_id, content, highlight_
 
         ))
         session.commit()
+    proj_id = getCommentProject(comment_id)
+    setCommentAsUnseenForAllProjUsersOtherThanMaker(comment_id, author_email, proj_id)
     return comment_id
 
 def getCommentProject(comment_id):
