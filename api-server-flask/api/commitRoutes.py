@@ -91,12 +91,15 @@ def createCommit(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    body = request.get_json()
+    try:
+        body = request.get_json()
+    except:
+        body = {}
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
         return {"success": False, "reason":"Working Commit Already Exists For User", "body":{}}
-    if "last_commit" in body:
+    if body.get("last_commit") == None:
         last_commit = None
     else:
         last_commit = body["last_commit"]
@@ -302,6 +305,8 @@ def deleteWorkingCommit(proj_id):
         }
     try:
         commit_info = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+        if commit_info == None:
+            return {"success":False, "reason":"working commit doesn't exist"}
     except:
         return {"success":False, "reason":"working commit doesn't exist"}
 

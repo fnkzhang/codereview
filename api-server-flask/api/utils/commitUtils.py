@@ -83,40 +83,43 @@ def commitACommit(commit_id, name):
     return True
 
 def deleteCommit(commit_id):
-    with engine.connect() as conn:
-        stmt = delete(models.ItemCommitLocation).where(
-                models.ItemCommitLocation.commit_id == commit_id
-        )
-        conn.execute(stmt)
-        stmt = delete(models.CommitDocumentSnapshotRelation).where(
-                models.CommitDocumentSnapshotRelation.commit_id == commit_id
-        )
-        conn.execute(stmt)
+    try:
+        with engine.connect() as conn:
+            stmt = delete(models.ItemCommitLocation).where(
+                    models.ItemCommitLocation.commit_id == commit_id
+            )
+            conn.execute(stmt)
+            stmt = delete(models.CommitDocumentSnapshotRelation).where(
+                    models.CommitDocumentSnapshotRelation.commit_id == commit_id
+            )
+            conn.execute(stmt)
 
-        stmt = select(models.Document).where(
-                models.Document.og_commit_id == commit_id)
-        docs = conn.execute(stmt)
-        for doc in docs:
-            purgeDocumentUtil(doc.doc_id)
+            stmt = select(models.Document).where(
+                    models.Document.og_commit_id == commit_id)
+            docs = conn.execute(stmt)
+            for doc in docs:
+                purgeDocumentUtil(doc.doc_id)
 
-        stmt = select(models.Folder).where(
-                models.Folder.og_commit_id == commit_id)
-        folds = conn.execute(stmt)
-        for fold in folds:
-            purgeFolderUtil(fold.folder_id)
+            stmt = select(models.Folder).where(
+                    models.Folder.og_commit_id == commit_id)
+            folds = conn.execute(stmt)
+            for fold in folds:
+                purgeFolderUtil(fold.folder_id)
 
-        stmt = select(models.Snapshot).where(
-                models.Snapshot.og_commit_id == commit_id)
-        snaps = conn.execute(stmt)
-        for snap in snaps:
-            deleteSnapshotUtil(snap.snapshot_id)
-        stmt = delete(models.Commit).where(
-                models.Commit.commit_id == commit_id
-        )
-        conn.execute(stmt)
+            stmt = select(models.Snapshot).where(
+                    models.Snapshot.og_commit_id == commit_id)
+            snaps = conn.execute(stmt)
+            for snap in snaps:
+                deleteSnapshotUtil(snap.snapshot_id)
+            stmt = delete(models.Commit).where(
+                    models.Commit.commit_id == commit_id
+            )
+            conn.execute(stmt)
 
-        conn.commit()
-    return True
+            conn.commit()
+        return True, None
+    except Exception as e:
+        return False, e
 
 def removeItemFromCommit(item_id, commit_id):
     with engine.connect() as conn:
