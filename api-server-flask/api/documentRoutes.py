@@ -67,7 +67,7 @@ def createDocument(proj_id, commit_id):
         folder = getProjectInfo(proj_id)["root_folder"]
     else:
         folder = inputBody["parent_folder"]
-    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"], commit_id)
+    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"], commit_id, idInfo["email"])
     return {
         "success": True,
         "reason": "",
@@ -318,7 +318,9 @@ def getAllCommentsForDocument(document_id):
             "success": False,
             "reason": "Error Grabbing Comments From Database"
         }
-
+    for comment in listOfComments:
+        comment["isSeen"]= isCommentSeenByUser(comment["comment_id"], idInfo["body"])
+        setCommentAsSeen(comment["comment_id"], idInfo["email"])
     return {
         "success": True,
         "reason": "Found all Comments For All Snapshots for document",

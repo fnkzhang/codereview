@@ -147,7 +147,7 @@ def pullToNewProject():
             pathToFolderID[file_content.path] = folder_id
         else:
             try:
-                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode(), commit_id)
+                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode(), commit_id, idInfo["email"])
             except Exception as e:
                 pass
     commitACommit(commit_id, "Pulled from branch " + body["branch"] + " of " + body["repository"])
@@ -229,12 +229,12 @@ def pullToExistingProject(proj_id):
                         #print("")
                         #print(getDocumentLastCommittedSnapshotContent(doc_id))
                         #print("____")
-                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode(), commit_id)
+                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode(), commit_id, idInfo["email"])
                         updated_files.append(doc_id)
                     #print(doc_id)
                     docs_to_delete.remove(doc_id)
                 else:
-                    doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content, commit_id)
+                    doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content, commit_id, idInfo["email"])
                     updated_files.append(doc_id)
             except Exception as e:
                 print(e)

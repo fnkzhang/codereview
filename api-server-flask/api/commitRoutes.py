@@ -301,7 +301,7 @@ def deleteWorkingCommit(proj_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        commit_info = getUserWorkingCommitInProject(proj_id, idInfo["email"])["commit_id"]
+        commit_info = getUserWorkingCommitInProject(proj_id, idInfo["email"])
     except:
         return {"success":False, "reason":"working commit doesn't exist"}
 
@@ -339,7 +339,7 @@ def getCommitFolderTree(commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    foldertree = getCommitTree(commit_id)
+    foldertree = getCommitTreeWithSeen(commit_id, idInfo["email"])
     return {
             "success":True,
             "reason": "",
