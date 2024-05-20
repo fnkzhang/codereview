@@ -145,8 +145,20 @@ export default function ProjectPage( props ) {
     }
 
     function DisplayFolderOptions() {
-      if (commit.date_committed !== null)
-        return
+      if (commit.date_committed !== null) {
+        return(        
+          <Dropdown className="bg-background" inline label="">
+            <Dropdown.Item
+              className="hover:bg-alternative"            
+              onClick={() => handleFolderClick()}
+            >
+              <div className="text-textcolor m-1">
+                View
+              </div>
+            </Dropdown.Item>
+          </Dropdown>
+        )
+      }
 
       return(
         <Dropdown className="bg-background" inline label="">
@@ -199,8 +211,20 @@ export default function ProjectPage( props ) {
     }
 
     function DisplayDocumentOptions() {
-      if (commit.date_committed !== null)
-        return
+      if (commit.date_committed !== null) {
+        return(        
+          <Dropdown className="bg-background" inline label="">
+            <Dropdown.Item
+              className="hover:bg-alternative"            
+              onClick={() => handleDocumentClick()}
+            >
+              <div className="text-textcolor m-1">
+                View
+              </div>
+            </Dropdown.Item>
+          </Dropdown>
+        )
+      }
 
       return(
         <Dropdown className="bg-background" inline label="">
