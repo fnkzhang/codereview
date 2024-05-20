@@ -9,11 +9,12 @@ import ProjectCreation from './components/Projects/ProjectCreation.js';
 import ProjectDeletion from './components/Projects/ProjectDeletion.js';
 import ProjectExport from './components/Projects/ProjectExport.js';
 import CommitDeletion from './components/Commits/CommitDeletion.js';
+import CommitSubmission from './components/Commits/CommitSubmission.js';
 import DocumentCreation from './components/Documents/DocumentCreation.js';
 import DocumentDeletion from './components/Documents/DocumentDeletion.js'
 import FolderCreation from './components/Folders/FolderCreation.js';
-import PermissionPage from './components/Permissions/PermissionPage.js';
 import FolderDeletion from './components/Folders/FolderDeletion.js';
+import PermissionPage from './components/Permissions/PermissionPage.js';
 
 function App() {
 
@@ -60,6 +61,8 @@ function App() {
           <Route path="/Project/:project_id/Commit/:commit_id" element={<ProjectPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/Commit/Delete/:commit_id" element={<CommitDeletion
+            isLoggedIn={isLoggedIn} userData={userData}/>}/>
+          <Route path="/Project/:project_id/Commit/Submit/:commit_id" element={<CommitSubmission
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/Export/:project_id" element={<ProjectExport
             isLoggedIn={isLoggedIn} userData={userData}

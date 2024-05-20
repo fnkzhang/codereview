@@ -896,3 +896,30 @@ export async function deleteCommit(proj_id) {
     return data
   })
 }
+
+export async function submitCommit(commit_id, commit_name) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }, 
+    body: JSON.stringify({
+      name: commit_name
+    })
+  };
+
+  return await fetch((`/api/Commit/${commit_id}/commitCommit/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data
+  })
+}

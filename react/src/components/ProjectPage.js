@@ -115,7 +115,7 @@ export default function ProjectPage( props ) {
   useEffect(() => {
     if (commitLoading && (folderStack !== null) && (folderStack[0].commit_id === commit.commit_id))
       setCommitLoading(false)
-  }, [folderStack, commitLoading, setCommitLoading])
+  }, [folderStack, commitLoading, setCommitLoading, commit])
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
@@ -421,6 +421,20 @@ export default function ProjectPage( props ) {
     )
   }
 
+  function DisplayCommitWorkingCommitButton() {
+    if (commit.date_committed !== null)
+      return
+
+    return(
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+          onClick={() => navigate(`/Project/${project_id}/Commit/Submit/${commit.commit_id}`)}>
+          Commit Changes
+        </button>
+      </div>
+    )
+  }
+
   function DisplayUploadDocumentButton() {
     if (commit.date_committed !== null)
       return
@@ -544,6 +558,7 @@ export default function ProjectPage( props ) {
       </div>
       <div className="flex m-1">
         <DisplayDeleteWorkingCommitButton/>
+        <DisplayCommitWorkingCommitButton/>
         <DisplayCreateCommitButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>
