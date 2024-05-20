@@ -19,8 +19,9 @@ export default function FolderDeletion(props) {
             setFolderName(result.name)
         }
 
-        getFolderData()
-    }, [project_id, folder_id])
+        if (props.isLoggedIn)
+            getFolderData()
+    }, [project_id, folder_id, props.isLoggedIn])
 
     const handleDeleteFolderButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission

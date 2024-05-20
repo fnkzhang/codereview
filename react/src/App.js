@@ -53,15 +53,15 @@ function App() {
           <Route path="/Project/Create" element={<ProjectCreation
             isLoggedIn={isLoggedIn} userData={userData}
             connected={connected} setConnected={setConnected}/>}/>
-          <Route path="/Project/Delete/:project_id/" element={<ProjectDeletion
+          <Route path="/Project/Delete/:project_id" element={<ProjectDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/Share" element={<PermissionPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="/Project/:project_id/Commit/:commit_id/" element={<ProjectPage
+          <Route path="/Project/:project_id/Commit/:commit_id" element={<ProjectPage
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="/Project/:project_id/Commit/Delete/:commit_id/" element={<CommitDeletion
+          <Route path="/Project/:project_id/Commit/Delete/:commit_id" element={<CommitDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="/Project/Export/:project_id/" element={<ProjectExport
+          <Route path="/Project/Export/:project_id" element={<ProjectExport
             isLoggedIn={isLoggedIn} userData={userData}
             connected={connected} setConnected={setConnected}/>}/>
           <Route path="/Project/:project_id/Commit/:commit_id/:parent_folder_id/Document/Create" element={<DocumentCreation

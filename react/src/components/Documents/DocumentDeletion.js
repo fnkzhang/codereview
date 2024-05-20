@@ -19,8 +19,9 @@ export default function DcoumentDeletion(props) {
             setDocumentName(result.name)
         }
 
-        getDocumentData()
-    }, [project_id, document_id])
+        if (props.isLoggedIn)
+            getDocumentData()
+    }, [project_id, document_id, props.isLoggedIn])
 
     const handleDeleteDocumentButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission

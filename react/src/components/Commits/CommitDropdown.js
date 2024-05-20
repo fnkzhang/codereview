@@ -12,7 +12,8 @@ export default function CommitDropdown( props ) {
               key={index}
               onClick={() => {
                 props.setCommit(commit)
-                props.setCommitLoading(true)
+                if (props.setCommitLoading)
+                  props.setCommitLoading(true)
               }}
             >
               <div className="text-textcolor m-1">
