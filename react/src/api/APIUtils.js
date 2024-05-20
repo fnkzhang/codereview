@@ -563,6 +563,47 @@ export async function createFolder(folder_name, proj_id, commit_id, parent_folde
   })
 }
 
+export async function deleteFolder(folder_id, commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "DELETE",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Folder/${folder_id}/${commit_id}/`), headers)
+    .then(response => response.json())
+}
+
+export async function  getFolderInfo(proj_id, commit_id, folder_id) {
+  let oAuthToken = getCookie("cr_id_token")
+  
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+
+  return await fetch((`/api/Folder/${proj_id}/${folder_id}/${commit_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data.body
+  })
+}
+
 /**
  * @param {string} code The entire code in the document/snapshot
  * @param {string} highlightedCode A substring of the code that will be changed

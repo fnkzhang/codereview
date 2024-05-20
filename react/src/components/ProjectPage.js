@@ -138,19 +138,50 @@ export default function ProjectPage( props ) {
 
   }, [props.userData, project_id, props.isLoggedIn])
 
-  function handleFolderClick (folder) {
-    setFolderStack([...folderStack, folder])
-  }
-
   function FolderDisplayBox({id, name, folder}) {
+
+    function handleFolderClick () {
+      setFolderStack([...folderStack, folder])
+    }
+
+    function DisplayFolderOptions() {
+      if (commit.date_committed !== null)
+        return
+
+      return(
+        <Dropdown className="bg-background" inline label="">
+          <Dropdown.Item
+            className="hover:bg-alternative"            
+            onClick={() => handleFolderClick()}
+          >
+            <div className="text-textcolor m-1">
+              View
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item
+            className="hover:bg-alternative"              
+            onClick={() => navigate(`/Project/${project_id}/Commit/${commit_id}/Folder/Delete/${id}`)}
+          >
+            <div className="text-textcolor m-1">
+              Delete
+            </div>
+          </Dropdown.Item>
+        </Dropdown>
+      )
+    }
+
     return (
       <Card 
-        className="max-w-sm transition-all duration-300 hover:bg-alternative p-3 m-3"
-        onClick={() => handleFolderClick(folder)}
+        className="bg-background w-1/4 p-3 m-3"
       >
-        <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
-          <span className="font-bold text-xl">{name}</span>
-        </h4>
+        <div className="w-full flex justify-between">
+          <h4 className="flex flex-col text-textcolor overflow-hidden whitespace-nowrap p-1">
+              <span className="font-bold text-xl">{name} </span>
+          </h4>
+          <div className="text-textcolor flex justify-end px-4 pt-4">
+            <DisplayFolderOptions/>
+          </div>
+        </div>
         <h4 className="text-textcolor p-1">
           <span className="font-bold block">ID: </span>
           <span className="block">{id}</span>
