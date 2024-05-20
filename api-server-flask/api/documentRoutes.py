@@ -17,7 +17,6 @@ import models
 #commit_id is info about the doc in the commit you're in
 @app.route('/api/Document/<proj_id>/<doc_id>/<commit_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id, commit_id):
-    print(request)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -43,7 +42,7 @@ def getDocument(proj_id, doc_id, commit_id):
     #data (text you want in the document)
     #doc_name (name of document)
     #parent_folder (folder you're making it in), if not in request will put in root folder
-@app.route('/api/Document/<proj_id>/<commit_id>', methods=["POST"])
+@app.route('/api/Document/<proj_id>/<commit_id>/', methods=["POST"])
 def createDocument(proj_id, commit_id):
     inputBody = request.get_json()
     headers = request.headers
@@ -67,7 +66,7 @@ def createDocument(proj_id, commit_id):
         folder = getProjectInfo(proj_id)["root_folder"]
     else:
         folder = inputBody["parent_folder"]
-    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"], commit_id)
+    doc_id = createNewDocument(inputBody["doc_name"], folder, proj_id, inputBody["data"], commit_id, idInfo["email"])
     return {
         "success": True,
         "reason": "",
@@ -318,7 +317,9 @@ def getAllCommentsForDocument(document_id):
             "success": False,
             "reason": "Error Grabbing Comments From Database"
         }
-
+    for comment in listOfComments:
+        comment["isSeen"]= isCommentSeenByUser(comment["comment_id"], idInfo["body"])
+        setCommentAsSeen(comment["comment_id"], idInfo["email"])
     return {
         "success": True,
         "reason": "Found all Comments For All Snapshots for document",

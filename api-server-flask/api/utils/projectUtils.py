@@ -37,7 +37,7 @@ def purgeProjectUtil(proj_id):
     try:
         with engine.connect() as conn:
             commits = getAllProjectCommits(proj_id)
-            for commit in commit:
+            for commit in commits:
                 deleteCommit(commit["commit_id"])
             docs = getAllProjectDocuments(proj_id)
             for doc in docs:

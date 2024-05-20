@@ -106,3 +106,13 @@ class CommitDocumentSnapshotRelation(Base):
     doc_id = Column(Integer, primary_key=True)
     commit_id = Column(Integer, primary_key=True)
     snapshot_id = Column(Integer)
+
+class UserUnseenSnapshot(Base):
+    __tablename__ = "userunseensnapshot"
+    snapshot_id = Column(Integer, primary_key=True)
+    user_email = Column(String(50), nullable=False)
+
+class UserUnseenComment(Base):
+    __tablename__ = "userunseencomment"
+    comment_id = Column(Integer, primary_key=True)
+    user_email = Column(String(50), nullable=False)

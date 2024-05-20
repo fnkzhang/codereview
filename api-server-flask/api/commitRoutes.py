@@ -15,6 +15,35 @@ from utils.commitLocationUtils import *
 
 import models
 
+@app.route('/api/Commit/<commit_id>/info/', methods = ["GET"])
+def getCommitInformation(commit_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    try:
+        proj_id = getCommitInfo(commit_id)["proj_id"]
+    except:
+        return {"success":False, "reason":"commit doesn't exist"}
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    info = getCommitInfo(commit_id)
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": info
+    }
+
 #gets a dict with the keys of documents mapping to their snapshot in the commit
 @app.route('/api/Commit/<commit_id>/', methods = ["GET"])
 def getCommitDocumentSnapshotPairs(commit_id):
@@ -62,12 +91,15 @@ def createCommit(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    body = request.get_json()
+    try:
+        body = request.get_json()
+    except:
+        body = {}
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
         return {"success": False, "reason":"Working Commit Already Exists For User", "body":{}}
-    if "last_commit" in body:
+    if body.get("last_commit") == None:
         last_commit = None
     else:
         last_commit = body["last_commit"]
@@ -312,7 +344,9 @@ def deleteWorkingCommit(proj_id):
             "reason": "Failed to Authenticate"
         }
     try:
-        commit_info = getUserWorkingCommitInProject(proj_id, idInfo["email"])["commit_id"]
+        commit_info = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+        if commit_info == None:
+            return {"success":False, "reason":"working commit doesn't exist"}
     except:
         return {"success":False, "reason":"working commit doesn't exist"}
 
@@ -350,7 +384,7 @@ def getCommitFolderTree(commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    foldertree = getCommitTree(commit_id)
+    foldertree = getCommitTreeWithSeen(commit_id, idInfo["email"])
     return {
             "success":True,
             "reason": "",

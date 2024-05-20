@@ -160,6 +160,14 @@ def getProjectCommittedCommits(proj_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     arrayOfCommits = getAllCommittedProjectCommitsInOrder(proj_id)
+    workingCommit = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+    if workingCommit != None:
+        arrayOfCommits.append(workingCommit)
+    for commit in arrayOfCommits:
+        docsnap = getAllCommitDocumentSnapshotRelation(commit["commit_id"])
+        for doc in docsnap.keys():
+            commit["seenSnapshot"] = isSnaphotSeenByUser(docsnap[doc], idInfo["email"])
+            commit["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[doc], idInfo["email"])
     return {
         "success": True,
         "reason": "",

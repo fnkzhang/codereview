@@ -5,6 +5,7 @@ from utils.snapshotUtils import *
 from utils.commitDocSnapUtils import *
 from utils.commitLocationUtils import *
 from utils.miscUtils import *
+from utils.seenUtils import *
 from sqlalchemy.sql import func
 import models
 from reviewStateEnums import reviewStateEnum
@@ -81,40 +82,43 @@ def commitACommit(commit_id, name):
     return True
 
 def deleteCommit(commit_id):
-    with engine.connect() as conn:
-        stmt = delete(models.ItemCommitLocation).where(
-                models.ItemCommitLocation.commit_id == commit_id
-        )
-        conn.execute(stmt)
-        stmt = delete(models.CommitDocumentSnapshotRelation).where(
-                models.CommitDocumentSnapshotRelation.commit_id == commit_id
-        )
-        conn.execute(stmt)
+    try:
+        with engine.connect() as conn:
+            stmt = delete(models.ItemCommitLocation).where(
+                    models.ItemCommitLocation.commit_id == commit_id
+            )
+            conn.execute(stmt)
+            stmt = delete(models.CommitDocumentSnapshotRelation).where(
+                    models.CommitDocumentSnapshotRelation.commit_id == commit_id
+            )
+            conn.execute(stmt)
 
-        stmt = select(models.Document).where(
-                models.Document.og_commit_id == commit_id)
-        docs = conn.execute(stmt)
-        for doc in docs:
-            purgeDocumentUtil(doc.doc_id)
+            stmt = select(models.Document).where(
+                    models.Document.og_commit_id == commit_id)
+            docs = conn.execute(stmt)
+            for doc in docs:
+                purgeDocumentUtil(doc.doc_id)
 
-        stmt = select(models.Folder).where(
-                models.Folder.og_commit_id == commit_id)
-        folds = conn.execute(stmt)
-        for fold in folds:
-            purgeFolderUtil(fold.folder_id)
+            stmt = select(models.Folder).where(
+                    models.Folder.og_commit_id == commit_id)
+            folds = conn.execute(stmt)
+            for fold in folds:
+                purgeFolderUtil(fold.folder_id)
 
-        stmt = select(models.Snapshot).where(
-                models.Snapshot.og_commit_id == commit_id)
-        snaps = conn.execute(stmt)
-        for snap in snaps:
-            deleteSnapshotUtil(snap.snapshot_id)
-        stmt = delete(models.Commit).where(
-                models.Commit.commit_id == commit_id
-        )
-        conn.execute(stmt)
+            stmt = select(models.Snapshot).where(
+                    models.Snapshot.og_commit_id == commit_id)
+            snaps = conn.execute(stmt)
+            for snap in snaps:
+                deleteSnapshotUtil(snap.snapshot_id)
+            stmt = delete(models.Commit).where(
+                    models.Commit.commit_id == commit_id
+            )
+            conn.execute(stmt)
 
-        conn.commit()
-    return True
+            conn.commit()
+        return True, None
+    except Exception as e:
+        return False, e
 
 def setCommitOpen(commit_id):
     try:
@@ -195,7 +199,7 @@ def getCommitNewerSnapshotsUtil(commit_id1, commit_id2):
             commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
             commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
             lastcommitsnap = getCommitDocumentSnapshot(itemId, last_commit)
-            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"] and lastcommitsnap["snapshot_id"] != commit2["snapshot_id"]:
+            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"] and lastcommitsnap["snapshot_id"] != commit2snap["snapshot_id"]:
                 commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
                 commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
     return commit1snaps, commit2snaps
@@ -279,6 +283,20 @@ def getAllCommitItemIds(commit_id):
 def getCommitTree(commit_id):
     root_folder = getCommitInfo(commit_id)["root_folder"]
     return getFolderTree(root_folder, commit_id)
+
+def getCommitTreeWithSeen(commit_id, email):
+    tree = getCommitTree(commit_id)
+    docsnap = getAllCommitDocumentSnapshotRelation(commit_id)
+    addToTree(tree, docsnap, email)
+    return tree
+
+def addToTree(tree, docsnap, email):
+    for item in tree["content"]["folders"]:
+        addToTree(item, docsnap, email)
+    for item in tree["content"]["documents"]:
+        item["seenSnapshot"] = isSnaphotSeenByUser(docsnap[item["doc_id"]], email)
+        item["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[item["doc_id"]], email)
+    return True
 
 def getCommitFoldersAsPaths(commit_id):
     project = getCommitInfo(commit_id)

@@ -1,48 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
-import { deleteProject, getProjectInfo } from "../../api/APIUtils";
+import { deleteCommit } from "../../api/APIUtils";
 import BackButton from "../BackButton.js";
 
-export default function ProjectDeletion(props) {
-    const [projectName, setProjectName] = useState(""); // Actual Project Name to compare
-    const [inputProjectName, setInputProjectName] = useState(""); // Handle Input for project name
+export default function CommitDeletion(props) {
+    const commitName = "User Working Commit" // Actual Commit Name to compare
+    const [inputCommitName, setInputCommitName] = useState(""); // Handle Input for commit name
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
-    const { project_id } = useParams();
+    const { project_id, commit_id } = useParams();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        async function getProjectData() {
-            let result = await getProjectInfo(project_id)
-            setProjectName(result.name)
-        }
-
-        if (props.isLoggedIn)
-            getProjectData()
-    }, [project_id, props.isLoggedIn])
-
-    const handleDeleteProjectButtonClick = async (e) => {
+    const handleDeleteCommitButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 
         setWorking(true)
 
-        if (inputProjectName === "") {
+        if (inputCommitName === "") {
             setWorking(false)
             return
         }
 
-        if (inputProjectName !== projectName) {
-            alert("Input Does Not Match Project Name")
+        if (inputCommitName !== commitName) {
+            alert("Input Does Not Match Commit Name")
             setWorking(false)
             return
         }
 
-        let result = await deleteProject(project_id)
+        let result = await deleteCommit(project_id)
 
         if (result.success) {
-            navigate("/") // Go Home
+            navigate(`/Project/${project_id}/Commit/0`) // Go back to project view
         } else {
             setWorking(false)
             setIsError(true)
@@ -67,30 +57,30 @@ export default function ProjectDeletion(props) {
             <div className="flex justify-center mt-20">
                 <form
                     className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
-                    onSubmit={handleDeleteProjectButtonClick}
+                    onSubmit={handleDeleteCommitButtonClick}
                 >
                     <div>
                         <div className="mb-3 block">
-                            <Label className="text-2xl" value="Are you sure you want to delete this project?" />
+                            <Label className="text-2xl" value="Are you sure you want to delete your working commit?" />
                         </div>
 
                         <div className="mb-3 block">
                             <Label className="text-2xl">
-                                Please type <strong className="text-red-500">{projectName}</strong> into the text field.
+                                Please type <strong className="text-red-500">{commitName}</strong> into the text field.
                             </Label>
                         </div>
                         <TextInput
                             className="text-black shadow-white"
-                            placeholder="Name of Project"
+                            placeholder="Name of Commit"
                             sizing="lg"
-                            onChange={(e) => setInputProjectName(e.target.value)}
+                            onChange={(e) => setInputCommitName(e.target.value)}
                             shadow
                             required
                         />
                     </div>
 
                     {isError ? (
-                        <p className="text-red-600 text-xl">Error: Could Not Delete Project</p>
+                        <p className="text-red-600 text-xl">Error: Could Not Delete Commit</p>
                     ) : null}
                     <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">
                         Delete

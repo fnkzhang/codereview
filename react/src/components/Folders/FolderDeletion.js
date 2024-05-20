@@ -2,47 +2,48 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
-import { deleteProject, getProjectInfo } from "../../api/APIUtils";
+import { deleteFolder, getFolderInfo } from "../../api/APIUtils";
 import BackButton from "../BackButton.js";
 
-export default function ProjectDeletion(props) {
-    const [projectName, setProjectName] = useState(""); // Actual Project Name to compare
-    const [inputProjectName, setInputProjectName] = useState(""); // Handle Input for project name
+export default function FolderDeletion(props) {
+    const [FolderName, setFolderName] = useState("");
+    const [inputFolderName, setInputFolderName] = useState("");
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
-    const { project_id } = useParams();
+    const { project_id, commit_id, folder_id } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
-        async function getProjectData() {
-            let result = await getProjectInfo(project_id)
-            setProjectName(result.name)
+        async function getFolderData() {
+            let result = await getFolderInfo(project_id, commit_id, folder_id)
+            setFolderName(result.name)
         }
 
         if (props.isLoggedIn)
-            getProjectData()
-    }, [project_id, props.isLoggedIn])
+            getFolderData()
+    }, [project_id, folder_id, props.isLoggedIn])
 
-    const handleDeleteProjectButtonClick = async (e) => {
+    const handleDeleteFolderButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
+
+        if (working)
+            return
+
+        if (inputFolderName === "") {
+            return
+        }
+
+        if (inputFolderName !== FolderName) {
+            alert("Input Does Not Match Folder Name")
+            return
+        }
 
         setWorking(true)
 
-        if (inputProjectName === "") {
-            setWorking(false)
-            return
-        }
-
-        if (inputProjectName !== projectName) {
-            alert("Input Does Not Match Project Name")
-            setWorking(false)
-            return
-        }
-
-        let result = await deleteProject(project_id)
+        let result = await deleteFolder(folder_id, commit_id)
 
         if (result.success) {
-            navigate("/") // Go Home
+            navigate(`/Project/${project_id}/Commit/${commit_id}`)
         } else {
             setWorking(false)
             setIsError(true)
@@ -62,35 +63,37 @@ export default function ProjectDeletion(props) {
     return (
         <div>
             <div>
-                <BackButton />
+                <BackButton
+                    location={`/Project/${project_id}/Commit/${commit_id}`}
+                />
             </div>
             <div className="flex justify-center mt-20">
                 <form
                     className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
-                    onSubmit={handleDeleteProjectButtonClick}
+                    onSubmit={handleDeleteFolderButtonClick}
                 >
                     <div>
                         <div className="mb-3 block">
-                            <Label className="text-2xl" value="Are you sure you want to delete this project?" />
+                            <Label className="text-2xl" value="Are you sure you want to delete this Folder?" />
                         </div>
 
                         <div className="mb-3 block">
                             <Label className="text-2xl">
-                                Please type <strong className="text-red-500">{projectName}</strong> into the text field.
+                                Please type <strong className="text-red-500">{FolderName}</strong> into the text field.
                             </Label>
                         </div>
                         <TextInput
                             className="text-black shadow-white"
-                            placeholder="Name of Project"
+                            placeholder="Name of Folder"
                             sizing="lg"
-                            onChange={(e) => setInputProjectName(e.target.value)}
+                            onChange={(e) => setInputFolderName(e.target.value)}
                             shadow
                             required
                         />
                     </div>
 
                     {isError ? (
-                        <p className="text-red-600 text-xl">Error: Could Not Delete Project</p>
+                        <p className="text-red-600 text-xl">Error: Could Not Delete Folder</p>
                     ) : null}
                     <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">
                         Delete

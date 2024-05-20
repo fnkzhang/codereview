@@ -1,21 +1,24 @@
 import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
-import { Card } from "flowbite-react"
+import { Card, Dropdown } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
-  getCommits } from "../api/APIUtils"
+  getCommits, createCommit } from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
+import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./BackButton"
 
 // Display Documents For Project
 export default function ProjectPage( props ) {
 
   const [loading, setLoading] = useState(true)
+  const [commitLoading, setCommitLoading] = useState(true)
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
   const [projectName, setProjectName] = useState(null)
   const [folderStack, setFolderStack] = useState(null)
   const [commits, setCommits] = useState(null)
+  const [commit, setCommit] = useState(null)
 
-  const { project_id } = useParams()
+  const { project_id, commit_id } = useParams()
   const navigate = useNavigate()
 
   const [userPermissionLevel, setUserPermissionLevel] = useState(0);
@@ -30,18 +33,10 @@ export default function ProjectPage( props ) {
       setProjectName(result.name)
     }
 
-    let commitArray = null
     async function grabCommits() {
-      await getCommits(project_id).then( result => {
-        commitArray = result.body
-      })
-      .then( async () => { await getFolderTree(commitArray[0].commit_id).then( result => {
-          setFolderStack([result.body])
-        })
-      })
-      .then(
-        setCommits(commitArray),
-      )
+      const commitResult = await getCommits(project_id);
+      const commitArray = commitResult.body;
+      setCommits(commitArray);
     }
 
     async function fetchData() {
@@ -57,13 +52,70 @@ export default function ProjectPage( props ) {
       }
     }
 
-    if (loading)
+    if (loading && props.isLoggedIn)
       fetchData()
     else
       return
 
-  }, [project_id, loading])
+  }, [project_id, loading, props.isLoggedIn])
 
+  useEffect(() => {
+
+    function findCommit (x) {
+      let foundCommit = null
+      for (let i = 0; i < commits.length; i++) {
+        if (Number(commits[i].commit_id) === x) {
+          foundCommit = commits[i];
+          break;
+        }
+      }
+      return foundCommit
+    }
+
+    async function getTree() {
+
+      let folderTreeResult = null
+      let commit_val = null
+      if (commit == null) {
+        if (Number(commit_id) === 0) {
+          commit_val = commits[0].commit_id
+          folderTreeResult = await getFolderTree(commit_val);
+        } else {
+          commit_val = findCommit(Number(commit_id)).commit_id
+          if (commit_val) {
+            folderTreeResult = await getFolderTree(commit_val)
+          } else {
+            console.log("This is an unknown commit_id")
+            return
+          }
+        }
+        setCommit(findCommit(commit_val))
+      } else {
+        commit_val = commit.commit_id
+        folderTreeResult = await getFolderTree(commit.commit_id)
+      }
+
+      folderTreeResult.body.commit_id = commit_val
+      setFolderStack([folderTreeResult.body])
+      navigate(`/Project/${project_id}/Commit/${commit_val}`)
+    }
+
+    if (props.isLoggedIn === false)
+      return
+
+    if ((commit !== null) && (commit.commit_id === Number(commit_id)))
+      return
+
+    if (commitLoading && (loading === false) && (commits !== null)) {
+      getTree()
+    }
+
+  }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading, props.isLoggedIn, navigate, project_id])
+
+  useEffect(() => {
+    if (commitLoading && (folderStack !== null) && (folderStack[0].commit_id === commit.commit_id))
+      setCommitLoading(false)
+  }, [folderStack, commitLoading, setCommitLoading])
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
@@ -80,29 +132,68 @@ export default function ProjectPage( props ) {
         }
       }
     }
-    getUserPermissionLevel();
-  }, [props.userData, project_id])
 
-  function handleFolderClick (folder) {
-    setFolderStack([...folderStack, folder])
-  }
+    if (props.isLoggedIn === true)
+      getUserPermissionLevel();
 
-  // Clicking on project will redirect to project page to select documents
-  async function handleDocumentClick (document_id, name) {
-    const result = await getAllSnapshotsFromDocument(project_id, document_id)
-    if (result.success)
-      navigate(`/Project/${project_id}/Document/${document_id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`, {state: {documentName: name}})
-  }
+  }, [props.userData, project_id, props.isLoggedIn])
 
   function FolderDisplayBox({id, name, folder}) {
+
+    function handleFolderClick () {
+      setFolderStack([...folderStack, folder])
+    }
+
+    function DisplayFolderOptions() {
+      if (commit.date_committed !== null) {
+        return(        
+          <Dropdown className="bg-background" inline label="">
+            <Dropdown.Item
+              className="hover:bg-alternative"            
+              onClick={() => handleFolderClick()}
+            >
+              <div className="text-textcolor m-1">
+                View
+              </div>
+            </Dropdown.Item>
+          </Dropdown>
+        )
+      }
+
+      return(
+        <Dropdown className="bg-background" inline label="">
+          <Dropdown.Item
+            className="hover:bg-alternative"            
+            onClick={() => handleFolderClick()}
+          >
+            <div className="text-textcolor m-1">
+              View
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item
+            className="hover:bg-alternative"              
+            onClick={() => navigate(`/Project/${project_id}/Commit/${commit_id}/Folder/Delete/${id}`)}
+          >
+            <div className="text-textcolor m-1">
+              Delete
+            </div>
+          </Dropdown.Item>
+        </Dropdown>
+      )
+    }
+
     return (
       <Card 
-        className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
-        onClick={() => handleFolderClick(folder)}
+        className="bg-background w-1/4 p-3 m-3"
       >
-        <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
-          <span className="font-bold text-xl">{name}</span>
-        </h4>
+        <div className="w-full flex justify-between">
+          <h4 className="flex flex-col text-textcolor overflow-hidden whitespace-nowrap p-1">
+              <span className="font-bold text-xl">{name} </span>
+          </h4>
+          <div className="text-textcolor flex justify-end px-4 pt-4">
+            <DisplayFolderOptions/>
+          </div>
+        </div>
         <h4 className="text-textcolor p-1">
           <span className="font-bold block">ID: </span>
           <span className="block">{id}</span>
@@ -112,16 +203,65 @@ export default function ProjectPage( props ) {
   }
 
   function DocumentDisplayBox({id, name, date}) {
+
+    async function handleDocumentClick () {
+      const result = await getAllSnapshotsFromDocument(project_id, id)
+      if (result.success)
+        navigate(`/Project/${project_id}/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
+    }
+
+    function DisplayDocumentOptions() {
+      if (commit.date_committed !== null) {
+        return(        
+          <Dropdown className="bg-background" inline label="">
+            <Dropdown.Item
+              className="hover:bg-alternative"            
+              onClick={() => handleDocumentClick()}
+            >
+              <div className="text-textcolor m-1">
+                View
+              </div>
+            </Dropdown.Item>
+          </Dropdown>
+        )
+      }
+
+      return(
+        <Dropdown className="bg-background" inline label="">
+          <Dropdown.Item
+            className="hover:bg-alternative"            
+            onClick={() => handleDocumentClick()}
+          >
+            <div className="text-textcolor m-1">
+              View
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item
+            className="hover:bg-alternative"              
+            onClick={() => navigate(`/Project/${project_id}/Commit/${commit_id}/Document/Delete/${id}`)}
+          >
+            <div className="text-textcolor m-1">
+              Delete
+            </div>
+          </Dropdown.Item>
+        </Dropdown>
+      )
+    }
+
     return (
       <Card 
-        className="w-1/4 transition-all duration-300 hover:bg-alternative p-3 m-3"
-        onClick={() => handleDocumentClick(id, name)}
+        className="bg-background w-1/4 p-3 m-3"
       >
-        <h4 className="text-textcolor overflow-hidden whitespace-nowrap p-1">
-          <span className="font-bold text-xl">{name} </span>
-        </h4>
+        <div className="w-full flex justify-between">
+          <h4 className="flex flex-col text-textcolor overflow-hidden whitespace-nowrap p-1">
+              <span className="font-bold text-xl">{name} </span>
+          </h4>
+          <div className="text-textcolor flex justify-end px-4 pt-4">
+            <DisplayDocumentOptions/>
+          </div>
+        </div>
         <h4 className="text-textcolor p-1">
-        <span className="font-bold block">ID: </span>
+          <span className="font-bold block">ID: </span>
           <span className="block">{id}</span>
         </h4>
         <h4 className="text-textcolor p-1">
@@ -219,10 +359,10 @@ export default function ProjectPage( props ) {
 
   function DisplayDeleteButton() {
     if (props.userData === null)
-      return null
+      return
 
     if (props.userData.email !== projectOwnerEmail)
-      return null
+      return
 
     return (
       <div className="text-textcolor text-xl">
@@ -234,10 +374,10 @@ export default function ProjectPage( props ) {
 
   function DisplayShareButton() {
     if (props.userData === null)
-      return null
+      return
     // Make Sure user has permision to share before allowing them to share
     if (!IsUserAllowedToShare(userPermissionLevel))
-      return;
+      return
 
     return (
       <div className="text-textcolor text-xl">
@@ -248,20 +388,69 @@ export default function ProjectPage( props ) {
       </div>
     )
   }
-  function DisplayUploadDocumentButton() {
+
+  function DisplayCreateCommitButton() {
+    if (commits.some(item => item.date_committed === null))
+      return
+
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${folderStack[folderStack.length - 1].folder_id}/Document/Create`)}>Upload Document</button>
+          onClick={() => {
+            createCommit(project_id, commit.commit_id)
+            setLoading(true)
+          }}>
+          Create Commit
+        </button>
+      </div>
+    )
+
+  }
+
+  function DisplayDeleteWorkingCommitButton() {
+    if (commit.date_committed !== null)
+      return
+
+    return(
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+          onClick={() => navigate(`/Project/${project_id}/Commit/Delete/${commit.commit_id}`)}>
+          Delete Commit
+        </button>
+      </div>
+    )
+  }
+
+  function DisplayUploadDocumentButton() {
+    if (commit.date_committed !== null)
+      return
+  
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+          onClick={() => 
+            navigate(`/Project/${project_id}/Commit/${commit.commit_id}/${folderStack[folderStack.length - 1].folder_id}/Document/Create`)
+          }
+        >
+          Upload Document
+        </button>
       </div>
     )
   }
 
   function DisplayCreateFolderButton() {
+    if (commit.date_committed !== null)
+      return
+
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-        onClick={() => navigate(`/Project/${project_id}/${folderStack[folderStack.length - 1].folder_id}/Folder/Create`)}>Create Folder</button>
+          onClick={() => 
+            navigate(`/Project/${project_id}/Commit/${commit.commit_id}/${folderStack[folderStack.length - 1].folder_id}/Folder/Create`)
+          }
+        >
+          Create Folder
+        </button>
       </div>
     )
   }
@@ -292,7 +481,7 @@ export default function ProjectPage( props ) {
     )
   }
 
-  if (loading) {
+  if (loading || (commitLoading && (commit === null))) {
     return (
       <div>
         <div className="text-textcolor text-center m-20 text-xl">
@@ -302,26 +491,68 @@ export default function ProjectPage( props ) {
     )
   }
 
-  let path = `${projectOwnerEmail}/${projectName}`
+  if (commitLoading) {
+    return(
+      <div>
+        <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
+        <div className="flex m-1">
+          <BackButton location={`/`}/>
+          <DisplayExportButton/>
+          <DisplayDeleteButton/>
+          <DisplayShareButton/>
+        </div>
+        <div className="flex">
+          <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
+          <CommitDropdown
+            commits={commits}
+            commit={commit}
+            setCommit={setCommit}
+            setCommitLoading={setCommitLoading}
+          />
+        </div>
+        <div>
+          <div className="text-textcolor text-center m-20 text-xl">
+            Loading...
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  let path = `root/`
   for (let i = 1; i < folderStack.length; i++) {
-    path += `/${folderStack[i].name}`
+    path += `${folderStack[i].name}/`
   }
 
   return (
     <div>
+      <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
+      <div className="flex m-1">
+        <BackButton location={`/`}/>
+        <DisplayExportButton/>
+        <DisplayDeleteButton/>
+        <DisplayShareButton/>
+      </div>
+      <div className="flex">
+        <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
+        <CommitDropdown
+          commits={commits}
+          commit={commit}
+          setCommit={setCommit}
+          setCommitLoading={setCommitLoading}
+        />
+      </div>
+      <div className="flex m-1">
+        <DisplayDeleteWorkingCommitButton/>
+        <DisplayCreateCommitButton/>
+        <DisplayUploadDocumentButton/>
+        <DisplayCreateFolderButton/>
+      </div>
       <div className="flex">
         <div className="overflow-x-auto">
           <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">{`${path}`}</h3>
         </div>
         <DisplayNavigateParentFolderButton/>
-      </div>
-      <div className="flex">
-        <BackButton/>
-        <DisplayExportButton/>
-        <DisplayDeleteButton/>
-        <DisplayUploadDocumentButton/>
-        <DisplayCreateFolderButton/>
-        <DisplayShareButton/>
       </div>
       <DisplayFolderBox/>
       <DisplayDocumentBox/>

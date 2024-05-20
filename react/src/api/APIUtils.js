@@ -159,7 +159,7 @@ export async function promoteEmailToProjectOwner(proj_id, currentOwnerEmail, new
     .then(response => response.json())
     .catch(error => console.log(error))
 }
-export async function createDocument(documentName, proj_id, documentData, parent_folder_id) {
+export async function createDocument(documentName, proj_id, commit_id, documentData, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
   let bodyData = {
@@ -180,11 +180,11 @@ export async function createDocument(documentName, proj_id, documentData, parent
     },
     body: JSON.stringify(bodyData)
   }
-  return await fetch((`/api/Document/${proj_id}/`), headers)
+  return await fetch((`/api/Document/${proj_id}/${commit_id}/`), headers)
     .then(response => response.json())
 }
 
-export async function deleteDocument(doc_id) {
+export async function deleteDocument(doc_id, commit_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -197,11 +197,11 @@ export async function deleteDocument(doc_id) {
       "Content-Type": "application/json"
     }
   }
-  return await fetch((`/api/Document/${doc_id}/`), headers)
+  return await fetch((`/api/Document/${doc_id}/${commit_id}/`), headers)
     .then(response => response.json())
 }
 
-export async function  getDocumentInfo(proj_id, doc_id, commit_id) {
+export async function  getDocumentInfo(proj_id, commit_id, doc_id) {
   let oAuthToken = getCookie("cr_id_token")
   
   let headers = {
@@ -215,9 +215,14 @@ export async function  getDocumentInfo(proj_id, doc_id, commit_id) {
     }
   }
 
-  return await fetch((`/api/Document/${proj_id}/${doc_id}/${commit_id}`), headers)
-    .then(response => response.json())
-
+  return await fetch((`/api/Document/${proj_id}/${doc_id}/${commit_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data.body
+  })
 }
 
 export async function getDocSnapshot(proj_id, doc_id, snap_id) {
@@ -237,7 +242,7 @@ export async function getDocSnapshot(proj_id, doc_id, snap_id) {
   return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}/`), headers)
     .then(response => response.json())
 }
-export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data) {
+export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data, commit_id) {
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "POST",
@@ -253,7 +258,7 @@ export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data) 
 
   // Fail = Null
   // Success = SnapshotID
-  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/`), headers)
+  return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${commit_id}/`), headers)
     .then(response => response.json())
     .then(data => {
       if (data.success)
@@ -480,8 +485,8 @@ export async function getProjectInfo(proj_id) {
 
 }
 
-
-export async function getProjectDocuments(proj_id) {
+/*
+export async function getCommitDocuments(commit_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -495,7 +500,7 @@ export async function getProjectDocuments(proj_id) {
     },
   };
 
-  return await fetch((`/api/Project/${proj_id}/GetDocuments/`), headers)
+  return await fetch((`/api/Project/${commit_id}/GetDocuments/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
@@ -503,7 +508,7 @@ export async function getProjectDocuments(proj_id) {
     }
     return data.body
   })
-}
+}*/
 
 export async function getFolderTree(commit_id) {
   let oAuthToken = getCookie("cr_id_token")
@@ -529,7 +534,7 @@ export async function getFolderTree(commit_id) {
   })
 }
 
-export async function createFolder(folder_name, proj_id, parent_folder_id) {
+export async function createFolder(folder_name, proj_id, commit_id, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
 
@@ -548,13 +553,54 @@ export async function createFolder(folder_name, proj_id, parent_folder_id) {
     }),
   };
 
-  return await fetch((`/api/Folder/${proj_id}/`), headers)
+  return await fetch((`/api/Folder/${proj_id}/${commit_id}/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
     }
     return data
+  })
+}
+
+export async function deleteFolder(folder_id, commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "DELETE",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+  return await fetch((`/api/Folder/${folder_id}/${commit_id}/`), headers)
+    .then(response => response.json())
+}
+
+export async function  getFolderInfo(proj_id, commit_id, folder_id) {
+  let oAuthToken = getCookie("cr_id_token")
+  
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  }
+
+  return await fetch((`/api/Folder/${proj_id}/${folder_id}/${commit_id}/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data.body
   })
 }
 
@@ -693,7 +739,7 @@ export async function hasGitHubToken() {
     return data
   })
 }
-
+/*
 export async function getDeletedDocuments( proj_id, repo_name, branch_name ) {
   let oAuthToken = getCookie("cr_id_token")
 
@@ -717,7 +763,7 @@ export async function getDeletedDocuments( proj_id, repo_name, branch_name ) {
     return data
   })
 }
-
+*/
 export async function pullFromGitHub(proj_name, repo_name, branch_name) {
   let oAuthToken = getCookie("cr_id_token")
 
@@ -747,7 +793,7 @@ export async function pullFromGitHub(proj_name, repo_name, branch_name) {
   })
 }
 
-export async function pushToExistingBranch(proj_id, repo_name, branch_name, deletedDocuments, snapshots, message) {
+export async function pushToExistingBranch(proj_id, repo_name, branch_name, commit_id, message) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -762,13 +808,11 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, dele
     body: JSON.stringify({
       "repository" : repo_name,
       "branch" : branch_name,
-      "deletedDocuments" : deletedDocuments,
-      "snapshots" : snapshots,
       "message" : message,
     })
   };
 
-  return await fetch((`/api/Github/${proj_id}/PushToExisting/`), headers)
+  return await fetch((`/api/Github/${proj_id}/${commit_id}/PushToExisting/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
@@ -793,6 +837,57 @@ export async function getCommits(proj_id) {
   };
 
   return await fetch((`/api/Project/${proj_id}/GetCommits/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data
+  })
+}
+
+export async function createCommit(proj_id, commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "POST",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "last_commit" : commit_id,
+    })
+  };
+
+  return await fetch((`/api/Commit/${proj_id}/createCommit/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+    }
+    return data
+  })
+}
+
+export async function deleteCommit(proj_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "DELETE",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+  return await fetch((`/api/Commit/${proj_id}/workingCommit/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {

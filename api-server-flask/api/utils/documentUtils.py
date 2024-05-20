@@ -39,7 +39,7 @@ def getDocumentInfoViaLocation(name, parent_folder, commit_id):
         document = getDocumentInfo(foundDocument["item_id"], commit_id)
         return document
 
-def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
+def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, user_email):
     doc_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
@@ -51,21 +51,24 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id):
         conn.execute(stmt)
         conn.commit()
     createItemCommitLocation(doc_id, commit_id, document_name, parent_folder, False)
-    createNewSnapshot(proj_id, doc_id, data, commit_id)
+    createNewSnapshot(proj_id, doc_id, data, commit_id, user_email)
     return doc_id
 
 def deleteDocumentFromCommit(doc_id, commit_id):
-    with engine.connect() as conn:
-        stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
-        conn.execute(stmt)
-        stmt = delete(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.doc_id == doc_id, models.CommitDocumentSnapshotRelation.commit_id == commit_id)
-        conn.execute(stmt)
-        stmt = select(models.Snapshot).where(models.Snapshot.og_commit_id == commit_id, models.Snapshot.associated_document_id == doc_id)
-        snaps = conn.execute(stmt)
-        for snap in snaps:
-            deleteSnapshotUtil(snap.snapshot_id)
-        conn.commit()
-    return True
+    try:
+        with engine.connect() as conn:
+            stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
+            conn.execute(stmt)
+            stmt = delete(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.doc_id == doc_id, models.CommitDocumentSnapshotRelation.commit_id == commit_id)
+            conn.execute(stmt)
+            stmt = select(models.Snapshot).where(models.Snapshot.og_commit_id == commit_id, models.Snapshot.associated_document_id == doc_id)
+            snaps = conn.execute(stmt)
+            for snap in snaps:
+                deleteSnapshotUtil(snap.snapshot_id)
+            conn.commit()
+        return True, None
+    except Exception as e:
+        return False, e
 
 #only for project deletion
 def purgeDocumentUtil(doc_id):
