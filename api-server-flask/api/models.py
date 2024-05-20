@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, String, Integer, Float, Boolean, MetaData, insert, select, DateTime, Text, Enum
+from sqlalchemy import Table, Column, String, Integer, Float, false, Boolean, MetaData, insert, select, DateTime, Text, Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase
 from reviewStateEnums import reviewStateEnum
@@ -70,7 +70,8 @@ class Document(Base):
     og_commit_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-
+    is_reviewed = Column(Boolean, server_default=false())
+    
 class ItemCommitLocation(Base):
     __tablename__ = "commititemlocation"
     item_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31))
@@ -98,7 +99,7 @@ class Commit(Base):
     date_committed = Column(DateTime(timezone=True))
     root_folder = Column(Integer)
     last_commit = Column(Integer)
-    #state = Column(Enum(reviewStateEnum))
+    state = Column(Enum(reviewStateEnum))
 
 class CommitDocumentSnapshotRelation(Base):
     __tablename__ = "docsnapshotrelation"

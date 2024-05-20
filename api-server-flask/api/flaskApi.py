@@ -3,7 +3,7 @@ app = get_app(__name__)
 
 from flask import request, jsonify
 try:
-    from testRoutes import *
+    from test.testRoutes import *
 except Exception as e:
     print(e)
     pass

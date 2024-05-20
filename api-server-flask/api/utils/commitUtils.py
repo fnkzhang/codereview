@@ -37,8 +37,8 @@ def createNewCommit(proj_id, email, last_commit):
                 author_email = email,
                 root_folder = root_folder_id,
                 last_commit = last_commit,
-                name = "User Working Commit"
-                #state = reviewStateEnum.open
+                name = "User Working Commit",
+                state = reviewStateEnum.reviewed # Set reviewed because not technically public yet
         )
         conn.execute(stmt)
         conn.commit()
@@ -73,8 +73,7 @@ def commitACommit(commit_id, name):
         stmt = update(models.Commit).where(
                 models.Commit.commit_id == commit_id).values(
                 date_committed = func.now(),
-                name = name
-                #state = reviewStateEnum.reviewed
+                name = name,
         )
 
         conn.execute(stmt)
@@ -116,6 +115,54 @@ def deleteCommit(commit_id):
 
         conn.commit()
     return True
+
+def setCommitOpen(commit_id):
+    try:
+
+        with engine.connect() as conn:
+            stmt = update(models.Commit).where(
+                models.Commit.commit_id == commit_id).values(
+                state = reviewStateEnum.open
+            )
+
+            conn.execute(stmt)
+            conn.commit()
+            return True
+    except Exception as e:
+        print("Error: ", e)
+        return False
+
+def setCommitClosed(commit_id):
+    try:
+
+        with engine.connect() as conn:
+            stmt = update(models.Commit).where(
+                models.Commit.commit_id == commit_id).values(
+                state = reviewStateEnum.closed
+            )
+
+            conn.execute(stmt)
+            conn.commit()
+            return True
+    except Exception as e:
+        print("Error: ", e)
+        return False
+
+def setCommitReviewed(commit_id):
+    try:
+
+        with engine.connect() as conn:
+            stmt = update(models.Commit).where(
+                models.Commit.commit_id == commit_id).values(
+                state = reviewStateEnum.reviewed
+            )
+
+            conn.execute(stmt)
+            conn.commit()
+            return True
+    except Exception as e:
+        print("Error: ", e)
+        return False
 
 def removeItemFromCommit(item_id, commit_id):
     with engine.connect() as conn:

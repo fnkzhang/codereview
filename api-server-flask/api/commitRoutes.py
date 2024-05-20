@@ -71,7 +71,12 @@ def createCommit(proj_id):
         last_commit = None
     else:
         last_commit = body["last_commit"]
+
     commit_id = createNewCommit(proj_id, idInfo["email"], last_commit)
+
+    # Redundant but just in case since creating new commit already sets it reviewed
+    setCommitReviewed(commit_id)
+
     return {
         "success": True,
         "reason": "",
@@ -242,18 +247,53 @@ def commitCommit(commit_id):
         }
     body = request.get_json()
     name = body["name"]
-    commit = getCommentInfo(commit_id)
+    commit = getCommitInfo(commit_id)
     proj_id = commit["proj_id"]
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
     commit_id = commitACommit(commit_id, name)
 
+    # After User Commits to public, commit should be open
+    setCommitOpen(commit_id)
+
     return {
         "success": True,
         "reason": "",
         "body": commit_id
     }
+
+@app.route('/api/Commit/<commit_id>/close/', methods=["GET"])
+def closeCommit(commit_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    # Using comments to get project_id
+    commit = getCommitInfo(commit_id)
+    proj_id = commit["proj_id"]
+    # ONLY OWNER CAN CLOSE COMMIT
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    closeCommit(commit_id)
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": commit_id
+    }
+
 
 #probably used if someone is halfway through a commit and wants to kill it
 @app.route('/api/Commit/<proj_id>/workingCommit/', methods=["DELETE"])
