@@ -75,7 +75,9 @@ export default function ProjectExport( props ) {
   return (
     <div>
       <div>
-        <BackButton/>
+        <BackButton
+          location={`/Project/${project_id}/Commit/0`}
+        />
       </div>
       <div className="flex justify-center mt-20">
         <form 
