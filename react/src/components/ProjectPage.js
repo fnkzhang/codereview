@@ -12,6 +12,7 @@ export default function ProjectPage( props ) {
 
   const [loading, setLoading] = useState(true)
   const [commitLoading, setCommitLoading] = useState(true)
+  const [creatingCommit, setCreatingCommit] = useState(false)
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
   const [projectName, setProjectName] = useState(null)
   const [folderStack, setFolderStack] = useState(null)
@@ -35,7 +36,7 @@ export default function ProjectPage( props ) {
 
     async function grabCommits() {
       const commitResult = await getCommits(project_id);
-      const commitArray = commitResult.body;
+      const commitArray = commitResult.body.reverse();
       setCommits(commitArray);
     }
 
@@ -52,12 +53,20 @@ export default function ProjectPage( props ) {
       }
     }
 
-    if (loading && props.isLoggedIn)
+    if (creatingCommit) {
+      setLoading(true)
+      setCommitLoading(true)
+      setFolderStack(null)
+    }
+
+    if (loading && props.isLoggedIn && !creatingCommit) {
+      setCommits(null)
+      setCommit(null)
       fetchData()
-    else
+    } else
       return
 
-  }, [project_id, loading, props.isLoggedIn])
+  }, [project_id, loading, props.isLoggedIn, creatingCommit])
 
   useEffect(() => {
 
@@ -396,9 +405,11 @@ export default function ProjectPage( props ) {
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-          onClick={() => {
-            createCommit(project_id, commit.commit_id)
-            setLoading(true)
+          onClick={async () => {
+            setCreatingCommit(true)
+            await createCommit(project_id, commit.commit_id)
+            setCreatingCommit(false)
+            navigate(`/Project/${project_id}/Commit/0`)
           }}>
           Create Commit
         </button>
@@ -492,6 +503,16 @@ export default function ProjectPage( props ) {
         You must Log in to view this page.
       </div>
     </div>
+    )
+  }
+
+  if (creatingCommit) {
+    return (
+      <div>
+        <div className="text-textcolor text-center m-20 text-xl">
+          Creating Working Commit...
+        </div>
+      </div>
     )
   }
 
