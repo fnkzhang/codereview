@@ -9,6 +9,7 @@ export default function CommitDropdown( props ) {
         {props.commits.map((commit, index) => { 
           return (
             <Dropdown.Item 
+              className="hover:bg-alternative"
               key={index}
               onClick={() => {
                 props.setCommit(commit)

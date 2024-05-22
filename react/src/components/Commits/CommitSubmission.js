@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
-import { deleteCommit } from "../../api/APIUtils";
+import { submitCommit } from "../../api/APIUtils";
 import BackButton from "../BackButton.js";
 
-export default function CommitDeletion(props) {
-    const commitName = "User Working Commit" // Actual Commit Name to compare
-    const [inputCommitName, setInputCommitName] = useState(""); // Handle Input for commit name
+export default function CommitSubmission(props) {
+    const [commitName, setCommitName] = useState(""); // Handle Input for commit name
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
     const { project_id, commit_id } = useParams();
@@ -18,18 +17,12 @@ export default function CommitDeletion(props) {
 
         setWorking(true)
 
-        if (inputCommitName === "") {
+        if (commitName === "") {
             setWorking(false)
             return
         }
 
-        if (inputCommitName !== commitName) {
-            alert("Input Does Not Match Commit Name")
-            setWorking(false)
-            return
-        }
-
-        let result = await deleteCommit(project_id)
+        let result = await submitCommit(commit_id, commitName)
 
         if (result.success) {
             navigate(`/Project/${project_id}/Commit/0`) // Go back to project view
@@ -63,19 +56,19 @@ export default function CommitDeletion(props) {
                 >
                     <div>
                         <div className="mb-3 block">
-                            <Label className="text-2xl" value="Are you sure you want to delete your working commit?" />
+                            <Label className="text-2xl" value="Commit Your Working Changes" />
                         </div>
 
                         <div className="mb-3 block">
                             <Label className="text-2xl">
-                                Please type <strong className="text-red-500">{commitName}</strong> into the text field.
+                                Please provide a name for your commit.
                             </Label>
                         </div>
                         <TextInput
                             className="text-black shadow-white"
                             placeholder="Name of Commit"
                             sizing="lg"
-                            onChange={(e) => setInputCommitName(e.target.value)}
+                            onChange={(e) => setCommitName(e.target.value)}
                             shadow
                             required
                         />
