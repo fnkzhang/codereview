@@ -12,7 +12,6 @@ export default function ProjectPage( props ) {
 
   const [loading, setLoading] = useState(true)
   const [commitLoading, setCommitLoading] = useState(true)
-  const [creatingCommit, setCreatingCommit] = useState(false)
   const [projectOwnerEmail, setProjectOwnerEmail] = useState(null)
   const [projectName, setProjectName] = useState(null)
   const [folderStack, setFolderStack] = useState(null)
@@ -36,7 +35,7 @@ export default function ProjectPage( props ) {
 
     async function grabCommits() {
       const commitResult = await getCommits(project_id);
-      const commitArray = commitResult.body.reverse();
+      const commitArray = commitResult.body;
       setCommits(commitArray);
     }
 
@@ -53,20 +52,12 @@ export default function ProjectPage( props ) {
       }
     }
 
-    if (creatingCommit) {
-      setLoading(true)
-      setCommitLoading(true)
-      setFolderStack(null)
-    }
-
-    if (loading && props.isLoggedIn && !creatingCommit) {
-      setCommits(null)
-      setCommit(null)
+    if (loading && props.isLoggedIn)
       fetchData()
-    } else
+    else
       return
 
-  }, [project_id, loading, props.isLoggedIn, creatingCommit])
+  }, [project_id, loading, props.isLoggedIn])
 
   useEffect(() => {
 
@@ -124,12 +115,8 @@ export default function ProjectPage( props ) {
   useEffect(() => {
     if (commitLoading && (folderStack !== null) && (folderStack[0].commit_id === commit.commit_id))
       setCommitLoading(false)
-<<<<<<< HEAD
   }, [folderStack, commitLoading, setCommitLoading])
   
-=======
-  }, [folderStack, commitLoading, setCommitLoading, commit])
->>>>>>> 51000e35c9d5d978d3e21131a1cd16440e964b87
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
@@ -221,8 +208,7 @@ export default function ProjectPage( props ) {
     async function handleDocumentClick () {
       const result = await getAllSnapshotsFromDocument(project_id, id)
       if (result.success)
-        navigate(`/Project/${project_id}/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`,
-          {state: {documentName: name}})
+        navigate(`/Project/${project_id}/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`)
     }
 
     function DisplayDocumentOptions() {
@@ -411,11 +397,9 @@ export default function ProjectPage( props ) {
     return (
       <div className="text-textcolor text-xl">
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-          onClick={async () => {
-            setCreatingCommit(true)
-            await createCommit(project_id, commit.commit_id)
-            setCreatingCommit(false)
-            navigate(`/Project/${project_id}/Commit/0`)
+          onClick={() => {
+            createCommit(project_id, commit.commit_id)
+            setLoading(true)
           }}>
           Create Commit
         </button>
@@ -433,20 +417,6 @@ export default function ProjectPage( props ) {
         <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
           onClick={() => navigate(`/Project/${project_id}/Commit/Delete/${commit.commit_id}`)}>
           Delete Commit
-        </button>
-      </div>
-    )
-  }
-
-  function DisplayCommitWorkingCommitButton() {
-    if (commit.date_committed !== null)
-      return
-
-    return(
-      <div className="text-textcolor text-xl">
-        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
-          onClick={() => navigate(`/Project/${project_id}/Commit/Submit/${commit.commit_id}`)}>
-          Commit Changes
         </button>
       </div>
     )
@@ -509,16 +479,6 @@ export default function ProjectPage( props ) {
         You must Log in to view this page.
       </div>
     </div>
-    )
-  }
-
-  if (creatingCommit) {
-    return (
-      <div>
-        <div className="text-textcolor text-center m-20 text-xl">
-          Creating Working Commit...
-        </div>
-      </div>
     )
   }
 
@@ -585,7 +545,6 @@ export default function ProjectPage( props ) {
       </div>
       <div className="flex m-1">
         <DisplayDeleteWorkingCommitButton/>
-        <DisplayCommitWorkingCommitButton/>
         <DisplayCreateCommitButton/>
         <DisplayUploadDocumentButton/>
         <DisplayCreateFolderButton/>

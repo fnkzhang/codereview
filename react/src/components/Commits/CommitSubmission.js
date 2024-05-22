@@ -12,7 +12,7 @@ export default function CommitSubmission(props) {
     const { project_id, commit_id } = useParams();
     const navigate = useNavigate();
 
-    const handleDeleteCommitButtonClick = async (e) => {
+    const handleSubmitCommitButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 
         setWorking(true)
@@ -52,7 +52,7 @@ export default function CommitSubmission(props) {
             <div className="flex justify-center mt-20">
                 <form
                     className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded"
-                    onSubmit={handleDeleteCommitButtonClick}
+                    onSubmit={handleSubmitCommitButtonClick}
                 >
                     <div>
                         <div className="mb-3 block">
@@ -75,7 +75,7 @@ export default function CommitSubmission(props) {
                     </div>
 
                     {isError ? (
-                        <p className="text-red-600 text-xl">Error: Could Not Delete Commit</p>
+                        <p className="text-red-600 text-xl">Error: Could Not Submit Commit</p>
                     ) : null}
                     <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">
                         Delete
