@@ -116,6 +116,7 @@ export default function ProjectPage( props ) {
     if (commitLoading && (folderStack !== null) && (folderStack[0].commit_id === commit.commit_id))
       setCommitLoading(false)
   }, [folderStack, commitLoading, setCommitLoading])
+  
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
