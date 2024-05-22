@@ -318,7 +318,7 @@ def getAllCommentsForDocument(document_id):
             "reason": "Error Grabbing Comments From Database"
         }
     for comment in listOfComments:
-        comment["isSeen"]= isCommentSeenByUser(comment["comment_id"], idInfo["body"])
+        comment["isSeen"]= isCommentSeenByUser(comment["comment_id"], idInfo["email"])
         setCommentAsSeen(comment["comment_id"], idInfo["email"])
     return {
         "success": True,
