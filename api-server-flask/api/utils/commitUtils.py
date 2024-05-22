@@ -19,6 +19,7 @@ def getCommitInfo(commit_id):
         return foundCommit._asdict()
 
 def createNewCommit(proj_id, email, last_commit):
+    print("COMMIT_CREATED!!!", last_commit)
     commit_id = createID()
     if last_commit != None:
         print(last_commit)
