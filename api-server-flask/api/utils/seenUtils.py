@@ -11,7 +11,6 @@ def isSnaphotSeenByUser(snapshot_id, user_email):
                 models.UserUnseenSnapshot.user_email == user_email
                 )
         seen = conn.execute(stmt).first()
-        print(seen)
         if seen == None:
             return True
         else:
@@ -69,9 +68,9 @@ def isCommentSeenByUser(comment_id, user_email):
                 )
         seen = conn.execute(stmt).first()
         if seen == None:
-            return False
-        else:
             return True
+        else:
+            return False
 
 def setCommentAsUnseen(comment_id, user_email):
     with engine.connect() as conn:
