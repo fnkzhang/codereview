@@ -218,12 +218,14 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               // Set Value Because Editor Changes length of the Document after mounting
               setCode(editor.getModifiedEditor().getValue())
               setInitialUpdatedCode(editor.getModifiedEditor().getValue())
-
               editorRef.current = editor
               monacoRef.current = monaco
+
+              const latestSnapshotDataIdString = latestSnapshotData?.snapshot.snapshot_id?.toString()
+
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: latestSnapshotData?.snapshot_id?.toString() === right_snapshot_id ? false : true
+                readOnly: latestSnapshotDataIdString === right_snapshot_id ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true

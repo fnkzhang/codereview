@@ -61,7 +61,7 @@ def createSnapshot(proj_id, doc_id, commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"], commit_id, idInfo["user_email"])
+    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"], commit_id, idInfo["email"])
     return {
         "success": True,
         "reason": "",

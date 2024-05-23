@@ -218,8 +218,13 @@ def getAllDocumentCommittedSnapshots(proj_id, doc_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
-
-    return {"success": True, "reason":"", "body": foundSnapshots}
+    snapCommits = []
+    for snap in foundSnapshots:
+        commit = getCommitInfo(snap["og_commit_id"])
+        snapCommits.append({"snapshot":snap, "commit":commit})
+    
+    print(snapCommits)
+    return {"success": True, "reason":"", "body": snapCommits}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotIdAndWorking/', methods=["GET"])
 def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
@@ -240,12 +245,17 @@ def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    working = getUserWorkingCommitInProject(proj_id)
+    working = getUserWorkingCommitInProject(proj_id, idInfo["email"])
     if working != None:
         foundSnapshots = getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working["commit_id"])
     else:
         foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
-    return {"success": True, "reason":"", "body": foundSnapshots}
+    snapCommits = []
+    for snap in foundSnapshots:
+        commit = getCommitInfo(snap["og_commit_id"])
+        snapCommits.append({"snapshot":snap, "commit":commit})
+
+    return {"success": True, "reason":"", "body": snapCommits}
 
 #changes a document's snapshot on a specific commit to the given one
 @app.route('/api/Document/<doc_id>/<commit_id>/<snapshot_id>/changeTo/', methods=["POST"])
