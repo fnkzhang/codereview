@@ -16,6 +16,7 @@ export default function ProjectDisplayBox({id, name, author, date}) {
   useEffect(() => {
     async function getLatestCommitState(project_id){
       const latestCommit = await getLatestCommitForProject(project_id)
+
       console.log(latestCommit);
       if (latestCommit === null)
         console.log("Failed To get latest commit")
