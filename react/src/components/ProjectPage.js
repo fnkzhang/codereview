@@ -18,7 +18,6 @@ export default function ProjectPage( props ) {
   const [commits, setCommits] = useState(null)
   const [commit, setCommit] = useState(null)
 
-  const [commitState, setCommitState] = useState('open')
   const { project_id, commit_id } = useParams()
   const navigate = useNavigate()
 
@@ -116,7 +115,7 @@ export default function ProjectPage( props ) {
   useEffect(() => {
     if (commitLoading && (folderStack !== null) && (folderStack[0].commit_id === commit.commit_id))
       setCommitLoading(false)
-  }, [folderStack, commitLoading, setCommitLoading])
+  }, [folderStack, commitLoading, setCommitLoading, commit.commit_id])
   
   // Get the user permission level for use on the page
   useEffect(() => {
