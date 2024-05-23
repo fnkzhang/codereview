@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { getLatestCommitForProject } from "../../api/APIUtils";
 import { Card } from "flowbite-react"
+import { Tooltip } from "react-tooltip";
 import { REVIEW_STATE } from "../../utils/reviewStateMapping";
 
 export default function ProjectDisplayBox({id, name, author, date}) {
   // Clicking on project will redirect to project page to select documents
   // Enum For State
   const [reviewState, setReviewState] = useState(REVIEW_STATE.CLOSED) 
-  const [latestCommitIdForReview, setLatestCommitIdForReview] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
 
   const navigate = useNavigate()
@@ -22,7 +22,6 @@ export default function ProjectDisplayBox({id, name, author, date}) {
         console.log("Failed To get latest commit")
       else {
         setReviewState(latestCommit.state)
-        setLatestCommitIdForReview(latestCommit.commit_id)
       }
 
       setIsLoaded(true)
@@ -31,7 +30,7 @@ export default function ProjectDisplayBox({id, name, author, date}) {
     getLatestCommitState(id)
   }, [id])
 
-  const handleProjectClick = async (project_id, commit_id) => {
+  const handleProjectClick = async (project_id) => {
     navigate(`/Project/${project_id}/Commit/0`)
   }
   if (isLoaded) {
@@ -47,7 +46,8 @@ export default function ProjectDisplayBox({id, name, author, date}) {
     return (
       <Card 
         className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"
-        onClick={() => handleProjectClick(id, latestCommitIdForReview)}
+        data-tooltip-id={`${id}`}
+        onClick={() => handleProjectClick(id)}
       >
         <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
           <span className="font-bold text-xl">{author}/{name}</span>
@@ -64,9 +64,22 @@ export default function ProjectDisplayBox({id, name, author, date}) {
           </div>
         </div>
         <h4 className="text-textcolor p-1">
-              <span className="font-bold">Date Modified: </span>
-              <span className="block"> {date} </span>
-            </h4>
+          <span className="font-bold">Date Modified: </span>
+          <span className="block"> {date} </span>
+        </h4>
+        <Tooltip 
+          className="z-9999" 
+          id={`${id}`}
+          place="bottom"
+          disableStyleInjection="true"
+          content={
+            <div>
+              <p>
+                {author}/{name}
+              </p>
+            </div>
+          }
+        />
       </Card>
     )
   }
