@@ -423,3 +423,31 @@ def getUserWorkingCommitForProject(proj_id):
         "body": commit
     }
 
+
+@app.route('/api/Commit/<proj_id>/getLatestComments/', methods=["GET"])
+def getAllLatestCommitComments(proj_id):
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    last_commit = getProjectLastCommittedCommit(proj_id)
+    docsnap = getAllCommitDocumentSnapshotRelation(last_commit["commit_id"])
+    comments = []
+    for doc in docsnap.keys():
+        comments.extend(filterCommentsByPredicate(models.Comment.snapshot_id == docsnap[doc]))
+
+    return {"success": True, "reason":"", "body": comments}
+
