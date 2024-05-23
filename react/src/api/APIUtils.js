@@ -432,6 +432,7 @@ export async function getAllSnapshotsFromDocument(project_id, document_id) {
 
     return await fetch((`/api/Document/${project_id}/${document_id}/getSnapshotId/`), headers)
       .then(response => response.json())
+      //.then(data => console.log(data))
 }
 
 export async function getUserProjects(userEmail) {
@@ -921,5 +922,30 @@ export async function submitCommit(commit_id, commit_name) {
       console.log("FAILED" + data.reason)
     }
     return data
+  })
+}
+
+export async function getLatestCommitForProject(project_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+  return await fetch((`/api/Project/${project_id}/GetLatestCommit/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return null
+    }
+    return data.body
   })
 }

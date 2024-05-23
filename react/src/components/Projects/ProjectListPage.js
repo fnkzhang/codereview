@@ -2,8 +2,8 @@ import React, {useState, useEffect} from "react";
 
 import { useNavigate } from "react-router";
 import { getUserProjects } from "../../api/APIUtils";
+import ProjectDisplayBox from "./ProjectDisplayBox";
 
-import { Card } from "flowbite-react"
 
 export default function ProjectListPage( props ) {
 
@@ -11,7 +11,8 @@ export default function ProjectListPage( props ) {
     const [loading, setLoading] = useState(true);
     
     const navigate = useNavigate()
-  
+
+    // Set up state variables
     useEffect(() => {
       // Grab User Data
       async function grabProjectData() {
@@ -23,31 +24,7 @@ export default function ProjectListPage( props ) {
       grabProjectData()
     }, [props])
 
-    // Clicking on project will redirect to project page to select documents
-    const handleProjectClick = (id) => {
-      navigate(`/Project/${id}/Commit/0`)
-    }
 
-    function ProjectDisplayBox({id, name, author, date}) {
-      return (
-        <Card 
-          className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"
-          onClick={() => handleProjectClick(id)}
-        >
-          <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
-            <span className="font-bold text-xl">{author}/{name}</span>
-          </h4>
-          <h4 className="text-textcolor p-1">
-            <span className="font-bold block">Project ID: </span>
-            <span className="block"> {id} </span>
-          </h4>
-          <h4 className="text-textcolor p-1">
-            <span className="font-bold">Date Modified: </span>
-            <span className="block"> {date} </span>
-          </h4>
-        </Card>
-      )
-    }
     function DisplayProjects() {
 
       if(userProjects.length > 0) {

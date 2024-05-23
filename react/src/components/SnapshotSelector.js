@@ -20,11 +20,12 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
           console.log(result)
           if (result.success)
             setSnapshots(result.body)
-
           snapshots.forEach((snapshot, index) => {
-            if(snapshot.snapshot_id.toString() === left_snapshot_id)
+            const currentSnapshot_id = snapshot.snapshot.snapshot_id.toString()
+            
+            if(currentSnapshot_id === left_snapshot_id)
               setSelectedLeftSnapshotIndex(index)
-            if(snapshot.snapshot_id.toString() === right_snapshot_id)
+            if(currentSnapshot_id === right_snapshot_id)
               setSelectedRightSnapshotIndex(index)
           });
         }

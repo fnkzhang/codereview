@@ -174,6 +174,38 @@ def getProjectCommittedCommits(proj_id):
         "body": arrayOfCommits
     }
 
+@app.route('/api/Project/<proj_id>/GetLatestCommit/', methods = ["GET"])
+def getProjectLatestCommit(proj_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+
+    latestCommit = getProjectLastCommittedCommit(proj_id)
+
+    if latestCommit == None:
+        return {
+            "success": False,
+            "reason": "No Latest Commit"
+        }
+    
+    return {
+        "success": True,
+        "reason": "",
+        "body": latestCommit
+    }
 #discontinued for now
 @app.route('/api/Project/<proj_id>/GetDocuments/', methods = ["GET"])
 def getProjectDocuments(proj_id):

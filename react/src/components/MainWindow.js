@@ -34,12 +34,13 @@ export default function MainWindow( props ) {
       console.log("No Data To Upload")
       return
     }
-
     let response = await createSnapshotForDocument(project_id, document_id, dataToUpload)
 
     if (response === null)
       return
-      
+
+    console.log(response);
+
     navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${response}`, {state: {documentName: location.state.documentName}})
     
   }

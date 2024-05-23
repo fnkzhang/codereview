@@ -312,7 +312,8 @@ def getAllDocumentCommittedSnapshots(proj_id, doc_id):
     for snap in foundSnapshots:
         commit = getCommitInfo(snap["og_commit_id"])
         snapCommits.append({"snapshot":snap, "commit":commit})
-
+    
+    print(snapCommits)
     return {"success": True, "reason":"", "body": snapCommits}
 
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotIdAndWorking/', methods=["GET"])
@@ -451,7 +452,7 @@ def getAllCommentsForDocument(document_id):
             "reason": "Error Grabbing Comments From Database"
         }
     for comment in listOfComments:
-        comment["isSeen"]= isCommentSeenByUser(comment["comment_id"], idInfo["body"])
+        comment["isSeen"]= isCommentSeenByUser(comment["comment_id"], idInfo["email"])
         setCommentAsSeen(comment["comment_id"], idInfo["email"])
     return {
         "success": True,

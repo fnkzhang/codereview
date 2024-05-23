@@ -216,9 +216,11 @@ export default function ProjectPage( props ) {
 
     async function handleDocumentClick () {
       const result = await getAllSnapshotsFromDocument(project_id, id)
+
+      const latestSnapshot = result.body[0].snapshot.snapshot_id;
+
       if (result.success)
-        navigate(`/Project/${project_id}/Document/${id}/${result.body[0].snapshot_id}/${result.body[0].snapshot_id}`,
-        {state: {documentName: name}})
+        navigate(`/Project/${project_id}/Document/${id}/${latestSnapshot}/${latestSnapshot}`, {state: {documentName: name}})
     }
 
     function DisplayDocumentOptions() {

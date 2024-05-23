@@ -15,6 +15,9 @@ module.exports = {
         highlight: '#ffff00',
         snapshotSelected: '#ff0000',
         offwhite: '#bababa',
+        reviewOpen: '#ffffff', // White 
+        reviewReviewed: '#FFCE83', // Orange
+        reviewClosed: '#47FF5D', // Green
       },
       zIndex: {
         '10': 10,
