@@ -48,7 +48,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
 
     function filterComments(snapshot) {
       if (comments.length > 0)
-        return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot_id) && (comment.is_resolved === false)).length
+        return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot.snapshot_id) && (comment.is_resolved === false)).length
       
       return 0
     }
