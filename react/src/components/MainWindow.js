@@ -5,7 +5,7 @@ import { useNavigate, useParams, useLocation } from 'react-router';
 import { createSnapshotForDocument } from "../api/APIUtils";
 import { EXTENSION_TO_LANGUAGE_MAP } from "../utils/programLanguageMapping";
 import { Button } from "flowbite-react";
-import { removeStyle, Tooltip } from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import 'react-tooltip/dist/react-tooltip.css'
 
 export default function MainWindow( props ) {

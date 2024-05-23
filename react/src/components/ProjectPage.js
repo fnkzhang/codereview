@@ -105,6 +105,7 @@ export default function ProjectPage( props ) {
       }
 
       folderTreeResult.body.commit_id = commit_val
+      console.log(folderTreeResult.body)
       setFolderStack([folderTreeResult.body])
       navigate(`/Project/${project_id}/Commit/${commit_val}`)
     }
@@ -212,7 +213,14 @@ export default function ProjectPage( props ) {
     )
   }
 
-  function DocumentDisplayBox({id, name, date}) {
+  function DocumentDisplayBox({id, name, date, seenComments, seenSnapshot}) {
+    let str1 = ""
+    let str2 = ""
+    if (seenSnapshot === false)
+      str1 += "* New Snapshots"
+
+    if (seenComments === false)
+      str2 += "* New Comments"
 
     async function handleDocumentClick () {
       const result = await getAllSnapshotsFromDocument(project_id, id)
@@ -274,10 +282,18 @@ export default function ProjectPage( props ) {
             <DisplayDocumentOptions/>
           </div>
         </div>
-        <h4 className="text-textcolor p-1">
-          <span className="font-bold block">ID: </span>
-          <span className="block">{id}</span>
-        </h4>
+        <div className="flex">
+          <div className="flex-1">
+            <h4 className="text-textcolor p-1">
+              <span className="font-bold block">ID: </span>
+              <span className="block">{id}</span>
+            </h4>
+          </div>
+          <div className="flex-1 text-textcolor content-center justify-end">
+            <p>{str1}</p>
+            <p>{str2}</p>
+          </div>
+        </div>
         <h4 className="text-textcolor p-1">
         <span className="font-bold block">Date Modified: </span>
           <span className="block">{date}</span>
@@ -349,6 +365,8 @@ export default function ProjectPage( props ) {
                       second: 'numeric',
                       timeZoneName: 'short',
                     })}
+                  seenComments={document.seenComments}
+                  seenSnapshot={document.seenSnapshot}
                 />)
               })
             }
