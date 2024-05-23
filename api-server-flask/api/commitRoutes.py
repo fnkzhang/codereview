@@ -107,7 +107,7 @@ def createCommit(proj_id):
     commit_id = createNewCommit(proj_id, idInfo["email"], last_commit)
 
     # Redundant but just in case since creating new commit already sets it reviewed
-    setCommitReviewed(commit_id)
+    setCommitOpen(commit_id)
 
     return {
         "success": True,
@@ -288,6 +288,38 @@ def commitCommit(commit_id):
 
     # After User Commits to public, commit should be open
     setCommitOpen(commit_id)
+
+    return {
+        "success": True,
+        "reason": "",
+        "body": commit_id
+    }
+
+@app.route('/api/Commit/<commit_id>/setReviewed', methods=["GET"])
+def setReviewedCommit(commit_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
+
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    # Using comments to get project_id
+    commit = getCommitInfo(commit_id)
+    proj_id = commit["proj_id"]
+
+    # Reviewer can make commit reviewed
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    setReviewedCommit(commit_id)
 
     return {
         "success": True,

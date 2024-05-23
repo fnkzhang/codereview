@@ -40,7 +40,7 @@ def createNewCommit(proj_id, email, last_commit):
                 root_folder = root_folder_id,
                 last_commit = last_commit,
                 name = "User Working Commit",
-                state = reviewStateEnum.reviewed # Set reviewed because not technically public yet
+                state = reviewStateEnum.open # Set opened because first commit
         )
         conn.execute(stmt)
         conn.commit()

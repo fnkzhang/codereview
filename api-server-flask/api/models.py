@@ -99,7 +99,7 @@ class Commit(Base):
     date_committed = Column(DateTime(timezone=True))
     root_folder = Column(Integer)
     last_commit = Column(Integer)
-    state = Column(Enum(reviewStateEnum), server_default=reviewStateEnum.reviewed)
+    state = Column(Enum(reviewStateEnum), server_default=reviewStateEnum.open)
 
 class CommitDocumentSnapshotRelation(Base):
     __tablename__ = "docsnapshotrelation"
