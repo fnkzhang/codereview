@@ -441,13 +441,19 @@ def getAllLatestCommitComments(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
     last_commit = getProjectLastCommittedCommit(proj_id)
     docsnap = getAllCommitDocumentSnapshotRelation(last_commit["commit_id"])
     comments = []
     for doc in docsnap.keys():
-        comments.extend(filterCommentsByPredicate(models.Comment.snapshot_id == docsnap[doc]))
-
+        doccomments = filterCommentsByPredicate(models.Comment.snapshot_id == docsnap[doc])
+        for comment in doccomments:
+            print(comment)
+            if comment["is_resolved"] == True:
+                doccomments.remove(comment)
+        comments.extend(doccomments)
+        
     return {"success": True, "reason":"", "body": comments}
+
 
