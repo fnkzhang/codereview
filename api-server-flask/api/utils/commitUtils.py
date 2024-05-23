@@ -285,18 +285,26 @@ def getCommitTree(commit_id):
     root_folder = getCommitInfo(commit_id)["root_folder"]
     return getFolderTree(root_folder, commit_id)
 
-def getCommitTreeWithSeen(commit_id, email):
+def getCommitTreeWithAddons(commit_id, email):
     tree = getCommitTree(commit_id)
     docsnap = getAllCommitDocumentSnapshotRelation(commit_id)
     addToTree(tree, docsnap, email)
     return tree
 
 def addToTree(tree, docsnap, email):
-    for item in tree["content"]["folders"]:
-        addToTree(item, docsnap, email)
-    for item in tree["content"]["documents"]:
-        item["seenSnapshot"] = isSnaphotSeenByUser(docsnap[item["doc_id"]], email)
-        item["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[item["doc_id"]], email)
+    with engine.connect() as conn:
+        for item in tree["content"]["folders"]:
+            addToTree(item, docsnap, email)
+        for item in tree["content"]["documents"]:
+            item["seenSnapshot"] = isSnaphotSeenByUser(docsnap[item["doc_id"]], email)
+            item["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[item["doc_id"]], email)
+            stmt = select(models.Comment).where(
+                    models.Comment.snapshot_id == docsnap[item["doc_id"]],
+                    models.Comment.is_resolved == False
+                    )
+            count = conn.execute(stmt).rowcount
+
+            item["unresolvedCommentCount"] = count
     return True
 
 def getCommitFoldersAsPaths(commit_id):

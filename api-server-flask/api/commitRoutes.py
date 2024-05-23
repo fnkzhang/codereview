@@ -384,7 +384,7 @@ def getCommitFolderTree(commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    foldertree = getCommitTreeWithSeen(commit_id, idInfo["email"])
+    foldertree = getCommitTreeWithAddons(commit_id, idInfo["email"])
     return {
             "success":True,
             "reason": "",
@@ -441,19 +441,21 @@ def getAllLatestCommitComments(proj_id):
             "reason": "Failed to Authenticate"
         }
 
-    #if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     last_commit = getProjectLastCommittedCommit(proj_id)
     docsnap = getAllCommitDocumentSnapshotRelation(last_commit["commit_id"])
-    comments = []
-    for doc in docsnap.keys():
-        doccomments = filterCommentsByPredicate(models.Comment.snapshot_id == docsnap[doc])
-        for comment in doccomments:
-            print(comment)
-            if comment["is_resolved"] == True:
-                doccomments.remove(comment)
-        comments.extend(doccomments)
+    allcomments = []
+    with engine.connect() as conn:
+        for doc in docsnap.keys():
+            stmt = select(models.Comment).where(
+                    models.Comment.snapshot_id == docsnap[doc],
+                    models.Comment.is_resolved == False
+                    )
+            comments = conn.execute(stmt)
+            for comment in comments:
+                allcomments.append(comment._asdict())         
         
-    return {"success": True, "reason":"", "body": comments}
+    return {"success": True, "reason":"", "body": allcomments}
 
 
