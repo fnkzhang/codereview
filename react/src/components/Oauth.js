@@ -61,12 +61,12 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             return
 
         const x = async () => {
-            // Singup user if they are not in database
+            // Signup user if they are not in database
             let result = await checkIfUserExists(userData["email"])
 
             if(!result) {
                 console.log("Signing up user because they do not exist in database")
-                singupUser(userData["email"])            
+                signupUser(userData["email"])            
             }
         }
         x()
@@ -92,7 +92,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
         .catch(e => console.log(e))
     }
     
-    async function singupUser(email) {
+    async function signupUser(email) {
         let credential = getCookie("cr_id_token")
 
         let headers= {
@@ -108,7 +108,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
         await fetch('/api/user/signup', headers)
         .then(response => response.json())
         .then(data => {
-            console.log("SINGED UP USER")
+            console.log("SIGNED UP USER")
             console.log(data)
         })
         .catch(e => console.log(e))

@@ -7,7 +7,7 @@ export default function GitHubImportForm ( props ) {
     if (!props.connected) {
       return(
         <div className="text-textcolor">
-          Connect to a GutHub account in order to import a project's contents.
+          Connect to a GitHub account in order to import a project's contents.
           <div className="flex items-center justify-center text-center">
             <div className="border border-offwhite border-1 bg-alternative transition-colors 
               duration-200 hover:bg-slate-500 w-1/3 rounded">
