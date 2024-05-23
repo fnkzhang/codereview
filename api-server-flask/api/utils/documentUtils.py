@@ -93,12 +93,13 @@ def getAllDocumentCommittedSnapshotsInOrder(doc_id):
         foundCommits = conn.execute(stmt)
 
         listOfSnapshots = []
-            
+        listOfSnapshotIds = []
         for row in foundCommits:
             commit = row._asdict()["commit_id"]
             snapshot = getCommitDocumentSnapshot(doc_id, commit)
-            if snapshot != None:
+            if snapshot != None and snapshot not in listOfSnapshotIds:
                 listOfSnapshots.append(getSnapshotInfo(snapshot))
+                listOfSnapshotIds.append(snapshot)
         return listOfSnapshots
 
 # Returns Array of Dictionaries
