@@ -78,7 +78,7 @@ export default function CommitSubmission(props) {
                         <p className="text-red-600 text-xl">Error: Could Not Submit Commit</p>
                     ) : null}
                     <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">
-                        Delete
+                        Commit
                     </Button>
 
                     <div className="flex justify-center">

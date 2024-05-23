@@ -23,7 +23,7 @@ export default function ProjectExport( props ) {
   useEffect(() => {
     async function getCommitData() {
         let result = await getCommits(project_id)
-        result = result.body.filter((commit) => commit.date_committed !== null)
+        result = result.body.filter((commit) => commit.date_committed !== null).reverse()
         setCommits(result)
         setCommit(result[0])
     }
