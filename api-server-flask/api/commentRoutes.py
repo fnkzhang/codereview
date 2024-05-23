@@ -14,6 +14,22 @@ import models
 
 @app.route('/api/Snapshot/<snapshot_id>/comment/create', methods=["POST"])
 def createComment(snapshot_id):
+    """
+    POST /api/Snapshot/<snapshot_id>/comment/create
+
+    Explanation:
+        Creates a top-level comment on the given snapshot
+
+    Args:
+        - snapshot_id (str): The ID of the snapshot.
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the comment creation was successful.
+            - reason (str): Description of the result of the comment creation.
+            - body (dict): Information about the created comment, including its ID, snapshot ID, author email, reply-to ID, content, highlight start and end coordinates, and resolution status.
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -60,6 +76,21 @@ def createComment(snapshot_id):
 # Set comment is_resolved to true
 @app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
 def resolveComment(comment_id):
+    """
+    PUT /api/comment/<comment_id>/resolve
+
+    Explanation:
+        Resolves a given comment
+
+    Args:
+        - comment_id (str): The ID of the comment to resolve.
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the resolution operation was successful.
+            - reason (str): Description of the result of the resolution operation.
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -84,45 +115,25 @@ def resolveComment(comment_id):
         "reason": "Ran The Call"
     }
 
-# Comment POST, GET, PUT, DELETE
-@app.route('/api/comments/<comment_id>/subcomments/get', methods=["GET"])
-def getSubcommentsOnComment(comment_id):
-    # authenticate
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-            "success": False,
-            "reason": "Invalid Token Provided"
-        }
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-
-    # query cloud sql
-    proj_id = getCommentProject(comment_id)
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-    # temporary
-    retArray = []
-    for i in range(5):
-        d = {
-            "subcomment_id": i + 1,
-            "comment_id": comment_id,
-            "author_id": 2000 + i,
-            "date_created": "2024-02-20 12:00:00",
-            "date_modified": "2024-02-20 12:00:00",
-            "content": f"Fake subcomment {i+1} on comment {comment_id}"
-        }
-        retArray.append(d)
-
-    return retArray
-
 @app.route('/api/comments/<comment_id>/edit', methods=["PUT"])
 def editComment(comment_id):
+    """
+    PUT /api/comments/<comment_id>/edit
+
+    Explanation:
+        Edits a comment
+
+    Args:
+        - comment_id (str): The ID of the comment to edit.
+        - body
+            - content (str): new contents of comment
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the edit operation was successful.
+            - reason (str): Description of the result of the edit operation.
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -173,6 +184,21 @@ def editComment(comment_id):
 
 @app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])
 def deleteComment(comment_id):
+    """
+    DELETE /api/comments/<comment_id>/delete
+
+    Explanation:
+        Deletes a comment
+
+    Args:
+        - comment_id (str): The ID of the comment to delete.
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the delete operation was successful.
+            - reason (str): Description of the result of the delete operation.
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):

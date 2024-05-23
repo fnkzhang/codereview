@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>commentRoutes module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-commentRoutes">
+<span id="commentroutes-module"></span><h1>commentRoutes module<a class="headerlink" href="#module-commentRoutes" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="commentRoutes.createComment">
+<span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">createComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.createComment" title="Link to this definition">¶</a></dt>
+<dd><p>POST /api/Snapshot/&lt;snapshot_id&gt;/comment/create</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Creates a top-level comment on the given snapshot</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>snapshot_id (str): The ID of the snapshot.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the comment creation was successful.</p></li>
+<li><p>reason (str): Description of the result of the comment creation.</p></li>
+<li><p>body (dict): Information about the created comment, including its ID, snapshot ID, author email, reply-to ID, content, highlight start and end coordinates, and resolution status.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commentRoutes.deleteComment">
+<span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.deleteComment" title="Link to this definition">¶</a></dt>
+<dd><p>DELETE /api/comments/&lt;comment_id&gt;/delete</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Deletes a comment</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>comment_id (str): The ID of the comment to delete.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the delete operation was successful.</p></li>
+<li><p>reason (str): Description of the result of the delete operation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commentRoutes.editComment">
+<span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">editComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.editComment" title="Link to this definition">¶</a></dt>
+<dd><p>PUT /api/comments/&lt;comment_id&gt;/edit</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Edits a comment</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>comment_id (str): The ID of the comment to edit.</p></li>
+<li><dl class="simple">
+<dt>body</dt><dd><ul>
+<li><p>content (str): new contents of comment</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the edit operation was successful.</p></li>
+<li><p>reason (str): Description of the result of the edit operation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commentRoutes.resolveComment">
+<span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">resolveComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.resolveComment" title="Link to this definition">¶</a></dt>
+<dd><p>PUT /api/comment/&lt;comment_id&gt;/resolve</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Resolves a given comment</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>comment_id (str): The ID of the comment to resolve.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the resolution operation was successful.</p></li>
+<li><p>reason (str): Description of the result of the resolution operation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/commentRoutes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

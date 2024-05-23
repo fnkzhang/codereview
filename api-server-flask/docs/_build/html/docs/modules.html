@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>api &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="api">
+<h1>api<a class="headerlink" href="#api" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="app.html">app module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.html#app.get_app"><code class="docutils literal notranslate"><span class="pre">get_app()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authRoutes.html">authRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authRoutes.html#authRoutes.authenticator"><code class="docutils literal notranslate"><span class="pre">authenticator()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="authRoutes.html#authRoutes.checkIsValidUser"><code class="docutils literal notranslate"><span class="pre">checkIsValidUser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="authRoutes.html#authRoutes.signUp"><code class="docutils literal notranslate"><span class="pre">signUp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cloudSql.html">cloudSql module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cloudSql.html#cloudSql.connectCloudSql"><code class="docutils literal notranslate"><span class="pre">connectCloudSql()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="commentRoutes.html">commentRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commentRoutes.html#commentRoutes.createComment"><code class="docutils literal notranslate"><span class="pre">createComment()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commentRoutes.html#commentRoutes.deleteComment"><code class="docutils literal notranslate"><span class="pre">deleteComment()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commentRoutes.html#commentRoutes.editComment"><code class="docutils literal notranslate"><span class="pre">editComment()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commentRoutes.html#commentRoutes.resolveComment"><code class="docutils literal notranslate"><span class="pre">resolveComment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="commitRoutes.html">commitRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.bulkAddToCommit"><code class="docutils literal notranslate"><span class="pre">bulkAddToCommit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.bulkDeleteFromCommit"><code class="docutils literal notranslate"><span class="pre">bulkDeleteFromCommit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.checkIfNewerCommitExists"><code class="docutils literal notranslate"><span class="pre">checkIfNewerCommitExists()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.closeCommit"><code class="docutils literal notranslate"><span class="pre">closeCommit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.commitCommit"><code class="docutils literal notranslate"><span class="pre">commitCommit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.createCommit"><code class="docutils literal notranslate"><span class="pre">createCommit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.deleteWorkingCommit"><code class="docutils literal notranslate"><span class="pre">deleteWorkingCommit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.getCommitDiffCareAboutLast"><code class="docutils literal notranslate"><span class="pre">getCommitDiffCareAboutLast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.getCommitDifferences"><code class="docutils literal notranslate"><span class="pre">getCommitDifferences()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.getCommitDocumentSnapshotPairs"><code class="docutils literal notranslate"><span class="pre">getCommitDocumentSnapshotPairs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.getCommitFolderTree"><code class="docutils literal notranslate"><span class="pre">getCommitFolderTree()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.getCommitInformation"><code class="docutils literal notranslate"><span class="pre">getCommitInformation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commitRoutes.html#commitRoutes.getUserWorkingCommitForProject"><code class="docutils literal notranslate"><span class="pre">getUserWorkingCommitForProject()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentRoutes.html">documentRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.changeDocumentSnapshot"><code class="docutils literal notranslate"><span class="pre">changeDocumentSnapshot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.createDocument"><code class="docutils literal notranslate"><span class="pre">createDocument()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.deleteDocument"><code class="docutils literal notranslate"><span class="pre">deleteDocument()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.getAllCommentsForDocument"><code class="docutils literal notranslate"><span class="pre">getAllCommentsForDocument()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.getAllDocumentCommittedSnapshots"><code class="docutils literal notranslate"><span class="pre">getAllDocumentCommittedSnapshots()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.getAllDocumentCommittedSnapshotsIncludingWorking"><code class="docutils literal notranslate"><span class="pre">getAllDocumentCommittedSnapshotsIncludingWorking()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.getDocument"><code class="docutils literal notranslate"><span class="pre">getDocument()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.moveDocument"><code class="docutils literal notranslate"><span class="pre">moveDocument()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentRoutes.html#documentRoutes.renameDocument"><code class="docutils literal notranslate"><span class="pre">renameDocument()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flaskApi.html">flaskApi module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flaskApi.html#flaskApi.afterRequest"><code class="docutils literal notranslate"><span class="pre">afterRequest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApi.html#flaskApi.defaultRoute"><code class="docutils literal notranslate"><span class="pre">defaultRoute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="folderRoutes.html">folderRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="folderRoutes.html#folderRoutes.createFolder"><code class="docutils literal notranslate"><span class="pre">createFolder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="folderRoutes.html#folderRoutes.deleteFolder"><code class="docutils literal notranslate"><span class="pre">deleteFolder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="folderRoutes.html#folderRoutes.getFolder"><code class="docutils literal notranslate"><span class="pre">getFolder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="folderRoutes.html#folderRoutes.moveFolder"><code class="docutils literal notranslate"><span class="pre">moveFolder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="folderRoutes.html#folderRoutes.renameFolder"><code class="docutils literal notranslate"><span class="pre">renameFolder()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="githubRoutes.html">githubRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="githubRoutes.html#githubRoutes.addGithubToken"><code class="docutils literal notranslate"><span class="pre">addGithubToken()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="githubRoutes.html#githubRoutes.getGithubRepositoryBranches"><code class="docutils literal notranslate"><span class="pre">getGithubRepositoryBranches()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="githubRoutes.html#githubRoutes.getUserGithubStatus"><code class="docutils literal notranslate"><span class="pre">getUserGithubStatus()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="githubRoutes.html#githubRoutes.pullToExistingProject"><code class="docutils literal notranslate"><span class="pre">pullToExistingProject()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="githubRoutes.html#githubRoutes.pullToNewProject"><code class="docutils literal notranslate"><span class="pre">pullToNewProject()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="githubRoutes.html#githubRoutes.pushToExistingBranch"><code class="docutils literal notranslate"><span class="pre">pushToExistingBranch()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="githubRoutes.html#githubRoutes.pushToNewBranch"><code class="docutils literal notranslate"><span class="pre">pushToNewBranch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="llmRoutes.html">llmRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="llmRoutes.html#llmRoutes.implement_code_changes_from_comment"><code class="docutils literal notranslate"><span class="pre">implement_code_changes_from_comment()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="llmRoutes.html#llmRoutes.suggest_comment_from_code"><code class="docutils literal notranslate"><span class="pre">suggest_comment_from_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">models module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Base.metadata"><code class="docutils literal notranslate"><span class="pre">Base.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Base.registry"><code class="docutils literal notranslate"><span class="pre">Base.registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.Comment"><code class="docutils literal notranslate"><span class="pre">Comment</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.author_email"><code class="docutils literal notranslate"><span class="pre">Comment.author_email</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.comment_id"><code class="docutils literal notranslate"><span class="pre">Comment.comment_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.content"><code class="docutils literal notranslate"><span class="pre">Comment.content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.date_created"><code class="docutils literal notranslate"><span class="pre">Comment.date_created</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.date_modified"><code class="docutils literal notranslate"><span class="pre">Comment.date_modified</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.highlight_end_x"><code class="docutils literal notranslate"><span class="pre">Comment.highlight_end_x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.highlight_end_y"><code class="docutils literal notranslate"><span class="pre">Comment.highlight_end_y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.highlight_start_x"><code class="docutils literal notranslate"><span class="pre">Comment.highlight_start_x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.highlight_start_y"><code class="docutils literal notranslate"><span class="pre">Comment.highlight_start_y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.is_resolved"><code class="docutils literal notranslate"><span class="pre">Comment.is_resolved</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.reply_to_id"><code class="docutils literal notranslate"><span class="pre">Comment.reply_to_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Comment.snapshot_id"><code class="docutils literal notranslate"><span class="pre">Comment.snapshot_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.Commit"><code class="docutils literal notranslate"><span class="pre">Commit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.author_email"><code class="docutils literal notranslate"><span class="pre">Commit.author_email</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.commit_id"><code class="docutils literal notranslate"><span class="pre">Commit.commit_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.date_committed"><code class="docutils literal notranslate"><span class="pre">Commit.date_committed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.date_created"><code class="docutils literal notranslate"><span class="pre">Commit.date_created</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.last_commit"><code class="docutils literal notranslate"><span class="pre">Commit.last_commit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.name"><code class="docutils literal notranslate"><span class="pre">Commit.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.proj_id"><code class="docutils literal notranslate"><span class="pre">Commit.proj_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.root_folder"><code class="docutils literal notranslate"><span class="pre">Commit.root_folder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Commit.state"><code class="docutils literal notranslate"><span class="pre">Commit.state</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.CommitDocumentSnapshotRelation"><code class="docutils literal notranslate"><span class="pre">CommitDocumentSnapshotRelation</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.CommitDocumentSnapshotRelation.commit_id"><code class="docutils literal notranslate"><span class="pre">CommitDocumentSnapshotRelation.commit_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.CommitDocumentSnapshotRelation.doc_id"><code class="docutils literal notranslate"><span class="pre">CommitDocumentSnapshotRelation.doc_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.CommitDocumentSnapshotRelation.snapshot_id"><code class="docutils literal notranslate"><span class="pre">CommitDocumentSnapshotRelation.snapshot_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.Document"><code class="docutils literal notranslate"><span class="pre">Document</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Document.associated_proj_id"><code class="docutils literal notranslate"><span class="pre">Document.associated_proj_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Document.date_created"><code class="docutils literal notranslate"><span class="pre">Document.date_created</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Document.date_modified"><code class="docutils literal notranslate"><span class="pre">Document.date_modified</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Document.doc_id"><code class="docutils literal notranslate"><span class="pre">Document.doc_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Document.is_reviewed"><code class="docutils literal notranslate"><span class="pre">Document.is_reviewed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Document.og_commit_id"><code class="docutils literal notranslate"><span class="pre">Document.og_commit_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.Folder"><code class="docutils literal notranslate"><span class="pre">Folder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Folder.associated_proj_id"><code class="docutils literal notranslate"><span class="pre">Folder.associated_proj_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Folder.date_created"><code class="docutils literal notranslate"><span class="pre">Folder.date_created</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Folder.date_modified"><code class="docutils literal notranslate"><span class="pre">Folder.date_modified</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Folder.folder_id"><code class="docutils literal notranslate"><span class="pre">Folder.folder_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Folder.og_commit_id"><code class="docutils literal notranslate"><span class="pre">Folder.og_commit_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.ItemCommitLocation"><code class="docutils literal notranslate"><span class="pre">ItemCommitLocation</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.ItemCommitLocation.commit_id"><code class="docutils literal notranslate"><span class="pre">ItemCommitLocation.commit_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.ItemCommitLocation.is_folder"><code class="docutils literal notranslate"><span class="pre">ItemCommitLocation.is_folder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.ItemCommitLocation.item_id"><code class="docutils literal notranslate"><span class="pre">ItemCommitLocation.item_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.ItemCommitLocation.name"><code class="docutils literal notranslate"><span class="pre">ItemCommitLocation.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.ItemCommitLocation.parent_folder"><code class="docutils literal notranslate"><span class="pre">ItemCommitLocation.parent_folder</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.Project"><code class="docutils literal notranslate"><span class="pre">Project</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Project.author_email"><code class="docutils literal notranslate"><span class="pre">Project.author_email</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Project.date_created"><code class="docutils literal notranslate"><span class="pre">Project.date_created</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Project.date_modified"><code class="docutils literal notranslate"><span class="pre">Project.date_modified</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Project.name"><code class="docutils literal notranslate"><span class="pre">Project.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Project.proj_id"><code class="docutils literal notranslate"><span class="pre">Project.proj_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.Snapshot"><code class="docutils literal notranslate"><span class="pre">Snapshot</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Snapshot.associated_document_id"><code class="docutils literal notranslate"><span class="pre">Snapshot.associated_document_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Snapshot.date_created"><code class="docutils literal notranslate"><span class="pre">Snapshot.date_created</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Snapshot.date_modified"><code class="docutils literal notranslate"><span class="pre">Snapshot.date_modified</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Snapshot.og_commit_id"><code class="docutils literal notranslate"><span class="pre">Snapshot.og_commit_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.Snapshot.snapshot_id"><code class="docutils literal notranslate"><span class="pre">Snapshot.snapshot_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.User.date_joined"><code class="docutils literal notranslate"><span class="pre">User.date_joined</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.User.github_token"><code class="docutils literal notranslate"><span class="pre">User.github_token</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.User.last_opened"><code class="docutils literal notranslate"><span class="pre">User.last_opened</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.User.name"><code class="docutils literal notranslate"><span class="pre">User.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.User.user_email"><code class="docutils literal notranslate"><span class="pre">User.user_email</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.UserProjectRelation"><code class="docutils literal notranslate"><span class="pre">UserProjectRelation</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserProjectRelation.permissions"><code class="docutils literal notranslate"><span class="pre">UserProjectRelation.permissions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserProjectRelation.proj_id"><code class="docutils literal notranslate"><span class="pre">UserProjectRelation.proj_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserProjectRelation.role"><code class="docutils literal notranslate"><span class="pre">UserProjectRelation.role</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserProjectRelation.user_email"><code class="docutils literal notranslate"><span class="pre">UserProjectRelation.user_email</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.UserUnseenComment"><code class="docutils literal notranslate"><span class="pre">UserUnseenComment</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserUnseenComment.comment_id"><code class="docutils literal notranslate"><span class="pre">UserUnseenComment.comment_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserUnseenComment.user_email"><code class="docutils literal notranslate"><span class="pre">UserUnseenComment.user_email</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#models.UserUnseenSnapshot"><code class="docutils literal notranslate"><span class="pre">UserUnseenSnapshot</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserUnseenSnapshot.snapshot_id"><code class="docutils literal notranslate"><span class="pre">UserUnseenSnapshot.snapshot_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#models.UserUnseenSnapshot.user_email"><code class="docutils literal notranslate"><span class="pre">UserUnseenSnapshot.user_email</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="projectRoutes.html">projectRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="projectRoutes.html#projectRoutes.createProject"><code class="docutils literal notranslate"><span class="pre">createProject()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="projectRoutes.html#projectRoutes.deleteProject"><code class="docutils literal notranslate"><span class="pre">deleteProject()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="projectRoutes.html#projectRoutes.getProject"><code class="docutils literal notranslate"><span class="pre">getProject()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="projectRoutes.html#projectRoutes.getProjectCommittedCommits"><code class="docutils literal notranslate"><span class="pre">getProjectCommittedCommits()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="projectRoutes.html#projectRoutes.getProjectDocuments"><code class="docutils literal notranslate"><span class="pre">getProjectDocuments()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="projectRoutes.html#projectRoutes.renameProject"><code class="docutils literal notranslate"><span class="pre">renameProject()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reviewStateEnums.html">reviewStateEnums module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reviewStateEnums.html#reviewStateEnums.reviewStateEnum"><code class="docutils literal notranslate"><span class="pre">reviewStateEnum</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reviewStateEnums.html#reviewStateEnums.reviewStateEnum.closed"><code class="docutils literal notranslate"><span class="pre">reviewStateEnum.closed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviewStateEnums.html#reviewStateEnums.reviewStateEnum.open"><code class="docutils literal notranslate"><span class="pre">reviewStateEnum.open</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reviewStateEnums.html#reviewStateEnums.reviewStateEnum.reviewed"><code class="docutils literal notranslate"><span class="pre">reviewStateEnum.reviewed</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="snapshotRoutes.html">snapshotRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="snapshotRoutes.html#snapshotRoutes.createSnapshot"><code class="docutils literal notranslate"><span class="pre">createSnapshot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="snapshotRoutes.html#snapshotRoutes.deleteSnapshot"><code class="docutils literal notranslate"><span class="pre">deleteSnapshot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="snapshotRoutes.html#snapshotRoutes.getCommentsOnSnapshot"><code class="docutils literal notranslate"><span class="pre">getCommentsOnSnapshot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="snapshotRoutes.html#snapshotRoutes.getSnapshot"><code class="docutils literal notranslate"><span class="pre">getSnapshot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="userAndPermissionsRoutes.html">userAndPermissionsRoutes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="userAndPermissionsRoutes.html#userAndPermissionsRoutes.addUser"><code class="docutils literal notranslate"><span class="pre">addUser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="userAndPermissionsRoutes.html#userAndPermissionsRoutes.addUserAdmin"><code class="docutils literal notranslate"><span class="pre">addUserAdmin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="userAndPermissionsRoutes.html#userAndPermissionsRoutes.getAllUserProjects"><code class="docutils literal notranslate"><span class="pre">getAllUserProjects()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="userAndPermissionsRoutes.html#userAndPermissionsRoutes.getUsersWithAccessToProject"><code class="docutils literal notranslate"><span class="pre">getUsersWithAccessToProject()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="userAndPermissionsRoutes.html#userAndPermissionsRoutes.importPermissions"><code class="docutils literal notranslate"><span class="pre">importPermissions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="userAndPermissionsRoutes.html#userAndPermissionsRoutes.removeUser"><code class="docutils literal notranslate"><span class="pre">removeUser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="userAndPermissionsRoutes.html#userAndPermissionsRoutes.transferProjectOwnership"><code class="docutils literal notranslate"><span class="pre">transferProjectOwnership()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/modules.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

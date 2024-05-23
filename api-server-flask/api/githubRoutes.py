@@ -17,6 +17,18 @@ import models
 #checks whether authenticated user has github connected
 @app.route('/api/Github/userHasGithub/', methods = ["GET"])
 def getUserGithubStatus():
+    """
+    GET /api/Github/userHasGithub/
+
+    Explanation:
+        Checks if user has github connected
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (bool): Indicates whether the user has a GitHub account associated.
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -45,6 +57,22 @@ def getUserGithubStatus():
 #put code in the body in "github_code"
 @app.route('/api/Github/addToken', methods=["POST"])
 def addGithubToken():
+    """
+    POST /api/Github/addToken
+
+    Explanation:
+        This endpoint adds a GitHub token to the user's account.
+        It requires authentication via an Authorization token header.
+
+    Args:
+        - request.body (dict):
+            - github_code (str): code
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -74,6 +102,22 @@ def addGithubToken():
 #needs parameter, ex ..../getRepositoryBranches/?repository=fnkzhang/codereview
 @app.route('/api/Github/getRepositoryBranches/', methods=["GET"])
 def getGithubRepositoryBranches():
+    """
+    GET /api/Github/getRepositoryBranches/
+
+    Explanation:
+        Gets a repository’s branches if the user has access
+
+    Args:
+        - request.body (dict):
+            - repository (str): name of repository, includes owner name
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): A list of strings representing the branches of the repository.
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -102,6 +146,24 @@ def getGithubRepositoryBranches():
 #format -> repository = "fnkzhang/codereview", branch = "main"
 @app.route('/api/Github/PullToNewProject/', methods=["POST"])
 def pullToNewProject():
+    """
+    POST /api/Github/PullToNewProject/
+
+    Explanation:
+        Pulls a github repo’s contents to a new project. Will not pull files that have content that cannot be decoded.
+        The project’s first commit will be the github repo’s contents
+
+    Args:
+        - request.body:
+            - repository (str): repository you’re pulling from
+            - branch (str): the branch you’re pulling from
+
+    Returns:
+        dict: A dictionary containing the following keys
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (str): Identifier of the newly created project if successful.
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
