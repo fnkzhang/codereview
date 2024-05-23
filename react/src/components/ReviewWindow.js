@@ -206,7 +206,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   
   return (
     <div>
-      <div className="h-9/10 w-screen flex text-center">
+      <div className="w-screen flex text-center">
         <div className="bg-altBackground w-2/3 border border-1 border-solid border-black inline-block">
           <DiffEditor 
             className="Monaco-editor"

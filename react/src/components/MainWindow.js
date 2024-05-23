@@ -4,6 +4,9 @@ import SnapshotSelector from "./SnapshotSelector";
 import { useNavigate, useParams, useLocation } from 'react-router';
 import { createSnapshotForDocument } from "../api/APIUtils";
 import { EXTENSION_TO_LANGUAGE_MAP } from "../utils/programLanguageMapping";
+import { Button } from "flowbite-react";
+import { removeStyle, Tooltip } from "react-tooltip";
+import 'react-tooltip/dist/react-tooltip.css'
 
 export default function MainWindow( props ) {
 
@@ -16,7 +19,7 @@ export default function MainWindow( props ) {
 
   const [editorReady, setEditorReady] = useState(false)
 
-  const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams();
+  const {project_id, commit_id, document_id, left_snapshot_id, right_snapshot_id} = useParams();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,25 +37,96 @@ export default function MainWindow( props ) {
       console.log("No Data To Upload")
       return
     }
-    let response = await createSnapshotForDocument(project_id, document_id, dataToUpload)
+    let response = await createSnapshotForDocument(project_id, commit_id, document_id, dataToUpload)
 
     if (response === null)
       return
 
     console.log(response);
 
-    navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${response}`, {state: {documentName: location.state.documentName}})
+    navigate(`/Project/${project_id}/Commit/${commit_id}/Document/${document_id}/${left_snapshot_id}/${response}`,
+      {state: {documentName: location.state.documentName, addSnapshots: location.state.addSnapshots}})
     
   }
 
-  const DisplaySnapshotCreateButton = () => (
-      <div className="text-textcolor text-xl">
-        <button className="p-3 rounded-lg border-2 transition-all duration-300
-        hover:bg-alternative m-1" onClick={handleCreateSnapshotClick}>
-          Add New Snapshot
-        </button> 
-      </div>
+  function DisplaySnapshotCreateButton () {
+    if (location.state.addSnapshots !== null) {
+      return(
+        <div className="text-alternative">
+          <Button disabled className="rounded-lg border-2 m-1 opacity-50" data-tooltip-id="addsnapshotbutton">
+            Add New Snapshot
+          </Button>
+          <Tooltip 
+            className="z-9999" 
+            id="addsnapshotbutton"
+            place="bottom"
+            disableStyleInjection="true"
+            content={
+              <div>
+                <p>
+                  To create a new snapshot, create a working commit
+                </p>
+                <p>
+                  and select a document within the working commit.
+                </p>
+              </div>
+            }
+          />
+        </div>
+      )
+    }
+
+    if (hasUpdatedCode === false) {
+      return(
+        <div className="text-alternative">
+          <Button disabled className="rounded-lg border-2 m-1 opacity-50" data-tooltip-id="addsnapshotbutton">
+            Add New Snapshot
+          </Button>
+          <Tooltip 
+            className="z-9999" 
+            id="addsnapshotbutton"
+            place="bottom"
+            disableStyleInjection="true"
+            content={
+              <div>
+                <p>
+                  To create a new snapshot, modify the code in
+                </p>
+                <p>
+                  the right side of the diff editor.
+                </p>
+              </div>
+            }
+          />
+        </div>
+      )
+    }
+
+  return(
+    <div className="text-textcolor">
+      <Button className="rounded-lg border-2 transition-all duration-300
+      hover:bg-alternative m-1" data-tooltip-id="addsnapshotbutton" onClick={handleCreateSnapshotClick}>
+        Add New Snapshot
+      </Button>
+      <Tooltip 
+        className="z-9999" 
+        id="addsnapshotbutton"
+        place="bottom"
+        disableStyleInjection="true"
+        content={
+          <div>
+            <p>
+              This will create a new snapshot. The most recently
+            </p>
+            <p>
+              created snapshot will be added to your working commit.
+            </p>
+          </div>
+        }
+      />
+    </div>
   )
+}
 
   if (props.isLoggedIn) {
     return(
@@ -63,10 +137,10 @@ export default function MainWindow( props ) {
             snapshots={snapshots}
             setSnapshots={setSnapshots}
             fileExtensionName={location.state.documentName}
+            canAddSnapshots={location.state.addSnapshots}
             editorReady={editorReady}
-            />
-
-          {hasUpdatedCode ? <DisplaySnapshotCreateButton/> : null}
+          />
+          <DisplaySnapshotCreateButton/>
         </div>
 
         <ReviewWindow

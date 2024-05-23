@@ -75,7 +75,7 @@ function App() {
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
           <Route path="/Project/:project_id/Commit/:commit_id/Folder/Delete/:folder_id" element={<FolderDeletion
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
-          <Route path="Project/:project_id/Document/:document_id/:left_snapshot_id/:right_snapshot_id" element={<MainWindow
+          <Route path="/Project/:project_id/Commit/:commit_id/Document/:document_id/:left_snapshot_id/:right_snapshot_id" element={<MainWindow
             isLoggedIn={isLoggedIn} userData={userData}/>}/>
         </Routes>
       </Router>

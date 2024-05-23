@@ -19,7 +19,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       try {
         let allComments = []
         let commentResults =  await getAllCommentsForDocument(document_id)
-        console.log(commentResults)
 
         allComments = allComments.concat(commentResults)
 

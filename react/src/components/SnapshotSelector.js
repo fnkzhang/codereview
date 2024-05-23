@@ -5,16 +5,15 @@ import { Dropdown } from "flowbite-react";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 
-export default function SnapshotSelector({ comments, snapshots, setSnapshots, fileExtensionName, editorReady }) { 
+export default function SnapshotSelector({ comments, snapshots, setSnapshots, fileExtensionName, canAddSnapshots, editorReady }) { 
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
     const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
 
     const navigate = useNavigate()
 
-    const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
+    const {project_id, commit_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
     // Get snapshots for document
     useEffect(() => {
-      console.log("EFRESHING SNAPSHOTS");
         const grabSnapshots = async () => {
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
           console.log(result)
@@ -37,12 +36,14 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
     
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
-      navigate(`/Project/${project_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`,  {state: {documentName: fileExtensionName}})
+      navigate(`/Project/${project_id}/Commit/${commit_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`,
+        {state: {documentName: fileExtensionName, addSnapshots: canAddSnapshots}})
     }
 
     async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedRightSnapshotIndex(selectedIndex)
-      navigate(`/Project/${project_id}/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`,  {state: {documentName: fileExtensionName}})
+      navigate(`/Project/${project_id}/Commit/${commit_id}/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`,
+        {state: {documentName: fileExtensionName, addSnapshots: canAddSnapshots}})
     }
 
     function filterComments(snapshot) {
@@ -67,7 +68,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                       <Dropdown.Item 
                         className="z-9999 bg-background"
                         key={index}
-                        onClick={() => handleLeftSnapClick(snapshot.snapshot_id, index)}
+                        onClick={() => handleLeftSnapClick(snapshot.snapshot.snapshot_id, index)}
                         data-tooltip-id={`tooltipleft${index}`}
                       >
                         Snapshot {index} {str}
@@ -78,7 +79,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                           content={
                             <div>
                               <p>
-                                Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
+                                Last Modified: {new Date(snapshot.snapshot.date_modified).toLocaleString()}
                               </p>
                               <p>
                                 Open Comments: {value}
@@ -111,7 +112,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                     <Dropdown.Item 
                       className="z-9999 bg-background"
                       key={index}
-                      onClick={() => handleRightSnapClick(snapshot.snapshot_id, index)}
+                      onClick={() => handleRightSnapClick(snapshot.snapshot.snapshot_id, index)}
                       data-tooltip-id={`tooltipright${index}`}
                     >
                       Snapshot {index} {str}
@@ -122,7 +123,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                         content={
                           <div>
                             <p>
-                              Last Modified: {new Date(snapshot.date_modified).toLocaleString()}
+                              Last Modified: {new Date(snapshot.snapshot.date_modified).toLocaleString()}
                             </p>
                             <p>
                               Open Comments: {value}

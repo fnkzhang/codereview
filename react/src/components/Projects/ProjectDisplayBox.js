@@ -32,7 +32,7 @@ export default function ProjectDisplayBox({id, name, author, date}) {
   }, [id])
 
   const handleProjectClick = async (project_id, commit_id) => {
-    navigate(`/Project/${project_id}/Commit/${commit_id}`)
+    navigate(`/Project/${project_id}/Commit/0`)
   }
   if (isLoaded) {
     let stateColor = 'text-textcolor';

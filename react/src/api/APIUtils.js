@@ -242,7 +242,7 @@ export async function getDocSnapshot(proj_id, doc_id, snap_id) {
   return await fetch((`/api/Snapshot/${proj_id}/${doc_id}/${snap_id}/`), headers)
     .then(response => response.json())
 }
-export async function createSnapshotForDocument(proj_id, doc_id, snapshot_data, commit_id) {
+export async function createSnapshotForDocument(proj_id, commit_id, doc_id, snapshot_data) {
   let oAuthToken = getCookie("cr_id_token")
   let headers = {
     method: "POST",
@@ -430,7 +430,7 @@ export async function getAllSnapshotsFromDocument(project_id, document_id) {
 
   };
 
-    return await fetch((`/api/Document/${project_id}/${document_id}/getSnapshotId/`), headers)
+    return await fetch((`/api/Document/${project_id}/${document_id}/getSnapshotIdAndWorking/`), headers)
       .then(response => response.json())
       //.then(data => console.log(data))
 }

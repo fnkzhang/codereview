@@ -220,7 +220,8 @@ export default function ProjectPage( props ) {
       const latestSnapshot = result.body[0].snapshot.snapshot_id;
 
       if (result.success)
-        navigate(`/Project/${project_id}/Document/${id}/${latestSnapshot}/${latestSnapshot}`, {state: {documentName: name}})
+        navigate(`/Project/${project_id}/Commit/${commit.commit_id}/Document/${id}/${latestSnapshot}/${latestSnapshot}`,
+          {state: {documentName: name, addSnapshots: commit.date_committed}})
     }
 
     function DisplayDocumentOptions() {
