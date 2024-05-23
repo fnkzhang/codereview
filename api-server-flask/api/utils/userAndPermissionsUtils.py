@@ -128,7 +128,7 @@ def setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email):
             stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc.doc_id)
             snaps = conn.execute(stmt)
             for snap in snaps:
-                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snap_id)
+                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snapshot_id)
                 coms = conn.execute(stmt)
                 for com in coms:
                     stmt = insert(models.UserUnseenComment).values(comment_id = com.comment_id, user_email = user_email)
@@ -146,7 +146,7 @@ def setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email):
             stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc.doc_id)
             snaps = conn.execute(stmt)
             for snap in snaps:
-                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snap_id)
+                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snapshot_id)
                 coms = conn.execute(stmt)
                 for com in coms:
                     stmt = delete(models.UserUnseenComment).where(models.UserUnseenComment.comment_id == com.comment_id, models.UserUnseenComment.user_email == user_email)
