@@ -103,31 +103,34 @@ def commitACommit(commit_id, name):
 def deleteCommit(commit_id):
     try:
         with engine.connect() as conn:
+            print("start commit deletion", commit_id)
             stmt = delete(models.ItemCommitLocation).where(
                     models.ItemCommitLocation.commit_id == commit_id
             )
+            print("delete location")
             conn.execute(stmt)
-            stmt = delete(models.CommitDocumentSnapshotRelation).where(
-                    models.CommitDocumentSnapshotRelation.commit_id == commit_id
-            )
-            conn.execute(stmt)
-
+            #stmt = delete(models.CommitDocumentSnapshotRelation).where(
+            #        models.CommitDocumentSnapshotRelation.commit_id == commit_id
+            #)
+            #conn.execute(stmt)
+            print("relation")
             stmt = select(models.Document).where(
                     models.Document.og_commit_id == commit_id)
             docs = conn.execute(stmt)
             for doc in docs:
                 purgeDocumentUtil(doc.doc_id)
-
+            print("docdead")
             stmt = select(models.Folder).where(
                     models.Folder.og_commit_id == commit_id)
             folds = conn.execute(stmt)
             for fold in folds:
                 purgeFolderUtil(fold.folder_id)
-
+            print("folderdead")
             stmt = select(models.Snapshot).where(
                     models.Snapshot.og_commit_id == commit_id)
             snaps = conn.execute(stmt)
             for snap in snaps:
+                print("start snapdelete in commit", snaps.snapshot_id)
                 deleteSnapshotUtil(snap.snapshot_id)
             stmt = delete(models.Commit).where(
                     models.Commit.commit_id == commit_id
@@ -137,6 +140,7 @@ def deleteCommit(commit_id):
             conn.commit()
         return True, None
     except Exception as e:
+        print(e)
         return False, e
 
 def setCommitOpen(commit_id):

@@ -105,7 +105,6 @@ def createCommit(proj_id):
         last_commit = body["last_commit"]
 
     commit_id = createNewCommit(proj_id, idInfo["email"], last_commit)
-    commitACommit(commit_id)
     # Redundant but just in case since creating new commit already sets it reviewed
     setCommitOpen(commit_id)
 

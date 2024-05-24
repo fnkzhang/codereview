@@ -35,7 +35,7 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
         result = conn.execute(stmt).first()
 
         setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, user_email, proj_id)
-        if result == None:
+        if result != None:
             deleteSnapshotUtil(snap)
         return snapshot_id
 
@@ -74,18 +74,24 @@ def getSnapshotContentUtil(snapshot_id):
 def deleteSnapshotUtil(snapshot_id):
     try:
         with engine.connect() as conn:
+            print("start_delete snap", snapshot_id) 
             deleteBlob(getSnapshotPath(snapshot_id))
+            print("deleteblob")
             stmt = delete(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
             conn.execute(stmt)
             stmt = delete(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
             conn.execute(stmt)
+            print("deletecomment")
             stmt = delete(models.CommitDocumentSnapshotRelation).where(
                 models.CommitDocumentSnapshotRelation.snapshot_id == snapshot_id
             )
             conn.execute(stmt)
             conn.commit()
+            print("snapdelete")
             proj_id = getSnapshotProject(snapshot_id)
             setSnapAsSeenForAllProjUsers(snapshot_id, proj_id)
+            print("seen")
         return True, "No Error"
     except Exception as e:
+        print(e)
         return False, e

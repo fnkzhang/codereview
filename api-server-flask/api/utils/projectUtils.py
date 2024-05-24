@@ -35,16 +35,12 @@ def createNewProject(proj_name, owner):
 
 def purgeProjectUtil(proj_id):
     try:
+        print("start!")
         with engine.connect() as conn:
             commits = getAllProjectCommits(proj_id)
             for commit in commits:
                 deleteCommit(commit["commit_id"])
-            docs = getAllProjectDocuments(proj_id)
-            for doc in docs:
-                purgeDocumentUtil(doc["doc_id"])
-            folders = getAllProjectFolders(proj_id)
-            for folder in folders:
-                purgeFolderUtil(folder["folder_id"])
+            print("commitsdied")
             stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
             conn.execute(stmt)
             stmt = delete(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
@@ -111,7 +107,7 @@ def getAllProjectCommits(proj_id):
 
         for row in foundCommits:
             listOfCommits.append(row._asdict())
-
+        print("gotten")
         return listOfCommits
 
 # Returns Array of Dictionaries
@@ -130,7 +126,8 @@ def getAllCommittedProjectCommitsInOrder(proj_id):
 def getProjectLastCommittedCommit(proj_id):
     try:
         return getAllCommittedProjectCommitsInOrder(proj_id)[-1]
-    except:
+    except Exception as e:
+        print(e)
         return None
 
 def getUserWorkingCommitInProject(proj_id, email):

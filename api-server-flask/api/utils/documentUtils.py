@@ -74,15 +74,19 @@ def deleteDocumentFromCommit(doc_id, commit_id):
 def purgeDocumentUtil(doc_id):
     try:
         with engine.connect() as conn:
+            print("start doc delete", doc_id)
             stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
             snapshots = conn.execute(stmt)
             for snapshot in snapshots:
+                print("start delete snap in doc", snapshot.snapshot_id)
                 deleteSnapshotUtil(snapshot.snapshot_id)
             stmt = delete(models.Document).where(models.Document.doc_id == doc_id)
             conn.execute(stmt)
             conn.commit()
+            print("finidhdoc delete", doc_id)
         return True, "No Error"
     except Exception as e:
+        print(e)
         return False, e
 
 # Returns Array of Dictionaries
