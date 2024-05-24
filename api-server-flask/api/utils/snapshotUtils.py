@@ -64,7 +64,8 @@ def getSnapshotPath(snapshot_id):
             document = conn.execute(stmt)
             proj_id = document.first().associated_proj_id
             return str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id)
-    except:
+    except Exception as e:
+        print(e)
         return None
 
 def getSnapshotContentUtil(snapshot_id):
