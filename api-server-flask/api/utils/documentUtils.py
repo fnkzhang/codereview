@@ -107,7 +107,9 @@ def getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working_comm
     foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
     snap = getCommitDocumentSnapshot(doc_id, working_commit_id)
     if snap != None:
-        foundSnapshots.append(getSnapshotInfo(snap))
+        info = getSnapshotInfo(snap)
+        if info not in foundSnapshots:
+            foundSnapshots.append(info)
     return foundSnapshots
     
 def getDocumentLastSnapshot(doc_id):
