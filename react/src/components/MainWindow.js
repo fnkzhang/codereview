@@ -20,7 +20,7 @@ export default function MainWindow( props ) {
 
   const [editorReady, setEditorReady] = useState(false)
 
-  const {project_id, commit_id, document_id, left_snapshot_id, right_snapshot_id} = useParams();
+  const {project_id, commit_id, document_id, left_snapshot_id} = useParams();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -161,6 +161,21 @@ export default function MainWindow( props ) {
         </div>
       </section>
 
+<<<<<<< HEAD
+=======
+        <ReviewWindow
+          comments={comments}
+          setComments={setComments}
+          userData={props.userData}
+          latestSnapshotData={snapshots[snapshots.length - 1]}
+          editorReady={editorReady}
+          setEditorReady={setEditorReady}
+          hasUpdatedCode={hasUpdatedCode}
+          setHasUpdatedCode={setHasUpdatedCode}
+          setDataToUpload={setDataToUpload}
+          editorLanguage={editorLanguage}/>
+      </div>
+>>>>>>> 7d3923eeaa538be0e5ea8b9f3c80aa79b9685553
     )
   }
   

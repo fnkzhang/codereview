@@ -77,7 +77,7 @@ export default function CommitSubmission(props) {
                     {isError ? (
                         <p className="text-red-600 text-xl">Error: Could Not Submit Commit</p>
                     ) : null}
-                    <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-red-800/75">
+                    <Button type="submit" className="bg-alternative transition-colors duration-200 hover:bg-slate-500">
                         Commit
                     </Button>
 

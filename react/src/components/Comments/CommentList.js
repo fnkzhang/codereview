@@ -1,7 +1,7 @@
 import React from 'react';
 import Comment from './Comments.js';
 
-function CommentList ({ setCommentsLoading, comments, latestSnapshotData, listLineJump,
+function CommentList ({ setCommentsLoading, comments, listLineJump,
   editorLanguage, editorCode, 
   checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
 
@@ -31,7 +31,6 @@ function CommentList ({ setCommentsLoading, comments, latestSnapshotData, listLi
             timeZoneName: 'short',
           })}
           snapshotID={comment.snapshot_id}
-          latestSnapshotData={latestSnapshotData}
           commentLineJump={listLineJump}
           highlightStartX={comment.highlight_start_x}
           highlightStartY={comment.highlight_start_y}

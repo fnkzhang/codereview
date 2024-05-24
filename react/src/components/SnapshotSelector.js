@@ -29,10 +29,13 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
           });
         }
 
-        grabSnapshots()
-
+        if (snapshots.length === 0 || 
+            snapshots[selectedLeftSnapshotIndex].snapshot.snapshot_id !== Number(left_snapshot_id) ||
+            snapshots[selectedRightSnapshotIndex].snapshot.snapshot_id !== Number(right_snapshot_id))
+          grabSnapshots()
         
-    }, [document_id, editorReady])
+    }, [document_id, editorReady, left_snapshot_id, right_snapshot_id, project_id, selectedLeftSnapshotIndex,
+      selectedRightSnapshotIndex, setSnapshots, snapshots])
     
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
@@ -48,7 +51,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
 
     function filterComments(snapshot) {
       if (comments.length > 0)
-        return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot_id) && (comment.is_resolved === false)).length
+        return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot.snapshot_id) && (comment.is_resolved === false)).length
       
       return 0
     }
