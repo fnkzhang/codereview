@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { getLatestCommitForProject } from "../../api/APIUtils";
+import { getAllProjectActiveCommentsForLatestCommit, getLatestCommitForProject } from "../../api/APIUtils";
 import { Card } from "flowbite-react"
 import { Tooltip } from "react-tooltip";
 import { REVIEW_STATE } from "../../utils/reviewStateMapping";
@@ -11,6 +11,8 @@ export default function ProjectDisplayBox({id, name, author, date}) {
   const [reviewState, setReviewState] = useState(REVIEW_STATE.CLOSED) 
   const [isLoaded, setIsLoaded] = useState(false)
   const [latestCommitApproveCount, setLatestCommitApproveCount] = useState(0)
+  const [activeSuggestionCount, setActiveSuggestionCount] = useState(0)
+
 
   const navigate = useNavigate()
   // Get Latest Commit State
@@ -35,8 +37,13 @@ export default function ProjectDisplayBox({id, name, author, date}) {
 
   // Get All Active Comments for Commit
   useEffect(() => {
+    async function getAllActiveCommentsForLatestProjectCommit(project_id) {
+      let response = await getAllProjectActiveCommentsForLatestCommit(project_id)
 
-  })
+      setActiveSuggestionCount(response.length)
+    }
+    getAllActiveCommentsForLatestProjectCommit(id)
+  }, [id])
   const handleProjectClick = async (project_id) => {
     navigate(`/Project/${project_id}/Commit/0`)
   }
@@ -67,7 +74,17 @@ export default function ProjectDisplayBox({id, name, author, date}) {
           </div>
           <div className="flex flex-1 text-2xl justify-end h-9 ">
             <h1 className={"align-middle pr-5 " + stateColor}>{reviewState.toString().toUpperCase()}</h1>
-            <h3 className="bg-[#47FF5D] pl-2 pr-2 rounded-sm">{latestCommitApproveCount}</h3>
+            {latestCommitApproveCount !== 0 ? 
+              <h3 className="bg-[#47FF5D] pl-2 pr-2 rounded-sm rounded-tl-[10px]">
+                {latestCommitApproveCount}
+              </h3> : null}
+
+
+            {activeSuggestionCount !== 0 ? 
+              <h3 className="bg-[#FFCE83] pl-2 pr-2 rounded-sm rounded-br-[10px]">
+                {activeSuggestionCount}
+              </h3> : null}
+
           </div>
         </div>
         <h4 className="text-textcolor p-1">

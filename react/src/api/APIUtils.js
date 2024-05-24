@@ -1020,3 +1020,31 @@ export async function setCommitClosed(commit_id) {
     return data.success
   })
 }
+
+export async function getAllProjectActiveCommentsForLatestCommit(project_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+
+  return await fetch((`/api/Commit/${project_id}/getLatestComments/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false) {
+      console.log("FAILED" + data.reason)
+      return null
+    }
+
+    console.log(data.body)
+    return data.body
+  })
+}
