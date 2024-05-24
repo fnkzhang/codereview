@@ -29,13 +29,13 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
 
         uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), data)
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
-        createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
         stmt = select(models.CommitDocumentSnapshotRelation).where(
                     models.CommitDocumentSnapshotRelation.snapshot_id == snap)
         result = conn.execute(stmt).first()
+        createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
 
         setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, user_email, proj_id)
-        if result != None:
+        if result == None:
             deleteSnapshotUtil(snap)
         return snapshot_id
 

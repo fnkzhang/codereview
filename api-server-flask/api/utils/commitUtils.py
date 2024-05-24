@@ -109,10 +109,10 @@ def deleteCommit(commit_id):
             )
             print("delete location")
             conn.execute(stmt)
-            #stmt = delete(models.CommitDocumentSnapshotRelation).where(
-            #        models.CommitDocumentSnapshotRelation.commit_id == commit_id
-            #)
-            #conn.execute(stmt)
+            stmt = delete(models.CommitDocumentSnapshotRelation).where(
+                    models.CommitDocumentSnapshotRelation.commit_id == commit_id
+            )
+            conn.execute(stmt)
             print("relation")
             stmt = select(models.Document).where(
                     models.Document.og_commit_id == commit_id)
