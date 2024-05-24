@@ -74,13 +74,29 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
 
 def commitACommit(commit_id, name):
     with engine.connect() as conn:
+        getCommit = select(models.Commit).where(
+            models.Commit.commit_id == commit_id
+        )
+        commitData = conn.execute(getCommit).first()._asdict()
+
+        print(commitData)
+
         stmt = update(models.Commit).where(
                 models.Commit.commit_id == commit_id).values(
                 date_committed = func.now(),
                 name = name,
         )
 
+
+        # Close Old Commit
+        closeCommitStmt = update(models.Commit).where(
+            models.Commit.commit_id == commitData.last_commit
+        ).values (
+            state = reviewStateEnum.closed
+        )
+
         conn.execute(stmt)
+        conn.execute(closeCommitStmt)
         conn.commit()
     return True
 

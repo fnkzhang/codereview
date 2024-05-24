@@ -285,6 +285,7 @@ def commitCommit(commit_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
     commit_id = commitACommit(commit_id, name)
+    
     print(commit_id)
     # After User Commits to public, commit should be open
     setCommitOpen(commit_id)
