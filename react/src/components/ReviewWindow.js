@@ -46,7 +46,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     }
 
     fetchData()
-  }, [document_id, left_snapshot_id, right_snapshot_id])
+  }, [document_id, left_snapshot_id, right_snapshot_id, project_id, setEditorReady])
 
   // 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     setHasUpdatedCode(true)
     setDataToUpload(updatedCode)
 
-  }, [updatedCode])
+  }, [updatedCode, initialUpdatedCode, setDataToUpload, setHasUpdatedCode])
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
@@ -157,10 +157,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
 
     if (originalEditor === null)
       return
-
-    let editorCode = originalEditor.getOriginalEditor().getModel().getValue()
-
-    editorCode = editorCode.replace(highlightCodeString, codeToReplace);
     
     setCode(codeToReplace)
 

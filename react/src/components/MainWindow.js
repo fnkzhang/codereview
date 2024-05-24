@@ -19,7 +19,7 @@ export default function MainWindow( props ) {
 
   const [editorReady, setEditorReady] = useState(false)
 
-  const {project_id, commit_id, document_id, left_snapshot_id, right_snapshot_id} = useParams();
+  const {project_id, commit_id, document_id, left_snapshot_id} = useParams();
 
   const location = useLocation();
   const navigate = useNavigate();

@@ -10,7 +10,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
-  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+  const {document_id} = useParams()
 
   const [userDataLocal] = useState(userData);
   
@@ -35,7 +35,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
+  }, [commentsLoading, leftSnapshotId, rightSnapshotId, document_id, setComments])
 
   function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
