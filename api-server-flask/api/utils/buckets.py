@@ -28,7 +28,8 @@ def deleteBlob(blobName):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
-    blob.delete()
+    if blob != None:
+        blob.delete()
     return True
 
 #location = basically the folder the files are located in
