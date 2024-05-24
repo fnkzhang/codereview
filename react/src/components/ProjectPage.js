@@ -8,6 +8,7 @@ import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getPr
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./BackButton"
+import { REVIEW_STATE } from "../utils/reviewStateMapping"
 
 // Display Documents For Project
 export default function ProjectPage( props ) {
@@ -22,6 +23,7 @@ export default function ProjectPage( props ) {
   const [commit, setCommit] = useState(null)
   const [latestCommitApproveCount, setLatestCommitApproveCount] = useState(0)
   const [latestCommitId, setLatestCommitId] = useState(null)
+  const [isCommitClosed, setIsCommitClosed] = useState(false)
 
   const { project_id, commit_id } = useParams()
   const navigate = useNavigate()
@@ -142,6 +144,11 @@ export default function ProjectPage( props ) {
         if(latestCommit.approved_count !== null)
           setLatestCommitApproveCount(latestCommit.approved_count)
       }
+      
+      if(latestCommit.state === REVIEW_STATE.CLOSED)
+        setIsCommitClosed(true)
+      else 
+        setIsCommitClosed(false)
 
       if (latestCommit !== null)
         setLatestCommitId(latestCommit.commit_id)
@@ -416,9 +423,9 @@ export default function ProjectPage( props ) {
   function DisplayExportButton() {
     let buttonBackgroundColor = 'bg-alternative'
 
-
-    if(latestCommitApproveCount > 0)
+    if(latestCommitApproveCount > 0 && isCommitClosed)
       buttonBackgroundColor = 'bg-[#23822e]'
+
     return (
       <div className="text-textcolor text-xl">
         <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1 " + buttonBackgroundColor }
@@ -553,9 +560,13 @@ export default function ProjectPage( props ) {
       return
     if(props.userData.email !== projectOwnerEmail)
       return
+    
+    let buttonBackgroundColor = 'bg-alternative'
+    if(latestCommitApproveCount > 0 && !isCommitClosed)
+      buttonBackgroundColor = "bg-[#23822e]"
+
     const closeCommit = async () => {
       const couldCloseCommit = await setCommitClosed(latestCommitId)
-      console.log(couldCloseCommit)
 
       if(couldCloseCommit){
         // Make Export Button Live
@@ -565,7 +576,7 @@ export default function ProjectPage( props ) {
     }
     return  (
       <div className="flex justify-center text-textcolor text-xl">
-        <button className=" p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1 " + buttonBackgroundColor}
         onClick={closeCommit}>
           Close Review
         </button>
