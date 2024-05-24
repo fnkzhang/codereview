@@ -62,7 +62,9 @@ export default function ProjectDeletion(props) {
     return (
         <div>
             <div>
-                <BackButton />
+                <BackButton
+                    location="/"
+                />
             </div>
             <div className="flex justify-center mt-20">
                 <form

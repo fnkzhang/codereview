@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData, latestSnapshotData,
+  start , end, comments, setComments, userData,
   editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
@@ -101,7 +101,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           }).filter((comment) => {
             return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId))
           })}
-          latestSnapshotData={latestSnapshotData}
           listLineJump={moduleLineJump}
           editorLanguage={editorLanguage}
           editorCode={editorCode}

@@ -2,7 +2,7 @@ import CommentModule from './Comments/CommentModule.js';
 import { getDocSnapshot } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
-import { useParams } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 
 export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
   const monacoRef = useRef(null);
@@ -22,6 +22,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   const decorationIdsRefOrig = useRef([]);
   const decorationIdsRefModif = useRef([]);
 
+  const location = useLocation();
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
   // Get Code for the 2 editors
@@ -128,9 +129,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   function getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
     if (left_snapshot_id !== right_snapshot_id)
       return ""
-
-    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
-      return ""
     
     let originalEditor = editorRef.current
 
@@ -147,16 +145,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     return originalEditor.getOriginalEditor().getModel().getValueInRange(range)
   }
   function updateHighlightedCode(codeToReplace, highlightCodeString) {
-    if (left_snapshot_id !== right_snapshot_id)
-    return ""
-
-    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
-      return ""
-    
-    let originalEditor = editorRef.current
-
-    if (originalEditor === null)
-      return
     
     setCode(codeToReplace)
 
@@ -167,7 +155,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     if (left_snapshot_id !== right_snapshot_id)
       return false
 
-    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
+    if (location.state.addSnapshots !== null)
       return false
 
     return true
@@ -193,6 +181,11 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               comments={comments}
               setComments={setComments}
               userData={userData}
+              editorLanguage={editorLanguage}
+              editorCode={updatedCode}
+              checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+              getHighlightedCode={getHighlightedCode}
+              updateHighlightedCode={updateHighlightedCode}
             />
           </div>
         </div>
@@ -217,11 +210,9 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               editorRef.current = editor
               monacoRef.current = monaco
 
-              const latestSnapshotDataIdString = latestSnapshotData?.snapshot.snapshot_id?.toString()
-
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: latestSnapshotDataIdString === right_snapshot_id ? false : true
+                readOnly: location.state.addSnapshots !== null ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
