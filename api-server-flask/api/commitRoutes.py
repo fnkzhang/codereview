@@ -105,7 +105,7 @@ def createCommit(proj_id):
         last_commit = body["last_commit"]
 
     commit_id = createNewCommit(proj_id, idInfo["email"], last_commit)
-
+    commitACommit(commit_id)
     # Redundant but just in case since creating new commit already sets it reviewed
     setCommitOpen(commit_id)
 
@@ -516,6 +516,8 @@ def getAllLatestCommitComments(proj_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     last_commit = getProjectLastCommittedCommit(proj_id)
+    if last_commit == None:
+        return {"success":False, "reason":"no commit?"}
     docsnap = getAllCommitDocumentSnapshotRelation(last_commit["commit_id"])
     allcomments = []
     with engine.connect() as conn:
