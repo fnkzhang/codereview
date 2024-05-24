@@ -23,7 +23,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
             setSnapshots(result.body.reverse())
         }
 
-        if (snapshots.length === 0 || !snapshots.some(snapshot => snapshot.snapshot.snapshot_id === right_snapshot_id))
+        if (snapshots.length === 0 || !snapshots.some(snapshot => snapshot.snapshot.snapshot_id === Number(right_snapshot_id)))
           grabSnapshots()
         
     }, [document_id, editorReady, project_id, setSnapshots, snapshots, right_snapshot_id])
