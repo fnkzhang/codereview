@@ -126,10 +126,11 @@ def deleteCommit(commit_id):
             for fold in folds:
                 purgeFolderUtil(fold.folder_id)
             print("folderdead")
+            conn.commit()
             stmt = select(models.Snapshot).where(
                     models.Snapshot.og_commit_id == commit_id)
             snaps = conn.execute(stmt)
-            conn.commit()
+
             for snap in snaps:
                 print("start snapdelete in commit", snap.snapshot_id)
                 deleteSnapshotUtil(snap.snapshot_id)
