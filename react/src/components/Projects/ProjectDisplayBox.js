@@ -10,6 +10,7 @@ export default function ProjectDisplayBox({id, name, author, date}) {
   // Enum For State
   const [reviewState, setReviewState] = useState(REVIEW_STATE.CLOSED) 
   const [isLoaded, setIsLoaded] = useState(false)
+  const [latestCommitApproveCount, setLatestCommitApproveCount] = useState(0)
 
   const navigate = useNavigate()
   // Get Latest Commit State
@@ -22,6 +23,8 @@ export default function ProjectDisplayBox({id, name, author, date}) {
         console.log("Failed To get latest commit")
       else {
         setReviewState(latestCommit.state)
+        if(latestCommit.approved_count !== null)
+          setLatestCommitApproveCount(latestCommit.approved_count)
       }
 
       setIsLoaded(true)
@@ -30,6 +33,10 @@ export default function ProjectDisplayBox({id, name, author, date}) {
     getLatestCommitState(id)
   }, [id])
 
+  // Get All Active Comments for Commit
+  useEffect(() => {
+
+  })
   const handleProjectClick = async (project_id) => {
     navigate(`/Project/${project_id}/Commit/0`)
   }
@@ -42,7 +49,6 @@ export default function ProjectDisplayBox({id, name, author, date}) {
       stateColor = 'text-reviewReviewed'
     else
       stateColor = 'text-reviewClosed'
-
     return (
       <Card 
         className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"
@@ -59,8 +65,9 @@ export default function ProjectDisplayBox({id, name, author, date}) {
               <span className="block"> {id} </span>
             </h4>
           </div>
-          <div className={"flex-1 text-2xl content-center justify-end " + stateColor }>
-            <h1>{reviewState.toString().toUpperCase()}</h1>
+          <div className="flex flex-1 text-2xl justify-end h-9 ">
+            <h1 className={"align-middle pr-5 " + stateColor}>{reviewState.toString().toUpperCase()}</h1>
+            <h3 className="bg-[#47FF5D] pl-2 pr-2 rounded-sm">{latestCommitApproveCount}</h3>
           </div>
         </div>
         <h4 className="text-textcolor p-1">

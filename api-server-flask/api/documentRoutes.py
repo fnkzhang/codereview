@@ -454,6 +454,7 @@ def getAllCommentsForDocument(document_id):
     for comment in listOfComments:
         comment["isSeen"]= isCommentSeenByUser(comment["comment_id"], idInfo["email"])
         setCommentAsSeen(comment["comment_id"], idInfo["email"])
+    
     return {
         "success": True,
         "reason": "Found all Comments For All Snapshots for document",

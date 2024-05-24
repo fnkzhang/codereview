@@ -38,7 +38,6 @@ export default function ProjectListPage( props ) {
                 .map( (project, index) => {
                 if(project === -1)
                   return null
-
                 return(<ProjectDisplayBox
                   key={index} 
                   id={project.proj_id} 
