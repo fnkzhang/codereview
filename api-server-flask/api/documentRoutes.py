@@ -443,7 +443,7 @@ def getAllCommentsForDocument(document_id):
     if working != None:
         foundSnapshots = getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working["commit_id"])
     else:
-        foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
+        foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(document_id)
 
     for snapshot in foundSnapshots:
         # Query
