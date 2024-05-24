@@ -35,7 +35,7 @@ def getFolderPath(folder_id, commit_id):
     if folder["parent_folder"] == 0:
         return ""
     else:
-        return getFolderPath(folder["parent_folder"]) + folder["name"] + '/'
+        return getFolderPath(folder["parent_folder"], commit_id) + folder["name"] + '/'
 
 def createNewFolder(folder_name, parent_folder, proj_id, commit_id):
     folder_id = createID()

@@ -439,7 +439,11 @@ def getAllCommentsForDocument(document_id):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
     listOfSnapshotIDs = []
-    foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(document_id)
+    working = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+    if working != None:
+        foundSnapshots = getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working["commit_id"])
+    else:
+        foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
 
     for snapshot in foundSnapshots:
         # Query
