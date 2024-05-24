@@ -553,11 +553,13 @@ export default function ProjectPage( props ) {
       return
     const closeCommit = async () => {
       const couldCloseCommit = await setCommitClosed(latestCommitId)
-      console.log(response)
+      console.log(couldCloseCommit)
 
-      if(closeCommit)
-        navigate('/')
-      
+      if(couldCloseCommit){
+        // Make Export Button Live
+      }
+        
+
     }
     return  (
       <div className="flex justify-center text-textcolor text-xl">
