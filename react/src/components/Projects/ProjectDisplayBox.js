@@ -54,8 +54,11 @@ export default function ProjectDisplayBox({id, name, author, date}) {
       stateColor = 'text-reviewOpen'
     else if (reviewState === REVIEW_STATE.REVIEWED)
       stateColor = 'text-reviewReviewed'
-    else
+    else if (reviewState === REVIEW_STATE.CLOSED)
       stateColor = 'text-reviewClosed'
+    else // Reviewed
+      stateColor = 'text-reviewApproved'
+      
     return (
       <Card 
         className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"

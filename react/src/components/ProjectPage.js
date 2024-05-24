@@ -144,7 +144,7 @@ export default function ProjectPage( props ) {
         if(latestCommit.approved_count !== null)
           setLatestCommitApproveCount(latestCommit.approved_count)
       }
-      
+
       if(latestCommit.state === REVIEW_STATE.CLOSED)
         setIsCommitClosed(true)
       else 
@@ -154,13 +154,15 @@ export default function ProjectPage( props ) {
         setLatestCommitId(latestCommit.commit_id)
     }
 
-    getLatestCommitState(project_id)
-  }, [project_id])
+    if(props.isLoggedIn)
+      getLatestCommitState(project_id)
+  }, [project_id, props.isLoggedIn])
 
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
       return;
+
     async function getUserPermissionLevel() {
 
       let searchResult = await getAllUsersWithPermissionForProject(project_id);
@@ -421,7 +423,7 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayExportButton() {
-    let buttonBackgroundColor = 'bg-alternative'
+    let buttonBackgroundColor = ''
 
     if(latestCommitApproveCount > 0 && isCommitClosed)
       buttonBackgroundColor = 'bg-[#23822e]'
@@ -561,7 +563,7 @@ export default function ProjectPage( props ) {
     if(props.userData.email !== projectOwnerEmail)
       return
     
-    let buttonBackgroundColor = 'bg-alternative'
+    let buttonBackgroundColor = ''
     if(latestCommitApproveCount > 0 && !isCommitClosed)
       buttonBackgroundColor = "bg-[#23822e]"
 
@@ -570,6 +572,7 @@ export default function ProjectPage( props ) {
 
       if(couldCloseCommit){
         // Make Export Button Live
+        setIsCommitClosed(true)
       }
         
 
