@@ -416,7 +416,7 @@ export default function ProjectPage( props ) {
       buttonBackgroundColor = 'bg-[#23822e]'
     return (
       <div className="text-textcolor text-xl">
-        
+        {latestCommitApproveCount > 0 ? <DisplayExportNotification/> : null}
         <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1 " + buttonBackgroundColor }
         onClick={() => navigate(`/Project/Export/${project_id}/`)}>Export Project</button>
       </div>
@@ -424,7 +424,7 @@ export default function ProjectPage( props ) {
   }
   function DisplayExportNotification() {
     return (
-      <div className="relative p-2 top-[-5px] bg-alternative">
+      <div className="absolute p-2 top-[-5px] bg-alternative">
         <h3 className="">Review is approved, please export</h3>
       </div>
     )
