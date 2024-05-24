@@ -12,6 +12,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
     const navigate = useNavigate()
 
     const {project_id, commit_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
+    
     // Get snapshots for document
     useEffect(() => {
         const grabSnapshots = async () => {
@@ -19,24 +20,29 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
           console.log(result)
           if (result.success)
             setSnapshots(result.body)
-          snapshots.forEach((snapshot, index) => {
-            const currentSnapshot_id = snapshot.snapshot.snapshot_id.toString()
-            
-            if(currentSnapshot_id === left_snapshot_id)
-              setSelectedLeftSnapshotIndex(index)
-            if(currentSnapshot_id === right_snapshot_id)
-              setSelectedRightSnapshotIndex(index)
-          });
         }
 
-        if (snapshots.length === 0 || 
-            snapshots[selectedLeftSnapshotIndex].snapshot.snapshot_id !== Number(left_snapshot_id) ||
-            snapshots[selectedRightSnapshotIndex].snapshot.snapshot_id !== Number(right_snapshot_id))
+        if (snapshots.length === 0 )
           grabSnapshots()
         
-    }, [document_id, editorReady, left_snapshot_id, right_snapshot_id, project_id, selectedLeftSnapshotIndex,
-      selectedRightSnapshotIndex, setSnapshots, snapshots])
+    }, [document_id, editorReady, project_id, setSnapshots, snapshots])
     
+    // Set Snapshot Selecter Snapshot Number
+    useEffect(() => {
+      if(snapshots.length === 0 || (snapshots[selectedLeftSnapshotIndex].snapshot.snapshot_id === left_snapshot_id &&
+        snapshots[selectedRightSnapshotIndex].snapshot.snapshot_id === right_snapshot_id
+        ) )
+        return
+      
+      snapshots.forEach((snapshot, index) => {
+        const currentSnapshot_id = snapshot.snapshot.snapshot_id.toString()
+        if(currentSnapshot_id === left_snapshot_id)
+          setSelectedLeftSnapshotIndex(index)
+        if(currentSnapshot_id === right_snapshot_id)
+          setSelectedRightSnapshotIndex(index)
+      });
+    }, [snapshots, left_snapshot_id, right_snapshot_id])
+
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
       navigate(`/Project/${project_id}/Commit/${commit_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`,
