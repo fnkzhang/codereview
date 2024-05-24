@@ -551,10 +551,18 @@ export default function ProjectPage( props ) {
       return
     if(props.userData.email !== projectOwnerEmail)
       return
+    const closeCommit = async () => {
+      const couldCloseCommit = await setCommitClosed(latestCommitId)
+      console.log(response)
 
+      if(closeCommit)
+        navigate('/')
+      
+    }
     return  (
       <div className="flex justify-center text-textcolor text-xl">
-        <button className=" p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1">
+        <button className=" p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        onClick={closeCommit}>
           Close Review
         </button>
       </div>

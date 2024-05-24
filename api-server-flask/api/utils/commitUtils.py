@@ -79,7 +79,7 @@ def commitACommit(commit_id, name):
         )
         commitData = conn.execute(getCommit).first()._asdict()
 
-        print(commitData)
+        print(commitData["last_commit"])
 
         stmt = update(models.Commit).where(
                 models.Commit.commit_id == commit_id).values(
@@ -90,7 +90,7 @@ def commitACommit(commit_id, name):
 
         # Close Old Commit
         closeCommitStmt = update(models.Commit).where(
-            models.Commit.commit_id == commitData.last_commit
+            models.Commit.commit_id == commitData["last_commit"]
         ).values (
             state = reviewStateEnum.closed
         )
