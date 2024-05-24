@@ -74,7 +74,7 @@ def createProject():
 def deleteProject(proj_id):
     # Authentication
     headers = request.headers
-    '''
+    
     if not isValidRequest(headers, ["Authorization"]):
         return {
             "success": False,
@@ -86,9 +86,9 @@ def deleteProject(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-    '''
-    #if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
-    #    return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
     rv, e = purgeProjectUtil(proj_id)
     if(not rv):
