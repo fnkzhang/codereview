@@ -144,12 +144,14 @@ export default function ProjectPage( props ) {
         if(latestCommit.approved_count !== null)
           setLatestCommitApproveCount(latestCommit.approved_count)
       }
-      setLatestCommitId(latestCommit.commit_id)
-
+      
       if(latestCommit.state === REVIEW_STATE.CLOSED)
         setIsCommitClosed(true)
       else 
         setIsCommitClosed(false)
+
+      if (latestCommit !== null)
+        setLatestCommitId(latestCommit.commit_id)
     }
 
     getLatestCommitState(project_id)
