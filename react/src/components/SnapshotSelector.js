@@ -20,7 +20,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
           console.log(result)
           if (result.success)
-            setSnapshots(result.body)
+            setSnapshots(result.body.reverse())
         }
 
         if (snapshots.length === 0 )
