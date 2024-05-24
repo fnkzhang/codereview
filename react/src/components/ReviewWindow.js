@@ -28,7 +28,6 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
   // Get Code for the 2 editors
   useEffect(() => {
     const fetchData = async () => {
-      console.log(location.state.addSnapshots)
       setEditorReady(false)
       setEditorLoading(true)
       try {
