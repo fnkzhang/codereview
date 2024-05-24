@@ -150,6 +150,7 @@ export default function MainWindow( props ) {
           latestSnapshotData={snapshots[snapshots.length - 1]}
           editorReady={editorReady}
           setEditorReady={setEditorReady}
+          hasUpdatedCode={hasUpdatedCode}
           setHasUpdatedCode={setHasUpdatedCode}
           setDataToUpload={setDataToUpload}
           editorLanguage={editorLanguage}/>

@@ -5,8 +5,8 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData,
-  editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
+  start , end, comments, setComments, userData, editorLanguage, editorCode, 
+  hasUpdatedCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
@@ -99,7 +99,8 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
               return (new Date(b.date_modified)) - (new Date(a.date_modified));
             }
           }).filter((comment) => {
-            return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId))
+            return ((comment.snapshot_id === leftSnapshotId) || 
+              ((comment.snapshot_id === rightSnapshotId) && (hasUpdatedCode === false)))
           })}
           listLineJump={moduleLineJump}
           editorLanguage={editorLanguage}

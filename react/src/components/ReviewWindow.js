@@ -4,7 +4,7 @@ import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams, useLocation } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
+export default function ReviewWindow({ comments, setComments, userData, hasUpdatedCode, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -28,6 +28,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   // Get Code for the 2 editors
   useEffect(() => {
     const fetchData = async () => {
+      console.log(location.state.addSnapshots)
       setEditorReady(false)
       setEditorLoading(true)
       try {
@@ -212,7 +213,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
 
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: location.state.addSnapshots !== null ? false : true
+                readOnly: location.state.addSnapshots === null ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
@@ -241,9 +242,9 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             comments={comments}
             setComments={setComments}
             userData={userData}
-            latestSnapshotData={latestSnapshotData}
             editorLanguage={editorLanguage}
             editorCode={updatedCode}
+            hasUpdatedCode={hasUpdatedCode}
             checkIfCanGetLLMCode={checkIfCanGetLLMCode}
             getHighlightedCode={getHighlightedCode}
             updateHighlightedCode={updateHighlightedCode}
