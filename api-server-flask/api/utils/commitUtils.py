@@ -343,8 +343,11 @@ def getCommitTree(commit_id):
 
 def getCommitTreeWithAddons(commit_id, email):
     tree = getCommitTree(commit_id)
+    print("tree")
     docsnap = getAllCommitDocumentSnapshotRelation(commit_id)
+    print("docsnap")
     addToTree(tree, docsnap, email)
+    print("add")
     return tree
 
 def addToTree(tree, docsnap, email):

@@ -86,17 +86,6 @@ def getAllProjectFolders(proj_id):
             folders.append(folder._asdict())
         return folders
     
-#discontinued
-##work on this later for github
-def getProjectFoldersAsPaths(proj_id):
-    project = getProjectInfo(proj_id)
-    folders = getAllProjectFolders(proj_id)
-    folderIDToPath = {}
-    folders = [folder for folder in folders if folder["parent_folder"] > 0]
-    folderIDToPath = getFolderPathsFromList(project["root_folder"], "", folders)
-    folderIDToPath[project["root_folder"]] = ""
-    return folderIDToPath
-
 # Returns Array of Dictionaries
 def getAllProjectCommits(proj_id):
     with engine.connect() as conn:
