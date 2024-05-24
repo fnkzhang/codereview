@@ -41,7 +41,6 @@ export default function PermissionPage( props ) {
     const getCurrentProjectUsers = async () => {
       let projectUserResponse = await getAllUsersWithPermissionForProject(project_id)
       setProjectUsers(projectUserResponse)
-      console.log(projectUserResponse);
     }
     async function fetchData() {
       try {

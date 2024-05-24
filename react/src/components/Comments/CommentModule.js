@@ -20,9 +20,9 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
         let allComments = []
         let commentResults =  await getAllCommentsForDocument(document_id)
 
-
         allComments = allComments.concat(commentResults)
-        console.log(allComments)
+
+
         setComments(allComments)
         
       } catch (error) {
@@ -100,7 +100,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
             }
           }).filter((comment) => {
             return ((comment.snapshot_id === leftSnapshotId) || 
-              ((comment.snapshot_id === rightSnapshotId) && (hasUpdatedCode === false)))
+              (comment.snapshot_id === rightSnapshotId))
           })}
           listLineJump={moduleLineJump}
           editorLanguage={editorLanguage}
