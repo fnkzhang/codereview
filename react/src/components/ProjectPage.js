@@ -2,7 +2,7 @@ import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import { Card, Dropdown } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
-  getCommits, createCommit } from "../api/APIUtils"
+  getCommits, createCommit, approveCommit, setCommitReviewed } from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./BackButton"
@@ -247,6 +247,8 @@ export default function ProjectPage( props ) {
           </Dropdown>
         )
       }
+      
+
 
       return(
         <Dropdown className="bg-background" inline label="">
@@ -270,6 +272,11 @@ export default function ProjectPage( props ) {
       )
     }
 
+    // Function for document checkbox
+    async function setDocumentViewed() {
+
+    }
+    
     return (
       <Card 
         className="bg-background w-1/4 p-3 m-3"
@@ -278,7 +285,10 @@ export default function ProjectPage( props ) {
           <h4 className="flex flex-col text-textcolor overflow-hidden whitespace-nowrap p-1">
               <span className="font-bold text-xl">{name} </span>
           </h4>
-          <div className="text-textcolor flex justify-end px-4 pt-4">
+          <div className="text-textcolor flex align-middle justify-end px-4 pt-4">
+            {/* Todo Adding CHeckbox for the document that have been changed for users to manually check */}
+            {/* <p>Check If Finished Reviewing</p>
+            <input type="checkbox" className="p-2 rounded-sm accent-[#47FF5D]" onChange={setDocumentViewed}/> */}
             <DisplayDocumentOptions/>
           </div>
         </div>
@@ -422,6 +432,10 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayCreateCommitButton() {
+    // If Not Owner Of Project
+    if (props.userData.email !== projectOwnerEmail)
+      return
+
     if (commits.some(item => item.date_committed === null))
       return
 
@@ -442,6 +456,9 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayDeleteWorkingCommitButton() {
+    if (props.userData.email !== projectOwnerEmail)
+      return
+
     if (commit.date_committed !== null)
       return
 
@@ -519,6 +536,39 @@ export default function ProjectPage( props ) {
     )  
   }
 
+  function DisplayApproveChangesDecisionButton() {
+    const ApproveCommitedChanges = async () => {
+      let isSuccess = await approveCommit(commit_id)
+      let isChangedState = await setCommitReviewed(commit_id);
+
+      console.log(isSuccess, isChangedState);
+      if(isSuccess)
+        navigate('/')
+
+      
+    } 
+    const DeclineCommitedChanged = async () => {
+      let isChangedState = await setCommitReviewed(commit_id);
+        // Todo for later
+      if(isChangedState)
+        navigate('/')
+    }
+
+    // Only Reviewer can decide on changes
+    if(props.userData.email === projectOwnerEmail)
+      return;
+
+    return (
+      <div className="text-textcolor text-xl">
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1"
+        onClick={ApproveCommitedChanges}>Approve</button>
+
+        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1"
+        onClick={DeclineCommitedChanged}>Needs Changes</button>
+      </div>
+    ) 
+  }
+
   if( props.isLoggedIn === false ) {
     return (
     <div>
@@ -554,10 +604,15 @@ export default function ProjectPage( props ) {
       <div>
         <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
         <div className="flex m-1">
-          <BackButton location={`/`}/>
-          <DisplayExportButton/>
-          <DisplayDeleteButton/>
-          <DisplayShareButton/>
+          <div className="flex flex-1 m-1">
+            <BackButton location={`/`}/>
+            <DisplayExportButton/>
+            <DisplayDeleteButton/>
+            <DisplayShareButton/>
+          </div>
+          <div className="flex-2 m-1">
+            <DisplayApproveChangesDecisionButton/>
+          </div>
         </div>
         <div className="flex">
           <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
@@ -586,11 +641,16 @@ export default function ProjectPage( props ) {
     <div>
       <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>
       <div className="flex m-1">
-        <BackButton location={`/`}/>
-        <DisplayExportButton/>
-        <DisplayDeleteButton/>
-        <DisplayShareButton/>
-      </div>
+        <div className="flex flex-1 m-1">
+            <BackButton location={`/`}/>
+            <DisplayExportButton/>
+            <DisplayDeleteButton/>
+            <DisplayShareButton/>
+          </div>
+          <div className="flex-2 m-1">
+            <DisplayApproveChangesDecisionButton/>
+          </div>
+        </div>
       <div className="flex">
         <h3 className="whitespace-nowrap text-textcolor text-2xl m-2">Commit: </h3>
         <CommitDropdown

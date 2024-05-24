@@ -295,7 +295,7 @@ def commitCommit(commit_id):
         "body": commit_id
     }
 
-@app.route('/api/Commit/<commit_id>/setReviewed', methods=["GET"])
+@app.route('/api/Commit/<commit_id>/setReviewed/', methods=["GET"])
 def setReviewedCommit(commit_id):
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -319,7 +319,7 @@ def setReviewedCommit(commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    setReviewedCommit(commit_id)
+    setCommitReviewed(commit_id)
 
     return {
         "success": True,
@@ -350,7 +350,7 @@ def closeCommit(commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    closeCommit(commit_id)
+    setCommitClosed(commit_id)
 
     return {
         "success": True,
@@ -358,7 +358,46 @@ def closeCommit(commit_id):
         "body": commit_id
     }
 
+@app.route('/api/Commit/<commit_id>/approve/', methods=["GET"])
+def approveCommit(commit_id):
+    headers = request.headers
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+                "success":False,
+                "reason": "Invalid Token Provided"
+        }
 
+    idInfo = authenticate()
+    if idInfo is None:
+        return {
+            "success":False,
+            "reason": "Failed to Authenticate"
+        }
+    
+    # Using comments to get project_id
+    commit = getCommitInfo(commit_id)
+    proj_id = commit["proj_id"]
+
+    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
+        return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    
+    couldCommit = setCommitApproved(commit_id)
+    print(couldCommit)
+    if(not couldCommit):
+
+        return {
+            "success": False,
+            "reason": "Failed To Set Approved",
+            "body": commit_id
+        }
+           
+    return {
+        "success": True,
+        "reason": "",
+        "body": commit_id
+
+    }
+    
 #probably used if someone is halfway through a commit and wants to kill it
 @app.route('/api/Commit/<proj_id>/workingCommit/', methods=["DELETE"])
 def deleteWorkingCommit(proj_id):

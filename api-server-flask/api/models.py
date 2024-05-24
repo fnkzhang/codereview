@@ -100,6 +100,8 @@ class Commit(Base):
     root_folder = Column(Integer)
     last_commit = Column(Integer)
     state = Column(Enum(reviewStateEnum), server_default=reviewStateEnum.open)
+    is_approved = Column(Boolean, server_default=false())
+    approved_count = Column(Integer)
 
 class CommitDocumentSnapshotRelation(Base):
     __tablename__ = "docsnapshotrelation"

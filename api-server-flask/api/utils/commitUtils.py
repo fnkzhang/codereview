@@ -40,7 +40,9 @@ def createNewCommit(proj_id, email, last_commit):
                 root_folder = root_folder_id,
                 last_commit = last_commit,
                 name = "User Working Commit",
-                state = reviewStateEnum.open # Set opened because first commit
+                state = reviewStateEnum.open, # Set opened because first commit
+                is_approved = False,
+                approved_count = 0,
         )
         conn.execute(stmt)
         conn.commit()
@@ -168,6 +170,38 @@ def setCommitReviewed(commit_id):
     except Exception as e:
         print("Error: ", e)
         return False
+
+def setCommitApproved(commit_id):
+    try:
+        with engine.connect() as conn:
+            stmt = update(models.Commit).where(
+                models.Commit.commit_id == commit_id).values(
+                is_approved = True,
+                approved_count = models.Commit.approved_count + 1
+            )
+
+            conn.execute(stmt)
+            conn.commit()
+            return True
+    except Exception as e:
+        print("Error: ", e)
+        return False
+
+# def unsetCommitApproved(commit_id):
+#     try:
+#         with engine.connect() as conn:
+#             stmt = update(models.Commit).where(
+#                 models.Commit.commit_id == commit_id).values(
+#                 is_approved = True,
+#                 approved_count = models.Commit.approved_count - 1
+#             )
+
+#             conn.execute(stmt)
+#             conn.commit()
+#             return True
+#     except Exception as e:
+#         print("Error: ", e)
+#         return False
 
 def removeItemFromCommit(item_id, commit_id):
     with engine.connect() as conn:

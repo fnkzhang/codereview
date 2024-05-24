@@ -7,6 +7,7 @@ import { EXTENSION_TO_LANGUAGE_MAP } from "../utils/programLanguageMapping";
 import { Button } from "flowbite-react";
 import { Tooltip } from "react-tooltip";
 import 'react-tooltip/dist/react-tooltip.css'
+import BackButton from "./BackButton";
 
 export default function MainWindow( props ) {
 
@@ -130,30 +131,36 @@ export default function MainWindow( props ) {
 
   if (props.isLoggedIn) {
     return(
-      <div className="">
-        <div className="flex">
-          <SnapshotSelector
-            comments={comments}
-            snapshots={snapshots}
-            setSnapshots={setSnapshots}
-            fileExtensionName={location.state.documentName}
-            canAddSnapshots={location.state.addSnapshots}
-            editorReady={editorReady}
-          />
-          <DisplaySnapshotCreateButton/>
+      <section>
+        <div>
+          <BackButton location={`/Project/${project_id}/Commit/${commit_id}`}/>
         </div>
+        <div className="">
+          <div className="flex">
+            <SnapshotSelector
+              comments={comments}
+              snapshots={snapshots}
+              setSnapshots={setSnapshots}
+              fileExtensionName={location.state.documentName}
+              canAddSnapshots={location.state.addSnapshots}
+              editorReady={editorReady}
+            />
+            <DisplaySnapshotCreateButton/>
+          </div>
 
-        <ReviewWindow
-          comments={comments}
-          setComments={setComments}
-          userData={props.userData}
-          latestSnapshotData={snapshots[snapshots.length - 1]}
-          editorReady={editorReady}
-          setEditorReady={setEditorReady}
-          setHasUpdatedCode={setHasUpdatedCode}
-          setDataToUpload={setDataToUpload}
-          editorLanguage={editorLanguage}/>
-      </div>
+          <ReviewWindow
+            comments={comments}
+            setComments={setComments}
+            userData={props.userData}
+            latestSnapshotData={snapshots[snapshots.length - 1]}
+            editorReady={editorReady}
+            setEditorReady={setEditorReady}
+            setHasUpdatedCode={setHasUpdatedCode}
+            setDataToUpload={setDataToUpload}
+            editorLanguage={editorLanguage}/>
+        </div>
+      </section>
+
     )
   }
   

@@ -921,7 +921,7 @@ export async function submitCommit(commit_id, commit_name) {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
     }
-    return data
+    return data.success
   })
 }
 
@@ -947,5 +947,76 @@ export async function getLatestCommitForProject(project_id) {
       return null
     }
     return data.body
+  })
+}
+
+export async function approveCommit(commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+  return await fetch((`/api/Commit/${commit_id}/approve/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false)
+      console.log("FAILED" + data.reason)
+
+    return data.success
+  })
+}
+
+export async function setCommitReviewed(commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+  return await fetch((`/api/Commit/${commit_id}/setReviewed/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false)
+      console.log("FAILED" + data.reason)
+
+    return data.success
+  })
+}
+export async function setCommitClosed(commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+  return await fetch((`/api/Commit/${commit_id}/close/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false)
+      console.log("FAILED" + data.reason)
+
+    return data.success
   })
 }
