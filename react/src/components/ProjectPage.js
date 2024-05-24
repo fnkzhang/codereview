@@ -2,7 +2,8 @@ import React, { useState, useEffect} from "react"
 import { useNavigate, useParams } from "react-router"
 import { Card, Dropdown } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
-  getCommits, createCommit, approveCommit, setCommitReviewed } from "../api/APIUtils"
+  getCommits, createCommit, approveCommit, setCommitReviewed, 
+  getLatestCommitForProject} from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./BackButton"
@@ -18,6 +19,7 @@ export default function ProjectPage( props ) {
   const [folderStack, setFolderStack] = useState(null)
   const [commits, setCommits] = useState(null)
   const [commit, setCommit] = useState(null)
+  const [latestCommitApproveCount, setLatestCommitApproveCount] = useState(0)
 
   const { project_id, commit_id } = useParams()
   const navigate = useNavigate()
@@ -127,6 +129,22 @@ export default function ProjectPage( props ) {
       setCommitLoading(false)
   }, [folderStack, commitLoading, setCommitLoading, commit])
   
+  // Get Latest Commit Prob optimize later
+  useEffect(() => {
+    async function getLatestCommitState(project_id){
+      const latestCommit = await getLatestCommitForProject(project_id)
+      console.log(latestCommit);
+      if (latestCommit === null)
+        console.log("Failed To get latest commit")
+      else {
+        if(latestCommit.approved_count !== null)
+          setLatestCommitApproveCount(latestCommit.approved_count)
+      }
+    }
+
+    getLatestCommitState(project_id)
+  }, [project_id])
+
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
@@ -391,10 +409,23 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayExportButton() {
+    let buttonBackgroundColor = 'bg-alternative'
+
+
+    if(latestCommitApproveCount > 0)
+      buttonBackgroundColor = 'bg-[#23822e]'
     return (
       <div className="text-textcolor text-xl">
-        <button className="p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1"
+        
+        <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1 " + buttonBackgroundColor }
         onClick={() => navigate(`/Project/Export/${project_id}/`)}>Export Project</button>
+      </div>
+    )
+  }
+  function DisplayExportNotification() {
+    return (
+      <div className="relative p-2 top-[-5px] bg-alternative">
+        <h3 className="">Review is approved, please export</h3>
       </div>
     )
   }
