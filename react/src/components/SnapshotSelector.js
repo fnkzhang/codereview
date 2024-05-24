@@ -41,7 +41,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
         if(currentSnapshot_id === right_snapshot_id)
           setSelectedRightSnapshotIndex(index)
       });
-    }, [snapshots, left_snapshot_id, right_snapshot_id])
+    }, [snapshots, left_snapshot_id, right_snapshot_id, selectedLeftSnapshotIndex, selectedRightSnapshotIndex])
 
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)

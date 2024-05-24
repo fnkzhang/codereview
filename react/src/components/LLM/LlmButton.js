@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { getCodeImplementation } from "../../api/APIUtils";
 
 
@@ -6,7 +6,7 @@ export default function LlmButton( { editorLanguage, editorCode, commentText, ch
   highlightStartX, highlightStartY, highlightEndX, highlightEndY, updateHighlightedCode } ) {
   
   //Todo Display Error Message When LLM Fails
-  const [isError, setIsError] = useState(false)
+  // const [isError, setIsError] = useState(false)
 
   const handleCreateSuggestion = async () => {
 

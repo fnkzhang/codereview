@@ -1,7 +1,7 @@
 import { resolveComment } from '../../api/APIUtils';
 import SubCommentList from './SubCommentList';
 import { Card } from "flowbite-react";
-import React, { useEffect } from 'react';
+import React from 'react';
 import LlmButton from '../LLM/LlmButton';
 
 function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID,
