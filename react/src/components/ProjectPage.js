@@ -142,7 +142,9 @@ export default function ProjectPage( props ) {
         if(latestCommit.approved_count !== null)
           setLatestCommitApproveCount(latestCommit.approved_count)
       }
-      setLatestCommitId(latestCommit.commit_id)
+
+      if (latestCommit !== null)
+        setLatestCommitId(latestCommit.commit_id)
     }
 
     getLatestCommitState(project_id)
