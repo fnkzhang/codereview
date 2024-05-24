@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router"
 import { Card, Dropdown } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
   getCommits, createCommit, approveCommit, setCommitReviewed, 
-  getLatestCommitForProject} from "../api/APIUtils"
+  getLatestCommitForProject,
+  setCommitClosed} from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./BackButton"
@@ -20,6 +21,7 @@ export default function ProjectPage( props ) {
   const [commits, setCommits] = useState(null)
   const [commit, setCommit] = useState(null)
   const [latestCommitApproveCount, setLatestCommitApproveCount] = useState(0)
+  const [latestCommitId, setLatestCommitId] = useState(null)
 
   const { project_id, commit_id } = useParams()
   const navigate = useNavigate()
@@ -140,6 +142,7 @@ export default function ProjectPage( props ) {
         if(latestCommit.approved_count !== null)
           setLatestCommitApproveCount(latestCommit.approved_count)
       }
+      setLatestCommitId(latestCommit.commit_id)
     }
 
     getLatestCommitState(project_id)
@@ -416,16 +419,8 @@ export default function ProjectPage( props ) {
       buttonBackgroundColor = 'bg-[#23822e]'
     return (
       <div className="text-textcolor text-xl">
-        {latestCommitApproveCount > 0 ? <DisplayExportNotification/> : null}
         <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1 " + buttonBackgroundColor }
         onClick={() => navigate(`/Project/Export/${project_id}/`)}>Export Project</button>
-      </div>
-    )
-  }
-  function DisplayExportNotification() {
-    return (
-      <div className="absolute p-2 top-[-5px] bg-alternative">
-        <h3 className="">Review is approved, please export</h3>
       </div>
     )
   }
@@ -546,6 +541,21 @@ export default function ProjectPage( props ) {
           }
         >
           Create Folder
+        </button>
+      </div>
+    )
+  }
+
+  function DisplayCloseCommitButton() {
+    if(latestCommitApproveCount <= 0 )
+      return
+    if(props.userData.email !== projectOwnerEmail)
+      return
+
+    return  (
+      <div className="flex justify-center text-textcolor text-xl">
+        <button className=" p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1">
+          Close Review
         </button>
       </div>
     )
@@ -680,6 +690,7 @@ export default function ProjectPage( props ) {
           </div>
           <div className="flex-2 m-1">
             <DisplayApproveChangesDecisionButton/>
+            <DisplayCloseCommitButton/>
           </div>
         </div>
       <div className="flex">
