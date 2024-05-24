@@ -20,9 +20,9 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
         let allComments = []
         let commentResults =  await getAllCommentsForDocument(document_id)
 
+
         allComments = allComments.concat(commentResults)
-
-
+        console.log(allComments)
         setComments(allComments)
         
       } catch (error) {

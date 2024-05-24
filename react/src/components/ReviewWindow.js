@@ -48,7 +48,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
     }
 
     fetchData()
-  }, [document_id, left_snapshot_id, right_snapshot_id, project_id, setEditorReady])
+  }, [document_id, left_snapshot_id, right_snapshot_id, project_id, setEditorReady, location.state])
 
   // 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
       originalEditor.onDidChangeCursorSelection(handleSelectionChange(originalEditor, left_snapshot_id));
       modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
     }
-  }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady ])
+  }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady, initialUpdatedCode, setDataToUpload ])
 
 
   // Handle Code Edit Detection For New Snapshot Creation

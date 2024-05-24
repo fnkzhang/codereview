@@ -273,9 +273,9 @@ export default function ProjectPage( props ) {
     }
 
     // Function for document checkbox
-    async function setDocumentViewed() {
+    // async function setDocumentViewed() {
 
-    }
+    // }
     
     return (
       <Card 
@@ -549,7 +549,7 @@ export default function ProjectPage( props ) {
     } 
     const DeclineCommitedChanged = async () => {
       let isChangedState = await setCommitReviewed(commit_id);
-        // Todo for later
+        // Todo for later handle in API
       if(isChangedState)
         navigate('/')
     }
