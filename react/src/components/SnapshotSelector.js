@@ -31,8 +31,9 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
 
         if (snapshots.length === 0 || 
             snapshots[selectedLeftSnapshotIndex].snapshot.snapshot_id !== Number(left_snapshot_id) ||
-            snapshots[selectedRightSnapshotIndex].snapshot.snapshot_id !== Number(right_snapshot_id))
+            snapshots[selectedRightSnapshotIndex].snapshot.snapshot_id !== Number(right_snapshot_id)) {
           grabSnapshots()
+        }
         
     }, [document_id, editorReady, left_snapshot_id, right_snapshot_id, project_id, selectedLeftSnapshotIndex,
       selectedRightSnapshotIndex, setSnapshots, snapshots])
