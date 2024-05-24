@@ -5,12 +5,12 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
-  start , end, comments, setComments, userData, latestSnapshotData,
-  editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
+  start , end, comments, setComments, userData, editorLanguage, editorCode, 
+  hasUpdatedCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
-  const {document_id, left_snapshot_id, right_snapshot_id} = useParams()
+  const {document_id} = useParams()
 
   const [userDataLocal] = useState(userData);
   
@@ -19,7 +19,6 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       try {
         let allComments = []
         let commentResults =  await getAllCommentsForDocument(document_id)
-        console.log(commentResults)
 
         allComments = allComments.concat(commentResults)
 
@@ -36,7 +35,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, leftSnapshotId, rightSnapshotId])
+  }, [commentsLoading, leftSnapshotId, rightSnapshotId, document_id, setComments])
 
   function handleCommentFieldChange (event) {
     setNewComment(event.target.value);
@@ -100,9 +99,9 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
               return (new Date(b.date_modified)) - (new Date(a.date_modified));
             }
           }).filter((comment) => {
-            return ((comment.snapshot_id === leftSnapshotId) || (comment.snapshot_id === rightSnapshotId))
+            return ((comment.snapshot_id === leftSnapshotId) || 
+              (comment.snapshot_id === rightSnapshotId))
           })}
-          latestSnapshotData={latestSnapshotData}
           listLineJump={moduleLineJump}
           editorLanguage={editorLanguage}
           editorCode={editorCode}

@@ -19,8 +19,9 @@ export default function ProjectDeletion(props) {
             setProjectName(result.name)
         }
 
-        getProjectData()
-    }, [project_id])
+        if (props.isLoggedIn)
+            getProjectData()
+    }, [project_id, props.isLoggedIn])
 
     const handleDeleteProjectButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
@@ -61,7 +62,9 @@ export default function ProjectDeletion(props) {
     return (
         <div>
             <div>
-                <BackButton />
+                <BackButton
+                    location="/"
+                />
             </div>
             <div className="flex justify-center mt-20">
                 <form

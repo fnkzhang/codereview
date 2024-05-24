@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>models module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-models">
+<span id="models-module"></span><h1>models module<a class="headerlink" href="#module-models" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="models.Base">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Base" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DeclarativeBase</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Base.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">MetaData</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">MetaData()</span></em><a class="headerlink" href="#models.Base.metadata" title="Link to this definition">¶</a></dt>
+<dd><p>Refers to the <code class="xref py py-class docutils literal notranslate"><span class="pre">_schema.MetaData</span></code> collection that will be used
+for new <code class="xref py py-class docutils literal notranslate"><span class="pre">_schema.Table</span></code> objects.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><span class="xref std std-ref">orm_declarative_metadata</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Base.registry">
+<span class="sig-name descname"><span class="pre">registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">_RegistryType</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;sqlalchemy.orm.decl_api.registry</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#models.Base.registry" title="Link to this definition">¶</a></dt>
+<dd><p>Refers to the <code class="xref py py-class docutils literal notranslate"><span class="pre">_orm.registry</span></code> in use where new
+<code class="xref py py-class docutils literal notranslate"><span class="pre">_orm.Mapper</span></code> objects will be associated.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.Comment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Comment" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.author_email">
+<span class="sig-name descname"><span class="pre">author_email</span></span><a class="headerlink" href="#models.Comment.author_email" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.comment_id">
+<span class="sig-name descname"><span class="pre">comment_id</span></span><a class="headerlink" href="#models.Comment.comment_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.content">
+<span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#models.Comment.content" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.date_created">
+<span class="sig-name descname"><span class="pre">date_created</span></span><a class="headerlink" href="#models.Comment.date_created" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.date_modified">
+<span class="sig-name descname"><span class="pre">date_modified</span></span><a class="headerlink" href="#models.Comment.date_modified" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.highlight_end_x">
+<span class="sig-name descname"><span class="pre">highlight_end_x</span></span><a class="headerlink" href="#models.Comment.highlight_end_x" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.highlight_end_y">
+<span class="sig-name descname"><span class="pre">highlight_end_y</span></span><a class="headerlink" href="#models.Comment.highlight_end_y" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.highlight_start_x">
+<span class="sig-name descname"><span class="pre">highlight_start_x</span></span><a class="headerlink" href="#models.Comment.highlight_start_x" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.highlight_start_y">
+<span class="sig-name descname"><span class="pre">highlight_start_y</span></span><a class="headerlink" href="#models.Comment.highlight_start_y" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.is_resolved">
+<span class="sig-name descname"><span class="pre">is_resolved</span></span><a class="headerlink" href="#models.Comment.is_resolved" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.reply_to_id">
+<span class="sig-name descname"><span class="pre">reply_to_id</span></span><a class="headerlink" href="#models.Comment.reply_to_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Comment.snapshot_id">
+<span class="sig-name descname"><span class="pre">snapshot_id</span></span><a class="headerlink" href="#models.Comment.snapshot_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.Commit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Commit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.author_email">
+<span class="sig-name descname"><span class="pre">author_email</span></span><a class="headerlink" href="#models.Commit.author_email" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.commit_id">
+<span class="sig-name descname"><span class="pre">commit_id</span></span><a class="headerlink" href="#models.Commit.commit_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.date_committed">
+<span class="sig-name descname"><span class="pre">date_committed</span></span><a class="headerlink" href="#models.Commit.date_committed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.date_created">
+<span class="sig-name descname"><span class="pre">date_created</span></span><a class="headerlink" href="#models.Commit.date_created" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.last_commit">
+<span class="sig-name descname"><span class="pre">last_commit</span></span><a class="headerlink" href="#models.Commit.last_commit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#models.Commit.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.proj_id">
+<span class="sig-name descname"><span class="pre">proj_id</span></span><a class="headerlink" href="#models.Commit.proj_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.root_folder">
+<span class="sig-name descname"><span class="pre">root_folder</span></span><a class="headerlink" href="#models.Commit.root_folder" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Commit.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#models.Commit.state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.CommitDocumentSnapshotRelation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">CommitDocumentSnapshotRelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.CommitDocumentSnapshotRelation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.CommitDocumentSnapshotRelation.commit_id">
+<span class="sig-name descname"><span class="pre">commit_id</span></span><a class="headerlink" href="#models.CommitDocumentSnapshotRelation.commit_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.CommitDocumentSnapshotRelation.doc_id">
+<span class="sig-name descname"><span class="pre">doc_id</span></span><a class="headerlink" href="#models.CommitDocumentSnapshotRelation.doc_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.CommitDocumentSnapshotRelation.snapshot_id">
+<span class="sig-name descname"><span class="pre">snapshot_id</span></span><a class="headerlink" href="#models.CommitDocumentSnapshotRelation.snapshot_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.Document">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Document" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Document.associated_proj_id">
+<span class="sig-name descname"><span class="pre">associated_proj_id</span></span><a class="headerlink" href="#models.Document.associated_proj_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Document.date_created">
+<span class="sig-name descname"><span class="pre">date_created</span></span><a class="headerlink" href="#models.Document.date_created" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Document.date_modified">
+<span class="sig-name descname"><span class="pre">date_modified</span></span><a class="headerlink" href="#models.Document.date_modified" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Document.doc_id">
+<span class="sig-name descname"><span class="pre">doc_id</span></span><a class="headerlink" href="#models.Document.doc_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Document.is_reviewed">
+<span class="sig-name descname"><span class="pre">is_reviewed</span></span><a class="headerlink" href="#models.Document.is_reviewed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Document.og_commit_id">
+<span class="sig-name descname"><span class="pre">og_commit_id</span></span><a class="headerlink" href="#models.Document.og_commit_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.Folder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Folder" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Folder.associated_proj_id">
+<span class="sig-name descname"><span class="pre">associated_proj_id</span></span><a class="headerlink" href="#models.Folder.associated_proj_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Folder.date_created">
+<span class="sig-name descname"><span class="pre">date_created</span></span><a class="headerlink" href="#models.Folder.date_created" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Folder.date_modified">
+<span class="sig-name descname"><span class="pre">date_modified</span></span><a class="headerlink" href="#models.Folder.date_modified" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Folder.folder_id">
+<span class="sig-name descname"><span class="pre">folder_id</span></span><a class="headerlink" href="#models.Folder.folder_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Folder.og_commit_id">
+<span class="sig-name descname"><span class="pre">og_commit_id</span></span><a class="headerlink" href="#models.Folder.og_commit_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.ItemCommitLocation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">ItemCommitLocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.ItemCommitLocation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.ItemCommitLocation.commit_id">
+<span class="sig-name descname"><span class="pre">commit_id</span></span><a class="headerlink" href="#models.ItemCommitLocation.commit_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.ItemCommitLocation.is_folder">
+<span class="sig-name descname"><span class="pre">is_folder</span></span><a class="headerlink" href="#models.ItemCommitLocation.is_folder" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.ItemCommitLocation.item_id">
+<span class="sig-name descname"><span class="pre">item_id</span></span><a class="headerlink" href="#models.ItemCommitLocation.item_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.ItemCommitLocation.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#models.ItemCommitLocation.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.ItemCommitLocation.parent_folder">
+<span class="sig-name descname"><span class="pre">parent_folder</span></span><a class="headerlink" href="#models.ItemCommitLocation.parent_folder" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.Project">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Project" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Project.author_email">
+<span class="sig-name descname"><span class="pre">author_email</span></span><a class="headerlink" href="#models.Project.author_email" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Project.date_created">
+<span class="sig-name descname"><span class="pre">date_created</span></span><a class="headerlink" href="#models.Project.date_created" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Project.date_modified">
+<span class="sig-name descname"><span class="pre">date_modified</span></span><a class="headerlink" href="#models.Project.date_modified" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Project.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#models.Project.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Project.proj_id">
+<span class="sig-name descname"><span class="pre">proj_id</span></span><a class="headerlink" href="#models.Project.proj_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.Snapshot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Snapshot" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Snapshot.associated_document_id">
+<span class="sig-name descname"><span class="pre">associated_document_id</span></span><a class="headerlink" href="#models.Snapshot.associated_document_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Snapshot.date_created">
+<span class="sig-name descname"><span class="pre">date_created</span></span><a class="headerlink" href="#models.Snapshot.date_created" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Snapshot.date_modified">
+<span class="sig-name descname"><span class="pre">date_modified</span></span><a class="headerlink" href="#models.Snapshot.date_modified" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Snapshot.og_commit_id">
+<span class="sig-name descname"><span class="pre">og_commit_id</span></span><a class="headerlink" href="#models.Snapshot.og_commit_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.Snapshot.snapshot_id">
+<span class="sig-name descname"><span class="pre">snapshot_id</span></span><a class="headerlink" href="#models.Snapshot.snapshot_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.User">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.User" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.User.date_joined">
+<span class="sig-name descname"><span class="pre">date_joined</span></span><a class="headerlink" href="#models.User.date_joined" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.User.github_token">
+<span class="sig-name descname"><span class="pre">github_token</span></span><a class="headerlink" href="#models.User.github_token" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.User.last_opened">
+<span class="sig-name descname"><span class="pre">last_opened</span></span><a class="headerlink" href="#models.User.last_opened" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.User.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#models.User.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.User.user_email">
+<span class="sig-name descname"><span class="pre">user_email</span></span><a class="headerlink" href="#models.User.user_email" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.UserProjectRelation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">UserProjectRelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.UserProjectRelation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserProjectRelation.permissions">
+<span class="sig-name descname"><span class="pre">permissions</span></span><a class="headerlink" href="#models.UserProjectRelation.permissions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserProjectRelation.proj_id">
+<span class="sig-name descname"><span class="pre">proj_id</span></span><a class="headerlink" href="#models.UserProjectRelation.proj_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserProjectRelation.role">
+<span class="sig-name descname"><span class="pre">role</span></span><a class="headerlink" href="#models.UserProjectRelation.role" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserProjectRelation.user_email">
+<span class="sig-name descname"><span class="pre">user_email</span></span><a class="headerlink" href="#models.UserProjectRelation.user_email" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.UserUnseenComment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">UserUnseenComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.UserUnseenComment" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserUnseenComment.comment_id">
+<span class="sig-name descname"><span class="pre">comment_id</span></span><a class="headerlink" href="#models.UserUnseenComment.comment_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserUnseenComment.user_email">
+<span class="sig-name descname"><span class="pre">user_email</span></span><a class="headerlink" href="#models.UserUnseenComment.user_email" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="models.UserUnseenSnapshot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">UserUnseenSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.UserUnseenSnapshot" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Base" title="models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserUnseenSnapshot.snapshot_id">
+<span class="sig-name descname"><span class="pre">snapshot_id</span></span><a class="headerlink" href="#models.UserUnseenSnapshot.snapshot_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="models.UserUnseenSnapshot.user_email">
+<span class="sig-name descname"><span class="pre">user_email</span></span><a class="headerlink" href="#models.UserUnseenSnapshot.user_email" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/models.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

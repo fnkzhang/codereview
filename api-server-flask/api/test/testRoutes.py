@@ -2,10 +2,26 @@ from app import get_app
 app = get_app(__name__)
 
 from flask import request
-from utils import *
+from projectRoutes import *
+from folderRoutes import *
+from documentRoutes import *
+from snapshotRoutes import *
+from commentRoutes import *
+from llmRoutes import *
+from githubRoutes import *
+from userAndPermissionsRoutes import *
+from authRoutes import *
+from utils.commitUtils import *
+
 # PUT TEST/TEMP STUFF HERE
 # @app.route
-from llm import *
+@app.route('/createTable')
+def createTable():
+    engine = connectCloudSql()
+    metaData = MetaData()
+    models.Base.metadata.create_all(engine)
+    print("Table was created")
+    return "Created Table"
 # curl -X POST http://127.0.0.1:5000/api/llm/test -H 'Content-Type: application/json' -d '{"input": "hi"}'
 @app.route("/api/llm/test", methods=["POST"])
 def test_llm():

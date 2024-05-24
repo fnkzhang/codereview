@@ -2,9 +2,9 @@ import CommentModule from './Comments/CommentModule.js';
 import { getDocSnapshot } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
-import { useParams } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 
-export default function ReviewWindow({ comments, setComments, userData, latestSnapshotData, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
+export default function ReviewWindow({ comments, setComments, userData, hasUpdatedCode, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -22,6 +22,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   const decorationIdsRefOrig = useRef([]);
   const decorationIdsRefModif = useRef([]);
 
+  const location = useLocation();
   const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
   // Get Code for the 2 editors
@@ -46,7 +47,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     }
 
     fetchData()
-  }, [document_id, left_snapshot_id, right_snapshot_id])
+  }, [document_id, left_snapshot_id, right_snapshot_id, project_id, setEditorReady, location.state])
 
   // 
   useEffect(() => {
@@ -66,7 +67,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
       originalEditor.onDidChangeCursorSelection(handleSelectionChange(originalEditor, left_snapshot_id));
       modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
     }
-  }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady ])
+  }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady, initialUpdatedCode, setDataToUpload ])
 
 
   // Handle Code Edit Detection For New Snapshot Creation
@@ -93,7 +94,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     setHasUpdatedCode(true)
     setDataToUpload(updatedCode)
 
-  }, [updatedCode])
+  }, [updatedCode, initialUpdatedCode, setDataToUpload, setHasUpdatedCode])
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
@@ -128,9 +129,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   function getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
     if (left_snapshot_id !== right_snapshot_id)
       return ""
-
-    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
-      return ""
     
     let originalEditor = editorRef.current
 
@@ -147,20 +145,6 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     return originalEditor.getOriginalEditor().getModel().getValueInRange(range)
   }
   function updateHighlightedCode(codeToReplace, highlightCodeString) {
-    if (left_snapshot_id !== right_snapshot_id)
-    return ""
-
-    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
-      return ""
-    
-    let originalEditor = editorRef.current
-
-    if (originalEditor === null)
-      return
-
-    let editorCode = originalEditor.getOriginalEditor().getModel().getValue()
-
-    editorCode = editorCode.replace(highlightCodeString, codeToReplace);
     
     setCode(codeToReplace)
 
@@ -171,7 +155,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
     if (left_snapshot_id !== right_snapshot_id)
       return false
 
-    if (left_snapshot_id !== latestSnapshotData?.snapshot_id?.toString())
+    if (location.state.addSnapshots !== null)
       return false
 
     return true
@@ -197,6 +181,11 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               comments={comments}
               setComments={setComments}
               userData={userData}
+              editorLanguage={editorLanguage}
+              editorCode={updatedCode}
+              checkIfCanGetLLMCode={checkIfCanGetLLMCode}
+              getHighlightedCode={getHighlightedCode}
+              updateHighlightedCode={updateHighlightedCode}
             />
           </div>
         </div>
@@ -206,7 +195,7 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
   
   return (
     <div>
-      <div className="h-9/10 w-screen flex text-center">
+      <div className="w-screen flex text-center">
         <div className="bg-altBackground w-2/3 border border-1 border-solid border-black inline-block">
           <DiffEditor 
             className="Monaco-editor"
@@ -218,12 +207,12 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
               // Set Value Because Editor Changes length of the Document after mounting
               setCode(editor.getModifiedEditor().getValue())
               setInitialUpdatedCode(editor.getModifiedEditor().getValue())
-
               editorRef.current = editor
               monacoRef.current = monaco
+
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: latestSnapshotData?.snapshot_id?.toString() === right_snapshot_id ? false : true
+                readOnly: location.state.addSnapshots === null ? false : true
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true
@@ -252,9 +241,9 @@ export default function ReviewWindow({ comments, setComments, userData, latestSn
             comments={comments}
             setComments={setComments}
             userData={userData}
-            latestSnapshotData={latestSnapshotData}
             editorLanguage={editorLanguage}
             editorCode={updatedCode}
+            hasUpdatedCode={hasUpdatedCode}
             checkIfCanGetLLMCode={checkIfCanGetLLMCode}
             getHighlightedCode={getHighlightedCode}
             updateHighlightedCode={updateHighlightedCode}

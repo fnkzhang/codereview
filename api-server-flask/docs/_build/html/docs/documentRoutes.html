@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>documentRoutes module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-documentRoutes">
+<span id="documentroutes-module"></span><h1>documentRoutes module<a class="headerlink" href="#module-documentRoutes" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.changeDocumentSnapshot">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">changeDocumentSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.changeDocumentSnapshot" title="Link to this definition">¶</a></dt>
+<dd><p>POST /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/&lt;snapshot_id&gt;/changeTo/</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>This endpoint changes the document identified by ‘doc_id’ and ‘commit_id’ to the snapshot identified by ‘snapshot_id’.
+It requires authentication via an Authorization token header.
+Only users with sufficient permissions can change document snapshots.</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>doc_id (str): The identifier of the document.</p></li>
+<li><p>commit_id (str): The identifier of the commit.</p></li>
+<li><p>snapshot_id (str): The identifier of the snapshot to change to.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (str): An empty string representing the body of the response.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.createDocument">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">createDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.createDocument" title="Link to this definition">¶</a></dt>
+<dd><p>POST /api/Document/&lt;proj_id&gt;/&lt;commit_id&gt;/</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data.</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>proj_id (str): The project ID.</p></li>
+<li><p>commit_id (str): The commit ID.</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>doc_name (str): name of document</p></li>
+<li><p>data (str): text you want in the document</p></li>
+<li><p>parent_folder(str): Optional; if not in request will put in root folder</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the creation was successful.</p></li>
+<li><p>reason (str): Description of the result of the creation.</p></li>
+<li><p>body (str): ID of the created document.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.deleteDocument">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.deleteDocument" title="Link to this definition">¶</a></dt>
+<dd><p>DELETE /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit</p>
+</dd>
+<dt>Args:</dt><dd><p>doc_id (str): The document ID.
+commit_id (str): The commit ID.</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the deletion was successful.</p></li>
+<li><p>reason (str): Description of the result of the deletion.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.getAllCommentsForDocument">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllCommentsForDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllCommentsForDocument" title="Link to this definition">¶</a></dt>
+<dd><p>GET /api/Document/&lt;document_id&gt;/comments/</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Gets all comments on a document across all committed snapshots</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>document_id (str): The identifier of the document.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><dl class="simple">
+<dt>body (list): A list of dictionaries representing comments associated with the document.</dt><dd><p>Each dictionary contains information about a single comment.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.getAllDocumentCommittedSnapshots">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllDocumentCommittedSnapshots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllDocumentCommittedSnapshots" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.getAllDocumentCommittedSnapshotsIncludingWorking">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllDocumentCommittedSnapshotsIncludingWorking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllDocumentCommittedSnapshotsIncludingWorking" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.getDocument">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getDocument" title="Link to this definition">¶</a></dt>
+<dd><p>GET /api/Document/&lt;proj_id&gt;/&lt;doc_id&gt;/&lt;commit_id&gt;/</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>Gets the document information in the commit given</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>proj_id (str): The project ID.</p></li>
+<li><p>doc_id (str): The document ID.</p></li>
+<li><p>commit_id (str): The commit ID.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the retrieval was successful.</p></li>
+<li><p>reason (str): Description of the result of the retrieval.</p></li>
+<li><p>body (dict): Document information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.moveDocument">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">moveDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.moveDocument" title="Link to this definition">¶</a></dt>
+<dd><p>POST /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/move/</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>moves a document</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>doc_id (str): The document ID</p></li>
+<li><p>commit_id (str): The commit you’re doing action on blah blah you get the idea</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>parent_folder (str): folder you’re moving it to</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (str): An empty string representing the body of the response.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="documentRoutes.renameDocument">
+<span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">renameDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.renameDocument" title="Link to this definition">¶</a></dt>
+<dd><p>POST /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/rename/</p>
+<dl class="simple">
+<dt>Explanation:</dt><dd><p>renames a document</p>
+</dd>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>doc_id (str): The document ID</p></li>
+<li><p>commit_id (str): the commit you’re changing the name of</p></li>
+<li><dl class="simple">
+<dt>request.body(dict):</dt><dd><ul>
+<li><p>doc_name (str): new name</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/documentRoutes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

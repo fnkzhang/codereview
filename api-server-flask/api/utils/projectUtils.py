@@ -3,6 +3,7 @@ from utils.folderUtils import *
 from utils.documentUtils import *
 from utils.snapshotUtils import * 
 from utils.miscUtils import *
+from utils.commitUtils import *
 import models
 
 def getProjectInfo(proj_id):
@@ -15,13 +16,11 @@ def getProjectInfo(proj_id):
 
 def createNewProject(proj_name, owner):
     pid = createID()
-    root_folder_id = createNewFolder('root', 0, pid)
     with engine.connect() as conn:
         projstmt = insert(models.Project).values(
                 proj_id = pid,
                 name = proj_name,
                 author_email = owner,
-                root_folder = root_folder_id
         )
         relationstmt = insert(models.UserProjectRelation).values(
                 user_email = owner,
@@ -34,12 +33,14 @@ def createNewProject(proj_name, owner):
         conn.commit()
     return pid
 
-def deleteProjectUtil(proj_id):
+def purgeProjectUtil(proj_id):
     try:
+        print("start!")
         with engine.connect() as conn:
-            stmt = select(models.Project).where(models.Project.proj_id == proj_id)
-            project = conn.execute(stmt).first()
-            deleteFolderUtil(project.root_folder)
+            commits = getAllProjectCommits(proj_id)
+            for commit in commits:
+                deleteCommit(commit["commit_id"])
+            print("commitsdied")
             stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
             conn.execute(stmt)
             stmt = delete(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
@@ -84,14 +85,45 @@ def getAllProjectFolders(proj_id):
         for folder in foundFolders:
             folders.append(folder._asdict())
         return folders
+    
+# Returns Array of Dictionaries
+def getAllProjectCommits(proj_id):
+    with engine.connect() as conn:
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id).order_by(models.Commit.date_created.asc())
+        foundCommits = conn.execute(stmt)
 
-def getProjectFoldersAsPaths(proj_id):
-    project = getProjectInfo(proj_id)
-    folders = getAllProjectFolders(proj_id)
-    folderIDToPath = {}
-    folders = [folder for folder in folders if folder["parent_folder"] > 0]
-    folderIDToPath = getFolderPathsFromList(project["root_folder"], "", folders)
-    folderIDToPath[project["root_folder"]] = ""
-    return folderIDToPath
+        listOfCommits = []
 
+        for row in foundCommits:
+            listOfCommits.append(row._asdict())
+        print("gotten")
+        return listOfCommits
+
+# Returns Array of Dictionaries
+def getAllCommittedProjectCommitsInOrder(proj_id):
+    with engine.connect() as conn:
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.date_committed != None).order_by(models.Commit.date_committed.asc())
+        foundCommits = conn.execute(stmt)
+
+        listOfCommits = []
+
+        for row in foundCommits:
+            listOfCommits.append(row._asdict())
+
+        return listOfCommits
+
+def getProjectLastCommittedCommit(proj_id):
+    try:
+        return getAllCommittedProjectCommitsInOrder(proj_id)[-1]
+    except Exception as e:
+        print(e)
+        return None
+
+def getUserWorkingCommitInProject(proj_id, email):
+    with engine.connect() as conn:
+        stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.author_email == email, models.Commit.date_committed == None)
+        commit = conn.execute(stmt).first()
+        if commit == None:
+            return None
+        return commit._asdict()
 

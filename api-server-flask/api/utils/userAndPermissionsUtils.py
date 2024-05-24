@@ -1,5 +1,4 @@
 from cloudSql import *
-
 import models
 
 def getUserInfo(user_email):
@@ -37,6 +36,7 @@ def deleteUser(user_email, proj_id):
 
         conn.execute(relationstmt)
         conn.commit()
+        setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email)
     return True
 
 def getUserProjPermissions(user_email, proj_id):
@@ -78,13 +78,8 @@ def getAllUserProjPermissionsForProject(proj_id):
 def setUserProjPermissions(email, proj_id, r, perms):
     try:
         with engine.connect() as conn:
-            stmt = insert(models.UserProjectRelation).values(
-                    user_email = email,
-                    proj_id = proj_id,
-                    role = r,
-                    permissions = perms
-            )
             if(getUserProjPermissions(email, proj_id)) < 0:
+                setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, email)
                 stmt = insert(models.UserProjectRelation).values(
                         user_email = email,
                         proj_id = proj_id,
@@ -124,4 +119,39 @@ def changeProjectOwner(email, proj_id):
     except Exception as e:
         print(e)
         return False
+    
+def setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)
+        docs = conn.execute(stmt)
+        for doc in docs:
+            stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc.doc_id)
+            snaps = conn.execute(stmt)
+            for snap in snaps:
+                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snapshot_id)
+                coms = conn.execute(stmt)
+                for com in coms:
+                    stmt = insert(models.UserUnseenComment).values(comment_id = com.comment_id, user_email = user_email)
+                    conn.execute(stmt)
+                stmt = insert(models.UserUnseenSnapshot).values(snapshot_id = snap.snapshot_id, user_email = user_email)
+                conn.execute(stmt)
+            conn.commit()
+        return True
 
+def setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email):
+    with engine.connect() as conn:
+        stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)
+        docs = conn.execute(stmt)
+        for doc in docs:
+            stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc.doc_id)
+            snaps = conn.execute(stmt)
+            for snap in snaps:
+                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snapshot_id)
+                coms = conn.execute(stmt)
+                for com in coms:
+                    stmt = delete(models.UserUnseenComment).where(models.UserUnseenComment.comment_id == com.comment_id, models.UserUnseenComment.user_email == user_email)
+                    conn.execute(stmt)
+                stmt = delete(models.UserUnseenSnapshot).where(models.UserUnseenSnapshot.snapshot_id == snap.snapshot_id, models.UserUnseenSnapshot.user_email == user_email)
+                conn.execute(stmt)
+            conn.commit()
+        return True

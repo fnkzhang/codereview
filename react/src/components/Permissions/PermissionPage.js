@@ -41,7 +41,6 @@ export default function PermissionPage( props ) {
     const getCurrentProjectUsers = async () => {
       let projectUserResponse = await getAllUsersWithPermissionForProject(project_id)
       setProjectUsers(projectUserResponse)
-      console.log(projectUserResponse);
     }
     async function fetchData() {
       try {
@@ -177,7 +176,9 @@ export default function PermissionPage( props ) {
     return (
       <div>
         <div>
-          <BackButton/> 
+          <BackButton
+            location={-1}
+          /> 
         </div>
         <div >
           <header className="text-textcolor text-3xl">

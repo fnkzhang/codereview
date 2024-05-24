@@ -1,10 +1,10 @@
 import { resolveComment } from '../../api/APIUtils';
 import SubCommentList from './SubCommentList';
 import { Card } from "flowbite-react";
-import React, { useEffect } from 'react';
+import React from 'react';
 import LlmButton from '../LLM/LlmButton';
 
-function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID, latestSnapshotData,
+function Comment ({ setCommentsLoading, commentID, author, text, subcomments, date, commentLineJump, snapshotID,
   highlightStartX, highlightStartY, highlightEndX, highlightEndY, isResolved,
   editorLanguage, editorCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode
 }) {
@@ -36,7 +36,7 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
           </button>
         </div>
 
-        {latestSnapshotData?.snapshot_id === snapshotID ? (
+        {checkIfCanGetLLMCode() ? (
             <div>
               <LlmButton
                 editorLanguage={editorLanguage}
