@@ -921,7 +921,7 @@ export async function submitCommit(commit_id, commit_name) {
     if (data.success === false) {
       console.log("FAILED" + data.reason)
     }
-    return data.success
+    return data
   })
 }
 
