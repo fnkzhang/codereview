@@ -18,7 +18,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
           console.log(result)
           if (result.success)
-            setSnapshots(result.body)
+            setSnapshots(result.body.reverse())
           snapshots.forEach((snapshot, index) => {
             const currentSnapshot_id = snapshot.snapshot.snapshot_id.toString()
             
@@ -60,21 +60,21 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
         if(snapshots.length !== 0) {
             return (
               <Dropdown 
-                className= "z-9999 bg-background" label={`Snapshot ${selectedLeftSnapshotIndex}`}>
+                className= "z-9999 bg-background" label={`${snapshots[selectedLeftSnapshotIndex].commit.name}`}>
                 {snapshots.map((snapshot, index) => { 
                     const value = filterComments(snapshot)
                     let str = ""
                     if (value !== 0)
                       str = `(${value})`
                     //console.log(snapshot)
-                    return (index <= selectedRightSnapshotIndex) ? (
+                    return (
                       <Dropdown.Item 
-                        className="z-9999 bg-background"
+                        className="z-9999 bg-background hover:bg-alternative"
                         key={index}
                         onClick={() => handleLeftSnapClick(snapshot.snapshot.snapshot_id, index)}
                         data-tooltip-id={`tooltipleft${index}`}
                       >
-                        Snapshot {index} {str}
+                        {snapshot.commit.name} {str}
                         <Tooltip
                           className="z-9999" 
                           id={`tooltipleft${index}`}
@@ -91,7 +91,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                           }
                         />
                       </Dropdown.Item>
-                    ) : null
+                    )
                 })}
               </Dropdown>
             )
@@ -104,21 +104,21 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
     function DisplayRightSnapshots() {
       if(snapshots.length !== 0) {
           return (
-            <Dropdown className="z-9999 bg-background" label={`Snapshot ${selectedRightSnapshotIndex}`}>
+            <Dropdown className="z-9999 bg-background" label={`${snapshots[selectedRightSnapshotIndex].commit.name}`}>
               {snapshots.map((snapshot, index) => { 
                   const value = filterComments(snapshot)
                   let str = ""
                   if (value !== 0)
                     str = `(${value})`
                   //console.log(snapshot.snapshot_id, right_snapshot_id, snapshot.snapshot_id === right_snapshot_id )
-                  return (index >= selectedLeftSnapshotIndex) ? (
+                  return (
                     <Dropdown.Item 
-                      className="z-9999 bg-background"
+                      className="z-9999 bg-background hover:bg-alternative"
                       key={index}
                       onClick={() => handleRightSnapClick(snapshot.snapshot.snapshot_id, index)}
                       data-tooltip-id={`tooltipright${index}`}
                     >
-                      Snapshot {index} {str}
+                      {snapshot.commit.name} {str}
                       <Tooltip
                         className="z-9999" 
                         id={`tooltipright${index}`}
@@ -135,7 +135,7 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                         }
                       />
                     </Dropdown.Item>
-                  ) : null
+                  )
               })}           
             </Dropdown>
           )
