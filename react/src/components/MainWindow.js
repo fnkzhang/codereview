@@ -27,6 +27,9 @@ export default function MainWindow( props ) {
 
   // Handle Setting Program Language that document uses
   useEffect(() => {
+    if(!location.state.documentName)
+      return
+    
     let extensionName = location.state.documentName.split('.')[1].toLowerCase()
     extensionName = EXTENSION_TO_LANGUAGE_MAP[extensionName]
 

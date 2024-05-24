@@ -20,8 +20,8 @@ export default function ProjectListPage( props ) {
         setUserProjects(projArray)
         setLoading(false)
       } 
-
-      grabProjectData()
+      if (props.isLoggedIn)
+        grabProjectData()
     }, [props])
 
 
