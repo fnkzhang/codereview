@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAllSnapshotsFromDocument } from "../api/APIUtils";
+import { truncateString, getColor } from "../utils/utils";
 import { Dropdown } from "flowbite-react";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
@@ -19,13 +20,13 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
           console.log(result)
           if (result.success)
-            setSnapshots(result.body)
+            setSnapshots(result.body.reverse())
         }
 
-        if (snapshots.length === 0 )
+        if (snapshots.length === 0 || !snapshots.some(snapshot => snapshot.snapshot.snapshot_id === Number(right_snapshot_id)))
           grabSnapshots()
         
-    }, [document_id, editorReady, project_id, setSnapshots, snapshots])
+    }, [document_id, editorReady, project_id, setSnapshots, snapshots, right_snapshot_id])
     
     // Set Snapshot Selecter Snapshot Number
     useEffect(() => {
@@ -66,7 +67,13 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
         if(snapshots.length !== 0) {
             return (
               <Dropdown 
-                className= "z-9999 bg-background" label={`${snapshots[selectedLeftSnapshotIndex].commit.name}`}>
+                className= "z-9999 bg-background" label={
+                  <div className="flex max-w-sm">
+                    <div className="flex-1 flex-grow w-full flex-col text-textcolor whitespace-nowrap">
+                      {`${truncateString(snapshots[selectedLeftSnapshotIndex].commit.name, 50)}`}
+                    </div>
+                  </div>
+                }>
                 {snapshots.map((snapshot, index) => { 
                     const value = filterComments(snapshot)
                     let str = ""
@@ -80,7 +87,17 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                         onClick={() => handleLeftSnapClick(snapshot.snapshot.snapshot_id, index)}
                         data-tooltip-id={`tooltipleft${index}`}
                       >
-                        {snapshot.commit.name} {str}
+                        <div className="flex">
+                          <div className="flex-1 flex-grow flex-col text-textcolor whitespace-nowrap mr-2">
+                            {`${truncateString(snapshot.commit.name, 40)}`}
+                          </div>
+                          <div className={"flex-1 " + getColor(snapshot.commit.state)}>
+                            {`*${snapshot.commit.state.toString().toUpperCase()}`}
+                          </div>
+                          <div className="ml-3">
+                            {str}
+                          </div>
+                        </div>
                         <Tooltip
                           className="z-9999" 
                           id={`tooltipleft${index}`}
@@ -110,7 +127,13 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
     function DisplayRightSnapshots() {
       if(snapshots.length !== 0) {
           return (
-            <Dropdown className="z-9999 bg-background" label={`${snapshots[selectedRightSnapshotIndex].commit.name}`}>
+            <Dropdown className="z-9999 bg-background" label={
+              <div className="flex max-w-sm">
+                <div className="flex-1 flex-grow w-full flex-col text-textcolor whitespace-nowrap">
+                  {`${truncateString(snapshots[selectedRightSnapshotIndex].commit.name, 50)}`}
+                </div>
+              </div>
+            }>
               {snapshots.map((snapshot, index) => { 
                   const value = filterComments(snapshot)
                   let str = ""
@@ -124,7 +147,17 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
                       onClick={() => handleRightSnapClick(snapshot.snapshot.snapshot_id, index)}
                       data-tooltip-id={`tooltipright${index}`}
                     >
-                      {snapshot.commit.name} {str}
+                      <div className="flex">
+                        <div className="flex-1 flex-grow flex-col text-textcolor whitespace-nowrap mr-2">
+                          {`${truncateString(snapshot.commit.name, 40)}`}
+                        </div>
+                        <div className={"flex-1 " + getColor(snapshot.commit.state)}>
+                          {`*${snapshot.commit.state.toString().toUpperCase()}`}
+                        </div>
+                        <div className="ml-3">
+                          {str}
+                        </div>
+                      </div>
                       <Tooltip
                         className="z-9999" 
                         id={`tooltipright${index}`}

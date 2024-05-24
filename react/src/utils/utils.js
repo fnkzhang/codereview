@@ -1,3 +1,5 @@
+import { REVIEW_STATE } from "./reviewStateMapping";
+
 export default function getCookie(name) {
     let cookieArray = document.cookie.split(";");
     //console.log(cookieArray)
@@ -22,4 +24,23 @@ export default function getCookie(name) {
 export function deleteCookie(name) {
     // Set the cookie to expire in the past, effectively deleting it
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+}
+
+export function truncateString(str, maxLength = 35) {
+    if (str.length > maxLength) {
+        return str.slice(0, maxLength) + '...';
+    }
+    return str;
+}
+
+export function getColor ( state ) {
+    let stateColor = 'text-textcolor';
+
+    if (state === REVIEW_STATE.OPEN)
+        stateColor = 'text-reviewOpen'
+    else if (state === REVIEW_STATE.REVIEWED)
+        stateColor = 'text-reviewReviewed'
+    else
+        stateColor = 'text-reviewClosed'
+    return stateColor
 }

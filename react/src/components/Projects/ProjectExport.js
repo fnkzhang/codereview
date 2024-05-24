@@ -59,15 +59,29 @@ export default function ProjectExport( props ) {
 
   if ( props.connected === false ) {
     return(
-      <div className="flex justify-center mt-20">
-        <form className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
-          <div>
-            <GitHubStatus
-              connected={props.connected}
-              setConnected={props.setConnected}
-            />
-          </div>
-        </form>
+      <div>
+        <div>
+          <BackButton
+            location={`/Project/${project_id}/Commit/0`}
+          />
+        </div>
+        <div className="flex justify-center mt-20">
+          <form 
+            className="flex max-w-lg flex-1 flex-col gap-4 text-textcolor bg-altBackground p-20 pt-10 rounded">
+            <div className="text-textcolor">
+              Connect to a GitHub account in order to export a project's contents.
+              <div className="flex items-center justify-center text-center">
+                <div className="border border-offwhite border-1 bg-alternative transition-colors 
+                  duration-200 hover:bg-slate-500 w-1/3 rounded">
+                  <GitHubStatus
+                    connected={props.connected}
+                    setConnected={props.setConnected}
+                  />
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     )
   }

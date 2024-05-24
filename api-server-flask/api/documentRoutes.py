@@ -441,9 +441,9 @@ def getAllCommentsForDocument(document_id):
     listOfSnapshotIDs = []
     working = getUserWorkingCommitInProject(proj_id, idInfo["email"])
     if working != None:
-        foundSnapshots = getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working["commit_id"])
+        foundSnapshots = getAllDocumentCommittedSnapshotsInOrderIncludingWorking(document_id, working["commit_id"])
     else:
-        foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
+        foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(document_id)
 
     for snapshot in foundSnapshots:
         # Query
