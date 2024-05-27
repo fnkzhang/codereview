@@ -454,7 +454,7 @@ def pushToExistingBranch(proj_id, commit_id):
     deleted = time.time()
     print("deleted", deleted-relation)
     tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
-    print("assemble", time.time()-start)
+    print("assemble", time.time()-deleted)
     if len(tree_elements) == 0:
         {"success":False,
                 "reason": "no files to push"}
