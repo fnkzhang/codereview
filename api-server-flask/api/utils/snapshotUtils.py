@@ -22,7 +22,8 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
         stmt = insert(models.Snapshot).values(
             snapshot_id = snapshot_id,
             associated_document_id = doc_id,
-            og_commit_id = commit_id
+            og_commit_id = commit_id,
+            proj_id = proj_id
         )
         conn.execute(stmt)
         conn.commit()
@@ -35,7 +36,7 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
         createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
 
         setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, user_email, proj_id)
-        if result == None:
+        if result == None and snap != None:
             deleteSnapshotUtil(snap)
         return snapshot_id
 
