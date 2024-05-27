@@ -14,7 +14,7 @@ def uploadBlob(blobName, item):
     bucket = storage_client.bucket('cr_storage')
     print("Uploading to", blobName)
     blob = bucket.blob(blobName)
-    blob.upload_from_string(data = item, content_type='application/json')
+    blob.upload_from_string(data = item)
 
     return True
 

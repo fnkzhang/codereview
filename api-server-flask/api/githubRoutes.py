@@ -441,11 +441,20 @@ def pushToExistingBranch(proj_id, commit_id):
                 "reason": "branch does not exist"}
     repo = g2.get_repo(body["repository"])
     updated_files = []
+    start = time.time()
     folderIDToPath = getCommitFoldersAsPaths(commit_id)
+    getpaths = time.time()
+    print("getpaths", getpaths-start)
     body = request.get_json()
     documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
+    relation = time.time()
+    print("getrelation", relation-getpaths)
+
     deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(body["repository"], body["branch"], token, commit_id)
+    deleted = time.time()
+    print("deleted", deleted-relation)
     tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
+    print("assemble", time.time()-start)
     if len(tree_elements) == 0:
         {"success":False,
                 "reason": "no files to push"}

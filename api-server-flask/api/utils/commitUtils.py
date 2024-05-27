@@ -327,14 +327,21 @@ def getAllCommitItemIdsOfType(commit_id, is_folder):
 def getAllCommitItemsOfType(commit_id, is_folder):
     items = getAllCommitItems(commit_id)
     rv = []
+    threads = []
     for item in items:
         if item["is_folder"] == is_folder:
-            if is_folder == True:
-                rv.append(getFolderInfo(item["item_id"], commit_id))
-            else:
-                rv.append(getDocumentInfo(item["item_id"], commit_id))
+            thread = threading.Thread(target=appendInfo, kwargs={"rv":rv, "item":item, "commit_id":commit_id, "is_folder":is_folder})
+            thread.start()
+            threads.append(thread)
+    for thread in threads:
+        thread.join()
     return rv
-
+def appendInfo(rv, item, commit_id, is_folder):
+    if is_folder == True:
+        rv.append(getFolderInfo(item["item_id"], commit_id))
+    else:
+        rv.append(getDocumentInfo(item["item_id"], commit_id))
+        
 def getAllCommitItems(commit_id):
 
     with engine.connect() as conn:
@@ -376,20 +383,31 @@ def getCommitTreeWithAddons(commit_id, email):
     return tree
 
 def addToTree(tree, docsnap, email):
-
+    threads = []
     with engine.connect() as conn:
         for item in tree["content"]["folders"]:
-            addToTree(item, docsnap, email)
+            thread = threading.Thread(target=addToTree, kwargs={'tree':item, 'docsnap':docsnap, 'email':email})
+            thread.start()
+            threads.append(thread)
+            #addToTree(item, docsnap, email)
         for item in tree["content"]["documents"]:
-            item["seenSnapshot"] = isSnaphotSeenByUser(docsnap[item["doc_id"]], email)
-            item["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[item["doc_id"]], email)
-            stmt = select(models.Comment).where(
-                    models.Comment.snapshot_id == docsnap[item["doc_id"]],
-                    models.Comment.is_resolved == False
-                    )
-            count = conn.execute(stmt).rowcount
+            thread = threading.Thread(target=addSeenAndUnresolved, kwargs={'item':item, 'docsnap':docsnap, 'email':email})
+            thread.start()
+            threads.append(thread)
+    for thread in threads:
+        thread.join()
+    return True
 
-            item["unresolvedCommentCount"] = count
+def addSeenAndUnresolved(item, docsnap, email):
+    with engine.connect() as conn:
+        item["seenSnapshot"] = isSnaphotSeenByUser(docsnap[item["doc_id"]], email)
+        item["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[item["doc_id"]], email)
+        stmt = select(models.Comment).where(
+                models.Comment.snapshot_id == docsnap[item["doc_id"]],
+                models.Comment.is_resolved == False
+                )
+        count = conn.execute(stmt).rowcount
+        item["unresolvedCommentCount"] = count
     return True
 
 def getCommitFoldersAsPaths(commit_id):

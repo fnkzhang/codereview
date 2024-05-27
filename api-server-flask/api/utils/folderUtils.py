@@ -22,8 +22,6 @@ def getFolderInfo(folder_id, commit_id):
         return foundFolder
 
 def getFolderInfoViaLocation(name, parent_folder, commit_id):
-    
-
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.name == name, models.ItemCommitLocation.parent_folder == parent_folder, models.ItemCommitLocation.is_folder == True)
 
@@ -42,8 +40,6 @@ def getFolderPath(folder_id, commit_id):
         return getFolderPath(folder["parent_folder"], commit_id) + folder["name"] + '/'
 
 def createNewFolder(folder_name, parent_folder, proj_id, commit_id):
-    
-
     folder_id = createID()
     with engine.connect() as conn:
         stmt = insert(models.Folder).values(
@@ -74,8 +70,6 @@ def deleteFolderFromCommit(folder_id, commit_id):
 
 #only use when deleting project
 def purgeFolderUtil(folder_id):
-    
-
     try:
         with engine.connect() as conn:
 
@@ -88,32 +82,50 @@ def purgeFolderUtil(folder_id):
         return False, e
 
 def getAllFolderContents(folder_id, commit_id):
+    threads = []
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.parent_folder == folder_id, models.ItemCommitLocation.commit_id == commit_id)
         foundItems = conn.execute(stmt)
         folders = []
         arrayOfDocuments = []
         for item in foundItems:
-            if item.is_folder == True:
-                folders.append(getFolderInfo(item.item_id, commit_id))
-            else:
-                arrayOfDocuments.append(getDocumentInfo(item.item_id, commit_id))
+            thread = threading.Thread(target=addItemToList, kwargs={'item':item, 'folders':folders, "arrayOfDocuments":arrayOfDocuments, "commit_id":commit_id})
+            thread.start()
+            threads.append(thread)
+        for thread in threads:
+            thread.join()
         return {"folders": folders, "documents":arrayOfDocuments}
+
+def addItemToList(item, folders, arrayOfDocuments, commit_id):
+    if item.is_folder == True:
+        folders.append(getFolderInfo(item.item_id, commit_id))
+    else:
+        arrayOfDocuments.append(getDocumentInfo(item.item_id, commit_id))
+    return True
 
 def getFolderTree(folder_id, commit_id):
     root = getFolderInfo(folder_id, commit_id)
     contents = getAllFolderContents(folder_id, commit_id)
     folders = []
     documents = []
+    threads = []
+    for folder in contents["folders"]:
+        thread = threading.Thread(target=appendFolderTreeToList, kwargs={"folderlist":folders, "folder_id":folder["folder_id"], "commit_id": commit_id})
+        thread.start()
+        threads.append(thread)
+        #foldertree = getFolderTree(folder["folder_id"], commit_id)
+        #folders.append(foldertree)
     for document in contents["documents"]:
         documents.append(document)
-    for folder in contents["folders"]:
-        foldertree = getFolderTree(folder["folder_id"], commit_id)
-        folders.append(foldertree)
     content = { "folders":folders, "documents":documents}
     root["content"] = content
+    for thread in threads:
+        thread.join()
     return root
 
+def appendFolderTreeToList(folderlist, folder_id, commit_id):
+    foldertree = getFolderTree(folder_id, commit_id)
+    folderlist.append(foldertree)
 
 #i don't want to have to query the database for every folder, money moment
 #terrible optimization but whatevertbh
