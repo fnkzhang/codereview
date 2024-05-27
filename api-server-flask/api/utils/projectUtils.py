@@ -38,13 +38,15 @@ def createNewProject(proj_name, owner):
     return pid
 
 def purgeProjectUtil(proj_id):
-    
-
     try:
         print("start!")
+        threads = []
         with engine.connect() as conn:
             commits = getAllProjectCommits(proj_id)
             for commit in commits:
+                thread = threading.Thread(target=deleteCommit, kwargs={"commit_id":commit["commit_id"]})
+                thread.start()
+                threads.append(thread)
                 deleteCommit(commit["commit_id"])
             print("commitsdied")
             stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
@@ -52,6 +54,8 @@ def purgeProjectUtil(proj_id):
             stmt = delete(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
             conn.execute(stmt)
             conn.commit()
+            for thread in threads:
+                thread.join()
         return True, "No Error"
     except Exception as e:
         return False, e

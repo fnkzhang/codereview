@@ -25,11 +25,14 @@ def getBlob(blobName):
     return blob.download_as_bytes()
 
 def deleteBlob(blobName):
-    storage_client = storage.Client()
-    bucket = storage_client.bucket('cr_storage')
-    blob = bucket.get_blob(blobName)
-    if blob != None:
-        blob.delete()
+    try:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('cr_storage')
+        blob = bucket.get_blob(blobName)
+        if blob != None:
+            blob.delete()
+    except:
+        pass
     return True
 
 #location = basically the folder the files are located in
