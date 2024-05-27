@@ -10,6 +10,8 @@ from utils.miscUtils import *
 import models
 
 def getDocumentInfo(doc_id, commit_id):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
         foundDocument = conn.execute(stmt).first()
@@ -22,6 +24,8 @@ def getDocumentInfo(doc_id, commit_id):
         return foundDocument
 
 def getDocumentProject(doc_id):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
         foundDocument = conn.execute(stmt).first()
@@ -30,6 +34,8 @@ def getDocumentProject(doc_id):
         return foundDocument._asdict()["associated_proj_id"]
 
 def getDocumentInfoViaLocation(name, parent_folder, commit_id):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.name == name, models.ItemCommitLocation.parent_folder == parent_folder, models.ItemCommitLocation.is_folder == False)
         foundDocument = conn.execute(stmt).first()
@@ -41,6 +47,8 @@ def getDocumentInfoViaLocation(name, parent_folder, commit_id):
 
 def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, user_email):
     doc_id = createID()
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
             doc_id = doc_id,
@@ -55,6 +63,8 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, us
     return doc_id
 
 def deleteDocumentFromCommit(doc_id, commit_id):
+    engine = connectCloudSql()
+
     try:
         with engine.connect() as conn:
             stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
@@ -78,6 +88,8 @@ def deleteDocumentFromCommit(doc_id, commit_id):
 
 #only for project deletion
 def purgeDocumentUtil(doc_id):
+    engine = connectCloudSql()
+
     try:
         with engine.connect() as conn:
             print("start doc delete", doc_id)
@@ -104,6 +116,8 @@ def purgeDocumentUtil(doc_id):
 
 # Returns Array of Dictionaries
 def getAllDocumentCommittedSnapshotsInOrder(doc_id):
+    engine = connectCloudSql()
+
     proj_id = getDocumentProject(doc_id)
     with engine.connect() as conn:
         stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.date_committed != None).order_by(models.Commit.date_committed.asc())

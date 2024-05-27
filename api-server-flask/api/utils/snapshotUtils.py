@@ -8,6 +8,8 @@ import models
 
 
 def getSnapshotInfo(snapshot_id):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
         snapshot = conn.execute(stmt).first()
@@ -17,6 +19,8 @@ def getSnapshotInfo(snapshot_id):
 
 #puts documentname as snapshot name until that changes
 def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         snapshot_id = createID()
         stmt = insert(models.Snapshot).values(
@@ -40,6 +44,8 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
         return snapshot_id
 
 def getSnapshotProject(snapshot_id):
+    engine = connectCloudSql()
+
     try:
         with engine.connect() as conn:
             stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
@@ -54,6 +60,8 @@ def getSnapshotProject(snapshot_id):
         return None
 
 def getSnapshotPath(snapshot_id):
+    engine = connectCloudSql()
+
     try:
         with engine.connect() as conn:
             stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
@@ -65,7 +73,6 @@ def getSnapshotPath(snapshot_id):
             proj_id = document.first().associated_proj_id
             return str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id)
     except Exception as e:
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         print(e)
         return None
 
@@ -74,6 +81,8 @@ def getSnapshotContentUtil(snapshot_id):
     return blob
 
 def deleteSnapshotUtil(snapshot_id):
+    engine = connectCloudSql()
+
     try:
         with engine.connect() as conn:
             print("start_delete snap", snapshot_id) 

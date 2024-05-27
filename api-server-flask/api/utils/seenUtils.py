@@ -5,6 +5,8 @@ from utils.userAndPermissionsUtils import *
 import models
 
 def isSnaphotSeenByUser(snapshot_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = select(models.UserUnseenSnapshot).where(
                 models.UserUnseenSnapshot.snapshot_id == snapshot_id,
@@ -17,6 +19,8 @@ def isSnaphotSeenByUser(snapshot_id, user_email):
             return False
 
 def setSnapshotAsUnseen(snapshot_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = insert(models.UserUnseenSnapshot).values(
                 snapshot_id = snapshot_id,
@@ -34,6 +38,8 @@ def setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, user_email, proj_i
     return True
 
 def setSnapshotAsSeen(snapshot_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = delete(models.UserUnseenSnapshot).where(
                 models.UserUnseenSnapshot.snapshot_id == snapshot_id,
@@ -50,6 +56,8 @@ def setSnapAsSeenForAllProjUsers(snapshot_id, proj_id):
     return True
 
 def isSnapshotAllCommentSeenByUser(snapshot_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = select(models.Comment).where(
             models.Comment.snapshot_id == snapshot_id
@@ -61,6 +69,8 @@ def isSnapshotAllCommentSeenByUser(snapshot_id, user_email):
         return True
         
 def isCommentSeenByUser(comment_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = select(models.UserUnseenComment).where(
                 models.UserUnseenComment.comment_id == comment_id,
@@ -73,6 +83,8 @@ def isCommentSeenByUser(comment_id, user_email):
             return False
 
 def setCommentAsUnseen(comment_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = insert(models.UserUnseenComment).values(
                 comment_id = comment_id,
@@ -90,6 +102,8 @@ def setCommentAsUnseenForAllProjUsersOtherThanMaker(comment_id, user_email, proj
     return True
 
 def setCommentAsSeen(comment_id, user_email):
+    engine = connectCloudSql()
+
     with engine.connect() as conn:
         stmt = delete(models.UserUnseenComment).where(
                 models.UserUnseenComment.comment_id == comment_id,
