@@ -22,13 +22,12 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
         stmt = insert(models.Snapshot).values(
             snapshot_id = snapshot_id,
             associated_document_id = doc_id,
-            og_commit_id = commit_id,
-            proj_id = proj_id
+            og_commit_id = commit_id
         )
         conn.execute(stmt)
         conn.commit()
 
-        uploadBlob(str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id), data)
+        uploadBlob(str(snapshot_id), data)
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
         stmt = select(models.CommitDocumentSnapshotRelation).where(
                     models.CommitDocumentSnapshotRelation.snapshot_id == snap)
@@ -66,21 +65,23 @@ def getSnapshotPath(snapshot_id):
             proj_id = document.first().associated_proj_id
             return str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id)
     except Exception as e:
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         print(e)
         return None
 
 def getSnapshotContentUtil(snapshot_id):
-    blob = getBlob(getSnapshotPath(snapshot_id))
+    blob = getBlob(str(snapshot_id))
     return blob
 
 def deleteSnapshotUtil(snapshot_id):
     try:
         with engine.connect() as conn:
             print("start_delete snap", snapshot_id) 
-            deleteBlob(getSnapshotPath(snapshot_id))
+            deleteBlob(str(snapshot_id))
             print("deleteblob")
             stmt = delete(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
             conn.execute(stmt)
+            print("snapdelete")
             stmt = delete(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
             conn.execute(stmt)
             print("deletecomment")
@@ -88,8 +89,9 @@ def deleteSnapshotUtil(snapshot_id):
                 models.CommitDocumentSnapshotRelation.snapshot_id == snapshot_id
             )
             conn.execute(stmt)
+            print("beforecommit")
             conn.commit()
-            print("snapdelete")
+            print("deleterelation")
             proj_id = getSnapshotProject(snapshot_id)
             setSnapAsSeenForAllProjUsers(snapshot_id, proj_id)
             print("seen")

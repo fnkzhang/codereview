@@ -30,7 +30,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
+    blob = fetchFromCloudStorage(str(snapshot_id))
     print(blob)
     setSnapshotAsSeen(snapshot_id, idInfo["email"])
     return {

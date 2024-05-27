@@ -109,40 +109,50 @@ def deleteCommit(commit_id):
             )
             print("delete location")
             conn.execute(stmt)
-            stmt = delete(models.CommitDocumentSnapshotRelation).where(
-                    models.CommitDocumentSnapshotRelation.commit_id == commit_id
-            )
-            conn.execute(stmt)
-            print("relation")
+            threads = []
             stmt = select(models.Document).where(
                     models.Document.og_commit_id == commit_id)
             docs = conn.execute(stmt)
             for doc in docs:
-                purgeDocumentUtil(doc.doc_id)
-            print("docdead")
+                thread = threading.Thread(target=purgeDocumentUtil, kwargs={'doc_id':doc.doc_id})
+                thread.start()
+                threads.append(thread)
+            for thread in threads:
+                thread.join()
+            threads = []
+            stmt = select(models.Snapshot).where(
+                    models.Snapshot.og_commit_id == commit_id)
+            snaps = conn.execute(stmt)
+            for snap in snaps:
+                print("start snapdelete in commit", snap.snapshot_id)
+                thread = threading.Thread(target=deleteSnapshotUtil, kwargs={'snapshot_id':snap.snapshot_id})
+                thread.start()
+                threads.append(thread)
+                #deleteSnapshotUtil(snap.snapshot_id)
+                #purgeDocumentUtil(doc.doc_id)
+            for thread in threads:
+                thread.join()
+            stmt = delete(models.CommitDocumentSnapshotRelation).where(
+                    models.CommitDocumentSnapshotRelation.commit_id == commit_id
+            )
+            conn.execute(stmt)
+            
+            print("relation")
             stmt = select(models.Folder).where(
                     models.Folder.og_commit_id == commit_id)
             folds = conn.execute(stmt)
             for fold in folds:
                 purgeFolderUtil(fold.folder_id)
             print("folderdead")
-            conn.commit()
-            stmt = select(models.Snapshot).where(
-                    models.Snapshot.og_commit_id == commit_id)
-            snaps = conn.execute(stmt)
-
-            for snap in snaps:
-                print("start snapdelete in commit", snap.snapshot_id)
-                deleteSnapshotUtil(snap.snapshot_id)
             stmt = delete(models.Commit).where(
                     models.Commit.commit_id == commit_id
             )
-            conn.execute(stmt)
+            snaps = conn.execute(stmt)
 
             conn.commit()
         return True, None
     except Exception as e:
-        print(e)
+        print("commit", e)
         return False, e
 
 def setCommitOpen(commit_id):

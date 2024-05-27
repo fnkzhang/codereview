@@ -22,7 +22,7 @@ def getBlob(blobName):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
-    return blob.download_as_text()
+    return blob.download_as_bytes()
 
 def deleteBlob(blobName):
     storage_client = storage.Client()

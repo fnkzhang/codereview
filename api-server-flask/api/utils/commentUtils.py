@@ -10,7 +10,7 @@ def getCommentInfo(comment_id):
         comment = conn.execute(stmt).first()
         return comment._asdict()
     
-def createNewComment(proj_id, snapshot_id, author_email, reply_to_id, content, highlight_start_x, highlight_start_y, highlight_end_x, highlight_end_y, is_resolved):
+def createNewComment(snapshot_id, author_email, reply_to_id, content, highlight_start_x, highlight_start_y, highlight_end_x, highlight_end_y, is_resolved):
     comment_id = createID()
     with Session() as session:
         session.add(models.Comment(
@@ -23,8 +23,7 @@ def createNewComment(proj_id, snapshot_id, author_email, reply_to_id, content, h
             highlight_start_y = highlight_start_y,
             highlight_end_x = highlight_end_x,
             highlight_end_y = highlight_end_y,
-            is_resolved = is_resolved,
-            proj_id = proj_id
+            is_resolved = is_resolved
         ))
         session.commit()
     proj_id = getCommentProject(comment_id)

@@ -13,7 +13,6 @@ class Comment(Base):
     author_email = Column(String(50), nullable=False)
     comment_id = Column(Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 31)) # https://stackoverflow.com/questions/38754816/sqlalchemy-random-unique-integer
     snapshot_id = Column(Integer, nullable=False)
-    doc_id = Column(Integer)
     content = Column(Text, nullable=False)
     reply_to_id = Column(Integer, nullable=False)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
@@ -63,7 +62,6 @@ class Snapshot(Base):
     og_commit_id = Column(Integer)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), server_default=func.now())
-    proj_id = Column(Integer)
 
 class Document(Base):
     __tablename__ = "documents"
@@ -82,7 +80,6 @@ class ItemCommitLocation(Base):
     name = Column(String(50))
     #true if folder, false if document
     is_folder = Column(Boolean, primary_key=True)
-    proj_id = Column(Integer)
 
 class Folder(Base):
     __tablename__ = "folders"
@@ -111,19 +108,13 @@ class CommitDocumentSnapshotRelation(Base):
     doc_id = Column(Integer, primary_key=True)
     commit_id = Column(Integer, primary_key=True)
     snapshot_id = Column(Integer)
-    proj_id = Column(Integer)
 
 class UserUnseenSnapshot(Base):
     __tablename__ = "userunseensnapshot"
     snapshot_id = Column(Integer, primary_key=True)
     user_email = Column(String(50), nullable=False)
-    doc_id = Column(Integer)
-    proj_id = Column(Integer)
 
 class UserUnseenComment(Base):
     __tablename__ = "userunseencomment"
     comment_id = Column(Integer, primary_key=True)
-    doc_id = Column(Integer)
-    snapshot_id = Column(Integer)
     user_email = Column(String(50), nullable=False)
-    proj_id = Column(Integer)

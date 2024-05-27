@@ -63,8 +63,14 @@ def deleteDocumentFromCommit(doc_id, commit_id):
             conn.execute(stmt)
             stmt = select(models.Snapshot).where(models.Snapshot.og_commit_id == commit_id, models.Snapshot.associated_document_id == doc_id)
             snaps = conn.execute(stmt)
+            snapThreads = []
             for snap in snaps:
-                deleteSnapshotUtil(snap.snapshot_id)
+                thread = threading.Thread(target=deleteSnapshotUtil, kwargs={'snapshot_id':snap.snapshot_id})
+                thread.start()
+                snapThreads.append(thread)
+                #deleteSnapshotUtil(snap.snapshot_id)
+            for thread in snapThreads:
+                thread.join()
             conn.commit()
         return True, None
     except Exception as e:
@@ -77,13 +83,20 @@ def purgeDocumentUtil(doc_id):
             print("start doc delete", doc_id)
             stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
             snapshots = conn.execute(stmt)
+            snapThreads = []
+
             for snapshot in snapshots:
                 print("start delete snap in doc", snapshot.snapshot_id)
-                deleteSnapshotUtil(snapshot.snapshot_id)
+                thread = threading.Thread(target=deleteSnapshotUtil, kwargs={'snapshot_id':snapshot.snapshot_id})
+                thread.start()
+                snapThreads.append(thread)
+                #deleteSnapshotUtil(snapshot.snapshot_id)
             stmt = delete(models.Document).where(models.Document.doc_id == doc_id)
             conn.execute(stmt)
             conn.commit()
             print("finidhdoc delete", doc_id)
+            for thread in snapThreads:
+                thread.join()
         return True, "No Error"
     except Exception as e:
         print(e)
@@ -117,18 +130,18 @@ def getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working_comm
     return foundSnapshots
     
 def getDocumentLastSnapshot(doc_id):
-    #try:
-    snapshot = getAllDocumentCommittedSnapshotsInOrder(doc_id)[-1]
-    return snapshot
-    #except Exception as e:
-    #    print(e)
-    #    return None
+    try:
+        snapshot = getAllDocumentCommittedSnapshotsInOrder(doc_id)[-1]
+        return snapshot
+    except Exception as e:
+        print(e)
+        return None
     
 def getDocumentLastCommittedSnapshotContent(doc_id):
     snapshot = getDocumentLastSnapshot(doc_id)
     print(snapshot["snapshot_id"])
     if snapshot == None:
         return None
-    snapshotContents = getBlob(getSnapshotPath(snapshot["snapshot_id"]))
+    snapshotContents = getBlob(str(snapshot["snapshot_id"]))
     return snapshotContents
 
