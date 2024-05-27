@@ -67,6 +67,8 @@ def addUser(proj_id):
         return {"success": False, "reason":"Cannot add another Owner", "body":{}}
     if (permissions < 0):
         return {"success": False, "reason":"Invalid Permission Level", "body":{}}
+    if inputBody["email"] == idInfo["email"]:
+        return return {"success": False, "reason":"Can't give yourself perms", "body":{}}
     return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A", "body": {}}
 
 #needs sections in body
