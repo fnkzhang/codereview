@@ -5,7 +5,6 @@ import models
 
 
 def getCommitDocumentSnapshot(doc_id, commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.commit_id == commit_id, models.CommitDocumentSnapshotRelation.doc_id == doc_id)
@@ -17,7 +16,6 @@ def getCommitDocumentSnapshot(doc_id, commit_id):
         return relation.snapshot_id
 
 def createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
@@ -38,7 +36,6 @@ def createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id):
     return True
 
 def getAllCommitDocumentSnapshotRelation(commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.commit_id == commit_id)

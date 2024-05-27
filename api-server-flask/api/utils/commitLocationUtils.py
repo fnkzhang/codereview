@@ -4,7 +4,6 @@ from utils.miscUtils import *
 import models
 
 def getItemCommitLocation(item_id, commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.commit_id == commit_id, models.ItemCommitLocation.item_id == item_id)
@@ -15,7 +14,6 @@ def getItemCommitLocation(item_id, commit_id):
         return relation._asdict()
 
 def createItemCommitLocation(item_id, commit_id, name, parent_folder, is_folder):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         if getItemCommitLocation(item_id, commit_id) == None:
@@ -38,7 +36,6 @@ def createItemCommitLocation(item_id, commit_id, name, parent_folder, is_folder)
     return True
 
 def renameItem(item_id, item_name, commit_id):
-    engine = connectCloudSql()
 
     try:
         with engine.connect() as conn:
@@ -54,7 +51,6 @@ def renameItem(item_id, item_name, commit_id):
         return False, e
 
 def moveItem(item_id, parent_folder, commit_id):
-    engine = connectCloudSql()
 
     try:
         with engine.connect() as conn:

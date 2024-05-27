@@ -5,7 +5,6 @@ from utils.seenUtils import *
 import models
 
 def getCommentInfo(comment_id):
-    engine = connectCloudSql()
     with engine.connect() as conn:
         stmt = select(models.Comment).where(models.Comment.comment_id == comment_id)
         comment = conn.execute(stmt).first()
@@ -33,7 +32,7 @@ def createNewComment(snapshot_id, author_email, reply_to_id, content, highlight_
 
 def getCommentProject(comment_id):
     snapshot_id = getCommentInfo(comment_id)["snapshot_id"]
-    engine = connectCloudSql()
+
 
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
@@ -46,7 +45,7 @@ def getCommentProject(comment_id):
     return proj_id
 
 def resolveCommentHelperFunction(comment_id):
-    engine = connectCloudSql()
+ 
 
     with engine.connect() as conn:
         stmt = (update(models.Comment)

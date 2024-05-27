@@ -8,7 +8,7 @@ from utils.miscUtils import *
 import models
 
 def getFolderInfo(folder_id, commit_id):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.Folder).where(models.Folder.folder_id == folder_id)
@@ -22,7 +22,7 @@ def getFolderInfo(folder_id, commit_id):
         return foundFolder
 
 def getFolderInfoViaLocation(name, parent_folder, commit_id):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.name == name, models.ItemCommitLocation.parent_folder == parent_folder, models.ItemCommitLocation.is_folder == True)
@@ -42,7 +42,7 @@ def getFolderPath(folder_id, commit_id):
         return getFolderPath(folder["parent_folder"], commit_id) + folder["name"] + '/'
 
 def createNewFolder(folder_name, parent_folder, proj_id, commit_id):
-    engine = connectCloudSql()
+    
 
     folder_id = createID()
     with engine.connect() as conn:
@@ -57,14 +57,12 @@ def createNewFolder(folder_name, parent_folder, proj_id, commit_id):
     return folder_id
 
 def deleteFolderFromCommit(folder_id, commit_id):
-    engine = connectCloudSql()
-
     try:
         contents = getAllFolderContents(folder_id, commit_id)
         for doc in contents["documents"]:
             deleteDocumentFromCommit(doc["doc_id"], commit_id)
         for folder in contents["folders"]:
-            deleteFolderFromCommit(doc["folder_id"], commit_id)
+            deleteFolderFromCommit(folder["folder_id"], commit_id)
 
         with engine.connect() as conn:
             stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == folder_id, models.ItemCommitLocation.commit_id == commit_id)
@@ -76,7 +74,7 @@ def deleteFolderFromCommit(folder_id, commit_id):
 
 #only use when deleting project
 def purgeFolderUtil(folder_id):
-    engine = connectCloudSql()
+    
 
     try:
         with engine.connect() as conn:
@@ -90,8 +88,6 @@ def purgeFolderUtil(folder_id):
         return False, e
 
 def getAllFolderContents(folder_id, commit_id):
-    engine = connectCloudSql()
-
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.parent_folder == folder_id, models.ItemCommitLocation.commit_id == commit_id)
         foundItems = conn.execute(stmt)

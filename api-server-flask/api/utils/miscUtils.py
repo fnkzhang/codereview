@@ -17,6 +17,7 @@ CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleuserconten
 def authenticate():
     headers = request.headers
     if (not isValidRequest(headers, ["Authorization"])):
+        print("what")
         return None
     try:
         idInfo = id_token.verify_oauth2_token(

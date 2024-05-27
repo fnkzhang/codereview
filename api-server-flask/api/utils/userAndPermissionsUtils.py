@@ -2,7 +2,7 @@ from cloudSql import *
 import models
 
 def getUserInfo(user_email):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)
@@ -15,7 +15,7 @@ def getUserInfo(user_email):
 
 #probably useless function now that userInfo exists but i don't remember wwhat uses it so it sits here
 def userExists(user_email):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)
@@ -23,7 +23,7 @@ def userExists(user_email):
         return result.first() != None
 
 def createNewUser(user_email, name):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = insert(models.User).values(
@@ -35,7 +35,7 @@ def createNewUser(user_email, name):
     return True
 
 def deleteUser(user_email, proj_id):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         relationstmt = delete(models.UserProjectRelation).where(
@@ -48,7 +48,7 @@ def deleteUser(user_email, proj_id):
     return True
 
 def getUserProjPermissions(user_email, proj_id):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email, models.UserProjectRelation.proj_id == proj_id)
@@ -61,7 +61,7 @@ def getUserProjPermissions(user_email, proj_id):
 
 # Find all project relationship models for user email
 def getAllUserProjPermissionsForUser(user_email):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email)
@@ -75,7 +75,7 @@ def getAllUserProjPermissionsForUser(user_email):
         return returnList
 # Find all project relationship models for project
 def getAllUserProjPermissionsForProject(proj_id):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
@@ -90,7 +90,7 @@ def getAllUserProjPermissionsForProject(proj_id):
 
 
 def setUserProjPermissions(email, proj_id, r, perms):
-    engine = connectCloudSql()
+    
 
     try:
         with engine.connect() as conn:
@@ -118,7 +118,7 @@ def setUserProjPermissions(email, proj_id, r, perms):
         return False
 
 def changeProjectOwner(email, proj_id):
-    engine = connectCloudSql()
+    
 
     try:
         with engine.connect() as conn:
@@ -139,7 +139,7 @@ def changeProjectOwner(email, proj_id):
         return False
     
 def setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)
@@ -159,7 +159,7 @@ def setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email):
         return True
 
 def setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)

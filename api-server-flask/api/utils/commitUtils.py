@@ -11,7 +11,6 @@ import models
 from reviewStateEnums import reviewStateEnum
 
 def getCommitInfo(commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(models.Commit).where(models.Commit.commit_id == commit_id)
@@ -22,7 +21,6 @@ def getCommitInfo(commit_id):
 
 def createNewCommit(proj_id, email, last_commit):
     print("COMMIT_CREATED!!!", last_commit)
-    engine = connectCloudSql()
 
     commit_id = createID()
     if last_commit != None:
@@ -53,7 +51,6 @@ def createNewCommit(proj_id, email, last_commit):
     return commit_id
 
 def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
@@ -79,7 +76,6 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
     return True
 
 def commitACommit(commit_id, name):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         getCommit = select(models.Commit).where(
@@ -109,7 +105,6 @@ def commitACommit(commit_id, name):
     return True
 
 def deleteCommit(commit_id):
-    engine = connectCloudSql()
 
     try:
         with engine.connect() as conn:
@@ -166,7 +161,6 @@ def deleteCommit(commit_id):
         return False, e
 
 def setCommitOpen(commit_id):
-    engine = connectCloudSql()
 
     try:
 
@@ -184,7 +178,6 @@ def setCommitOpen(commit_id):
         return False
 
 def setCommitClosed(commit_id):
-    engine = connectCloudSql()
 
     try:
 
@@ -202,7 +195,6 @@ def setCommitClosed(commit_id):
         return False
 
 def setCommitReviewed(commit_id):
-    engine = connectCloudSql()
 
     try:
 
@@ -220,7 +212,6 @@ def setCommitReviewed(commit_id):
         return False
 
 def setCommitApproved(commit_id):
-    engine = connectCloudSql()
 
     try:
         with engine.connect() as conn:
@@ -254,7 +245,6 @@ def setCommitApproved(commit_id):
 #         return False
 
 def removeItemFromCommit(item_id, commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = delete(models.ItemCommitLocation).where(
@@ -346,7 +336,6 @@ def getAllCommitItemsOfType(commit_id, is_folder):
     return rv
 
 def getAllCommitItems(commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(
@@ -359,7 +348,6 @@ def getAllCommitItems(commit_id):
         return itemArray
 
 def getAllCommitItemIds(commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(
@@ -374,18 +362,20 @@ def getAllCommitItemIds(commit_id):
 def getCommitTree(commit_id):
     root_folder = getCommitInfo(commit_id)["root_folder"]
     return getFolderTree(root_folder, commit_id)
+import time
 
 def getCommitTreeWithAddons(commit_id, email):
+    start = time.time()
     tree = getCommitTree(commit_id)
-    print("tree")
+    treetime = time.time()
     docsnap = getAllCommitDocumentSnapshotRelation(commit_id)
-    print("docsnap")
+    dstime = time.time()
     addToTree(tree, docsnap, email)
-    print("add")
+    combine = time.time()
+    print("tree:", treetime-start, " dstime:", dstime-treetime, " combine:", combine-dstime)
     return tree
 
 def addToTree(tree, docsnap, email):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         for item in tree["content"]["folders"]:

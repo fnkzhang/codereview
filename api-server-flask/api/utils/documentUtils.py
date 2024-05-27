@@ -10,7 +10,6 @@ from utils.miscUtils import *
 import models
 
 def getDocumentInfo(doc_id, commit_id):
-    engine = connectCloudSql()
 
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
@@ -24,7 +23,7 @@ def getDocumentInfo(doc_id, commit_id):
         return foundDocument
 
 def getDocumentProject(doc_id):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.doc_id == doc_id)
@@ -34,7 +33,7 @@ def getDocumentProject(doc_id):
         return foundDocument._asdict()["associated_proj_id"]
 
 def getDocumentInfoViaLocation(name, parent_folder, commit_id):
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.name == name, models.ItemCommitLocation.parent_folder == parent_folder, models.ItemCommitLocation.is_folder == False)
@@ -47,7 +46,7 @@ def getDocumentInfoViaLocation(name, parent_folder, commit_id):
 
 def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, user_email):
     doc_id = createID()
-    engine = connectCloudSql()
+    
 
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
@@ -63,7 +62,7 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, us
     return doc_id
 
 def deleteDocumentFromCommit(doc_id, commit_id):
-    engine = connectCloudSql()
+    
 
     try:
         with engine.connect() as conn:
@@ -88,7 +87,7 @@ def deleteDocumentFromCommit(doc_id, commit_id):
 
 #only for project deletion
 def purgeDocumentUtil(doc_id):
-    engine = connectCloudSql()
+    
 
     try:
         with engine.connect() as conn:
@@ -116,7 +115,7 @@ def purgeDocumentUtil(doc_id):
 
 # Returns Array of Dictionaries
 def getAllDocumentCommittedSnapshotsInOrder(doc_id):
-    engine = connectCloudSql()
+    
 
     proj_id = getDocumentProject(doc_id)
     with engine.connect() as conn:
