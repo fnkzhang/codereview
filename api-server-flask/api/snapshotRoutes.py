@@ -34,6 +34,10 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     blob = fetchFromCloudStorage(str(snapshot_id))
     print(blob)
     setSnapshotAsSeen(snapshot_id, idInfo["email"])
+    try:
+        blob = blob.decode()
+    except:
+        blob = None
     return {
         "success": True,
         "reason": "",
@@ -61,6 +65,8 @@ def createSnapshot(proj_id, doc_id, commit_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    if inputBody.get("data") == None:
+        return {"success": False, "reason":"no data", "body":{}}
     working = getUserWorkingCommitInProject(proj_id, idInfo["email"])
     if working == None:
         work_id = createNewCommit(proj_id, idInfo["email"], commit_id)
