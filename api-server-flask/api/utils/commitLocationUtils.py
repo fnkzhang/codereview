@@ -41,7 +41,7 @@ def rebuildPathToPrevCommit(item_id, commit_id, last_commit):
         last_item = getItemCommitLocation(item_id, last_commit)
         if last_item == None:
             return False
-        thread = threading.Thread(target=createItemCommitLocation, kwargs={'item_id':item_id, "commit_id":commit_id, "name":last_item["name"], "parent_folder":last_item["parent_folder"], last_item["is_folder"]})
+        thread = threading.Thread(target=createItemCommitLocation, kwargs={'item_id':item_id, "commit_id":commit_id, "name":last_item["name"], "parent_folder":last_item["parent_folder"], "is_folder":last_item["is_folder"]})
         thread.start()
         threads.append(thread)
         #createItemCommitLocation(item_id, commit_id, last_item["name"], last_item["parent_folder"], last_item["is_folder"]
