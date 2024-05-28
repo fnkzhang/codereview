@@ -4,6 +4,7 @@ app = get_app(__name__)
 from flask import request, jsonify
 
 from cloudSql import *
+from utils.projectUtils import *
 from utils.snapshotUtils import *
 from utils.commentUtils import *
 from utils.miscUtils import *
@@ -60,8 +61,14 @@ def createSnapshot(proj_id, doc_id, commit_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"], commit_id, idInfo["email"])
+    working = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+    if working == None:
+        work_id = createNewCommit(proj_id, idInfo["email"], commit_id)
+    else:
+        work_id = working["commit_id"]
+        rebuildPathToPrevCommit(doc_id, work_id, commit_id)
+        
+    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"], work_id, idInfo["email"])
     return {
         "success": True,
         "reason": "",
