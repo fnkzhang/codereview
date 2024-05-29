@@ -17,6 +17,26 @@ import models
 
 @app.route('/api/Commit/<commit_id>/info/', methods = ["GET"])
 def getCommitInformation(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -47,6 +67,26 @@ def getCommitInformation(commit_id):
 #gets a dict with the keys of documents mapping to their snapshot in the commit
 @app.route('/api/Commit/<commit_id>/', methods = ["GET"])
 def getCommitDocumentSnapshotPairs(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -78,6 +118,26 @@ def getCommitDocumentSnapshotPairs(commit_id):
 #will fail if user already has a working non-committed commit
 @app.route('/api/Commit/<proj_id>/createCommit/', methods = ["POST"])
 def createCommit(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -117,6 +177,26 @@ def createCommit(proj_id):
 #checks if there are commits newer than the user's current working commit
 @app.route('/api/Commit/<proj_id>/checkIfNewer/', methods = ["GET"])
 def checkIfNewerCommitExists(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -142,6 +222,26 @@ def checkIfNewerCommitExists(proj_id):
 
 @app.route('/api/Commit/<commit_id1>/<commit_id2>/getDiff', methods = ["GET"])
 def getCommitDifferences(commit_id1, commit_id2):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -167,6 +267,26 @@ def getCommitDifferences(commit_id1, commit_id2):
 #will also compare commit_id2 snapshots to commit_id1's last commit and remove those
 @app.route('/api/Commit/<commit_id1>/<commit_id2>/getDiff', methods = ["GET"])
 def getCommitDiffCareAboutLast(commit_id1, commit_id2):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -200,6 +320,26 @@ def getCommitDiffCareAboutLast(commit_id1, commit_id2):
 #send empty dict/list if there are no updates/creations/deletions
 @app.route('/api/Commit/<dst_commit_id>/<src_commit_id>/bulkAdd/', methods = ["POST"])
 def bulkAddToCommit(dst_commit_id, src_commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -231,6 +371,26 @@ def bulkAddToCommit(dst_commit_id, src_commit_id):
 #put ids of things to delete in "items"
 @app.route('/api/Commit/<commit_id>/bulkDelete/', methods = ["DELETE"])
 def bulkDeleteFromCommit(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -263,6 +423,26 @@ def bulkDeleteFromCommit(commit_id):
 #in body: requires commit name in "name"
 @app.route('/api/Commit/<commit_id>/commitCommit/', methods = ["POST"])
 def commitCommit(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -297,6 +477,26 @@ def commitCommit(commit_id):
 
 @app.route('/api/Commit/<commit_id>/setReviewed/', methods=["GET"])
 def setReviewedCommit(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -329,6 +529,26 @@ def setReviewedCommit(commit_id):
 
 @app.route('/api/Commit/<commit_id>/close/', methods=["GET"])
 def closeCommit(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -360,6 +580,26 @@ def closeCommit(commit_id):
 
 @app.route('/api/Commit/<commit_id>/approve/', methods=["GET"])
 def approveCommit(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -401,6 +641,26 @@ def approveCommit(commit_id):
 #probably used if someone is halfway through a commit and wants to kill it
 @app.route('/api/Commit/<proj_id>/workingCommit/', methods=["DELETE"])
 def deleteWorkingCommit(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -438,6 +698,26 @@ def deleteWorkingCommit(proj_id):
 
 @app.route('/api/Commit/<commit_id>/getFolderTree/',methods=["GET"])
 def getCommitFolderTree(commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -464,6 +744,26 @@ def getCommitFolderTree(commit_id):
 
 @app.route('/api/Commit/<proj_id>/workingCommit', methods = ["GET"])
 def getUserWorkingCommitForProject(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -497,6 +797,26 @@ def getUserWorkingCommitForProject(proj_id):
 
 @app.route('/api/Commit/<proj_id>/getLatestComments/', methods=["GET"])
 def getAllLatestCommitComments(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
 
     if not isValidRequest(headers, ["Authorization"]):

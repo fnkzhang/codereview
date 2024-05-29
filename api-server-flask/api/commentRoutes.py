@@ -15,16 +15,16 @@ import models
 @app.route('/api/Snapshot/<snapshot_id>/comment/create', methods=["POST"])
 def createComment(snapshot_id):
     """
-    POST /api/Snapshot/<snapshot_id>/comment/create
+    ``POST /api/Snapshot/<snapshot_id>/comment/create``
 
-    Explanation:
+    **Explanation:**
         Creates a top-level comment on the given snapshot
 
-    Args:
+    **Args:**
         - snapshot_id (str): The ID of the snapshot.
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the comment creation was successful.
             - reason (str): Description of the result of the comment creation.
             - body (dict): Information about the created comment, including its ID, snapshot ID, author email, reply-to ID, content, highlight start and end coordinates, and resolution status.
@@ -77,16 +77,16 @@ def createComment(snapshot_id):
 @app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
 def resolveComment(comment_id):
     """
-    PUT /api/comment/<comment_id>/resolve
+    ``PUT /api/comment/<comment_id>/resolve``
 
-    Explanation:
+    **Explanation:**
         Resolves a given comment
 
-    Args:
+    **Args:**
         - comment_id (str): The ID of the comment to resolve.
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the resolution operation was successful.
             - reason (str): Description of the result of the resolution operation.
 
@@ -118,18 +118,18 @@ def resolveComment(comment_id):
 @app.route('/api/comments/<comment_id>/edit', methods=["PUT"])
 def editComment(comment_id):
     """
-    PUT /api/comments/<comment_id>/edit
+    ``PUT /api/comments/<comment_id>/edit``
 
-    Explanation:
+    **Explanation:**
         Edits a comment
 
-    Args:
+    **Args:**
         - comment_id (str): The ID of the comment to edit.
-        - body
+        - request.body (dict):
             - content (str): new contents of comment
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the edit operation was successful.
             - reason (str): Description of the result of the edit operation.
 
@@ -185,16 +185,16 @@ def editComment(comment_id):
 @app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])
 def deleteComment(comment_id):
     """
-    DELETE /api/comments/<comment_id>/delete
+    ``DELETE /api/comments/<comment_id>/delete``
 
-    Explanation:
+    **Explanation:**
         Deletes a comment
 
-    Args:
+    **Args:**
         - comment_id (str): The ID of the comment to delete.
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the delete operation was successful.
             - reason (str): Description of the result of the delete operation.
 

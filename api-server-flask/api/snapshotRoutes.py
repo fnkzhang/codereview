@@ -13,6 +13,26 @@ import models
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
 def getSnapshot(proj_id, doc_id, snapshot_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     print("GETTING SNAPSHOT", proj_id, doc_id, snapshot_id)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -42,6 +62,26 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 # Data Passed in body while project and document id passed in url
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<commit_id>/', methods=["POST"])
 def createSnapshot(proj_id, doc_id, commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     print("Creating Snapshot", proj_id, doc_id)
     inputBody = request.get_json()
     headers = request.headers
@@ -70,6 +110,26 @@ def createSnapshot(proj_id, doc_id, commit_id):
 
 @app.route('/api/Snapshot/<snapshot_id>/', methods=["DELETE"])
 def deleteSnapshot(snapshot_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -99,11 +159,28 @@ def deleteSnapshot(snapshot_id):
         "reason": "Successful Delete"
     }
 
-# look into pagination
-# https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
 def getCommentsOnSnapshot(snapshot_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
 
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):

@@ -14,6 +14,26 @@ import models
 
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
 def getProject(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -47,6 +67,26 @@ def getProject(proj_id):
 #put project name in body in "project_name"
 @app.route('/api/Project/createProject/', methods = ["POST"])
 def createProject():
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -72,6 +112,26 @@ def createProject():
 
 @app.route('/api/Project/<proj_id>/', methods=["DELETE"])
 def deleteProject(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     # Authentication
     headers = request.headers
     
@@ -105,6 +165,26 @@ def deleteProject(proj_id):
 #body: put new name in "proj_name"
 @app.route('/api/Project/<proj_id>/rename/', methods=["POST"])
 def renameProject(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -144,6 +224,26 @@ def renameProject(proj_id):
 
 @app.route('/api/Project/<proj_id>/GetCommits/', methods = ["GET"])
 def getProjectCommittedCommits(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -173,6 +273,26 @@ def getProjectCommittedCommits(proj_id):
 
 @app.route('/api/Project/<proj_id>/GetLatestCommit/', methods = ["GET"])
 def getProjectLatestCommit(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -206,6 +326,26 @@ def getProjectLatestCommit(proj_id):
 #discontinued for now
 @app.route('/api/Project/<proj_id>/GetDocuments/', methods = ["GET"])
 def getProjectDocuments(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {

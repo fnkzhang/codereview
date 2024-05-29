@@ -12,6 +12,26 @@ from utils.projectUtils import *
 # Array can contain -1 value indicating missing references
 @app.route('/api/User/Project/', methods = ["GET"])
 def getAllUserProjects():
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -46,6 +66,26 @@ def getAllUserProjects():
     #permissions (integer that represents perms)
 @app.route('/api/Project/<proj_id>/addUser/', methods=["POST"])
 def addUser(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -76,6 +116,26 @@ def addUser(proj_id):
     #email (user to make owner)
 @app.route('/api/Project/<proj_id>/transferOwnership/', methods=["POST"])
 def transferProjectOwnership(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -98,6 +158,26 @@ def transferProjectOwnership(proj_id):
 #copies all permissions from one project to this one
 @app.route('/api/Project/<old_proj_id>/<new_proj_id>/importPermissions/', methods = ["POST"])
 def importPermissions(old_proj_id, new_proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -133,12 +213,52 @@ def importPermissions(old_proj_id, new_proj_id):
     #permissions( integer that represents perms, so far anything greater than 0 is everything)
 @app.route('/api/Project/<proj_id>/addUserAdmin/', methods=["POST"])
 def addUserAdmin(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     inputBody = request.get_json()
     return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A", "body": {}}
 
 #have email in body in "email"
 @app.route('/api/Project/<proj_id>/removeUser/', methods=["DELETE"])
 def removeUser(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -172,6 +292,26 @@ def removeUser(proj_id):
 
 @app.route('/api/Project/<proj_id>/Users/', methods=["GET"])
 def getUsersWithAccessToProject(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
