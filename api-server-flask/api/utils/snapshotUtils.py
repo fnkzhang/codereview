@@ -89,8 +89,13 @@ def deleteSnapshotUtil(snapshot_id):
             stmt = delete(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
             conn.execute(stmt)
             print("snapdelete")
-            stmt = delete(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
-            conn.execute(stmt)
+            stmt = select(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
+            comms = conn.execute(stmt)
+            threads = []
+            for comm in comms:
+                thread = threading.Thread(target=purgeComment, kwargs={"comment_id":comment_id})
+                thread.start()
+                threads.append(thread)
             print("deletecomment")
             stmt = delete(models.CommitDocumentSnapshotRelation).where(
                 models.CommitDocumentSnapshotRelation.snapshot_id == snapshot_id
@@ -99,9 +104,10 @@ def deleteSnapshotUtil(snapshot_id):
             print("beforecommit")
             conn.commit()
             print("deleterelation")
-            proj_id = getSnapshotProject(snapshot_id)
-            setSnapAsSeenForAllProjUsers(snapshot_id, proj_id)
+            setSnapAsSeenForAllUsers(snapshot_id)
             print("seen")
+        for thread in threads:
+            thread.join()
         return True, "No Error"
     except Exception as e:
         print(e)

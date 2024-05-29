@@ -206,7 +206,14 @@ def getUsersWithAccessToProject(proj_id):
                 userSearchResult = conn.execute(getUserDataStmt).first()
 
                 # Add User Role To Return Data
-                returnDict = userSearchResult._asdict()
+                if userSearchResult == None:
+                    returnDict = {}
+                    returnDict["user_email"] == userEmail
+                    returnDict["name"] = "Unknown Name"
+                    returnDict["date_joined"] = None
+                    returnDict["github_token"] = None
+                else:
+                    returnDict = userSearchResult._asdict()
                 returnDict["userRole"] = userRole
                 returnDict["userPermissionLevel"] = userPermissionLevel
                 userDataList.append(returnDict)

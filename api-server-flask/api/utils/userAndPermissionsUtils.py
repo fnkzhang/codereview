@@ -1,5 +1,6 @@
 from cloudSql import *
 import models
+import threading
 
 def getUserInfo(user_email):
     
@@ -35,8 +36,6 @@ def createNewUser(user_email, name):
     return True
 
 def deleteUser(user_email, proj_id):
-    
-
     with engine.connect() as conn:
         relationstmt = delete(models.UserProjectRelation).where(
             models.UserProjectRelation.user_email == user_email).where(
@@ -48,8 +47,6 @@ def deleteUser(user_email, proj_id):
     return True
 
 def getUserProjPermissions(user_email, proj_id):
-    
-
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email, models.UserProjectRelation.proj_id == proj_id)
         result = conn.execute(stmt)
@@ -90,8 +87,6 @@ def getAllUserProjPermissionsForProject(proj_id):
 
 
 def setUserProjPermissions(email, proj_id, r, perms):
-    
-
     try:
         with engine.connect() as conn:
             if(getUserProjPermissions(email, proj_id)) < 0:
@@ -139,41 +134,154 @@ def changeProjectOwner(email, proj_id):
         return False
     
 def setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email):
-    
-
+    threads = []
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)
         docs = conn.execute(stmt)
         for doc in docs:
-            stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc.doc_id)
-            snaps = conn.execute(stmt)
-            for snap in snaps:
-                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snapshot_id)
-                coms = conn.execute(stmt)
-                for com in coms:
-                    stmt = insert(models.UserUnseenComment).values(comment_id = com.comment_id, user_email = user_email)
-                    conn.execute(stmt)
-                stmt = insert(models.UserUnseenSnapshot).values(snapshot_id = snap.snapshot_id, user_email = user_email)
-                conn.execute(stmt)
-            conn.commit()
+            thread = threading.Thread(target=setAllUnseenSnap, kwargs={"doc_id":doc.doc_id, "user_email":user_email})
+            thread.start()
+            threads.append(thread)
+    for thread in threads:
+        thread.join()
         return True
+
+def setAllUnseenSnap(doc_id, user_email):
+    threads = []
+    with engine.connect() as conn:
+        stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
+        snaps = conn.execute(stmt)
+        for snap in snaps:
+            thread = threading.Thread(target=setAllUnseenComm, kwargs= {"snapshot_id":snap.snapshot_id, "user_email":user_email})
+            thread.start()
+            threads.append(thread)
+            thread2 = threading.Thread(target=setSnapshotAsUnseen2, kwargs={"snapshot_id":snap.snapshot_id, "user_email":user_email})
+            thread2.start()
+            threads.append(thread2)
+    for thread in threads:
+        thread.join()
+    return True
+
+def setAllUnseenComm(snapshot_id, user_email):
+    threads = []
+    with engine.connect() as conn:
+        stmt = select(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
+        coms = conn.execute(stmt)
+        for com in coms:
+            thread = threading.Thread(target=setCommentAsUnseen2, kwargs={"comment_id":com.comment_id, "user_email":user_email})
+            thread.start()
+            threads.append(thread)
+    for thread in threads:
+        thread.join()
+    return True
 
 def setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email):
-    
-
+    threads = []
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)
         docs = conn.execute(stmt)
         for doc in docs:
-            stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc.doc_id)
-            snaps = conn.execute(stmt)
-            for snap in snaps:
-                stmt = select(models.Comment).where(models.Comment.snapshot_id == snap.snapshot_id)
-                coms = conn.execute(stmt)
-                for com in coms:
-                    stmt = delete(models.UserUnseenComment).where(models.UserUnseenComment.comment_id == com.comment_id, models.UserUnseenComment.user_email == user_email)
-                    conn.execute(stmt)
-                stmt = delete(models.UserUnseenSnapshot).where(models.UserUnseenSnapshot.snapshot_id == snap.snapshot_id, models.UserUnseenSnapshot.user_email == user_email)
-                conn.execute(stmt)
-            conn.commit()
-        return True
+            thread = threading.Thread(target=setAllSeenSnap, kwargs={"doc_id":doc.doc_id, "user_email":user_email})
+            thread.start()
+            threads.append(thread)
+    for thread in threads:
+        thread.join()
+    return True
+
+def setAllSeenSnap(doc_id, user_email):
+    threads = []
+    with engine.connect() as conn:
+        stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
+        snaps = conn.execute(stmt)
+        for snap in snaps:
+            thread = threading.Thread(target=setAllSeenComm, kwargs= {"snapshot_id":snap.snapshot_id, "user_email":user_email})
+            thread.start()
+            threads.append(thread)
+            thread2 = threading.Thread(target=setSnapshotAsSeen2, kwargs={"snapshot_id":snap.snapshot_id, "user_email":user_email})
+            thread2.start()
+            threads.append(thread2)
+    for thread in threads:
+        thread.join()
+    return True
+
+def setAllSeenComm(snapshot_id, user_email):
+    threads = []
+    with engine.connect() as conn:
+        stmt = select(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
+        coms = conn.execute(stmt)
+        for com in coms:
+            thread = threading.Thread(target=setCommentAsSeen2, kwargs={"comment_id":com.comment_id, "user_email":user_email})
+            thread.start()
+            threads.append(thread)
+    for thread in threads:
+        thread.join()
+    return True
+
+def isSnapshotSeenByUser2(snapshot_id, user_email):
+    with engine.connect() as conn:
+        stmt = select(models.UserUnseenSnapshot).where(
+                models.UserUnseenSnapshot.snapshot_id == snapshot_id,
+                models.UserUnseenSnapshot.user_email == user_email
+                )
+        seen = conn.execute(stmt).first()
+        if seen == None:
+            return True
+        else:
+            return False
+
+def setSnapshotAsUnseen2(snapshot_id, user_email):
+    if isSnapshotSeenByUser2(snapshot_id, user_email) == False:
+        return False
+    with engine.connect() as conn:
+        stmt = insert(models.UserUnseenSnapshot).values(
+                snapshot_id = snapshot_id,
+                user_email = user_email
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return True
+
+def setSnapshotAsSeen2(snapshot_id, user_email):
+    with engine.connect() as conn:
+        stmt = delete(models.UserUnseenSnapshot).where(
+                models.UserUnseenSnapshot.snapshot_id == snapshot_id,
+                models.UserUnseenSnapshot.user_email == user_email
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return True
+
+def isCommentSeenByUser2(comment_id, user_email):
+    with engine.connect() as conn:
+        stmt = select(models.UserUnseenComment).where(
+                models.UserUnseenComment.comment_id == comment_id,
+                models.UserUnseenComment.user_email == user_email
+                )
+        seen = conn.execute(stmt).first()
+        if seen == None:
+            return True
+        else:
+            return False
+
+def setCommentAsUnseen2(comment_id, user_email):
+    if isCommentSeenByUser2(comment_id, user_email) == True:
+        return False
+    with engine.connect() as conn:
+        stmt = insert(models.UserUnseenComment).values(
+                comment_id = comment_id,
+                user_email = user_email
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return True
+
+def setCommentAsSeen2(comment_id, user_email):
+    with engine.connect() as conn:
+        stmt = delete(models.UserUnseenComment).where(
+                models.UserUnseenComment.comment_id == comment_id,
+                models.UserUnseenComment.user_email == user_email
+        )
+        conn.execute(stmt)
+        conn.commit()
+    return True
+

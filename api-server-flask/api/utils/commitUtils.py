@@ -378,6 +378,8 @@ def getCommitTreeWithAddons(commit_id, email):
 
 def addToTree(tree, docsnap, email):
     threads = []
+    tree["seenSnapshot"] = True
+    tree["seenComments"] = True
     with engine.connect() as conn:
         for item in tree["content"]["folders"]:
             thread = threading.Thread(target=addToTree, kwargs={'tree':item, 'docsnap':docsnap, 'email':email})
@@ -385,17 +387,21 @@ def addToTree(tree, docsnap, email):
             threads.append(thread)
             #addToTree(item, docsnap, email)
         for item in tree["content"]["documents"]:
-            thread = threading.Thread(target=addSeenAndUnresolved, kwargs={'item':item, 'docsnap':docsnap, 'email':email})
+            thread = threading.Thread(target=addSeenAndUnresolved, kwargs={'item':item, 'docsnap':docsnap, 'email':email, 'tree':tree})
             thread.start()
             threads.append(thread)
     for thread in threads:
         thread.join()
     return True
 
-def addSeenAndUnresolved(item, docsnap, email):
+def addSeenAndUnresolved(item, docsnap, email, tree):
     with engine.connect() as conn:
-        item["seenSnapshot"] = isSnaphotSeenByUser(docsnap[item["doc_id"]], email)
+        item["seenSnapshot"] = isSnapshotSeenByUser(docsnap[item["doc_id"]], email)
         item["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[item["doc_id"]], email)
+        if item["seenSnapshot"] == False:
+            tree["seenSnapshot"] = False
+        if item["seenComments"] == False:
+            tree["seenComments"] = False
         stmt = select(models.Comment).where(
                 models.Comment.snapshot_id == docsnap[item["doc_id"]],
                 models.Comment.is_resolved == False

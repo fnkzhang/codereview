@@ -46,8 +46,6 @@ def getDocumentInfoViaLocation(name, parent_folder, commit_id):
 
 def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, user_email):
     doc_id = createID()
-    
-
     with engine.connect() as conn:
         stmt = insert(models.Document).values(
             doc_id = doc_id,
@@ -62,8 +60,6 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, us
     return doc_id
 
 def deleteDocumentFromCommit(doc_id, commit_id):
-    
-
     try:
         with engine.connect() as conn:
             stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
@@ -85,8 +81,6 @@ def deleteDocumentFromCommit(doc_id, commit_id):
 
 #only for project deletion
 def purgeDocumentUtil(doc_id):
-    
-
     try:
         with engine.connect() as conn:
             print("start doc delete", doc_id)

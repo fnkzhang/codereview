@@ -95,4 +95,11 @@ def filterCommentsByPredicate(predicate):
     
     return commentsList
 
+def purgeComment(comment_id):
+    with engine.connect() as conn:
+        stmt = delete(models.Comment).where(models.Comment.comment_id == comment_id)
+        conn.execute(stmt)
+        setCommentAsSeenForAllUsers(comment_id)
+    return True
+
 
