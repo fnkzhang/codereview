@@ -35,20 +35,20 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.changeDocumentSnapshot">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">changeDocumentSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.changeDocumentSnapshot" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/&lt;snapshot_id&gt;/changeTo/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/&lt;snapshot_id&gt;/changeTo/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>This endpoint changes the document identified by ‘doc_id’ and ‘commit_id’ to the snapshot identified by ‘snapshot_id’.
+<dt><strong>Explanation:</strong></dt><dd><p>This endpoint changes the document identified by ‘doc_id’ and ‘commit_id’ to the snapshot identified by ‘snapshot_id’.
 It requires authentication via an Authorization token header.
 Only users with sufficient permissions can change document snapshots.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>doc_id (str): The identifier of the document.</p></li>
 <li><p>commit_id (str): The identifier of the commit.</p></li>
 <li><p>snapshot_id (str): The identifier of the snapshot to change to.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
 <li><p>body (str): An empty string representing the body of the response.</p></li>
@@ -62,11 +62,11 @@ Only users with sufficient permissions can change document snapshots.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.createDocument">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">createDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.createDocument" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/Document/&lt;proj_id&gt;/&lt;commit_id&gt;/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;proj_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data.</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>proj_id (str): The project ID.</p></li>
 <li><p>commit_id (str): The commit ID.</p></li>
 <li><dl class="simple">
@@ -80,8 +80,8 @@ Only users with sufficient permissions can change document snapshots.</p>
 </li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the creation was successful.</p></li>
 <li><p>reason (str): Description of the result of the creation.</p></li>
 <li><p>body (str): ID of the created document.</p></li>
@@ -95,15 +95,15 @@ Only users with sufficient permissions can change document snapshots.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.deleteDocument">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.deleteDocument" title="Link to this definition">¶</a></dt>
-<dd><p>DELETE /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit</p>
 </dd>
-<dt>Args:</dt><dd><p>doc_id (str): The document ID.
+<dt><strong>Args:</strong></dt><dd><p>doc_id (str): The document ID.
 commit_id (str): The commit ID.</p>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the deletion was successful.</p></li>
 <li><p>reason (str): Description of the result of the deletion.</p></li>
 </ul>
@@ -116,16 +116,16 @@ commit_id (str): The commit ID.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.getAllCommentsForDocument">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllCommentsForDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllCommentsForDocument" title="Link to this definition">¶</a></dt>
-<dd><p>GET /api/Document/&lt;document_id&gt;/comments/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Document/&lt;document_id&gt;/comments/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Gets all comments on a document across all committed snapshots</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all comments on a document across all committed snapshots</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>document_id (str): The identifier of the document.</p></li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
 <li><dl class="simple">
@@ -143,28 +143,80 @@ commit_id (str): The commit ID.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.getAllDocumentCommittedSnapshots">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllDocumentCommittedSnapshots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllDocumentCommittedSnapshots" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>TODO: Documentation</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>route_params (&lt;param_type&gt;): description</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>body_params (&lt;param_type&gt;): description</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): description</p></li>
+<li><p>reason (str): description</p></li>
+<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.getAllDocumentCommittedSnapshotsIncludingWorking">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllDocumentCommittedSnapshotsIncludingWorking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllDocumentCommittedSnapshotsIncludingWorking" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>TODO: Documentation</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>route_params (&lt;param_type&gt;): description</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>body_params (&lt;param_type&gt;): description</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): description</p></li>
+<li><p>reason (str): description</p></li>
+<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.getDocument">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getDocument" title="Link to this definition">¶</a></dt>
-<dd><p>GET /api/Document/&lt;proj_id&gt;/&lt;doc_id&gt;/&lt;commit_id&gt;/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Document/&lt;proj_id&gt;/&lt;doc_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Gets the document information in the commit given</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the document information in the commit given</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>proj_id (str): The project ID.</p></li>
 <li><p>doc_id (str): The document ID.</p></li>
 <li><p>commit_id (str): The commit ID.</p></li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the retrieval was successful.</p></li>
 <li><p>reason (str): Description of the result of the retrieval.</p></li>
 <li><p>body (dict): Document information.</p></li>
@@ -178,11 +230,11 @@ commit_id (str): The commit ID.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.moveDocument">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">moveDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.moveDocument" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/move/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/move/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>moves a document</p>
+<dt><strong>Explanation:</strong></dt><dd><p>moves a document</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>doc_id (str): The document ID</p></li>
 <li><p>commit_id (str): The commit you’re doing action on blah blah you get the idea</p></li>
 <li><dl class="simple">
@@ -194,8 +246,8 @@ commit_id (str): The commit ID.</p>
 </li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
 <li><p>body (str): An empty string representing the body of the response.</p></li>
@@ -209,11 +261,11 @@ commit_id (str): The commit ID.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.renameDocument">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">renameDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.renameDocument" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/rename/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/rename/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>renames a document</p>
+<dt><strong>Explanation:</strong></dt><dd><p>renames a document</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>doc_id (str): The document ID</p></li>
 <li><p>commit_id (str): the commit you’re changing the name of</p></li>
 <li><dl class="simple">
@@ -225,8 +277,8 @@ commit_id (str): The commit ID.</p>
 </li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
 </ul>
