@@ -9,12 +9,14 @@ import { Tooltip } from "react-tooltip";
 import 'react-tooltip/dist/react-tooltip.css'
 import BackButton from "./BackButton";
 
+
 export default function MainWindow( props ) {
 
   const [comments, setComments] =  useState([])
   const [snapshots, setSnapshots] = useState([])
   const [hasUpdatedCode, setHasUpdatedCode] = useState(false)
   const [editorLanguage, setEditorLanguage] = useState("")
+
 
   const [dataToUpload, setDataToUpload] = useState(null) // Null until set to a string value
 
@@ -24,7 +26,6 @@ export default function MainWindow( props ) {
 
   const location = useLocation();
   const navigate = useNavigate();
-
   // Handle Setting Program Language that document uses
   useEffect(() => {
     if(!location.state.documentName)
@@ -35,6 +36,7 @@ export default function MainWindow( props ) {
 
     setEditorLanguage(extensionName)
   }, [location.state.documentName ])
+
 
   const handleCreateSnapshotClick = async () => {
     if (!dataToUpload) {
@@ -160,7 +162,8 @@ export default function MainWindow( props ) {
             setEditorReady={setEditorReady}
             setHasUpdatedCode={setHasUpdatedCode}
             setDataToUpload={setDataToUpload}
-            editorLanguage={editorLanguage}/>
+            editorLanguage={editorLanguage}
+            />
         </div>
       </section>
 
