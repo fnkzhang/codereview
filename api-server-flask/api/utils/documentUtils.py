@@ -68,8 +68,6 @@ def deleteDocumentFromCommit(doc_id, commit_id):
         with engine.connect() as conn:
             stmt = delete(models.ItemCommitLocation).where(models.ItemCommitLocation.item_id == doc_id, models.ItemCommitLocation.commit_id == commit_id)
             conn.execute(stmt)
-            stmt = delete(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.doc_id == doc_id, models.CommitDocumentSnapshotRelation.commit_id == commit_id)
-            conn.execute(stmt)
             stmt = select(models.Snapshot).where(models.Snapshot.og_commit_id == commit_id, models.Snapshot.associated_document_id == doc_id)
             snaps = conn.execute(stmt)
             snapThreads = []

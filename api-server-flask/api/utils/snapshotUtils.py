@@ -33,10 +33,10 @@ def createNewSnapshot(proj_id, doc_id, data, commit_id, user_email):
 
         uploadBlob(str(snapshot_id), data)
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
+        createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
         stmt = select(models.CommitDocumentSnapshotRelation).where(
                     models.CommitDocumentSnapshotRelation.snapshot_id == snap)
         result = conn.execute(stmt).first()
-        createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
 
         setSnapAsUnseenForAllProjUsersOtherThanMaker(snapshot_id, user_email, proj_id)
         if result == None and snap != None:
@@ -81,8 +81,6 @@ def getSnapshotContentUtil(snapshot_id):
     return blob
 
 def deleteSnapshotUtil(snapshot_id):
-    
-
     try:
         with engine.connect() as conn:
             print("start_delete snap", snapshot_id) 
