@@ -25,6 +25,7 @@ def authenticator():
 
     """
     idInfo = authenticate()
+    print(idInfo)
     if idInfo is not None:
         print("Successful authentication")
         # RETURN User Data back
@@ -58,14 +59,16 @@ def signUp():
     idInfo = authenticate()
     if idInfo is None:
         return {
-            "success":False,
+            "success": False,
             "reason": "Failed to Authenticate"
         }
 
     if userExists(idInfo["email"]) == False:
-        createNewUser(idInfo["email"], idInfo["name"])
+        test = createNewUser(idInfo["email"], idInfo["name"])
+        print(test)
+
     return {
-            "success":True,
+            "success": True,
             "reason": "N/A",
             "body": idInfo
     }
