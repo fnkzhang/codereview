@@ -605,11 +605,10 @@ export default function ProjectPage( props ) {
 
   function DisplayApproveChangesDecisionButton() {
     const ApproveCommitedChanges = async () => {
-      let isSuccess = await approveCommit(commit_id)
-      let isChangedState = await setCommitReviewed(commit_id);
+      let isApproved = await approveCommit(commit_id)
 
-      console.log(isSuccess, isChangedState);
-      if(isSuccess)
+      console.log(isApproved);
+      if(isApproved)
         navigate('/')
 
       
