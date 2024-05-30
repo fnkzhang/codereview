@@ -208,7 +208,7 @@ def getUsersWithAccessToProject(proj_id):
                 # Add User Role To Return Data
                 if userSearchResult == None:
                     returnDict = {}
-                    returnDict["user_email"] == userEmail
+                    returnDict["user_email"] = userEmail
                     returnDict["name"] = "Unknown Name"
                     returnDict["date_joined"] = None
                     returnDict["github_token"] = None
@@ -225,7 +225,6 @@ def getUsersWithAccessToProject(proj_id):
                 "reason": "",
                 "body": userDataList
             }
-
     except Exception as e:
             print("Error: ", e)
             return {

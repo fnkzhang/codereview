@@ -111,9 +111,9 @@ class CommitDocumentSnapshotRelation(Base):
 class UserUnseenSnapshot(Base):
     __tablename__ = "userunseensnapshot"
     snapshot_id = Column(Integer, primary_key=True)
-    user_email = Column(String(50), nullable=False)
+    user_email = Column(String(50), primary_key=True)
 
 class UserUnseenComment(Base):
     __tablename__ = "userunseencomment"
     comment_id = Column(Integer, primary_key=True)
-    user_email = Column(String(50), nullable=False)
+    user_email = Column(String(50), primary_key=True)
