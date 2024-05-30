@@ -64,8 +64,7 @@ def signUp():
         }
 
     if userExists(idInfo["email"]) == False:
-        test = createNewUser(idInfo["email"], idInfo["name"])
-        print(test)
+        createNewUser(idInfo["email"], idInfo["name"])
 
     return {
             "success": True,

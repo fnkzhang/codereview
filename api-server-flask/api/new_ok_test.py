@@ -10,7 +10,11 @@ def app():
     })
     yield app
 
-FAKE_ID_INFO = {
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+GOOGLE_FAKE_ID_INFO = {
     "aud": "CLIENT_ID",
     "azp": "CLIENT_ID",
     "email": "fake-email@fake-domain.com",
@@ -28,73 +32,60 @@ FAKE_ID_INFO = {
     "sub": "subject_identifier"
 }
 
-@pytest.fixture()
-def client(app):
-    with patch('utils.miscUtils.id_token.verify_oauth2_token', autospec=True) as mock_verify_oauth2_token:
-        mock_verify_oauth2_token.return_value = FAKE_ID_INFO
-        
-        yield app.test_client()
-
 """
 Unit Tests for authRoutes.py
 """
 
 def test_authenticator(client):
     
-    # Invalid Requests
     response = client.post("/api/user/authenticate")
+    assert response.status_code == 200
     assert response.json["success"] == False
 
-    # Valid Requests
-    response = client.post("/api/user/authenticate", headers={"Authorization": "oAuthToken"})
-    print(response.json["reason"])
-    assert response.json["success"] == True
+    with patch("authRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+        response = client.post("/api/user/authenticate")
+        assert response.status_code == 200
+        assert response.json["success"] == True
+        assert response.json["body"]["email"] == GOOGLE_FAKE_ID_INFO["email"]
 
 def test_signUp(client):
 
-    # Invalid requests
     response = client.post("/api/user/signup")
+    assert response.status_code == 200
     assert response.json["success"] == False
 
-    # Valid Requests
-    with patch('authRoutes.createNewUser', autospec=True) as mock_createNewUser:
-
-        mock_createNewUser.return_value = True
-        response = client.post("/api/user/signup", headers={"Authorization": "oAuthToken"})
-        assert response.json["success"] == True
-
-        with patch('authRoutes.userExists', autospec=True) as mock_userExists:
-            
-            mock_userExists.return_value = True
-            response = client.post("/api/user/signup", headers={"Authorization": "oAuthToken"})
+    with patch("authRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+        with patch("authRoutes.userExists", autospec=True, return_value=True):
+            response = client.post("/api/user/signup")
+            assert response.status_code == 200
             assert response.json["success"] == True
+            assert response.json["body"] == GOOGLE_FAKE_ID_INFO
 
-            mock_userExists.return_value = False
-            response = client.post("/api/user/signup", headers={"Authorization": "oAuthToken"})
-            assert response.json["success"] == True
+        with patch("authRoutes.userExists", autospec=True, return_value=False):
+            with patch("authRoutes.createNewUser", autospec=True, return_value=True):
+                response = client.post("/api/user/signup")
+                assert response.status_code == 200
+                assert response.json["success"] == True
+                assert response.json["body"] == GOOGLE_FAKE_ID_INFO
 
 def test_checkIsValidUser(client):
 
-    # Invalid Requests
-    with patch('authRoutes.userExists', autospec=True) as mock_UserExists:
+    response = client.post("/api/user/isValidUser", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-        mock_UserExists.return_value = False
+    response = client.post("/api/user/isValidUser", headers={"Email": "fake-email@fake-domain.com"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-        response = client.post("/api/user/isValidUser", headers={"Authorization": "oAuthToken"})
-        assert response.json["success"] == False
-
-        response = client.post("/api/user/isValidUser", headers={"Email": "fake-email@fake-domain.com"})
-        assert response.json["success"] == False
-
-    # Valid Requests
-    with patch('authRoutes.userExists', autospec=True) as mock_UserExists:
-
-        mock_UserExists.return_value = False
+    with patch("authRoutes.userExists", autospec=True, return_value=False):
         response = client.post("/api/user/isValidUser", headers={"Authorization": "oAuthToken", "Email": "fake-email@fake-domain.com"})
+        assert response.status_code == 200
         assert response.json["success"] == False
 
-        mock_UserExists.return_value = True
+    with patch("authRoutes.userExists", autospec=True, return_value=True):
         response = client.post("/api/user/isValidUser", headers={"Authorization": "oAuthToken", "Email": "fake-email@fake-domain.com"})
+        assert response.status_code == 200
         assert response.json["success"] == True
 
 """
@@ -103,11 +94,27 @@ Unit Tests for commentRoutes.py
 
 def test_createComment(client):
 
-    # Invalid Requests
+    response = client.post("/api/Snapshot/123/comment/create")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+        #response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
+        #assert response.status_code == 200
+        #assert response.json["success"] == False
+
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, json={})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, json={"author_email": "fake-email@fake-domain.com", "reply_to_id": 0, "content": "This is a comment"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+        assert response.json["reason"] == "Invalid Permissions"
 
 def test_resolveComment(client):
 

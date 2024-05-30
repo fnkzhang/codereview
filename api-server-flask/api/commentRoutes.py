@@ -22,6 +22,15 @@ def createComment(snapshot_id):
 
     **Args:**
         - snapshot_id (str): The ID of the snapshot.
+        - request.body (dict):
+            - author_email (str): The email of the author of the comment.
+            - reply_to_id (int): The ID of the comment being replied to. Defaults to 0 if not specified.
+            - content (str): The content of the comment.
+            - highlight_start_x (int): The x-coordinate of the start of the highlighted area.
+            - highlight_start_y (int): The y-coordinate of the start of the highlighted area.
+            - highlight_end_x (int): The x-coordinate of the end of the highlighted area.
+            - highlight_end_y (int): The y-coordinate of the end of the highlighted area.
+            - is_resolved (bool): Indicates whether the comment is resolved.
 
     **Returns:**
         A dictionary containing the following keys:
