@@ -255,7 +255,6 @@ export default function ProjectPage( props ) {
       const result = await getAllSnapshotsFromDocument(project_id, id)
 
       if (result.success) {
-        console.log(result)
         let latestSnapshot = result.body.find(snapshot => snapshot.commit.commit_id === Number(commit_id))
         if (latestSnapshot)
           latestSnapshot = latestSnapshot.snapshot.snapshot_id
