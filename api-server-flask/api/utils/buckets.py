@@ -14,7 +14,7 @@ def uploadBlob(blobName, item):
     bucket = storage_client.bucket('cr_storage')
     print("Uploading to", blobName)
     blob = bucket.blob(blobName)
-    blob.upload_from_string(data = item, content_type='application/json')
+    blob.upload_from_string(data = item)
 
     return True
 
@@ -22,14 +22,17 @@ def getBlob(blobName):
     storage_client = storage.Client()
     bucket = storage_client.bucket('cr_storage')
     blob = bucket.get_blob(blobName)
-    return blob.download_as_text()
+    return blob.download_as_bytes()
 
 def deleteBlob(blobName):
-    storage_client = storage.Client()
-    bucket = storage_client.bucket('cr_storage')
-    blob = bucket.get_blob(blobName)
-    if blob != None:
-        blob.delete()
+    try:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('cr_storage')
+        blob = bucket.get_blob(blobName)
+        if blob != None:
+            blob.delete()
+    except:
+        pass
     return True
 
 #location = basically the folder the files are located in

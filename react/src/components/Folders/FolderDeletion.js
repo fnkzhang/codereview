@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { deleteFolder, getFolderInfo } from "../../api/APIUtils";
-import BackButton from "../BackButton.js";
+import BackButton from "../Buttons/BackButton.js";
 
 export default function FolderDeletion(props) {
     const [FolderName, setFolderName] = useState("");

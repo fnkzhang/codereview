@@ -33,7 +33,7 @@ def getCommitInformation(commit_id):
     try:
         proj_id = getCommitInfo(commit_id)["proj_id"]
     except:
-        return {"success":False, "reason":"commit doesn't exist"}
+        return {"success": False, "reason":"commit doesn't exist"}
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     info = getCommitInfo(commit_id)
@@ -381,10 +381,10 @@ def approveCommit(commit_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     
-    couldCommit = setCommitApproved(commit_id)
-    print(couldCommit)
-    if(not couldCommit):
+    couldApproveCommit = setCommitApproved(commit_id)
+    print(couldApproveCommit)
 
+    if(not couldApproveCommit):
         return {
             "success": False,
             "reason": "Failed To Set Approved",

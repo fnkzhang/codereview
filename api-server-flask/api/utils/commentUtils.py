@@ -24,7 +24,6 @@ def createNewComment(snapshot_id, author_email, reply_to_id, content, highlight_
             highlight_end_x = highlight_end_x,
             highlight_end_y = highlight_end_y,
             is_resolved = is_resolved
-
         ))
         session.commit()
     proj_id = getCommentProject(comment_id)
@@ -33,6 +32,8 @@ def createNewComment(snapshot_id, author_email, reply_to_id, content, highlight_
 
 def getCommentProject(comment_id):
     snapshot_id = getCommentInfo(comment_id)["snapshot_id"]
+
+
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
         snapshot = conn.execute(stmt)
@@ -44,6 +45,8 @@ def getCommentProject(comment_id):
     return proj_id
 
 def resolveCommentHelperFunction(comment_id):
+ 
+
     with engine.connect() as conn:
         stmt = (update(models.Comment)
         .where(models.Comment.comment_id == comment_id)
@@ -91,5 +94,12 @@ def filterCommentsByPredicate(predicate):
             commentsList = None
     
     return commentsList
+
+def purgeComment(comment_id):
+    with engine.connect() as conn:
+        stmt = delete(models.Comment).where(models.Comment.comment_id == comment_id)
+        conn.execute(stmt)
+        setCommentAsSeenForAllUsers(comment_id)
+    return True
 
 

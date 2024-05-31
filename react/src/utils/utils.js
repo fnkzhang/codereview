@@ -40,7 +40,10 @@ export function getColor ( state ) {
         stateColor = 'text-reviewOpen'
     else if (state === REVIEW_STATE.REVIEWED)
         stateColor = 'text-reviewReviewed'
+    else if (state === REVIEW_STATE.APPROVED)
+        stateColor = 'text-reviewApproved'
     else
         stateColor = 'text-reviewClosed'
+
     return stateColor
 }

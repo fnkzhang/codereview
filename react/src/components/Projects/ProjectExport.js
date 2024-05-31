@@ -6,7 +6,7 @@ import CommitDropdown from "../Commits/CommitDropdown.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { pushToExistingBranch, getCommits } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
-import BackButton from "../BackButton.js";
+import BackButton from "../Buttons/BackButton";
 
 export default function ProjectExport( props ) {
 

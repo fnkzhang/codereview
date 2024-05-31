@@ -1044,7 +1044,32 @@ export async function getAllProjectActiveCommentsForLatestCommit(project_id) {
       return null
     }
 
-    console.log(data.body)
     return data.body
+  })
+}
+
+export async function getCommitData(commit_id) {
+  let oAuthToken = getCookie("cr_id_token")
+
+  let headers = {
+    method: "GET",
+    mode: "cors",
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
+      "Authorization": oAuthToken,
+      "Content-Type": "application/json"
+    }
+  };
+
+  return await fetch((`/api/Commit/${commit_id}/info/`), headers)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success === false){
+      console.log("FAILED" + data.reason)
+      return null
+    }
+
+    return data.info
   })
 }
