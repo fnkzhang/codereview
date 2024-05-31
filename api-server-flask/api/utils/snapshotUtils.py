@@ -93,7 +93,7 @@ def deleteSnapshotUtil(snapshot_id):
             comms = conn.execute(stmt)
             threads = []
             for comm in comms:
-                thread = threading.Thread(target=purgeComment, kwargs={"comment_id":comment_id})
+                thread = threading.Thread(target=purgeComment, kwargs={"comment_id":comm.comment_id})
                 thread.start()
                 threads.append(thread)
             print("deletecomment")
