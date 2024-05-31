@@ -1044,7 +1044,6 @@ export async function getAllProjectActiveCommentsForLatestCommit(project_id) {
       return null
     }
 
-    console.log(data.body)
     return data.body
   })
 }
