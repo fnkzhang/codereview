@@ -13,7 +13,7 @@ from utils.documentUtils import *
 from utils.snapshotUtils import *
 from utils.commentUtils import *
 import models
-
+import threading
 #checks whether authenticated user has github connected
 @app.route('/api/Github/userHasGithub/', methods = ["GET"])
 def getUserGithubStatus():
@@ -145,10 +145,13 @@ def getGithubRepositoryBranches():
             "reason": "",
             "body": rv
         }
+import time
 
 #format -> repository = "fnkzhang/codereview", branch = "main"
 @app.route('/api/Github/PullToNewProject/', methods=["POST"])
 def pullToNewProject():
+    start = time.time()
+
     """
     ``POST /api/Github/PullToNewProject/``
 
@@ -184,6 +187,7 @@ def pullToNewProject():
         #
     body = request.get_json()
     user = getUserInfo(idInfo["email"])
+    permstime = time.time()
     success, rv = getBranches(user["github_token"], body["repository"])
     if (not success):
         return {"success":False,
@@ -191,15 +195,20 @@ def pullToNewProject():
     if body["branch"] not in rv:
         return {"success":False,
                 "reason": "branch does not exist"}
+    branchtime = time.time()
     proj_id = createNewProject(body["project_name"], idInfo["email"])
+    projectcreation = time.time()
     commit_id = createNewCommit(proj_id, idInfo["email"], None)
+    commitcreation = time.time()
     g2 = Github(auth = Auth.Token(user["github_token"]))
     repo = g2.get_repo(body["repository"])
+    getrepo = time.time()
     commit = getCommitInfo(commit_id)
-    project = getProjectInfo(proj_id)
     pathToFolderID = {}
     pathToFolderID[""] = commit["root_folder"]
+    getpaths = time.time()
     contents = repo.get_contents("", body["branch"])
+    threads = []
     while contents:
         file_content = contents.pop(0)
         index = file_content.path.rfind('/')
@@ -213,10 +222,20 @@ def pullToNewProject():
             pathToFolderID[file_content.path] = folder_id
         else:
             try:
-                doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content.decode(), commit_id, idInfo["email"])
+                thread = threading.Thread(target=createNewDocument, kwargs = {'document_name':file_content.name, 'parent_folder':pathToFolderID[path], 'proj_id':proj_id, 'data': file_content.decoded_content, 'commit_id':commit_id, 'user_email':idInfo["email"]})
+                thread.start()
+                threads.append(thread)
+                #doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content, commit_id, idInfo["email"])
             except Exception as e:
                 pass
+    commitstart = time.time()
+    print(commitstart-getpaths)
     commitACommit(commit_id, "Pulled from branch " + body["branch"] + " of " + body["repository"])
+    commiting = time.time()
+    for thread in threads:
+        thread.join()
+    createdocs = time.time()
+    print("persm", permstime-start, "branch", branchtime-permstime,"projc", projectcreation-permstime, "commitc", commitcreation-projectcreation, "getrepo", getrepo-commitcreation, "getpaths", getpaths-getrepo, "commit", commiting-commitstart, "createdocs", createdocs-getpaths)
     return {"success":True, "reason":"", "body":proj_id}
 
 #needs auth
@@ -275,7 +294,6 @@ def pullToExistingProject(proj_id):
     commit_id = createNewCommit(proj_id, idInfo["email"], last_commit)
     g2 = Github(auth = Auth.Token(user["github_token"]))
     repo = g2.get_repo(body["repository"])
-    project = getProjectInfo(proj_id)
     folders = getAllCommitItemsOfType(last_commit, True)
     documents = getAllCommitItemsOfType(last_commit, False)
     pathToFolderID = {}
@@ -288,6 +306,7 @@ def pullToExistingProject(proj_id):
     folders_to_delete = [folder['folder_id'] for folder in folders]
     folders_to_delete.remove(commit["root_folder"])
     print("____________________________________________________")
+    threads = []
     while contents:
         file_content = contents.pop(0)
         index = file_content.path.rfind('/')
@@ -310,18 +329,24 @@ def pullToExistingProject(proj_id):
             try:
                 if document != None:
                     doc_id = document["doc_id"]
-                    if file_content.decoded_content.decode() != getDocumentLastCommittedSnapshotContent(doc_id):
+                    if file_content.decoded_content != getDocumentLastCommittedSnapshotContent(doc_id):
                         #print(file_content.decoded_content)
                         #print("")
                         #print(getDocumentLastCommittedSnapshotContent(doc_id))
                         #print("____")
-                        createNewSnapshot(proj_id, doc_id, file_content.decoded_content.decode(), commit_id, idInfo["email"])
+                        thread = threading.Thread(target=createNewSnapshot, kwargs = {'proj_id':proj_id, 'doc_id':doc_id, 'data':file_content.decoded_content, 'commit_id':commit_id, 'user_email':idInfo["email"]})
+                        thread.start()
+                        threads.append(thread)
+                        #createNewSnapshot(proj_id, doc_id, file_content.decoded_content, commit_id, idInfo["email"])
                         updated_files.append(doc_id)
                     #print(doc_id)
                     docs_to_delete.remove(doc_id)
                 else:
-                    doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content, commit_id, idInfo["email"])
-                    updated_files.append(doc_id)
+                    thread = threading.Thread(target=createNewDocument, kwargs = {'document_name':file_content.name, 'parent_folder':pathToFolderID[path], 'proj_id':proj_id, 'data': file_content.decoded_content, 'commit_id':commit_id, 'user_email':idInfo["email"]})
+                    thread.start()
+                    threads.append(thread)
+                    #doc_id = createNewDocument(file_content.name, pathToFolderID[path], proj_id, file_content.decoded_content, commit_id, idInfo["email"])
+                    #updated_files.append(doc_id)
             except Exception as e:
                 print(e)
     for doc_to_delete in docs_to_delete:
@@ -480,11 +505,20 @@ def pushToExistingBranch(proj_id, commit_id):
                 "reason": "branch does not exist"}
     repo = g2.get_repo(body["repository"])
     updated_files = []
+    start = time.time()
     folderIDToPath = getCommitFoldersAsPaths(commit_id)
+    getpaths = time.time()
+    print("getpaths", getpaths-start)
     body = request.get_json()
     documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
+    relation = time.time()
+    print("getrelation", relation-getpaths)
+
     deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(body["repository"], body["branch"], token, commit_id)
+    deleted = time.time()
+    print("deleted", deleted-relation)
     tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
+    print("assemble", time.time()-deleted)
     if len(tree_elements) == 0:
         {"success":False,
                 "reason": "no files to push"}

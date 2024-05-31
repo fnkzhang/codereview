@@ -3,7 +3,8 @@ import LoadingSpinner from "../Loading/LoadingSpinner";
 import { Button, Label, FileInput } from "flowbite-react";
 import { useNavigate, useParams } from "react-router";
 import { createDocument } from "../../api/APIUtils";
-import BackButton from "../BackButton";
+import BackButton from "../Buttons/BackButton.js";
+
 export default function DocumentCreation( props ) {
 
   const [documentName, setDocumentName] = useState("");

@@ -3,7 +3,7 @@ import Comment from './Comments.js';
 
 function CommentList ({ setCommentsLoading, comments, listLineJump,
   editorLanguage, editorCode, 
-  checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
+  checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode, commitState, userData}) {
 
   if (!Array.isArray(comments)) {
     return null
@@ -42,6 +42,8 @@ function CommentList ({ setCommentsLoading, comments, listLineJump,
           checkIfCanGetLLMCode={checkIfCanGetLLMCode}
           getHighlightedCode={getHighlightedCode}
           updateHighlightedCode={updateHighlightedCode}
+          commitState={commitState}
+          userData={userData}
         />
       ))}
     </div>

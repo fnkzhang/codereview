@@ -3,7 +3,7 @@ import LoadingSpinner from "../Loading/LoadingSpinner";
 import { Button, Label, TextInput } from "flowbite-react";
 import { useNavigate, useParams } from "react-router";
 import { createFolder } from "../../api/APIUtils";
-import BackButton from "../BackButton";
+import BackButton from "../Buttons/BackButton.js";
 
 export default function FolderCreation( props ) {
 

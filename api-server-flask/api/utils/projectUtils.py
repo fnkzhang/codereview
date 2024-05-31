@@ -7,6 +7,8 @@ from utils.commitUtils import *
 import models
 
 def getProjectInfo(proj_id):
+    
+
     with engine.connect() as conn:
         stmt = select(models.Project).where(models.Project.proj_id == proj_id)
         foundProject = conn.execute(stmt).first()
@@ -16,6 +18,8 @@ def getProjectInfo(proj_id):
 
 def createNewProject(proj_name, owner):
     pid = createID()
+    
+
     with engine.connect() as conn:
         projstmt = insert(models.Project).values(
                 proj_id = pid,
@@ -36,9 +40,13 @@ def createNewProject(proj_name, owner):
 def purgeProjectUtil(proj_id):
     try:
         print("start!")
+        threads = []
         with engine.connect() as conn:
             commits = getAllProjectCommits(proj_id)
             for commit in commits:
+                thread = threading.Thread(target=deleteCommit, kwargs={"commit_id":commit["commit_id"]})
+                thread.start()
+                threads.append(thread)
                 deleteCommit(commit["commit_id"])
             print("commitsdied")
             stmt = delete(models.Project).where(models.Project.proj_id == proj_id)
@@ -46,11 +54,15 @@ def purgeProjectUtil(proj_id):
             stmt = delete(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
             conn.execute(stmt)
             conn.commit()
+            for thread in threads:
+                thread.join()
         return True, "No Error"
     except Exception as e:
         return False, e
 
 def renameProjectUtil(proj_id, proj_name):
+    
+
     try:
         with engine.connect() as conn:
             stmt = (update(models.Project)
@@ -64,6 +76,8 @@ def renameProjectUtil(proj_id, proj_name):
         return False, e
 
 def getAllProjectDocuments(proj_id):
+    
+
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
 
@@ -78,6 +92,8 @@ def getAllProjectDocuments(proj_id):
 
 
 def getAllProjectFolders(proj_id):
+    
+
     with engine.connect() as conn:
         stmt = select(models.Folder).where(models.Folder.associated_proj_id == proj_id)
         foundFolders = conn.execute(stmt)
@@ -88,6 +104,8 @@ def getAllProjectFolders(proj_id):
     
 # Returns Array of Dictionaries
 def getAllProjectCommits(proj_id):
+    
+
     with engine.connect() as conn:
         stmt = select(models.Commit).where(models.Commit.proj_id == proj_id).order_by(models.Commit.date_created.asc())
         foundCommits = conn.execute(stmt)
@@ -101,6 +119,8 @@ def getAllProjectCommits(proj_id):
 
 # Returns Array of Dictionaries
 def getAllCommittedProjectCommitsInOrder(proj_id):
+    
+
     with engine.connect() as conn:
         stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.date_committed != None).order_by(models.Commit.date_committed.asc())
         foundCommits = conn.execute(stmt)
@@ -120,6 +140,8 @@ def getProjectLastCommittedCommit(proj_id):
         return None
 
 def getUserWorkingCommitInProject(proj_id, email):
+    
+
     with engine.connect() as conn:
         stmt = select(models.Commit).where(models.Commit.proj_id == proj_id, models.Commit.author_email == email, models.Commit.date_committed == None)
         commit = conn.execute(stmt).first()

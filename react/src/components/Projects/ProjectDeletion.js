@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { deleteProject, getProjectInfo } from "../../api/APIUtils";
-import BackButton from "../BackButton.js";
+import BackButton from "../Buttons/BackButton.js";
 
 export default function ProjectDeletion(props) {
     const [projectName, setProjectName] = useState(""); // Actual Project Name to compare

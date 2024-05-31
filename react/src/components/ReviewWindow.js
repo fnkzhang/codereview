@@ -1,10 +1,12 @@
 import CommentModule from './Comments/CommentModule.js';
-import { getDocSnapshot } from '../api/APIUtils.js';
+import { getDocSnapshot, getCommitData } from '../api/APIUtils.js';
 import { DiffEditor } from '@monaco-editor/react';
 import React, { useState, useRef, useEffect} from 'react';
 import { useParams, useLocation } from 'react-router';
+import { REVIEW_STATE } from "../utils/reviewStateMapping";
 
-export default function ReviewWindow({ comments, setComments, userData, hasUpdatedCode, setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
+export default function ReviewWindow({ comments, setComments, userData, hasUpdatedCode,
+   setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -18,12 +20,14 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
   const [currentHighlightEnd, setEnd] = useState(null);
   const [editorLoading, setEditorLoading] = useState(true);
   const [snapshotId, setSnapshotID] = useState(null);
+  const [commitState, setCommitState] = useState(null)
 
   const decorationIdsRefOrig = useRef([]);
   const decorationIdsRefModif = useRef([]);
 
   const location = useLocation();
-  const {project_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
+
+  const {project_id, commit_id, document_id, left_snapshot_id, right_snapshot_id} = useParams()
 
   // Get Code for the 2 editors
   useEffect(() => {
@@ -95,6 +99,24 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
     setDataToUpload(updatedCode)
 
   }, [updatedCode, initialUpdatedCode, setDataToUpload, setHasUpdatedCode])
+
+  // Set Set Commit State
+  useEffect(() => {
+    if(commitState !== null)
+      return;
+
+    const getCommitState = async (commit_id) => {
+      const commitState = await getCommitData(commit_id)
+
+      if (commitState === null)
+        setCommitState(REVIEW_STATE.CLOSED) // Default State because state is not open
+      else
+        setCommitState(commitState)
+
+    }
+
+    getCommitState(commit_id)
+  }, [commitState])
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
@@ -186,6 +208,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
               checkIfCanGetLLMCode={checkIfCanGetLLMCode}
               getHighlightedCode={getHighlightedCode}
               updateHighlightedCode={updateHighlightedCode}
+              commitState={commitState}
             />
           </div>
         </div>
@@ -212,7 +235,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
 
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: location.state.addSnapshots === null ? false : true
+                readOnly: false
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true

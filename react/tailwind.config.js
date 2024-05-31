@@ -17,7 +17,8 @@ module.exports = {
         offwhite: '#bababa',
         reviewOpen: '#ffffff', // White 
         reviewReviewed: '#FFCE83', // Orange
-        reviewClosed: '#47FF5D', // Green
+        reviewClosed: '#BABABA', // Gray
+        reviewApproved: '#47FF5D' // Green
       },
       zIndex: {
         '10': 10,

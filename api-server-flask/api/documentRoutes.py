@@ -338,6 +338,8 @@ def getAllDocumentCommittedSnapshots(proj_id, doc_id):
     print(snapCommits)
     return {"success": True, "reason":"", "body": snapCommits}
 
+import time
+
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotIdAndWorking/', methods=["GET"])
 def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
     """
@@ -360,6 +362,7 @@ def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
             - body (<body_type>): <body_contents>
 
     """
+    start = time.time()
     headers = request.headers
 
     if not isValidRequest(headers, ["Authorization"]):
@@ -377,16 +380,20 @@ def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
+    permstime = time.time()
     working = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+    workingtime = time.time()
     if working != None:
         foundSnapshots = getAllDocumentCommittedSnapshotsInOrderIncludingWorking(doc_id, working["commit_id"])
     else:
         foundSnapshots = getAllDocumentCommittedSnapshotsInOrder(doc_id)
+    snapshotfind = time.time()
     snapCommits = []
     for snap in foundSnapshots:
         commit = getCommitInfo(snap["og_commit_id"])
         snapCommits.append({"snapshot":snap, "commit":commit})
-
+    getcommits = time.time()
+    print("perms:", permstime-start, " getworking:", workingtime-permstime, " snapshotfindtime:", snapshotfind-workingtime, " commitfindtime:", getcommits - snapshotfind)
     return {"success": True, "reason":"", "body": snapCommits}
 
 #changes a document's snapshot on a specific commit to the given one

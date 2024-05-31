@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { deleteCommit } from "../../api/APIUtils";
-import BackButton from "../BackButton.js";
+import BackButton from "../Buttons/BackButton.js";
 
 export default function CommitDeletion(props) {
     const commitName = "User Working Commit" // Actual Commit Name to compare
