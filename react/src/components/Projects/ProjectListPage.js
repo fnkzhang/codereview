@@ -24,7 +24,7 @@ export default function ProjectListPage( props ) {
       } 
       if (props.isLoggedIn)
         grabProjectData()
-    }, [props, loading])
+    }, [props.isLoggedIn, props.userData, loading])
 
 
     function DisplayProjects() {
