@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch
 import flaskApi
+from flask import request
 
 @pytest.fixture()
 def app():
@@ -103,18 +104,61 @@ def test_createComment(client):
     assert response.json["success"] == False
 
     with patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-        #response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
-        #assert response.status_code == 200
-        #assert response.json["success"] == False
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
         response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, json={})
         assert response.status_code == 200
         assert response.json["success"] == False
 
-        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, json={"author_email": "fake-email@fake-domain.com", "reply_to_id": 0, "content": "This is a comment"})
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, 
+                               json={
+                                   "author_email": "fake-email@fake-domain.com",
+                                   "reply_to_id": 0,
+                                   "content": "This is a comment",
+                                   "highlight_start_x": 1,
+                                   "highlight_start_y": 1,
+                                   "highlight_end_x": 1,
+                                   "highlight_end_y": 1,
+                                   "is_resolved": False
+                                   })
         assert response.status_code == 200
         assert response.json["success"] == False
-        assert response.json["reason"] == "Invalid Permissions"
+
+        with patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+             patch("commentRoutes.createNewComment", autospec=True, return_value=123):
+            SAME_EMAIL = GOOGLE_FAKE_ID_INFO["email"]
+            DIFFERENT_EMAIL = "fake-email-2@fake-domain.com"
+
+            response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"},
+                                   json={
+                                       "author_email": DIFFERENT_EMAIL,
+                                       "reply_to_id": 0,
+                                       "content": "This is a comment",
+                                       "highlight_start_x": 1,
+                                       "highlight_start_y": 1,
+                                       "highlight_end_x": 1,
+                                       "highlight_end_y": 1,
+                                       "is_resolved": False
+                                       })
+            assert response.status_code == 200
+            assert response.json["success"] == False
+
+            response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"},
+                                   json={
+                                       "author_email": SAME_EMAIL,
+                                       "reply_to_id": 0,
+                                       "content": "This is a comment",
+                                       "highlight_start_x": 1,
+                                       "highlight_start_y": 1,
+                                       "highlight_end_x": 1,
+                                       "highlight_end_y": 1,
+                                       "is_resolved": False
+                                       })
+            assert response.status_code == 200
+            assert response.json["success"] == True
+
 
 def test_resolveComment(client):
 
