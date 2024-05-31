@@ -423,14 +423,18 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayExportButton() {
-    let buttonBackgroundColor = ''
 
-    if(latestCommitApproveCount > 0 && isCommitClosed)
-      buttonBackgroundColor = 'bg-[#23822e]'
+    let buttonHoverBackground = ''
+    let buttonBackgroundColor = 'hover:bg-alternative'
+
+    if(latestCommitApproveCount > 0 && isCommitClosed) {
+      buttonBackgroundColor = "bg-[#23822e]"
+      buttonHoverBackground = "hover:bg-[#114117]"
+    }
 
     return (
       <div className="text-textcolor text-xl">
-        <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1 " + buttonBackgroundColor }
+        <button className={"p-3 rounded-lg border-2 transition-all duration-300  m-1 " + buttonBackgroundColor + ' ' + buttonHoverBackground}
         onClick={() => navigate(`/Project/Export/${project_id}/`)}>Export Project</button>
       </div>
     )
@@ -562,10 +566,15 @@ export default function ProjectPage( props ) {
       return
     if(props.userData.email !== projectOwnerEmail)
       return
+
+    let buttonHoverBackground = ''
+    let buttonBackgroundColor = 'hover:bg-alternative'
     
-    let buttonBackgroundColor = ''
-    if(latestCommitApproveCount > 0 && !isCommitClosed)
+    if(latestCommitApproveCount > 0 && !isCommitClosed) {
       buttonBackgroundColor = "bg-[#23822e]"
+      buttonHoverBackground = "hover:bg-[#114117]"
+    }
+
 
     const closeCommit = async () => {
       const couldCloseCommit = await setCommitClosed(latestCommitId)
@@ -574,12 +583,11 @@ export default function ProjectPage( props ) {
         // Make Export Button Live
         setIsCommitClosed(true)
       }
-        
-
     }
+
     return  (
       <div className="flex justify-center text-textcolor text-xl">
-        <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1 " + buttonBackgroundColor}
+        <button className={"p-3 rounded-lg border-2 transition-all duration-300  m-1 " + buttonBackgroundColor + ' ' + buttonHoverBackground}
         onClick={closeCommit}>
           Close Review
         </button>
