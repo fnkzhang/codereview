@@ -6,8 +6,8 @@ import { createSnapshotForDocument } from "../api/APIUtils";
 import { EXTENSION_TO_LANGUAGE_MAP } from "../utils/programLanguageMapping";
 import { Button } from "flowbite-react";
 import { Tooltip } from "react-tooltip";
-import 'react-tooltip/dist/react-tooltip.css'
-import BackButton from "./BackButton";
+import 'react-tooltip/dist/react-tooltip.css';
+import BackButton from "./Buttons/BackButton.js";
 
 
 export default function MainWindow( props ) {

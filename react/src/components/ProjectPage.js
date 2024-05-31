@@ -7,7 +7,7 @@ import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getPr
   setCommitClosed} from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
-import BackButton from "./BackButton"
+import BackButton from "./Buttons/BackButton"
 import { REVIEW_STATE } from "../utils/reviewStateMapping"
 
 // Display Documents For Project
