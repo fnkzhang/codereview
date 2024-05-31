@@ -130,12 +130,6 @@ def deleteCommit(commit_id):
                 thread = threading.Thread(target=deleteSnapshotUtil, kwargs={'snapshot_id':snap.snapshot_id})
                 thread.start()
                 threads.append(thread)
-            stmt = delete(models.CommitDocumentSnapshotRelation).where(
-                    models.CommitDocumentSnapshotRelation.commit_id == commit_id
-            )
-            conn.execute(stmt)
-            
-            print("relation")
             stmt = select(models.Folder).where(
                     models.Folder.og_commit_id == commit_id)
             folds = conn.execute(stmt)
@@ -148,6 +142,11 @@ def deleteCommit(commit_id):
             snaps = conn.execute(stmt)
             for thread in threads:
                 thread.join()
+            conn.commit()
+        with engine.connect() as conn:
+            stmt = delete(models.CommitDocumentSnapshotRelation).where(
+                models.CommitDocumentSnapshotRelation.commit_id == commit_id)
+            conn.execute(stmt)
             conn.commit()
         return True, None
     except Exception as e:
