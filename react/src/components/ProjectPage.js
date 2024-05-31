@@ -7,7 +7,7 @@ import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getPr
   setCommitClosed} from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
-import BackButton from "./BackButton"
+import BackButton from "./Buttons/BackButton"
 import { REVIEW_STATE } from "../utils/reviewStateMapping"
 
 // Display Documents For Project
@@ -143,7 +143,7 @@ export default function ProjectPage( props ) {
         if(latestCommit.approved_count !== null)
           setLatestCommitApproveCount(latestCommit.approved_count)
       }
-      
+
       if(latestCommit.state === REVIEW_STATE.CLOSED)
         setIsCommitClosed(true)
       else 
@@ -153,13 +153,15 @@ export default function ProjectPage( props ) {
         setLatestCommitId(latestCommit.commit_id)
     }
 
-    getLatestCommitState(project_id)
-  }, [project_id])
+    if(props.isLoggedIn)
+      getLatestCommitState(project_id)
+  }, [project_id, props.isLoggedIn])
 
   // Get the user permission level for use on the page
   useEffect(() => {
     if (props.userData === null)
       return;
+
     async function getUserPermissionLevel() {
 
       let searchResult = await getAllUsersWithPermissionForProject(project_id);
@@ -424,14 +426,18 @@ export default function ProjectPage( props ) {
   }
 
   function DisplayExportButton() {
-    let buttonBackgroundColor = 'bg-alternative'
 
-    if(latestCommitApproveCount > 0 && isCommitClosed)
-      buttonBackgroundColor = 'bg-[#23822e]'
+    let buttonHoverBackground = ''
+    let buttonBackgroundColor = 'hover:bg-alternative'
+
+    if(latestCommitApproveCount > 0 && isCommitClosed) {
+      buttonBackgroundColor = "bg-[#23822e]"
+      buttonHoverBackground = "hover:bg-[#114117]"
+    }
 
     return (
       <div className="text-textcolor text-xl">
-        <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:hover:bg-alternative m-1 " + buttonBackgroundColor }
+        <button className={"p-3 rounded-lg border-2 transition-all duration-300  m-1 " + buttonBackgroundColor + ' ' + buttonHoverBackground}
         onClick={() => navigate(`/Project/Export/${project_id}/`)}>Export Project</button>
       </div>
     )
@@ -563,23 +569,28 @@ export default function ProjectPage( props ) {
       return
     if(props.userData.email !== projectOwnerEmail)
       return
+
+    let buttonHoverBackground = ''
+    let buttonBackgroundColor = 'hover:bg-alternative'
     
-    let buttonBackgroundColor = 'bg-alternative'
-    if(latestCommitApproveCount > 0 && !isCommitClosed)
+    if(latestCommitApproveCount > 0 && !isCommitClosed) {
       buttonBackgroundColor = "bg-[#23822e]"
+      buttonHoverBackground = "hover:bg-[#114117]"
+    }
+
 
     const closeCommit = async () => {
       const couldCloseCommit = await setCommitClosed(latestCommitId)
 
       if(couldCloseCommit){
         // Make Export Button Live
+        setIsCommitClosed(true)
       }
-        
-
     }
+
     return  (
       <div className="flex justify-center text-textcolor text-xl">
-        <button className={"p-3 rounded-lg border-2 transition-all duration-300 hover:bg-alternative m-1 " + buttonBackgroundColor}
+        <button className={"p-3 rounded-lg border-2 transition-all duration-300  m-1 " + buttonBackgroundColor + ' ' + buttonHoverBackground}
         onClick={closeCommit}>
           Close Review
         </button>
@@ -605,11 +616,10 @@ export default function ProjectPage( props ) {
 
   function DisplayApproveChangesDecisionButton() {
     const ApproveCommitedChanges = async () => {
-      let isSuccess = await approveCommit(commit_id)
-      let isChangedState = await setCommitReviewed(commit_id);
+      let isApproved = await approveCommit(commit_id)
 
-      console.log(isSuccess, isChangedState);
-      if(isSuccess)
+      console.log(isApproved);
+      if(isApproved)
         navigate('/')
 
       

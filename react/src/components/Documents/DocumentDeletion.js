@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { deleteDocument, getDocumentInfo } from "../../api/APIUtils";
-import BackButton from "../BackButton.js";
+import BackButton from "../Buttons/BackButton.js";
 
 export default function DcoumentDeletion(props) {
     const [documentName, setDocumentName] = useState("");

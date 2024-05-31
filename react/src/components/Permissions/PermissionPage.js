@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import { getProjectInfo, getAllUsersWithPermissionForProject, addUserToProject, removeUserFromProject, promoteEmailToProjectOwner } from "../../api/APIUtils";
 import { Label, TextInput, Button, Dropdown } from "flowbite-react";
 import LoadingSpinner from "../Loading/LoadingSpinner";
-import BackButton from "../BackButton";
+import BackButton from "../Buttons/BackButton.js";
 
 export default function PermissionPage( props ) {
 

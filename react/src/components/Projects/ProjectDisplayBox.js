@@ -4,6 +4,7 @@ import { getAllProjectActiveCommentsForLatestCommit, getLatestCommitForProject }
 import { Card } from "flowbite-react"
 import { Tooltip } from "react-tooltip";
 import { REVIEW_STATE } from "../../utils/reviewStateMapping";
+import { getColor } from "../../utils/utils";
 
 export default function ProjectDisplayBox({id, name, author, date}) {
   // Clicking on project will redirect to project page to select documents
@@ -20,7 +21,6 @@ export default function ProjectDisplayBox({id, name, author, date}) {
     async function getLatestCommitState(project_id){
       const latestCommit = await getLatestCommitForProject(project_id)
 
-      console.log(latestCommit);
       if (latestCommit === null)
         console.log("Failed To get latest commit")
       else {
@@ -48,14 +48,8 @@ export default function ProjectDisplayBox({id, name, author, date}) {
     navigate(`/Project/${project_id}/Commit/0`)
   }
   if (isLoaded) {
-    let stateColor = 'text-textcolor';
-    // Determine Text Color
-    if (reviewState === REVIEW_STATE.OPEN)
-      stateColor = 'text-reviewOpen'
-    else if (reviewState === REVIEW_STATE.REVIEWED)
-      stateColor = 'text-reviewReviewed'
-    else
-      stateColor = 'text-reviewClosed'
+    let stateColor = getColor(reviewState)
+    
     return (
       <Card 
         className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"

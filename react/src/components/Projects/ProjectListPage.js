@@ -14,15 +14,17 @@ export default function ProjectListPage( props ) {
 
     // Set up state variables
     useEffect(() => {
+      if(!loading)
+        return
       // Grab User Data
       async function grabProjectData() {
         let projArray = await getUserProjects(props.userData.email)
         setUserProjects(projArray)
         setLoading(false)
       } 
-
-      grabProjectData()
-    }, [props])
+      if (props.isLoggedIn)
+        grabProjectData()
+    }, [props, loading])
 
 
     function DisplayProjects() {

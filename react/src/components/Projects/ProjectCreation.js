@@ -4,7 +4,7 @@ import LoadingSpinner from "../Loading/LoadingSpinner.js";
 import { Button, Label, TextInput } from "flowbite-react";
 import { createProject, pullFromGitHub } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
-import BackButton from "../BackButton.js";
+import BackButton from "../Buttons/BackButton.js";
 
 export default function ProjectCreation( props ) {
 

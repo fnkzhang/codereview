@@ -6,7 +6,7 @@ import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
   start , end, comments, setComments, userData, editorLanguage, editorCode, 
-  hasUpdatedCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode}) {
+  hasUpdatedCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode, commitState}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
@@ -108,6 +108,8 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
           checkIfCanGetLLMCode={checkIfCanGetLLMCode}
           getHighlightedCode={getHighlightedCode}
           updateHighlightedCode={updateHighlightedCode}
+          commitState={commitState}
+          userData={userData}
         />
         
       </div>

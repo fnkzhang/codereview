@@ -6,8 +6,9 @@ import { createSnapshotForDocument } from "../api/APIUtils";
 import { EXTENSION_TO_LANGUAGE_MAP } from "../utils/programLanguageMapping";
 import { Button } from "flowbite-react";
 import { Tooltip } from "react-tooltip";
-import 'react-tooltip/dist/react-tooltip.css'
-import BackButton from "./BackButton";
+import 'react-tooltip/dist/react-tooltip.css';
+import BackButton from "./Buttons/BackButton.js";
+
 
 export default function MainWindow( props ) {
 
@@ -15,6 +16,7 @@ export default function MainWindow( props ) {
   const [snapshots, setSnapshots] = useState([])
   const [hasUpdatedCode, setHasUpdatedCode] = useState(false)
   const [editorLanguage, setEditorLanguage] = useState("")
+
 
   const [dataToUpload, setDataToUpload] = useState(null) // Null until set to a string value
 
@@ -24,14 +26,17 @@ export default function MainWindow( props ) {
 
   const location = useLocation();
   const navigate = useNavigate();
-
   // Handle Setting Program Language that document uses
   useEffect(() => {
+    if(!location.state.documentName)
+      return
+    
     let extensionName = location.state.documentName.split('.')[1].toLowerCase()
     extensionName = EXTENSION_TO_LANGUAGE_MAP[extensionName]
 
     setEditorLanguage(extensionName)
   }, [location.state.documentName ])
+
 
   const handleCreateSnapshotClick = async () => {
     if (!dataToUpload) {
@@ -109,7 +114,8 @@ export default function MainWindow( props ) {
             setEditorReady={setEditorReady}
             setHasUpdatedCode={setHasUpdatedCode}
             setDataToUpload={setDataToUpload}
-            editorLanguage={editorLanguage}/>
+            editorLanguage={editorLanguage}
+            />
         </div>
       </section>
 

@@ -212,7 +212,8 @@ def setCommitApproved(commit_id):
             stmt = update(models.Commit).where(
                 models.Commit.commit_id == commit_id).values(
                 is_approved = True,
-                approved_count = models.Commit.approved_count + 1
+                state = reviewStateEnum.approved,
+                approved_count = models.Commit.approved_count + 1,
             )
 
             conn.execute(stmt)
