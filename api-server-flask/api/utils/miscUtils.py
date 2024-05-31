@@ -28,7 +28,6 @@ def authenticate():
         return idInfo
 
     except ValueError:
-        print("huh")
         return None
 
 def getTime():
