@@ -235,7 +235,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
 
               editor.getModifiedEditor().updateOptions({
                 // Set True Or False if Matching Right Editor Snapshot
-                readOnly: location.state.addSnapshots === null ? false : true
+                readOnly: false
               })
               editor.getOriginalEditor().updateOptions({
                 readOnly: true

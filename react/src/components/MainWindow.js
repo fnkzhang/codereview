@@ -56,83 +56,35 @@ export default function MainWindow( props ) {
   }
 
   function DisplaySnapshotCreateButton () {
-    if (location.state.addSnapshots !== null) {
-      return(
-        <div className="text-alternative">
-          <Button disabled className="rounded-lg border-2 m-1 opacity-50" data-tooltip-id="addsnapshotbutton">
-            Add New Snapshot
-          </Button>
-          <Tooltip 
-            className="z-9999" 
-            id="addsnapshotbutton"
-            place="bottom"
-            disableStyleInjection="true"
-            content={
-              <div>
-                <p>
-                  To create a new snapshot, create a working commit
-                </p>
-                <p>
-                  and select a document within the working commit.
-                </p>
-              </div>
-            }
-          />
-        </div>
-      )
-    }
 
-    if (hasUpdatedCode === false) {
-      return(
-        <div className="text-alternative">
-          <Button disabled className="rounded-lg border-2 m-1 opacity-50" data-tooltip-id="addsnapshotbutton">
-            Add New Snapshot
-          </Button>
-          <Tooltip 
-            className="z-9999" 
-            id="addsnapshotbutton"
-            place="bottom"
-            disableStyleInjection="true"
-            content={
-              <div>
-                <p>
-                  To create a new snapshot, modify the code in
-                </p>
-                <p>
-                  the right side of the diff editor.
-                </p>
-              </div>
-            }
-          />
-        </div>
-      )
-    }
+    if (hasUpdatedCode === false)
+      return
 
-  return(
-    <div className="text-textcolor">
-      <Button className="rounded-lg border-2 transition-all duration-300
-      hover:bg-alternative m-1" data-tooltip-id="addsnapshotbutton" onClick={handleCreateSnapshotClick}>
-        Add New Snapshot
-      </Button>
-      <Tooltip 
-        className="z-9999" 
-        id="addsnapshotbutton"
-        place="bottom"
-        disableStyleInjection="true"
-        content={
-          <div>
-            <p>
-              This will create a new snapshot. The most recently
-            </p>
-            <p>
-              created snapshot will be added to your working commit.
-            </p>
-          </div>
-        }
-      />
-    </div>
-  )
-}
+    return(
+      <div className="text-textcolor">
+        <Button className="rounded-lg border-2 transition-all duration-300
+        hover:bg-alternative m-1" data-tooltip-id="addsnapshotbutton" onClick={handleCreateSnapshotClick}>
+          Add New Snapshot
+        </Button>
+        <Tooltip 
+          className="z-9999" 
+          id="addsnapshotbutton"
+          place="bottom"
+          disableStyleInjection="true"
+          content={
+            <div>
+              <p>
+                This will create a new snapshot. The most recently
+              </p>
+              <p>
+                created snapshot will be added to your working commit.
+              </p>
+            </div>
+          }
+        />
+      </div>
+    )
+  }
 
   if (props.isLoggedIn) {
     return(

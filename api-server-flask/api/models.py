@@ -35,7 +35,6 @@ class User(Base):
     name = Column(String(50))
     #username = Column(String(50)) #unsure if user_id is necessary if username is already unique
     date_joined = Column(DateTime(timezone=True), server_default=func.now())
-    #last_opened = Column(DateTime(timezone=True), server_default=func.now())
     github_token = Column(String(50))
 
 class Project(Base):

@@ -56,6 +56,20 @@ def getCommitNonexistentGithubDocumentsUtil(repo, branch, token, commit_id):
     nonexistant = list(allGithubFiles - projectDocumentPaths)
     return nonexistant
 
+import base64
+def addTreeElement(tree_elements, doc_id, commit_id, repo, documentSnapshots, folderIDToPath):
+    document = getDocumentInfo(doc_id, commit_id)
+    snapcontent = getSnapshotContentUtil(documentSnapshots[doc_id])
+    blob = repo.create_git_blob(
+        content = base64.b64encode(snapcontent).decode(),
+        encoding = 'base64',
+        )
+    tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
+            mode = "100644",
+            type = "blob",
+            sha = blob.sha
+        ))
+    
 def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id):
     tree_elements = []
     for deletedDocumentPath in deletedDocumentPaths:
@@ -65,17 +79,13 @@ def assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, docum
                 sha = None
             ))
     print(documentSnapshots)
+    threads = []
     for doc_id in documentSnapshots.keys():
-        document = getDocumentInfo(doc_id, commit_id)
-        blob = repo.create_git_blob(
-                content = getSnapshotContentUtil(documentSnapshots[doc_id]),
-                encoding = 'utf-8',
-                )
-        tree_elements.append(InputGitTreeElement(path = folderIDToPath[document["parent_folder"]] + document["name"],
-                mode = "100644",
-                type = "blob",
-                sha = blob.sha
-            ))
+        thread = threading.Thread(target=addTreeElement, kwargs={"tree_elements":tree_elements, "doc_id": doc_id, "commit_id":commit_id, "repo":repo, "documentSnapshots":documentSnapshots, "folderIDToPath":folderIDToPath})
+        thread.start()
+        threads.append(thread)
+    for thread in threads:
+        thread.join()
     return tree_elements
 
 def assembleGithubComments(documentSnapshots, commit_id):

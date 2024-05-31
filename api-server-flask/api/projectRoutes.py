@@ -74,6 +74,7 @@ def createProject():
 def deleteProject(proj_id):
     # Authentication
     headers = request.headers
+    
     if not isValidRequest(headers, ["Authorization"]):
         return {
             "success": False,
@@ -85,6 +86,7 @@ def deleteProject(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
+    
     if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
     # Query
@@ -163,11 +165,6 @@ def getProjectCommittedCommits(proj_id):
     workingCommit = getUserWorkingCommitInProject(proj_id, idInfo["email"])
     if workingCommit != None:
         arrayOfCommits.append(workingCommit)
-    for commit in arrayOfCommits:
-        docsnap = getAllCommitDocumentSnapshotRelation(commit["commit_id"])
-        for doc in docsnap.keys():
-            commit["seenSnapshot"] = isSnaphotSeenByUser(docsnap[doc], idInfo["email"])
-            commit["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[doc], idInfo["email"])
     return {
         "success": True,
         "reason": "",

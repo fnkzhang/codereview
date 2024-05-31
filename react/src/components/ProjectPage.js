@@ -137,7 +137,6 @@ export default function ProjectPage( props ) {
   useEffect(() => {
     async function getLatestCommitState(project_id){
       const latestCommit = await getLatestCommitForProject(project_id)
-      console.log(latestCommit);
       if (latestCommit === null)
         console.log("Failed To get latest commit")
       else {
@@ -257,11 +256,15 @@ export default function ProjectPage( props ) {
     async function handleDocumentClick () {
       const result = await getAllSnapshotsFromDocument(project_id, id)
 
-      const latestSnapshot = result.body[0].snapshot.snapshot_id;
-
-      if (result.success)
+      if (result.success) {
+        let latestSnapshot = result.body.find(snapshot => snapshot.commit.commit_id === Number(commit_id))
+        if (latestSnapshot)
+          latestSnapshot = latestSnapshot.snapshot.snapshot_id
+        else
+          latestSnapshot = result.body[result.body.length - 1].snapshot.snapshot_id;
         navigate(`/Project/${project_id}/Commit/${commit.commit_id}/Document/${id}/${latestSnapshot}/${latestSnapshot}`,
           {state: {documentName: name, addSnapshots: commit.date_committed}})
+      }
     }
 
     function DisplayDocumentOptions() {

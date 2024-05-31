@@ -67,6 +67,8 @@ def addUser(proj_id):
         return {"success": False, "reason":"Cannot add another Owner", "body":{}}
     if (permissions < 0):
         return {"success": False, "reason":"Invalid Permission Level", "body":{}}
+    if inputBody["email"] == idInfo["email"]:
+        return {"success": False, "reason":"Can't give yourself perms", "body":{}}
     return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A", "body": {}}
 
 #needs sections in body
@@ -204,7 +206,14 @@ def getUsersWithAccessToProject(proj_id):
                 userSearchResult = conn.execute(getUserDataStmt).first()
 
                 # Add User Role To Return Data
-                returnDict = userSearchResult._asdict()
+                if userSearchResult == None:
+                    returnDict = {}
+                    returnDict["user_email"] = userEmail
+                    returnDict["name"] = "Unknown Name"
+                    returnDict["date_joined"] = None
+                    returnDict["github_token"] = None
+                else:
+                    returnDict = userSearchResult._asdict()
                 returnDict["userRole"] = userRole
                 returnDict["userPermissionLevel"] = userPermissionLevel
                 userDataList.append(returnDict)
@@ -216,7 +225,6 @@ def getUsersWithAccessToProject(proj_id):
                 "reason": "",
                 "body": userDataList
             }
-
     except Exception as e:
             print("Error: ", e)
             return {

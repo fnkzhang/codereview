@@ -7,6 +7,7 @@ import os
 import google.auth
 from google.oauth2 import id_token
 from google.auth.transport import requests
+import threading
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials/googlecreds.json"
 os.environ["GCLOUD_PROJECT"] = "codereview-413200"
@@ -16,6 +17,7 @@ CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleuserconten
 def authenticate():
     headers = request.headers
     if (not isValidRequest(headers, ["Authorization"])):
+        print("what")
         return None
     try:
         idInfo = id_token.verify_oauth2_token(
@@ -26,7 +28,7 @@ def authenticate():
         return idInfo
 
     except ValueError:
-        print("huh")
+        print("huh", ValueError)
         return None
 
 def getTime():

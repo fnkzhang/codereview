@@ -4,6 +4,7 @@ app = get_app(__name__)
 from flask import request, jsonify
 
 from cloudSql import *
+from utils.projectUtils import *
 from utils.snapshotUtils import *
 from utils.commentUtils import *
 from utils.miscUtils import *
@@ -30,9 +31,13 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
 
-    blob = fetchFromCloudStorage(f"{proj_id}/{doc_id}/{snapshot_id}")
+    blob = fetchFromCloudStorage(str(snapshot_id))
     print(blob)
     setSnapshotAsSeen(snapshot_id, idInfo["email"])
+    try:
+        blob = blob.decode()
+    except:
+        blob = None
     return {
         "success": True,
         "reason": "",
@@ -60,8 +65,16 @@ def createSnapshot(proj_id, doc_id, commit_id):
 
     if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"], commit_id, idInfo["email"])
+    if inputBody.get("data") == None:
+        return {"success": False, "reason":"no data", "body":{}}
+    working = getUserWorkingCommitInProject(proj_id, idInfo["email"])
+    if working == None:
+        work_id = createNewCommit(proj_id, idInfo["email"], commit_id)
+    else:
+        work_id = working["commit_id"]
+        rebuildPathToPrevCommit(doc_id, work_id, commit_id)
+        
+    snapshot_id = createNewSnapshot(proj_id, doc_id, inputBody["data"], work_id, idInfo["email"])
     return {
         "success": True,
         "reason": "",
