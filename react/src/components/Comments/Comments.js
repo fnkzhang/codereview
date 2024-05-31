@@ -1,6 +1,6 @@
 import { resolveComment } from '../../api/APIUtils';
 import SubCommentList from './SubCommentList';
-import { Card, Spinner } from "flowbite-react";
+import { Card } from "flowbite-react";
 import React, { useEffect, useState } from 'react';
 import LlmButton from '../LLM/LlmButton';
 import LoadingSpinner from '../Loading/LoadingSpinner';
