@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import Comment from '../components/Comments/Comments.js';
+import Comment from '../components/Comments/Comments';
 import { resolveComment } from '../api/APIUtils';
 import userEvent from '@testing-library/user-event';
 
