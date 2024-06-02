@@ -15,6 +15,7 @@ api
    githubRoutes
    llmRoutes
    models
+   new_ok_test
    projectRoutes
    reviewStateEnums
    snapshotRoutes

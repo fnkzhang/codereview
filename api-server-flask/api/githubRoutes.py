@@ -18,16 +18,17 @@ import threading
 @app.route('/api/Github/userHasGithub/', methods = ["GET"])
 def getUserGithubStatus():
     """
-    GET /api/Github/userHasGithub/
+    ``GET /api/Github/userHasGithub/``
 
-    Explanation:
+    **Explanation:**
         Checks if user has github connected
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
             - body (bool): Indicates whether the user has a GitHub account associated.
+
     """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -58,20 +59,21 @@ def getUserGithubStatus():
 @app.route('/api/Github/addToken', methods=["POST"])
 def addGithubToken():
     """
-    POST /api/Github/addToken
+    ``POST /api/Github/addToken``
 
-    Explanation:
+    **Explanation:**
         This endpoint adds a GitHub token to the user's account.
         It requires authentication via an Authorization token header.
 
-    Args:
+    **Args:**
         - request.body (dict):
             - github_code (str): code
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
+
     """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -103,20 +105,21 @@ def addGithubToken():
 @app.route('/api/Github/getRepositoryBranches/', methods=["GET"])
 def getGithubRepositoryBranches():
     """
-    GET /api/Github/getRepositoryBranches/
+    ``GET /api/Github/getRepositoryBranches/``
 
-    Explanation:
-        Gets a repository’s branches if the user has access
+    **Explanation:**
+        Gets a repository's branches if the user has access
 
-    Args:
+    **Args:**
         - request.body (dict):
             - repository (str): name of repository, includes owner name
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
             - body (list): A list of strings representing the branches of the repository.
+
     """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -150,22 +153,23 @@ def pullToNewProject():
     start = time.time()
 
     """
-    POST /api/Github/PullToNewProject/
+    ``POST /api/Github/PullToNewProject/``
 
-    Explanation:
-        Pulls a github repo’s contents to a new project. Will not pull files that have content that cannot be decoded.
-        The project’s first commit will be the github repo’s contents
+    **Explanation:**
+        Pulls a github repo's contents to a new project. Will not pull files that have content that cannot be decoded.
+        The project's first commit will be the github repo's contents
 
-    Args:
+    **Args:**
         - request.body:
-            - repository (str): repository you’re pulling from
-            - branch (str): the branch you’re pulling from
+            - repository (str): repository you're pulling from
+            - branch (str): the branch you're pulling from
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
             - body (str): Identifier of the newly created project if successful.
+
     """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -240,6 +244,26 @@ def pullToNewProject():
 #put commit name in "name"
 @app.route('/api/Github/<proj_id>/PullToExistingProject/', methods=["POST"])
 def pullToExistingProject(proj_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -344,6 +368,26 @@ def pullToExistingProject(proj_id):
 #put commit message in "message", or if we eventually put a generic message that's fine
 @app.route('/api/Github/<proj_id>/<commit_id>/PushToNewBranch/', methods=["POST"])
 def pushToNewBranch(proj_id, commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -415,6 +459,26 @@ def pushToNewBranch(proj_id, commit_id):
 #put commit message in "message", or if we eventually put a generic message that's fine
 @app.route('/api/Github/<proj_id>/<commit_id>/PushToExisting/', methods=["POST"])
 def pushToExistingBranch(proj_id, commit_id):
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {

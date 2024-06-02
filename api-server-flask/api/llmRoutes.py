@@ -7,18 +7,42 @@ from utils.llmUtils import *
 
 init_llm()
 
+
+@app.route('/api/fake-route', methods=["POST"])
+def fake_route():
+    """
+    TODO: Documentation
+    
+    ``<POST/GET/UPDATE/DELETE> /api``
+
+    **Explanation:**
+        <insert_explanation_here>
+
+    **Args:**
+        - route_params (<param_type>): description
+        - request.body (dict):
+            - body_params (<param_type>): description
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): description
+            - reason (str): description
+            - body (<body_type>): <body_contents>
+    """
+    pass
+
 # EXAMPLE:
 # curl -X POST http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "startLine": 1, "endLine": 2, "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function.", "language": "Python"}'
 @app.route("/api/llm/code-implementation", methods=["POST"])
 def implement_code_changes_from_comment():
     """
-    POST /api/llm/code-implementation
+    ``POST /api/llm/code-implementation``
 
-    Explanation:
+    **Explanation:**
         Implements code changes based on the provided comment using LLM.
 
-    Args:
-        request.body (dict): A dictionary containing the following keys:
+    **Args:**
+        - request.body (dict): A dictionary containing the following keys:
             - code (str): The original code.
             - highlightedCode (str): The highlighted code.
             - startLine (int): The starting line of the code snippet.
@@ -26,8 +50,8 @@ def implement_code_changes_from_comment():
             - comment (str): The comment containing the code suggestion.
             - language (str): The programming language of the code.
 
-    Returns:
-        dict: A dictionary containing the following keys:
+    **Returns:**
+        - dict: A dictionary containing the following keys:
             - success (bool): Indicates whether the implementation was successful.
             - reason (str): Description of the result of the implementation.
             - body (str): The implemented code changes.
@@ -78,18 +102,18 @@ def implement_code_changes_from_comment():
 @app.route("/api/llm/comment-suggestion", methods=["POST"])
 def suggest_comment_from_code():
     """
-    POST /api/llm/comment-suggestion
+    ``POST /api/llm/comment-suggestion``
 
-    Explanation:
+    **Explanation:**
         Generates a comment suggestion based on the provided code using LLM.
 
-    Args:
-        request.body (dict): A dictionary containing the following keys:
+    **Args:**
+        - request.body (dict): A dictionary containing the following keys:
             - code (str): The original code.
             - language (str): The programming language of the code.
 
-    Returns:
-        dict: A dictionary containing the following keys:
+    **Returns:**
+        - dict: A dictionary containing the following keys:
             - success (bool): Indicates whether the suggestion generation was successful.
             - reason (str): Description of the result of the suggestion generation.
             - body (str): The generated comment suggestion.
