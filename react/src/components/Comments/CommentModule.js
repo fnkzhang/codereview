@@ -6,7 +6,7 @@ import { useParams } from 'react-router';
 
 function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snapshotId, 
   start , end, comments, setComments, userData, editorLanguage, editorCode, 
-  hasUpdatedCode, checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode, commitState}) {
+  checkIfCanGetLLMCode, getHighlightedCode, updateHighlightedCode, commitState}) {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
@@ -43,14 +43,10 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
 
   async function handleNewCommentSubmit() {
     try {
-      console.log(snapshotId)
       if (snapshotId !== null) {
-        console.log("adding comment ...", userDataLocal)
 
         // ToDo Handle Nested Comments in future
         let createdComment = await createComment(snapshotId, userDataLocal.email, 0, newComment, start.column, start.lineNumber, end.column, end.lineNumber)
-
-        console.log(createdComment)
         
         setCommentsLoading(true);
       }

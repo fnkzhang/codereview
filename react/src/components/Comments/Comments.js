@@ -22,13 +22,9 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
   }, [userData])
 
   async function handleResolve() {
-    console.log("RESOLVING COMMENT")
-    console.log(commentID, author, snapshotID)
     let result = await resolveComment(commentID);
 
     setCommentsLoading(true)
-    console.log(result)
-
   }
 
   // Show Resolve Button only for Author
