@@ -423,12 +423,15 @@ def pushToNewBranch(proj_id, commit_id):
     folderIDToPath = getCommitFoldersAsPaths(commit_id)
     body = request.get_json()
     documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
+    if len(documentSnapshots.keys())==0:
+        return {"success":False, "reason":"no files to push"}
+
     deletedDocumentPaths = getCommitNonexistentGithubDocumentsUtil(body["repository"], body["oldbranch"], token, commit_id)
     branch_sha = repo.get_branch(body["oldbranch"]).commit.sha
     tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
     if len(tree_elements) == 0:
-        {"success":False,
-                "reason": "no files to push"}
+        return {"success":False,
+                "reason": "no changes to push"}
     try:
         new_tree = repo.create_git_tree(
             tree = tree_elements,
@@ -511,6 +514,8 @@ def pushToExistingBranch(proj_id, commit_id):
     print("getpaths", getpaths-start)
     body = request.get_json()
     documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
+    if len(documentSnapshots.keys())==0:
+        return {"success":False, "reason":"no files to push"}
     relation = time.time()
     print("getrelation", relation-getpaths)
 
@@ -520,8 +525,8 @@ def pushToExistingBranch(proj_id, commit_id):
     tree_elements = assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
     print("assemble", time.time()-deleted)
     if len(tree_elements) == 0:
-        {"success":False,
-                "reason": "no files to push"}
+        return {"success":False,
+                "reason": "no changes to push"}
     branch_sha = repo.get_branch(body["branch"]).commit.sha
     try:
         new_tree = repo.create_git_tree(
@@ -529,9 +534,9 @@ def pushToExistingBranch(proj_id, commit_id):
             base_tree = repo.get_git_tree(sha=branch_sha)
             )
     except Exception as e:
-        new_tree = repo.create_git_tree(
-            tree = tree_elements,
-            )
+            new_tree = repo.create_git_tree(
+                tree = tree_elements,
+                )
     commit = repo.create_git_commit(
         message=body["message"],
         tree = repo.get_git_tree(sha=new_tree.sha),
