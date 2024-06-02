@@ -25,7 +25,6 @@ def authenticator():
 
     """
     idInfo = authenticate()
-    print(idInfo)
     if idInfo is not None:
         print("Successful authentication")
         # RETURN User Data back

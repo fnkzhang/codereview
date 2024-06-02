@@ -38,6 +38,20 @@ GOOGLE_FAKE_ID_INFO = {
     "sub": "subject_identifier"
 }
 
+def get_request_body(response):
+    """
+    **Args:**
+        - response (Response): Response object from a Flask request
+
+    **Returns:**
+        The input body of a request which includes the parameters from route.
+
+    """
+    try:
+        print(json.loads(response.data.decode('utf-8')))
+        return json.loads(response.data.decode('utf-8'))["body"]
+    except:
+        return {}
 """
 Unit Tests for authRoutes.py
 """
@@ -147,7 +161,9 @@ def test_createComment(client):
                                        "highlight_end_y": 1,
                                        "is_resolved": False
                                        })
-            #assert json.loads(response.data.decode('utf-8'))["body"]["author_email"] == GOOGLE_FAKE_ID_INFO["email"]
+            
+            body = get_request_body(response)
+            assert body["author_email"] == GOOGLE_FAKE_ID_INFO["email"]
             #assert response.status_code == 200
             #assert response.json["success"] == False
 
