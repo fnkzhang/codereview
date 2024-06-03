@@ -60,7 +60,7 @@ def getSnapshotProject(snapshot_id):
         return None
 
 def getSnapshotContentUtil(snapshot_id):
-    blob = getBlob(str(snapshot_id))
+    blob = fetchFromCloudStorage(str(snapshot_id))
     return blob
 
 def deleteSnapshotUtil(snapshot_id):

@@ -147,6 +147,6 @@ def getDocumentLastCommittedSnapshotContent(doc_id):
     print(snapshot["snapshot_id"])
     if snapshot == None:
         return None
-    snapshotContents = getBlob(str(snapshot["snapshot_id"]))
+    snapshotContents = fetchFromCloudStorage(str(snapshot["snapshot_id"]))
     return snapshotContents
 
