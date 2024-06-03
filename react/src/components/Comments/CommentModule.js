@@ -46,7 +46,7 @@ function CommentModule ({ moduleLineJump, leftSnapshotId, rightSnapshotId, snaps
       if (snapshotId !== null) {
 
         // ToDo Handle Nested Comments in future
-        let createdComment = await createComment(snapshotId, userDataLocal.email, 0, newComment, start.column, start.lineNumber, end.column, end.lineNumber)
+        await createComment(snapshotId, userDataLocal.email, 0, newComment, start.column, start.lineNumber, end.column, end.lineNumber)
         
         setCommentsLoading(true);
       }

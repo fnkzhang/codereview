@@ -22,7 +22,7 @@ function Comment ({ setCommentsLoading, commentID, author, text, subcomments, da
   }, [userData])
 
   async function handleResolve() {
-    let result = await resolveComment(commentID);
+    await resolveComment(commentID);
 
     setCommentsLoading(true)
   }

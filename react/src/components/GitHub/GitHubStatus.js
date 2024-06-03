@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { hasGitHubToken } from "../../api/APIUtils";
 
 export default function GitHubStatus ( props ) {
@@ -33,7 +32,7 @@ export default function GitHubStatus ( props ) {
     } else {
       setLoading(false)
     }
-  })
+  },[loading, setLoading, props])
 
   if (loading) {
     return(<div>
