@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import DocumentCreation from '../components/Documents/DocumentCreation';
-import { useParams, useNavigate } from 'react-router';
-import { createDocument } from '../api/APIUtils';
+import { useParams } from 'react-router';
 
 // Mocking react-router
 jest.mock('react-router', () => ({
