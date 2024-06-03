@@ -621,6 +621,13 @@ export async function getFolderTree(commit_id) {
 
 }
 
+/**
+* @param {string} folder_name The name of the folder which is being created
+* @param {number} proj_id The project id number for the project which the folder is in
+* @param {number} commit_id The commit id number for the commit wich the folder is a part of
+* @param {number} parent_folder_id The folder id number for the folder which this folder is inside of
+* @returns {string} The server response message
+*/
 export async function createFolder(folder_name, proj_id, commit_id, parent_folder_id) {
 
   let oAuthToken = getCookie("cr_id_token")
@@ -648,9 +655,16 @@ export async function createFolder(folder_name, proj_id, commit_id, parent_folde
     }
     return data
   })
+
 }
 
+/**
+* @param {number} folder_id The folder id for the folder being deleted
+* @param {number} commit_id The commit id number for the commit wich the folder is a part of
+* @returns {string} The server response message
+*/
 export async function deleteFolder(folder_id, commit_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -667,7 +681,14 @@ export async function deleteFolder(folder_id, commit_id) {
     .then(response => response.json())
 }
 
+/**
+* @param {number} proj_id The project id number for the project which the folder is in
+* @param {number} commit_id The commit id number for the commit wich the folder is a part of
+* @param {number} folder_id The folder id number for the folder
+* @returns {folder} The folder information
+*/
 export async function  getFolderInfo(proj_id, commit_id, folder_id) {
+
   let oAuthToken = getCookie("cr_id_token")
   
   let headers = {
@@ -701,6 +722,7 @@ export async function  getFolderInfo(proj_id, commit_id, folder_id) {
  * @returns {string} The code implementation based on the suggestion
 */
 export async function getCodeImplementation(code, highlightedCode, startLine, endLine, comment, language) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -736,7 +758,12 @@ export async function getCodeImplementation(code, highlightedCode, startLine, en
 
 }
 
+/**
+* @param {string} token The github token provided to the application for the current user
+* @returns {string} The server response message
+*/
 export async function addGitHubToken(token) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -763,7 +790,11 @@ export async function addGitHubToken(token) {
   })
 }
 
+/**
+* @returns {string} The server response message, indicates whether or not the user has a valid github connection
+*/
 export async function hasGitHubToken() {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -787,7 +818,14 @@ export async function hasGitHubToken() {
   })
 }
 
+/**
+* @param {string} proj_name The name of the project which will be populated by the github branch
+* @param {string} repo_name The name of the repository, in the form ${user}/${repository}
+* @param {string} branch_name The name of the branch which is being pulled from
+* @returns {string} The server response message
+*/
 export async function pullFromGitHub(proj_name, repo_name, branch_name) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -814,9 +852,19 @@ export async function pullFromGitHub(proj_name, repo_name, branch_name) {
     }
     return data
   })
+
 }
 
+/**
+* @param {number} proj_id The project id number for the project which is being pushed
+* @param {string} repo_name The name of the repository, in the form ${user}/${repository}
+* @param {string} branch_name The name of the branch which is being pushed to
+* @param {number} commit_id The commit id for the commit from the project which is being pushed to GitHub
+* @param {string} message The commit message which will appear in GitHub
+* @returns {string} The server response message
+*/
 export async function pushToExistingBranch(proj_id, repo_name, branch_name, commit_id, message) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -843,9 +891,15 @@ export async function pushToExistingBranch(proj_id, repo_name, branch_name, comm
     }
     return data
   })
+
 }
 
+/**
+* @param {number} proj_id The project id number for the project which the commits are being requested
+* @returns {[commit]} The list of commits for the given project
+*/
 export async function getCommits(proj_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -867,9 +921,16 @@ export async function getCommits(proj_id) {
     }
     return data
   })
+
 }
 
+/**
+* @param {number} proj_id The project id number for the project
+* @param {number} commit_id The commit id for the commit which this new working commit is based on
+* @returns {string} The server response message
+*/
 export async function createCommit(proj_id, commit_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -894,9 +955,15 @@ export async function createCommit(proj_id, commit_id) {
     }
     return data
   })
+
 }
 
+/**
+* @param {number} proj_id The project id number for the project where the user is deleting their working commit
+* @returns {string} The server response message
+*/
 export async function deleteCommit(proj_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -918,9 +985,16 @@ export async function deleteCommit(proj_id) {
     }
     return data
   })
+
 }
 
+/**
+* @param {number} commit_id The commit id for the  working commit which is being submitted
+* @param {string} commit_name The name which is being provided to the commit upon submission
+* @returns {string} The server response message
+*/
 export async function submitCommit(commit_id, commit_name) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -945,9 +1019,15 @@ export async function submitCommit(commit_id, commit_name) {
     }
     return data
   })
+
 }
 
-export async function getLatestCommitForProject(project_id) {
+/**
+* @param {number} proj_id The project id number for the project
+* @returns {commit} The most recent commit for the project
+*/
+export async function getLatestCommitForProject(proj_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -961,7 +1041,7 @@ export async function getLatestCommitForProject(project_id) {
     }
   };
 
-  return await fetch((`/api/Project/${project_id}/GetLatestCommit/`), headers)
+  return await fetch((`/api/Project/${proj_id}/GetLatestCommit/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
@@ -970,9 +1050,15 @@ export async function getLatestCommitForProject(project_id) {
     }
     return data.body
   })
+
 }
 
+/**
+* @param {number} commit_id The commit id for the commit which is being set to "approved"
+* @returns {string} The server response message
+*/
 export async function approveCommit(commit_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -994,9 +1080,15 @@ export async function approveCommit(commit_id) {
 
     return data.success
   })
+
 }
 
+/**
+* @param {number} commit_id The commit id for the commit which is being set to "reviewed"
+* @returns {string} The server response message
+*/
 export async function setCommitReviewed(commit_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -1018,8 +1110,15 @@ export async function setCommitReviewed(commit_id) {
 
     return data.success
   })
+
 }
+
+/**
+* @param {number} commit_id The commit id for the commit which is being set to "closed"
+* @returns {string} The server response message
+*/
 export async function setCommitClosed(commit_id) {
+
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -1041,9 +1140,14 @@ export async function setCommitClosed(commit_id) {
 
     return data.success
   })
+
 }
 
-export async function getAllProjectActiveCommentsForLatestCommit(project_id) {
+/**
+* @param {number} proj_id The project id number for which the comments are being requested
+* @returns {[comment]} The list of unresolved comments on the most recent commit
+*/
+export async function getAllProjectActiveCommentsForLatestCommit(proj_id) {
   let oAuthToken = getCookie("cr_id_token")
 
   let headers = {
@@ -1058,7 +1162,7 @@ export async function getAllProjectActiveCommentsForLatestCommit(project_id) {
   };
 
 
-  return await fetch((`/api/Commit/${project_id}/getLatestComments/`), headers)
+  return await fetch((`/api/Commit/${proj_id}/getLatestComments/`), headers)
   .then(response => response.json())
   .then(data => {
     if (data.success === false) {
@@ -1068,8 +1172,13 @@ export async function getAllProjectActiveCommentsForLatestCommit(project_id) {
 
     return data.body
   })
+
 }
 
+/**
+* @param {number} commit_id The commit id for the commit whos information is being requested
+* @returns {commit} The commit information
+*/
 export async function getCommitData(commit_id) {
   let oAuthToken = getCookie("cr_id_token")
 
@@ -1094,4 +1203,5 @@ export async function getCommitData(commit_id) {
 
     return data.info
   })
+
 }
