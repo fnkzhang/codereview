@@ -217,46 +217,6 @@ def test_createCommit(client):
 
     pass
 
-def test_checkIfNewerCommitExists(client):
-    
-    # Invalid Requests
-
-    # Valid Requests
-
-    pass
-
-def test_getCommitDifferences(client):
-    
-    # Invalid Requests
-
-    # Valid Requests
-
-    pass
-
-def test_getCommitDiffCareAboutLast(client):
-    
-    # Invalid Requests
-
-    # Valid Requests
-
-    pass
-
-def test_bulkAddToCommit(client):
-    
-    # Invalid Requests
-
-    # Valid Requests
-
-    pass
-
-def test_bulkDeleteFromCommit(client):
-    
-    # Invalid Requests
-
-    # Valid Requests
-
-    pass
-
 def test_commitCommit(client):
     
     # Invalid Requests
@@ -576,14 +536,6 @@ def test_getProjectLatestCommit(client):
 
     pass
 
-def test_getProjectDocuments(client):
-    
-    # Invalid Requests
-
-    # Valid Requests
-
-    pass
-
 """
 Unit Tests for snapshotRoutes.py
 """
@@ -641,14 +593,6 @@ def test_addUser(client):
     pass
 
 def test_transferProjectOwnership(client):
-    
-    # Invalid Requests
-
-    # Valid Requests
-
-    pass
-
-def test_importPermissions(client):
     
     # Invalid Requests
 
