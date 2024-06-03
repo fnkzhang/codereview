@@ -15,8 +15,6 @@ import models
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
 def getProject(proj_id):
     """
-    TODO: Documentation
-    
     ``<POST/GET/UPDATE/DELETE> /api``
 
     **Explanation:**
@@ -68,17 +66,14 @@ def getProject(proj_id):
 @app.route('/api/Project/createProject/', methods = ["POST"])
 def createProject():
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``POST /api/Project/createProject/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Creates a project.
 
     **Args:**
-        - route_params (<param_type>): description
         - request.body (dict):
-            - body_params (<param_type>): description
+            - project_name (str): The name of the project
 
     **Returns:**
         A dictionary containing the following keys:
@@ -113,23 +108,18 @@ def createProject():
 @app.route('/api/Project/<proj_id>/', methods=["DELETE"])
 def deleteProject(proj_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``DELETE /api/Project/<proj_id>/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Deletes a project
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project you're deleting
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Whether or not the request succeeded
+            - reason (str): If the request failed, the error
 
     """
     # Authentication
