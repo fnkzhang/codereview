@@ -220,16 +220,6 @@ def setCommitApproved(commit_id):
         print("Error: ", e)
         return False
 
-def removeItemFromCommit(item_id, commit_id):
-
-    with engine.connect() as conn:
-        stmt = delete(models.ItemCommitLocation).where(
-                models.ItemCommitLocation.item_id == item_id).where(
-                models.ItemCommitLocation.commit_id == commit_id
-        )
-        conn.execute(stmt)
-        conn.commit()
-    return True
 
 def getAllCommitItemsOfType(commit_id, is_folder):
     items = getAllCommitItems(commit_id)

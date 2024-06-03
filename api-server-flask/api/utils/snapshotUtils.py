@@ -59,23 +59,6 @@ def getSnapshotProject(snapshot_id):
     except:
         return None
 
-def getSnapshotPath(snapshot_id):
-    
-
-    try:
-        with engine.connect() as conn:
-            stmt = select(models.Snapshot).where(models.Snapshot.snapshot_id == snapshot_id)
-            snapshot = conn.execute(stmt)
-            doc_id = snapshot.first().associated_document_id
-
-            stmt = select(models.Document).where(models.Document.doc_id == doc_id)
-            document = conn.execute(stmt)
-            proj_id = document.first().associated_proj_id
-            return str(proj_id) + '/' + str(doc_id) + '/' + str(snapshot_id)
-    except Exception as e:
-        print(e)
-        return None
-
 def getSnapshotContentUtil(snapshot_id):
     blob = getBlob(str(snapshot_id))
     return blob

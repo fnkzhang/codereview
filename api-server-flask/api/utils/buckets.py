@@ -35,15 +35,6 @@ def deleteBlob(blobName):
         pass
     return True
 
-#location = basically the folder the files are located in
-def deleteBlobsInDirectory(location):
-    storage_client = storage.Client()
-    bucket = storage_client.bucket('cr_storage')
-    blobs = bucket.list_blobs(prefix = location)
-    for blob in blobs:
-        blob.delete()
-    return True
-
 def fetchFromCloudStorage(blobName:str):
     '''
     If cached, returns the blob in cache.
