@@ -11,10 +11,8 @@ export default function LlmButton( { editorLanguage, editorCode, commentText, ch
   const handleCreateSuggestion = async () => {
 
     let highlightedCode = getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY)
-    console.log(highlightedCode)
     let result = await getCodeImplementation(editorCode, highlightedCode,
       highlightStartY, highlightEndY, commentText, editorLanguage)
-    console.log(result)
 
     updateHighlightedCode(result, highlightedCode);
   }
