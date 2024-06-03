@@ -17,7 +17,6 @@ export default function getCookie(name) {
     }
     
     // Return null if not 
-    console.log("Cookie not found")
     return null;
 }
 
