@@ -300,8 +300,10 @@ def getAllDocumentCommittedSnapshots(proj_id, doc_id):
         A dictionary containing the following keys:
             - success (bool): Whether or not the request succeeded
             - reason (str): The reason
-            - body (list): A list of dicts of the format {"snapshot":'information about a snapshot', "commit":'information about the commit the snapshot is originally from'}
-
+            - body (list): A list of dicts of the format 
+                {"snapshot": A Snapshot object in the form of a dict
+                  "commit": A Commit object in the form of a dict, this is the commit that the snapshot above was originally associated with
+                }
     """
     headers = request.headers
 

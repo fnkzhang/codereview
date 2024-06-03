@@ -8,29 +8,6 @@ from utils.llmUtils import *
 init_llm()
 
 
-@app.route('/api/fake-route', methods=["POST"])
-def fake_route():
-    """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
-
-    **Explanation:**
-        <insert_explanation_here>
-
-    **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
-
-    **Returns:**
-        A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
-    """
-    pass
-
 # EXAMPLE:
 # curl -X POST http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "startLine": 1, "endLine": 2, "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function.", "language": "Python"}'
 @app.route("/api/llm/code-implementation", methods=["POST"])

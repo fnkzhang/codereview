@@ -15,26 +15,24 @@ import models
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
 def getSnapshot(proj_id, doc_id, snapshot_id):
     """
-    TODO: Documentation
     
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``GET /api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Gets the contents of a snapshot
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project this is in
+        - doc_id (int): id of the document the snapshot is for
+        - snapshot_id (int): id of the snapshot
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (str): The contents of the snapshot in string format, if unable to be decoded, returns None
 
     """
-    print("GETTING SNAPSHOT", proj_id, doc_id, snapshot_id)
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -68,26 +66,25 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<commit_id>/', methods=["POST"])
 def createSnapshot(proj_id, doc_id, commit_id):
     """
-    TODO: Documentation
     
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``POST /api/Snapshot/<proj_id>/<doc_id>/<commit_id>/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Creates a snapshot on a document in a commit
 
     **Args:**
-        - route_params (<param_type>): description
+        - proj_id (int): id of the project this is in
+        - doc_id (int): id of the document the snapshot is for
+        - commit_id (int): id of the commit this is happening on
         - request.body (dict):
-            - body_params (<param_type>): description
+            - data (str): contents of the snapshot
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
-
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): Id of the newly created snapshot
     """
-    print("Creating Snapshot", proj_id, doc_id)
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -124,23 +121,18 @@ def createSnapshot(proj_id, doc_id, commit_id):
 @app.route('/api/Snapshot/<snapshot_id>/', methods=["DELETE"])
 def deleteSnapshot(snapshot_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``DELETE /api/Snapshot/<snapshot_id>/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Deletes a snapshot
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - snapshot_id (int): id of the snapshot
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
 
     """
     # Authentication
@@ -175,23 +167,20 @@ def deleteSnapshot(snapshot_id):
 @app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
 def getCommentsOnSnapshot(snapshot_id):
     """
-    TODO: Documentation
     
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``GET /api/Snapshot/<snapshot_id>/comments/get``
 
     **Explanation:**
-        <insert_explanation_here>
+        Gets all comments attatched to the snapshot
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - snapshot_id (int): id of the snapshot
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): list of Comment objects as dicts
 
     """
     # Authentication

@@ -20,8 +20,6 @@ def getCommitInfo(commit_id):
         return foundCommit._asdict()
 
 def createNewCommit(proj_id, email, last_commit):
-    print("COMMIT_CREATED!!!", last_commit)
-
     commit_id = createID()
     if last_commit != None:
         print(last_commit)
@@ -222,22 +220,6 @@ def setCommitApproved(commit_id):
         print("Error: ", e)
         return False
 
-# def unsetCommitApproved(commit_id):
-#     try:
-#         with engine.connect() as conn:
-#             stmt = update(models.Commit).where(
-#                 models.Commit.commit_id == commit_id).values(
-#                 is_approved = True,
-#                 approved_count = models.Commit.approved_count - 1
-#             )
-
-#             conn.execute(stmt)
-#             conn.commit()
-#             return True
-#     except Exception as e:
-#         print("Error: ", e)
-#         return False
-
 def removeItemFromCommit(item_id, commit_id):
 
     with engine.connect() as conn:
@@ -248,75 +230,6 @@ def removeItemFromCommit(item_id, commit_id):
         conn.execute(stmt)
         conn.commit()
     return True
-
-#does not care about last_commit
-def getCommitSharedItemIdsUtil(commit_id1, commit_id2):
-    commit1Items = getAllCommitItemIds(commit_id1)
-    commit2Items = getAllCommitItemIds(commit_id2)
-    sharedIds = []
-    for itemId in commit1Items:
-        if itemId in commit2Items:
-            sharedIds.append(itemId)
-    return sharedIds
-
-def getCommitNewerSnapshotsUtil(commit_id1, commit_id2):
-    shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
-    commit1snaps = {}
-    commit2snaps = {}
-    last_commit = getCommitInfo(commit_id1)["last_commit"]
-    for itemId in shared:
-        item = getItemCommitLocation(itemId, commit_id1)
-        if item["is_folder"] == False:
-            commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
-            commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
-            lastcommitsnap = getCommitDocumentSnapshot(itemId, last_commit)
-            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"] and lastcommitsnap["snapshot_id"] != commit2snap["snapshot_id"]:
-                commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
-                commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
-    return commit1snaps, commit2snaps
-
-def getCommitDiffSnapshotsUtil(commit_id1, commit_id2):
-    shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
-    commit1snaps = {}
-    commit2snaps = {}
-    for itemId in shared:
-        item = getItemCommitLocation(itemId, commit_id1)
-        if item["is_folder"] == False:
-            commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
-            commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
-            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"]:
-                commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
-                commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
-    return commit1snaps, commit2snaps
-
-def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
-    commit1Items = getAllCommitItemIds(commit_id1)
-    commit2Items = getAllCommitItemIds(commit_id2)
-    commit1Uniques = []
-    commit2Uniques = []
-    for itemId in commit1Items:
-        if itemId not in commit2Items:
-            item = getItemCommitLocation(itemId)
-            if item["is_folder"] == True:
-                commit1Uniques.append(getFolderInfo(item, commit_id1))
-            else: 
-                commit1Uniques.append(getDocumentInfo(item, commit_id1))
-    for itemId in commit2Items:
-        if itemId not in commit1Items:
-            item = getItemCommitLocation(itemId)
-            if item["is_folder"] == True:
-                commit2Uniques.append(getFolderInfo(item, commit_id2))
-            else:
-                commit2Uniques.append(getDocumentInfo(item, commit_id2))
-    return commit1Uniques, commit2Uniques
-
-def getAllCommitItemIdsOfType(commit_id, is_folder):
-    items = getAllCommitItems(commit_id)
-    rv = []
-    for item in items:
-        if item["is_folder"] == is_folder:
-            rv.append(item["item_id"])
-    return rv
 
 def getAllCommitItemsOfType(commit_id, is_folder):
     items = getAllCommitItems(commit_id)
@@ -346,18 +259,6 @@ def getAllCommitItems(commit_id):
         itemArray = []
         for row in results:
             itemArray.append(row._asdict())
-        return itemArray
-
-def getAllCommitItemIds(commit_id):
-
-    with engine.connect() as conn:
-        stmt = select(models.ItemCommitLocation).where(
-                models.ItemCommitLocation.commit_id == commit_id
-        )
-        results = conn.execute(stmt)
-        itemArray = []
-        for row in results:
-            itemArray.append(row.item_id)
         return itemArray
 
 def getCommitTree(commit_id):

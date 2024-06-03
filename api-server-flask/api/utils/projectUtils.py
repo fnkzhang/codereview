@@ -74,33 +74,6 @@ def renameProjectUtil(proj_id, proj_name):
         return True, "No Error"
     except Exception as e:
         return False, e
-
-def getAllProjectDocuments(proj_id):
-    
-
-    with engine.connect() as conn:
-        stmt = select(models.Document).where(models.Document.associated_proj_id == int(proj_id))
-
-        results = conn.execute(stmt)
-
-        arrayOfDocuments = []
-
-        for row in results:
-            arrayOfDocuments.append(row._asdict())
-
-        return arrayOfDocuments
-
-
-def getAllProjectFolders(proj_id):
-    
-
-    with engine.connect() as conn:
-        stmt = select(models.Folder).where(models.Folder.associated_proj_id == proj_id)
-        foundFolders = conn.execute(stmt)
-        folders = []
-        for folder in foundFolders:
-            folders.append(folder._asdict())
-        return folders
     
 # Returns Array of Dictionaries
 def getAllProjectCommits(proj_id):
