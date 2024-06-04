@@ -4,10 +4,12 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 import os
 from utils.cacheUtils import cloudStorageCache, publishTopicUpdate
+from dotenv import dotenv_values
 
-# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
-# os.environ["GCLOUD_PROJECT"] = "codereview-413200"
-# CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
+BUCKET_NAME = dotenv_values('.env')["BUCKET_NAME"]
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
+os.environ["GCLOUD_PROJECT"] = "codereview-413200"
+CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 def uploadBlob(blobName, item):
     """
@@ -24,7 +26,8 @@ def uploadBlob(blobName, item):
 
     """
     storage_client = storage.Client()
-    bucket = storage_client.bucket('cr_storage')
+    print(BUCKET_NAME)
+    bucket = storage_client.bucket(BUCKET_NAME)
     print("Uploading to", blobName)
     blob = bucket.blob(blobName)
     blob.upload_from_string(data = item)
@@ -45,7 +48,7 @@ def getBlob(blobName):
 
     """
     storage_client = storage.Client()
-    bucket = storage_client.bucket('cr_storage')
+    bucket = storage_client.bucket(BUCKET_NAME)
     blob = bucket.get_blob(blobName)
     return blob.download_as_bytes()
 
@@ -64,7 +67,7 @@ def deleteBlob(blobName):
     """
     try:
         storage_client = storage.Client()
-        bucket = storage_client.bucket('cr_storage')
+        bucket = storage_client.bucket(BUCKET_NAME)
         blob = bucket.get_blob(blobName)
         if blob != None:
             blob.delete()
