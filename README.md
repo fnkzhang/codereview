@@ -60,7 +60,7 @@ To run the program, you will type:
 
 Now, you can communicated with cloud sql from your port 5000 which is the port our Backend API runs.
 
-## How to Setup Google Buckets
+### How to Setup Google Buckets
 Go to https://console.cloud.google.com/storage/ and select your project for the app. Click on create bucket.
 
 Give your bucket a name and click create. Add the BUCKET_NAME variable in .env as your bucket's name.
