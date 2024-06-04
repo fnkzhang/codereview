@@ -1,4 +1,4 @@
-## Initialization For Development
+![image](https://github.com/fnkzhang/codereview/assets/87836307/2547b09d-b402-43e6-9c7b-928510f4579a)## Initialization For Development
 ### React
 With Node.js installed, move to the react directory folder and perform
 
@@ -27,6 +27,49 @@ One the virtual environment is activated install the required libraries by perfo
 
 pip install -r requirements.txt
 
+## Setting up Google Cloud
+
+Go to https://console.cloud.google.com/welcome/ and click "Create or Select a Project". Then click on "New Project". Give your project a name and click create. Copy your project id.
+
+Find all instances of os.environ["GCLOUD_PROJECT"] = "codereview-413200" and change it to your project id. These are located in codereview/api-server-flask/api/utils/buckets.py and codereview/api-server-flask/api/cloudSql.py
+
+Make sure you have Application Default Credentials set up so you can run the program: https://cloud.google.com/docs/authentication/provide-credentials-adc 
+
+Place them in codereview/api-server-flask/api/credentials/googlecreds.json
+
+### How to Setup Cloud SQL
+
+Go to Google Cloud -> SQL and click Create Instance. Select MySql. Give your instance a name and password. Save these.
+
+Go to codereview/api-server-flask/api/cloudSql.py
+
+Change the instance_connection_name, db_user, db_pass, and db_name to your values. Instance connection name has the format (YourProjectID):(YourRegion):(YourDatabaseName).
+
+To work with cloud sql locally, you will need to use cloud-sql-proxy to connect to the cloud sql db from a local port.
+
+follow the tutorial provided by Google: https://cloud.google.com/sql/docs/mysql/connect-auth-proxy
+
+Download the cloud sql proxy file given and place it in a folder you can access in terminal later.
+
+To run the program, you will type:
+
+.\cloud-sql-proxy.exe --address 0.0.0.0 --port 5000 (YourProjectID):(YourRegion):(YourDatabaseName)
+
+Now, you can communicated with cloud sql from your port 5000 which is the port our Backend API runs.
+
+## How to Setup Google Buckets
+Go to https://console.cloud.google.com/storage/ and select your project for the app. Click on create bucket.
+
+Give your bucket a name and click create. Change the BUCKET_NAME variable in codereview/api-server-flask/api/utils/buckets.py to your bucket's name.
+
+## Setting up Github Oath App
+
+Create a Github Oauth app https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app
+
+You do not have a Homepage URL or Authorization callback URL right now, so wait until later.
+
+Create a github_oath_credentials.json, a json file of format {"client-id": (Your Oauth App's client-id), "client-secret":  (Your Oath App's client-secret)} and place it in api-server-flask/api/credentials.
+
 ## Building Docker Containers and Deploying to Google Cloud
 Go here to install docker for your machine: https://docs.docker.com/engine/install/
 
@@ -47,6 +90,8 @@ Click create.
 
 Repeat for the other service.
 
+Set your Github Oath App's homepage url and callback url to the url of the frontend service.
+
 ### Routing Container traffic
 In react/nginx/nginx.default.conf, change the proxy_pass value in location /api to the url of the backend will be run on. If it is on Google Cloud this will be the url of the backend service.
 
@@ -58,7 +103,6 @@ docker compose build
 to build the docker containers.
 
 ### Deploying the Containers to Google Cloud
-Go to https://console.cloud.google.com/welcome/ and click "Create or Select a Project". Then click on "New Project". Give your project a name and click create. Copy your project id.
 
 Open your terminal and type “gcloud init”. Log in to your Google account.
 
