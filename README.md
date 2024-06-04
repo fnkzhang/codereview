@@ -43,7 +43,7 @@ to build the docker containers.
 ### Deploying the Containers to Google Cloud
 Go to https://console.cloud.google.com/welcome/ and click "Create or Select a Project". Then click on "New Project". Give your project a name and click create. Copy your project id.
 Open your terminal and type “gcloud init”. Log in to your Google account.
-Type in “gcloud config set project <Your Project ID Here>” to your terminal.
+Type in “gcloud config set project (Your Project ID Here)” to your terminal.
 Build the docker containers (can easily be done with “docker compose build” in the main directory)
 Type “docker tag react-flask-app-api gcr.io/yourverycoolgooglecloudprojecthere/yourverycoolservicenamehere” into the terminal.
 Configure docker with “gcloud auth configure-docker” 
