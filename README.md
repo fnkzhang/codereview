@@ -90,7 +90,14 @@ Create a Github Oauth app https://docs.github.com/en/apps/oauth-apps/building-oa
 
 You do not have a Homepage URL or Authorization callback URL right now, so wait until later.
 
-Create a github_oath_credentials.json, a json file of format {"client-id": (Your Oauth App's client-id), "client-secret":  (Your Oath App's client-secret)} and place it in api-server-flask/api/credentials.
+Create a github_oath_credentials.json, a json file of format 
+
+    {
+        "client-id": (Your Oauth App's client-id),
+        "client-secret":  (Your Oath App's client-secret)
+    }
+    
+and place it in api-server-flask/api/credentials.
 
 ## Building Docker Containers and Deploying to Google Cloud
 Go here to install docker for your machine: https://docs.docker.com/engine/install/
