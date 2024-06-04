@@ -21,7 +21,7 @@ def getUserGithubStatus():
     ``GET /api/Github/userHasGithub/``
 
     **Explanation:**
-        Checks if user has github connected
+        Checks if user has github connected (user is dictated by credentials given in Authorization header)
 
     **Returns:**
         A dictionary containing the following keys:
@@ -108,7 +108,7 @@ def getGithubRepositoryBranches():
     ``GET /api/Github/getRepositoryBranches/``
 
     **Explanation:**
-        Gets a repository's branches if the user has access
+        Gets a repository's branches if the user has access (user determined by credentials in Authorization header). Requires Github token connection for the user to function.
 
     **Args:**
         - request.body (dict):
@@ -250,8 +250,8 @@ def pullToExistingProject(proj_id):
 
     **Explanation:**
         Pulls a github repo's contents to an existing project. 
-        The project's next commit will be the github repo's contents
-
+        The project's next commit will be the github repo's contents. Enforces permissions through credentials given in Authorization header.
+        This function has issues due to the fact that duplicate names are not prevented.
     **Args:**
         - proj_id (int): id of the project
         - request.body:
@@ -304,10 +304,8 @@ def pullToExistingProject(proj_id):
     contents = repo.get_contents("", body["branch"])
     updated_files = []
     docs_to_delete = [document['doc_id'] for document in documents]
-    print(docs_to_delete)
     folders_to_delete = [folder['folder_id'] for folder in folders]
     folders_to_delete.remove(commit["root_folder"])
-    print("____________________________________________________")
     threads = []
     while contents:
         file_content = contents.pop(0)
@@ -374,7 +372,7 @@ def pushToNewBranch(proj_id, commit_id):
     ``POST /api/Github/<proj_id>/<commit_id>/PushToNewBranch/``
 
     **Explanation:**
-        Pushes a commit's files into a new branch on github
+        Pushes a commit's files into a new branch on github. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project
@@ -465,7 +463,7 @@ def pushToExistingBranch(proj_id, commit_id):
     ``POST /api/Github/<proj_id>/<commit_id>/PushToExisting/``
 
     **Explanation:**
-        Pushes a commit's files into an existing branch on github
+        Pushes a commit's files into an existing branch on github. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project

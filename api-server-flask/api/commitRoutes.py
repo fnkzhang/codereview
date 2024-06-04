@@ -21,7 +21,7 @@ def getCommitInformation(commit_id):
     ``GET /api/Commit/<commit_id>/info/``
 
     **Explanation:**
-        gets information about a commit
+        Gets information about a commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - commit_id (int): id of the commit
@@ -67,7 +67,7 @@ def getCommitDocumentSnapshotPairs(commit_id):
     ``GET /api/Commit/<commit_id>/``
 
     **Explanation:**
-        Gets all the snapshots associated with the documents in a commit
+        Gets all the snapshots associated with the documents in a commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - commit_id (int): id of the commit
@@ -114,7 +114,7 @@ def createCommit(proj_id):
     ``POST /api/Commit/<proj_id>/createCommit/``
 
     **Explanation:**
-        Creates a working commit
+        Creates a working commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int)): the id of the project the commit is for
@@ -172,7 +172,7 @@ def commitCommit(commit_id):
     ``POST /api/Commit/<commit_id>/commitCommit/``
 
     **Explanation:**
-        Commits a commit. Also sets the commit as open
+        Commits a commit. Also sets the commit as open. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - commit_id (int): id of the commit
@@ -225,7 +225,7 @@ def setReviewedCommit(commit_id):
     ``GET /api/Commit/<commit_id>/setReviewed/``
 
     **Explanation:**
-        Sets a commit as reviewed
+        Sets a commit as reviewed. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - commit_id (int): id of the commit
@@ -274,7 +274,7 @@ def closeCommit(commit_id):
     ``GET /api/Commit/<commit_id>/close/``
 
     **Explanation:**
-        sets the commit as closed
+        Sets the commit as closed. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - commit_id (int): id of the commit
@@ -322,7 +322,7 @@ def approveCommit(commit_id):
     ``GET /api/Commit/<commit_id>/approve/``
 
     **Explanation:**
-        sets the commit as approved
+        Sets the commit as approved. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - commit_id (int): id of the commit
@@ -380,7 +380,7 @@ def deleteWorkingCommit(proj_id):
     ``DELETE /api/Commit/<proj_id>/workingCommit/``
 
     **Explanation:**
-        deletes the working commit of the user (derived from credentials in authorization)
+        Deletes the working commit of the user (derived from credentials in authorization). Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (proj_id): id of the project the commit is getting deleted
@@ -432,7 +432,7 @@ def getCommitFolderTree(commit_id):
     ``GET /api/Commit/<commit_id>/getFolderTree/``
 
     **Explanation:**
-        Gets all the items in a commit in a tree structure
+        Gets all the items in a commit in a tree structure. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - commit_id (int): id of the commit
@@ -475,7 +475,7 @@ def getUserWorkingCommitForProject(proj_id):
     ``GET /api/Commit/<proj_id>/workingCommit``
 
     **Explanation:**
-        Gets information about the user's (derived from credentials in Authorization headers) working commit
+        Gets information about the user's (derived from credentials in Authorization headers) working commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project
@@ -525,7 +525,7 @@ def getAllLatestCommitComments(proj_id):
     ``GET /api/Commit/<proj_id>/getLatestComments/``
 
     **Explanation:**
-        Gets all comments associated with snapshots that are associated with the latest committed commit of the project
+        Gets all comments associated with snapshots that are associated with the latest committed commit of the project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project

@@ -65,7 +65,7 @@ def addUser(proj_id):
     ``POST /api/Project/<proj_id>/addUser/``
 
     **Explanation:**
-        Adds a user to a project with the given permission level. Will update the permission level if they are already on the project
+        Adds a user to a project with the given permission level. Will update the permission level if they are already on the project. Enforces permissions through credentials given in Authorization header. User's permissions must be higher than or equal the level they are giving
 
     **Args:**
         - proj_id (int): the id of the project
@@ -118,7 +118,7 @@ def transferProjectOwnership(proj_id):
     ``POST /api/Project/<proj_id>/transferOwnership/``
 
     **Explanation:**
-        Transfers ownership to the given user
+        Transfers ownership to the given user. Enforces permissions through credentials given in Authorization header. User must be owner already
     
     **Args:**
         - proj_id (int): the id of the project
@@ -161,7 +161,7 @@ def removeUser(proj_id):
     ``DELETE /api/Project/<proj_id>/removeUser/``
 
     **Explanation:**
-        Removes a user from the project
+        Removes a user from the project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): the id of the project

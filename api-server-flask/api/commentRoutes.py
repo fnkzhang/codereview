@@ -18,7 +18,7 @@ def createComment(snapshot_id):
     ``POST /api/Snapshot/<snapshot_id>/comment/create``
 
     **Explanation:**
-        Creates a top-level comment on the given snapshot
+        Creates a top-level comment on the given snapshot. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - snapshot_id (str): The ID of the snapshot.
@@ -89,7 +89,7 @@ def resolveComment(comment_id):
     ``PUT /api/comment/<comment_id>/resolve``
 
     **Explanation:**
-        Resolves a given comment
+        Resolves a given comment. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - comment_id (str): The ID of the comment to resolve.
@@ -130,7 +130,7 @@ def editComment(comment_id):
     ``PUT /api/comments/<comment_id>/edit``
 
     **Explanation:**
-        Edits a comment
+        Edits a comment. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - comment_id (str): The ID of the comment to edit.
@@ -197,7 +197,7 @@ def deleteComment(comment_id):
     ``DELETE /api/comments/<comment_id>/delete``
 
     **Explanation:**
-        Deletes a comment
+        Deletes a comment. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - comment_id (str): The ID of the comment to delete.

@@ -216,6 +216,16 @@ def init_llm(project_id: str="codereview-413200",
 # Helper Functions
 #-------------------------------------------------------------------------------
 def get_json_from_llm_response(response: str):
+    """
+    **Explanation:**
+        Creates a json object from a string
+
+    **Args:**
+        - response (str): A string representing a json string
+
+    **Returns:**
+        json (dict): a dict representing the json string
+    """
     #json_match = re.search(r"```json\s*(.*?)\s*```", response, re.DOTALL)
 
     #json_response = json_match.group(1) if json_match else response
@@ -224,6 +234,17 @@ def get_json_from_llm_response(response: str):
 
 def get_chat_response(user_prompt: str,
                       system_prompt: str = None):
+    """
+    **Explanation:**
+        Gets a response from VertexAi given a user prompt and a system prompt
+
+    **Args:**
+        - user_prompt (str): A user prompt (query a user would ask the AI)
+        - system_prompt (str): Guidelines for the AI to follow when responding to the user prompt
+
+    **Returns:**
+        response (str): VertexAI's response
+    """
     model = GenerativeModel(
         model_name=MODEL_NAME,
         system_instruction=system_prompt,
@@ -240,6 +261,18 @@ def get_chat_response(user_prompt: str,
 def add_few_shot_example(example_number: int,
                          example_input: str,
                          example_output: str):
+    """
+    **Explanation:**
+        Creates a few_shot_example string to be added to a system prompt
+
+    **Args:**
+        - example_number (int): Number of the example
+        - example_input (str): Example user prompt
+        - example_output (str): Example output from the AI
+
+    **Returns:**
+        few_shot_example (str): a string formatted to a few shot example format
+    """
     return FEW_SHOT_EXAMPLE.format(
         example_number=example_number,
         example_input=example_input,
@@ -248,6 +281,16 @@ def add_few_shot_example(example_number: int,
     )
 
 def get_code_with_line_numbers(code: str):
+    """
+    **Explanation:**
+        Adds line numbers before every line in a string
+
+    **Args:**
+        - code (str): string to add line numbers to
+
+    **Returns:**
+        codeWithLineNumbers (str): a string with line numbers added before every line
+    """
     return '\n'.join([
         f"{i+1}| {line}" 
         for i, line in enumerate(code.splitlines())
@@ -262,6 +305,21 @@ def get_llm_code_from_suggestion(code: str,
                                  end_line: int,
                                  suggestion: str,
                                  language: str):
+    """
+    **Explanation:**
+        Gets a code edit from VertexAI given a suggestion
+
+    **Args:**
+        - code (str): code to edit
+        - highlighted_code (str): code that the suggestion refers to
+        - start_line (int): line that the code the suggestion refers to starts on
+        - end_line (int): line that the code the suggestion refers to ends on
+        - suggestion (str): The suggestion
+        - language (str): Language the code was written in; e.g: Python, C++, Java
+
+    **Returns:**
+        response (dict): A dict with the keys "success", "insertions", and "deletions". The "insertions" key maps to a dictionary of line insertions that follow the format of (line number (int)) : "(lines to insert (str))". The lines are inserted on the line number directly after the line number provided. The "deletions" key maps to a list of line numbers (int) that should be deleted. The "success" key maps to whether or not the response was succesfull
+    """
     # Configure System Prompt
     system_prompt = SYSTEM_INSTRUCTION_CODE_FROM_SUGGESTION.format(
         language=language
@@ -364,6 +422,17 @@ def get_llm_code_from_suggestion(code: str,
 
 def get_llm_suggestion_from_code(code: str,
                                  language: str):
+    """
+    **Explanation:**
+        Gets a suggestion from VertexAI given code
+
+    **Args:**
+        - code (str): code to get suggestions for
+        - language (str): Language the code was written in; e.g: Python, C++, Java
+
+    **Returns:**
+        response (dict): A dict with the key "suggestions" which maps to a list of JSON objects. Each object in the list contains the keys "startLine", "endLine", and "suggestion" keys, indicating the highlighted code lines and suggested changes.
+    """
     # Configure System Prompt
     system_prompt = SYSTEM_INSTRUCTION_SUGGESTION_FROM_CODE.format(
         language=language

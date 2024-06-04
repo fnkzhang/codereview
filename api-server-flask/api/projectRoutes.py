@@ -18,7 +18,7 @@ def getProject(proj_id):
     ``GET /api/Project/<proj_id>/``
 
     **Explanation:**
-        Gets information about the project of the id.
+        Gets information about the project of the id. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): Id of the project you're getting
@@ -109,7 +109,7 @@ def deleteProject(proj_id):
     ``DELETE /api/Project/<proj_id>/``
 
     **Explanation:**
-        Deletes a project
+        Deletes a project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project you're deleting
@@ -157,7 +157,7 @@ def renameProject(proj_id):
     ``POST /api/Project/<proj_id>/rename/``
 
     **Explanation:**
-        Renames a project
+        Renames a project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project you're renaming
@@ -213,7 +213,7 @@ def getProjectCommittedCommits(proj_id):
     ``GET /api/Project/<proj_id>/GetCommits/``
 
     **Explanation:**
-        Get all of the project's committed commits
+        Get all of the project's committed commits. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project
@@ -255,12 +255,10 @@ def getProjectCommittedCommits(proj_id):
 @app.route('/api/Project/<proj_id>/GetLatestCommit/', methods = ["GET"])
 def getProjectLatestCommit(proj_id):
     """
-    TODO: Documentation
-    
     ``GET /api/Project/<proj_id>/GetLatestCommit/``
 
     **Explanation:**
-        Get the latest committed commit of the project
+        Get the latest committed commit of the project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project

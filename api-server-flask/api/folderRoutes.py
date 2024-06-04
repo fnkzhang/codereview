@@ -19,7 +19,7 @@ def getFolder(proj_id, folder_id, commit_id):
     ``GET /api/Folder/<proj_id>/<folder_id>/<commit_id>/``
 
     **Explanation:**
-        Gets folder information from the given commit
+        Gets folder information from the given commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (str): folder you're moving
@@ -67,7 +67,7 @@ def createFolder(proj_id, commit_id):
     ``POST /api/Folder/<proj_id>/<commit_id>/``
 
     **Explanation:**
-        Creates a folder in a project's commit with the given name and parent folder
+        Creates a folder in a project's commit with the given name and parent folder. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (str): project you're making the folder in
@@ -114,7 +114,7 @@ def deleteFolder(folder_id, commit_id):
     ``DELETE /api/Folder/<folder_id>/<commit_id>/``
 
     **Explanation:**
-        Deletes the folder from the commit
+        Deletes the folder from the commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - folder_id (str): folder you’re deleting
@@ -169,7 +169,7 @@ def renameFolder(folder_id, commit_id):
     ``POST /api/Folder/<folder_id>/<commit_id>/rename/``
 
     **Explanation:**
-        Renames the folder from the commit
+        Renames the folder from the commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - folder_id (str): folder you’re renaming
@@ -230,7 +230,7 @@ def moveFolder(folder_id, commit_id):
     ``POST /api/Folder/<folder_id>/<commit_id>/move/``
 
     **Explanation:**
-        This endpoint moves a folder within a project's commit to another folder.
+        This endpoint moves a folder within a project's commit to another folder. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - folder_id (str): folder you're moving

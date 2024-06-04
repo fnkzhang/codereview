@@ -21,7 +21,7 @@ def getDocument(proj_id, doc_id, commit_id):
     ``GET /api/Document/<proj_id>/<doc_id>/<commit_id>/``
 
     **Explanation:**
-        Gets the document information in the commit given
+        Gets the document information in the commit given. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): The project ID.
@@ -66,7 +66,7 @@ def createDocument(proj_id, commit_id):
     ``POST /api/Document/<proj_id>/<commit_id>/``
 
     **Explanation:**
-        Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data.
+        Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): The project ID.
@@ -119,7 +119,7 @@ def deleteDocument(doc_id, commit_id):
     ``DELETE /api/Document/<doc_id>/<commit_id>/``
 
     **Explanation:**
-        Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit
+        Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         doc_id (int): The document ID.
@@ -176,7 +176,7 @@ def renameDocument(doc_id, commit_id):
     ``POST /api/Document/<doc_id>/<commit_id>/rename/``
 
     **Explanation:**
-        renames a document
+        Renames a document. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - doc_id (int): The document ID
@@ -233,7 +233,7 @@ def moveDocument(doc_id, commit_id):
     ``POST /api/Document/<doc_id>/<commit_id>/move/``
 
     **Explanation:**
-        moves a document
+        Moves a document. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - doc_id (int): The document ID
@@ -290,7 +290,7 @@ def getAllDocumentCommittedSnapshots(proj_id, doc_id):
     ``GET /api/Document/<proj_id>/<doc_id>/getSnapshotId/``
 
     **Explanation:**
-        Returns every snapshot associated with this document and committed commits.
+        Returns every snapshot associated with this document and committed commits. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): The project id the document is in
@@ -339,7 +339,7 @@ def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
     ``GET /api/Document/<proj_id>/<doc_id>/getSnapshotIdAndWorking/``
 
     **Explanation:**
-        Returns every snapshot associated with this document and committed commits. Also return the snapshots associated with any working commits of the user sending the request based off the authentication headers.
+        Returns every snapshot associated with this document and committed commits. Also return the snapshots associated with any working commits of the user sending the request based off the authentication headers. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): The project id the document is in
@@ -447,7 +447,7 @@ def getAllCommentsForDocument(document_id):
     ``GET /api/Document/<document_id>/comments/``
 
     **Explanation:**
-        Gets all comments on a document across all committed snapshots
+        Gets all comments on a document across all committed snapshots. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - document_id (int): The identifier of the document.

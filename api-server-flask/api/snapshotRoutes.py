@@ -19,7 +19,7 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
     ``GET /api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/``
 
     **Explanation:**
-        Gets the contents of a snapshot
+        Gets the contents of a snapshot. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project this is in
@@ -70,7 +70,7 @@ def createSnapshot(proj_id, doc_id, commit_id):
     ``POST /api/Snapshot/<proj_id>/<doc_id>/<commit_id>/``
 
     **Explanation:**
-        Creates a snapshot on a document in a commit
+        Creates a snapshot on a document in a commit. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - proj_id (int): id of the project this is in
@@ -124,7 +124,7 @@ def deleteSnapshot(snapshot_id):
     ``DELETE /api/Snapshot/<snapshot_id>/``
 
     **Explanation:**
-        Deletes a snapshot
+        Deletes a snapshot. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - snapshot_id (int): id of the snapshot
@@ -171,7 +171,7 @@ def getCommentsOnSnapshot(snapshot_id):
     ``GET /api/Snapshot/<snapshot_id>/comments/get``
 
     **Explanation:**
-        Gets all comments attatched to the snapshot
+        Gets all comments attatched to the snapshot. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
         - snapshot_id (int): id of the snapshot
