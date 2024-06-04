@@ -2,8 +2,7 @@
 ### React
 With Node.js installed, move to the react directory folder and perform
 
-npm install 
-
+    npm install 
 
 ### Flask
 To Prepare for flask make sure to set up a python virtual environment
@@ -12,7 +11,7 @@ First go back to the root directory of the project
 
 create a python virtual environment if not already there:
 
-python -m venv .venv
+    python -m venv .venv
 
 To activate, type:
 For Windows:
@@ -25,7 +24,7 @@ For Ubuntu/Mac:
 
 One the virtual environment is activated install the required libraries by performing 
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
 ## Setting up Google Cloud
 
@@ -57,14 +56,14 @@ Download the cloud sql proxy file given and place it in a folder you can access 
 
 To run the program, you will type:
 
-.\cloud-sql-proxy.exe --address 0.0.0.0 --port 5000 (YourProjectID):(YourRegion):(YourDatabaseName)
+    .\cloud-sql-proxy.exe --address 0.0.0.0 --port 5000 (YourProjectID):(YourRegion):(YourDatabaseName)
 
 Now, you can communicated with cloud sql from your port 5000 which is the port our Backend API runs.
 
 ## How to Setup Google Buckets
 Go to https://console.cloud.google.com/storage/ and select your project for the app. Click on create bucket.
 
-Give your bucket a name and click create. Add the BUCKET_NAME variable in .rnv as your bucket's name.
+Give your bucket a name and click create. Add the BUCKET_NAME variable in .env as your bucket's name.
 
 Your final .env file should look something like this
 
@@ -127,21 +126,31 @@ In react/nginx/nginx.default.conf, change the proxy_pass value in location /api 
 ### Building Docker Containers
 perform
 
-docker compose build
+    docker compose build
 
 to build the docker containers.
 
 ### Deploying the Containers to Google Cloud
 
-Open your terminal and type “gcloud init”. Log in to your Google account.
+Open your terminal and type 
+    
+    gcloud init
 
-Type in “gcloud config set project (Your Project ID Here)” to your terminal.
+Log in to your Google account.
 
-Configure docker with “gcloud auth configure-docker” 
+Then type in
 
-Type “docker tag backend gcr.io/(Your Project ID Here)/backend” into the terminal.
+    gcloud config set project (Your Project ID Here)
 
-Type “docker push gcr.io/(Your Project ID Here)/backend” into the terminal.
+Then configure docker with 
+
+    gcloud auth configure-docker
+
+Run the following commands
+
+    docker tag backend gcr.io/(Your Project ID Here)/backend
+
+    docker push gcr.io/(Your Project ID Here)/backend
 
 Go to your backend service on Google Cloud, and set the container image url to what you just pushed.
 
