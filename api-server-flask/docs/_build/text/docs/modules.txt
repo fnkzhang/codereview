@@ -1,32 +1,466 @@
-utils
-*****
+api
+***
 
-* buckets module
+* app module
 
-* cacheUtils module
+  * "get_app()"
 
-* commentUtils module
+* authRoutes module
 
-* commitDocSnapUtils module
+  * "authenticator()"
 
-* commitLocationUtils module
+  * "checkIsValidUser()"
 
-* commitUtils module
+  * "signUp()"
 
-* documentUtils module
+* cloudSql module
 
-* folderUtils module
+  * "connectCloudSql()"
 
-* githubUtils module
+* commentRoutes module
 
-* llmUtils module
+  * "createComment()"
 
-* miscUtils module
+  * "deleteComment()"
 
-* projectUtils module
+  * "editComment()"
 
-* seenUtils module
+  * "resolveComment()"
 
-* snapshotUtils module
+* commitRoutes module
 
-* userAndPermissionsUtils module
+  * "approveCommit()"
+
+  * "closeCommit()"
+
+  * "commitCommit()"
+
+  * "createCommit()"
+
+  * "deleteWorkingCommit()"
+
+  * "getAllLatestCommitComments()"
+
+  * "getCommitDocumentSnapshotPairs()"
+
+  * "getCommitFolderTree()"
+
+  * "getCommitInformation()"
+
+  * "getUserWorkingCommitForProject()"
+
+  * "setReviewedCommit()"
+
+* documentRoutes module
+
+  * "changeDocumentSnapshot()"
+
+  * "createDocument()"
+
+  * "deleteDocument()"
+
+  * "getAllCommentsForDocument()"
+
+  * "getAllDocumentCommittedSnapshots()"
+
+  * "getAllDocumentCommittedSnapshotsIncludingWorking()"
+
+  * "getDocument()"
+
+  * "moveDocument()"
+
+  * "renameDocument()"
+
+* flaskApi module
+
+  * "afterRequest()"
+
+  * "defaultRoute()"
+
+* folderRoutes module
+
+  * "createFolder()"
+
+  * "deleteFolder()"
+
+  * "getFolder()"
+
+  * "moveFolder()"
+
+  * "renameFolder()"
+
+* githubRoutes module
+
+  * "addGithubToken()"
+
+  * "getGithubRepositoryBranches()"
+
+  * "getUserGithubStatus()"
+
+  * "pullToExistingProject()"
+
+  * "pullToNewProject()"
+
+  * "pushToExistingBranch()"
+
+  * "pushToNewBranch()"
+
+* llmRoutes module
+
+  * "implement_code_changes_from_comment()"
+
+  * "suggest_comment_from_code()"
+
+* models module
+
+  * "Base"
+
+    * "Base.metadata"
+
+    * "Base.registry"
+
+  * "Comment"
+
+    * "Comment.author_email"
+
+    * "Comment.comment_id"
+
+    * "Comment.content"
+
+    * "Comment.date_created"
+
+    * "Comment.date_modified"
+
+    * "Comment.highlight_end_x"
+
+    * "Comment.highlight_end_y"
+
+    * "Comment.highlight_start_x"
+
+    * "Comment.highlight_start_y"
+
+    * "Comment.is_resolved"
+
+    * "Comment.reply_to_id"
+
+    * "Comment.snapshot_id"
+
+  * "Commit"
+
+    * "Commit.approved_count"
+
+    * "Commit.author_email"
+
+    * "Commit.commit_id"
+
+    * "Commit.date_committed"
+
+    * "Commit.date_created"
+
+    * "Commit.is_approved"
+
+    * "Commit.last_commit"
+
+    * "Commit.name"
+
+    * "Commit.proj_id"
+
+    * "Commit.root_folder"
+
+    * "Commit.state"
+
+  * "CommitDocumentSnapshotRelation"
+
+    * "CommitDocumentSnapshotRelation.commit_id"
+
+    * "CommitDocumentSnapshotRelation.doc_id"
+
+    * "CommitDocumentSnapshotRelation.snapshot_id"
+
+  * "Document"
+
+    * "Document.associated_proj_id"
+
+    * "Document.date_created"
+
+    * "Document.date_modified"
+
+    * "Document.doc_id"
+
+    * "Document.is_reviewed"
+
+    * "Document.og_commit_id"
+
+  * "Folder"
+
+    * "Folder.associated_proj_id"
+
+    * "Folder.date_created"
+
+    * "Folder.date_modified"
+
+    * "Folder.folder_id"
+
+    * "Folder.og_commit_id"
+
+  * "ItemCommitLocation"
+
+    * "ItemCommitLocation.commit_id"
+
+    * "ItemCommitLocation.is_folder"
+
+    * "ItemCommitLocation.item_id"
+
+    * "ItemCommitLocation.name"
+
+    * "ItemCommitLocation.parent_folder"
+
+  * "Project"
+
+    * "Project.author_email"
+
+    * "Project.date_created"
+
+    * "Project.date_modified"
+
+    * "Project.name"
+
+    * "Project.proj_id"
+
+  * "Snapshot"
+
+    * "Snapshot.associated_document_id"
+
+    * "Snapshot.date_created"
+
+    * "Snapshot.date_modified"
+
+    * "Snapshot.og_commit_id"
+
+    * "Snapshot.snapshot_id"
+
+  * "User"
+
+    * "User.date_joined"
+
+    * "User.github_token"
+
+    * "User.name"
+
+    * "User.user_email"
+
+  * "UserProjectRelation"
+
+    * "UserProjectRelation.permissions"
+
+    * "UserProjectRelation.proj_id"
+
+    * "UserProjectRelation.role"
+
+    * "UserProjectRelation.user_email"
+
+  * "UserUnseenComment"
+
+    * "UserUnseenComment.comment_id"
+
+    * "UserUnseenComment.user_email"
+
+  * "UserUnseenSnapshot"
+
+    * "UserUnseenSnapshot.snapshot_id"
+
+    * "UserUnseenSnapshot.user_email"
+
+* new_ok_test module
+
+  * "app()"
+
+  * "client()"
+
+  * "get_request_body()"
+
+  * "test_addGithubToken()"
+
+  * "test_addUser()"
+
+  * "test_addUserAdmin()"
+
+  * "test_approveCommit()"
+
+  * "test_authenticator()"
+
+  * "test_bulkAddToCommit()"
+
+  * "test_bulkDeleteFromCommit()"
+
+  * "test_changeDocumentSnapshot()"
+
+  * "test_checkIfNewerCommitExists()"
+
+  * "test_checkIsValidUser()"
+
+  * "test_closeCommit()"
+
+  * "test_commitCommit()"
+
+  * "test_createComment()"
+
+  * "test_createCommit()"
+
+  * "test_createDocument()"
+
+  * "test_createFolder()"
+
+  * "test_createProject()"
+
+  * "test_createSnapshot()"
+
+  * "test_deleteComment()"
+
+  * "test_deleteDocument()"
+
+  * "test_deleteFolder()"
+
+  * "test_deleteProject()"
+
+  * "test_deleteSnapshot()"
+
+  * "test_deleteWorkingCommit()"
+
+  * "test_editComment()"
+
+  * "test_getAllCommentsForDocument()"
+
+  * "test_getAllDocumentCommittedSnapshots()"
+
+  * "test_getAllDocumentCommittedSnapshotsIncludingWorking()"
+
+  * "test_getAllLatestCommitComments()"
+
+  * "test_getAllUserProjects()"
+
+  * "test_getCommentsOnSnapshot()"
+
+  * "test_getCommitDiffCareAboutLast()"
+
+  * "test_getCommitDifferences()"
+
+  * "test_getCommitFolderTree()"
+
+  * "test_getDocument()"
+
+  * "test_getFolder()"
+
+  * "test_getGithubRepositoryBranches()"
+
+  * "test_getProject()"
+
+  * "test_getProjectCommittedCommits()"
+
+  * "test_getProjectDocuments()"
+
+  * "test_getProjectLatestCommit()"
+
+  * "test_getSnapshot()"
+
+  * "test_getUserGithubStatus()"
+
+  * "test_getUserWorkingCommitForProject()"
+
+  * "test_getUsersWithAccessToProject()"
+
+  * "test_implement_code_changes_from_comment()"
+
+  * "test_importPermissions()"
+
+  * "test_moveDocument()"
+
+  * "test_moveFolder()"
+
+  * "test_pullToExistingProject()"
+
+  * "test_pullToNewProject()"
+
+  * "test_pushToExistingBranch()"
+
+  * "test_pushToNewBranch()"
+
+  * "test_removeUser()"
+
+  * "test_renameDocument()"
+
+  * "test_renameFolder()"
+
+  * "test_renameProject()"
+
+  * "test_resolveComment()"
+
+  * "test_setReviewedCommit()"
+
+  * "test_signUp()"
+
+  * "test_suggest_comment_from_code()"
+
+  * "test_transferProjectOwnership()"
+
+* projectRoutes module
+
+  * "createProject()"
+
+  * "deleteProject()"
+
+  * "getProject()"
+
+  * "getProjectCommittedCommits()"
+
+  * "getProjectLatestCommit()"
+
+  * "renameProject()"
+
+* reviewStateEnums module
+
+  * "reviewStateEnum"
+
+    * "reviewStateEnum.approved"
+
+    * "reviewStateEnum.closed"
+
+    * "reviewStateEnum.open"
+
+    * "reviewStateEnum.reviewed"
+
+* snapshotRoutes module
+
+  * "createSnapshot()"
+
+  * "deleteSnapshot()"
+
+  * "getCommentsOnSnapshot()"
+
+  * "getSnapshot()"
+
+* testRoutes module
+
+  * "createTable()"
+
+  * "get_app()"
+
+  * "testExamples()"
+
+  * "test_llm()"
+
+  * "testcommentodcodellm()"
+
+  * "testsnapshotgetinfo()"
+
+* userAndPermissionsRoutes module
+
+  * "addUser()"
+
+  * "getAllUserProjects()"
+
+  * "getUsersWithAccessToProject()"
+
+  * "removeUser()"
+
+  * "transferProjectOwnership()"

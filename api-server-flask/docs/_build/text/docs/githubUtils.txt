@@ -1,2 +1,113 @@
 githubUtils module
 ******************
+
+githubUtils.addTreeElement(tree_elements, doc_id, commit_id, repo, documentSnapshots, folderIDToPath)
+
+   **Explanation:**
+      Creates a git blob for the given repo and adds it to the
+      tree_elements list
+
+   **Args:**
+      * tree_elements (list): List you're adding an element to
+
+      * doc_id (int): id of the document you're adding
+
+      * commit_id (int): id of the commit this is taking place in
+
+      * repo (Repository): Repository object https://pygithub.readthe
+        docs.io/en/stable/github_objects/Repository.html
+
+      * documentSnapshots (dict): Keys of document ids that map to
+        their respective snapshot ids in the commit
+
+      * folderIDToPath (dict): dict of folder ids mapping to their
+        paths
+
+githubUtils.assembleGithubComments(documentSnapshots, commit_id)
+
+   **Explanation:**
+      Creates a list of comments to Comment for a commit, includes all
+      comments on all snapshots on a commit
+
+   **Args:**
+      * documentSnapshots (dict): Keys of document ids that map to
+        their respective snapshot ids in the commit
+
+      * commit_id (int): id of the commit you're grabbing from
+
+   **Returns:**
+      githubComments (list): list of comments to make on Github
+
+githubUtils.assembleGithubTreeElements(repo, folderIDToPath, deletedDocumentPaths, documentSnapshots, commit_id)
+
+   **Explanation:**
+      Creates a list of tree elements for the given repo, includes
+      deletions and existing files
+
+   **Args:**
+      * repo (Repository): Repository object https://pygithub.readthe
+        docs.io/en/stable/github_objects/Repository.html
+
+      * deletedDocumentPaths (list): List of document paths that
+        should be deleted from the github
+
+      * documentSnapshots (dict): Keys of document ids that map to
+        their respective snapshot ids in the commit
+
+      * folderIDToPath (dict): dict of folder ids mapping to their
+        paths
+
+      * commit_id (int): id of the commit you're grabbing from
+
+   **Returns:**
+      tree_elements (list): list of InputGitTreeElements
+      https://pygithub.readthedocs.io/en/stable/utilities.html
+
+githubUtils.getBranches(token, repository)
+
+   **Explanation:**
+      Gets a repository's branches if the token has access
+
+   **Args:**
+      * token (int): A user's github token from the Oauth app
+
+      * repository (str): name of repository, includes owner name
+
+   **Returns:**
+      branches (list): list of branch names of the repository as
+      strings
+
+githubUtils.getCommitNonexistentGithubDocumentsUtil(repository, branch, token, commit_id)
+
+   **Explanation:**
+      Gets all of the repository's documents from a specific branch
+      that do not exist in the given commit as paths
+
+   **Args:**
+      * repository (str): name of repository, includes owner name
+
+      * branch (str): name of the branch
+
+      * token (int): A user's github token from the Oauth app
+
+      * commit_id (int): id of the commit you're comparing to
+
+   **Returns:**
+      nonexistant (list): list of documents paths that do not exist in
+      the commit as strings
+
+githubUtils.getGithubProjectDocumentsAsPaths(repository, branch, token)
+
+   **Explanation:**
+      Gets all of the repository's documents as paths from a specific
+      branch
+
+   **Args:**
+      * repository (str): name of repository, includes owner name
+
+      * branch (str): name of the branch
+
+      * token (int): A user's github token from the Oauth app
+
+   **Returns:**
+      githubFiles (list): list of document paths as strings

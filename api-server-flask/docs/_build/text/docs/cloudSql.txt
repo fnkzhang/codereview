@@ -1,2 +1,4 @@
 cloudSql module
 ***************
+
+cloudSql.connectCloudSql() -> Engine

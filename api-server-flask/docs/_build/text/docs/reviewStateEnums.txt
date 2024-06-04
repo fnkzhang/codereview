@@ -1,7 +1,7 @@
 reviewStateEnums module
 ***********************
 
-class reviewStateEnums.reviewStateEnum(value, names=None, *values, module=None, qualname=None, type=None, start=1, boundary=None)
+class reviewStateEnums.reviewStateEnum(value, names=None, *, module=None, qualname=None, type=None, start=1, boundary=None)
 
    Bases: "str", "Enum"
 

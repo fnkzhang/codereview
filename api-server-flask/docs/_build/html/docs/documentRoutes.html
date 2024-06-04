@@ -37,14 +37,14 @@
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">changeDocumentSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.changeDocumentSnapshot" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/&lt;snapshot_id&gt;/changeTo/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>This endpoint changes the document identified by ‘doc_id’ and ‘commit_id’ to the snapshot identified by ‘snapshot_id’.
+<dt><strong>Explanation:</strong></dt><dd><p>This endpoint changes the document identified by 'doc_id' and 'commit_id' to the snapshot identified by 'snapshot_id'.
 It requires authentication via an Authorization token header.
 Only users with sufficient permissions can change document snapshots.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>doc_id (str): The identifier of the document.</p></li>
-<li><p>commit_id (str): The identifier of the commit.</p></li>
-<li><p>snapshot_id (str): The identifier of the snapshot to change to.</p></li>
+<li><p>doc_id (int): The identifier of the document.</p></li>
+<li><p>commit_id (int): The identifier of the commit.</p></li>
+<li><p>snapshot_id (int): The identifier of the snapshot to change to.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><dl class="simple">
@@ -64,16 +64,16 @@ Only users with sufficient permissions can change document snapshots.</p>
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">createDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.createDocument" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;proj_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data.</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>proj_id (str): The project ID.</p></li>
-<li><p>commit_id (str): The commit ID.</p></li>
+<li><p>proj_id (int): The project ID.</p></li>
+<li><p>commit_id (int): The commit ID.</p></li>
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
 <li><p>doc_name (str): name of document</p></li>
 <li><p>data (str): text you want in the document</p></li>
-<li><p>parent_folder(str): Optional; if not in request will put in root folder</p></li>
+<li><p>parent_folder(int): Optional; if not in request will put in root folder</p></li>
 </ul>
 </dd>
 </dl>
@@ -97,10 +97,10 @@ Only users with sufficient permissions can change document snapshots.</p>
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.deleteDocument" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
-<dt><strong>Args:</strong></dt><dd><p>doc_id (str): The document ID.
-commit_id (str): The commit ID.</p>
+<dt><strong>Args:</strong></dt><dd><p>doc_id (int): The document ID.
+commit_id (int): The commit ID.</p>
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
 <dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
@@ -118,10 +118,10 @@ commit_id (str): The commit ID.</p>
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllCommentsForDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllCommentsForDocument" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Document/&lt;document_id&gt;/comments/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Gets all comments on a document across all committed snapshots</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all comments on a document across all committed snapshots. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>document_id (str): The identifier of the document.</p></li>
+<li><p>document_id (int): The identifier of the document.</p></li>
 </ul>
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
@@ -143,27 +143,28 @@ commit_id (str): The commit ID.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.getAllDocumentCommittedSnapshots">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllDocumentCommittedSnapshots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllDocumentCommittedSnapshots" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
-<dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Document/&lt;proj_id&gt;/&lt;doc_id&gt;/getSnapshotId/</span></code></p>
+<dl>
+<dt><strong>Explanation:</strong></dt><dd><p>Returns every snapshot associated with this document and committed commits. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
-<li><dl class="simple">
-<dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
+<li><p>proj_id (int): The project id the document is in</p></li>
+<li><p>doc_id (int): The id of the document</p></li>
 </ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl>
+<dt>A dictionary containing the following keys:</dt><dd><ul>
+<li><p>success (bool): Whether or not the request succeeded</p></li>
+<li><p>reason (str): The reason</p></li>
+<li><dl>
+<dt>body (list): A list of dicts of the format </dt><dd><dl class="simple">
+<dt>{&quot;snapshot&quot;: A Snapshot object in the form of a dict</dt><dd><p>&quot;commit&quot;: A Commit object in the form of a dict, this is the commit that the snapshot above was originally associated with</p>
+</dd>
+</dl>
+<p>}</p>
 </dd>
 </dl>
 </li>
-</ul>
-</dd>
-<dt><strong>Returns:</strong></dt><dd><dl class="simple">
-<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
 </ul>
 </dd>
 </dl>
@@ -174,27 +175,20 @@ commit_id (str): The commit ID.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="documentRoutes.getAllDocumentCommittedSnapshotsIncludingWorking">
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllDocumentCommittedSnapshotsIncludingWorking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getAllDocumentCommittedSnapshotsIncludingWorking" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Document/&lt;proj_id&gt;/&lt;doc_id&gt;/getSnapshotIdAndWorking/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Returns every snapshot associated with this document and committed commits. Also return the snapshots associated with any working commits of the user sending the request based off the authentication headers. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
-<li><dl class="simple">
-<dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
-</ul>
-</dd>
-</dl>
-</li>
+<li><p>proj_id (int): The project id the document is in</p></li>
+<li><p>doc_id (int): The id of the document</p></li>
 </ul>
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
 <dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+<li><p>success (bool): Whether or not the request succeeded</p></li>
+<li><p>reason (str): The reason</p></li>
+<li><p>body (list): A list of dicts of the format {&quot;snapshot&quot;:'information about a snapshot', &quot;commit&quot;:'information about the commit the snapshot is originally from'}</p></li>
 </ul>
 </dd>
 </dl>
@@ -207,12 +201,12 @@ commit_id (str): The commit ID.</p>
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">getDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.getDocument" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Document/&lt;proj_id&gt;/&lt;doc_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Gets the document information in the commit given</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the document information in the commit given. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>proj_id (str): The project ID.</p></li>
-<li><p>doc_id (str): The document ID.</p></li>
-<li><p>commit_id (str): The commit ID.</p></li>
+<li><p>proj_id (int): The project ID.</p></li>
+<li><p>doc_id (int): The document ID.</p></li>
+<li><p>commit_id (int): The commit ID.</p></li>
 </ul>
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
@@ -232,14 +226,14 @@ commit_id (str): The commit ID.</p>
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">moveDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.moveDocument" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/move/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>moves a document</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Moves a document. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>doc_id (str): The document ID</p></li>
-<li><p>commit_id (str): The commit you’re doing action on blah blah you get the idea</p></li>
+<li><p>doc_id (int): The document ID</p></li>
+<li><p>commit_id (int): The commit you're doing action on</p></li>
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
-<li><p>parent_folder (str): folder you’re moving it to</p></li>
+<li><p>parent_folder (int): folder you're moving it to</p></li>
 </ul>
 </dd>
 </dl>
@@ -263,11 +257,11 @@ commit_id (str): The commit ID.</p>
 <span class="sig-prename descclassname"><span class="pre">documentRoutes.</span></span><span class="sig-name descname"><span class="pre">renameDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#documentRoutes.renameDocument" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Document/&lt;doc_id&gt;/&lt;commit_id&gt;/rename/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>renames a document</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Renames a document. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>doc_id (str): The document ID</p></li>
-<li><p>commit_id (str): the commit you’re changing the name of</p></li>
+<li><p>doc_id (int): The document ID</p></li>
+<li><p>commit_id (int): the commit you're changing the name of</p></li>
 <li><dl class="simple">
 <dt>request.body(dict):</dt><dd><ul>
 <li><p>doc_name (str): new name</p></li>

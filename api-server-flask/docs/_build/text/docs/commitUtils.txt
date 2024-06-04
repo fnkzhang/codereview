@@ -1,2 +1,242 @@
 commitUtils module
 ******************
+
+commitUtils.addItemInfoToList(rv, item, commit_id, is_folder)
+
+   **Explanation:**
+      Adds an item to list, getting the relevant folder/document
+      information
+
+   **Args:**
+      -rv (list): the list to add the item to -commit_id (int): id of
+      the commit -is_folder (int): Whether or not the item is a folder
+      or document (True for folder, False for document)
+
+commitUtils.addSeenAndUnresolved(item, docsnap, email, tree)
+
+   **Explanation:**
+      Adds the seenSnapshot and seenComment values to an item and its
+      parent folder
+
+   **Args:**
+      -item (dict): Dict of the item, located in the tree variable's
+      ["content"]["documents] -docsnap (dict): A dict with document
+      ids as keys, which map to the snapshots related to them in a
+      commit -email (str): email of the user for the seen values -tree
+      (dict): A tree like the one returned in getCommitTree. Top level
+      represents the parent folder of the document
+
+   **Returns:**
+      -True
+
+commitUtils.addSnapshotToCommit(snapshot_id, doc_id, commit_id)
+
+   **Explanation:**
+      Creates a new working commit for the given user
+
+   **Args:**
+      -proj_id (int): id of the project this is for -email (str):
+      Email of the user -last_commit (int or None): id of the commit
+      the new commit will be based off of
+
+   **Returns:**
+      -commit_id (int): id of the newly created commit
+
+commitUtils.addToTree(tree, docsnap, email)
+
+   **Explanation:**
+      Adds the seenSnapshot and seenComment values to a folder and its
+      contents, and recurses for any child folders
+
+   **Args:**
+      -tree (dict): A tree like the one returned in getCommitTree
+      -docsnap (dict): A dict with document ids as keys, which map to
+      the snapshots related to them in a commit -email (str): email of
+      the user for the seen values
+
+   **Returns:**
+      * tree (dict): The top level of the dict is a Folder object
+        represented as a dict. It has the added key of "contents",
+        which maps to another dict, which has 2 keys of "folders" and
+        "documents". These keys map to lists of dicts of their
+        respective items within the folder. Both item dicts have the
+        "seenSnapshots" and "seenComments" key added, which represent
+        whether or not the user has seen all snapshots/comments for
+        that document. The folders also have the "contents" key added,
+        which map to their own contents.
+
+commitUtils.commitACommit(commit_id, name)
+
+   **Explanation:**
+      Commits a working commit
+
+   **Args:**
+      -commit_id (int): id of the working commit -name (str): New name
+      for the commit
+
+   **Returns:**
+      -True
+
+commitUtils.createNewCommit(proj_id, email, last_commit)
+
+   **Explanation:**
+      Creates a new working commit for the given user
+
+   **Args:**
+      -proj_id (int): id of the project this is for -email (str):
+      Email of the user -last_commit (int or None): id of the commit
+      the new commit will be based off of
+
+   **Returns:**
+      -commit_id (int): id of the newly created commit
+
+commitUtils.deleteCommit(commit_id)
+
+   **Explanation:**
+      Deletes a commit. This should generally be only used for working
+      commits, and using it on committed commits could cause undefined
+      behavior if other commits in the project will still exist after
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+commitUtils.getAllCommitItems(commit_id)
+
+   **Explanation:**
+      Gets all items from a commit
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -itemlist (list): list of the items of the commit
+
+commitUtils.getAllCommitItemsOfType(commit_id, is_folder)
+
+   **Explanation:**
+      Gets all items from the commit that are either documents or
+      folders, determined by the argument "is_folder"
+
+   **Args:**
+      -commit_id (int): id of the commit -is_folder (int): Whether or
+      not the items returned are folders or documents (True for
+      folder, False for document)
+
+   **Returns:**
+      -itemlist (list): list of the items of the commit that match the
+      condition as dicts
+
+commitUtils.getCommitFoldersAsPaths(commit_id)
+
+   **Explanation:**
+      Gets all of the folders in the commit as paths; e.g: if folder2
+      is in folder1, which is in the root folder of the commit, the
+      path would be folder1/folder2/
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -folderIDToPath (dict): dict with folder ids mapping to their
+      paths
+
+commitUtils.getCommitInfo(commit_id)
+
+   **Explanation:**
+      Returns a Commit object as a dict
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -commit (dict): Commit as a dict
+
+commitUtils.getCommitTree(commit_id)
+
+   **Explanation:**
+      Gets all items from the commit in a tree structure
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      * tree (dict): The top level of the dict is a Folder object
+        represented as a dict. It has the added key of "contents",
+        which maps to another dict, which has 2 keys of "folders" and
+        "documents". These keys map to lists of dicts of their
+        respective items within the folder. The folders also have the
+        "contents" key added, which map to their own contents.
+
+commitUtils.getCommitTreeWithAddons(commit_id, email)
+
+   **Explanation:**
+      Gets all items from the commit in a tree structure with along
+      with whether or not there are newly seen snapshots/comments in
+      the folder/document
+
+   **Args:**
+      -commit_id (int): id of the commit -email (str): email of the
+      user for the seen values
+
+   **Returns:**
+      * tree (dict): The top level of the dict is a Folder object
+        represented as a dict. It has the added key of "contents",
+        which maps to another dict, which has 2 keys of "folders" and
+        "documents". These keys map to lists of dicts of their
+        respective items within the folder. Both item dicts have the
+        "seenSnapshots" and "seenComments" key added, which represent
+        whether or not the user has seen all snapshots/comments for
+        that document. The folders also have the "contents" key added,
+        which map to their own contents.
+
+commitUtils.setCommitApproved(commit_id)
+
+   **Explanation:**
+      Sets a commit's state to approved
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+commitUtils.setCommitClosed(commit_id)
+
+   **Explanation:**
+      Sets a commit's state to closed
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+commitUtils.setCommitOpen(commit_id)
+
+   **Explanation:**
+      Sets a commit's state to open
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+commitUtils.setCommitReviewed(commit_id)
+
+   **Explanation:**
+      Sets a commit's state to reviewed
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None

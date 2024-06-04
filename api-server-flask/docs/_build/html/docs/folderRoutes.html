@@ -37,15 +37,15 @@
 <span class="sig-prename descclassname"><span class="pre">folderRoutes.</span></span><span class="sig-name descname"><span class="pre">createFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderRoutes.createFolder" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Folder/&lt;proj_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Creates a folder in a project’s commit with the given name and parent folder</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a folder in a project's commit with the given name and parent folder. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>proj_id (str): project you’re making the folder in</p></li>
+<li><p>proj_id (str): project you're making the folder in</p></li>
 <li><p>commit_id (str): commit this action is taking place on</p></li>
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
 <li><p>folder_name (str): name of the folder</p></li>
-<li><p>parent_folder (str): folder you’re making it in</p></li>
+<li><p>parent_folder (str): folder you're making it in</p></li>
 </ul>
 </dd>
 </dl>
@@ -69,7 +69,7 @@
 <span class="sig-prename descclassname"><span class="pre">folderRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderRoutes.deleteFolder" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/Folder/&lt;folder_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Deletes the folder from the commit</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes the folder from the commit. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>folder_id (str): folder you’re deleting</p></li>
@@ -92,10 +92,10 @@
 <span class="sig-prename descclassname"><span class="pre">folderRoutes.</span></span><span class="sig-name descname"><span class="pre">getFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderRoutes.getFolder" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Folder/&lt;proj_id&gt;/&lt;folder_id&gt;/&lt;commit_id&gt;/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Gets folder information from the given commit</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets folder information from the given commit. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>proj_id (str): folder you’re moving</p></li>
+<li><p>proj_id (str): folder you're moving</p></li>
 <li><p>folder_id (str): project this folder is in</p></li>
 <li><p>commit_id (str): commit this action is taking place on</p></li>
 </ul>
@@ -117,14 +117,14 @@
 <span class="sig-prename descclassname"><span class="pre">folderRoutes.</span></span><span class="sig-name descname"><span class="pre">moveFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderRoutes.moveFolder" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Folder/&lt;folder_id&gt;/&lt;commit_id&gt;/move/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>This endpoint moves a folder within a project’s commit to another folder.</p>
+<dt><strong>Explanation:</strong></dt><dd><p>This endpoint moves a folder within a project's commit to another folder. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>folder_id (str): folder you’re moving</p></li>
+<li><p>folder_id (str): folder you're moving</p></li>
 <li><p>commit_id (str): commit this action is taking place on</p></li>
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
-<li><p>parent_folder (str): folder you’re moving it to</p></li>
+<li><p>parent_folder (str): folder you're moving it to</p></li>
 </ul>
 </dd>
 </dl>
@@ -147,7 +147,7 @@
 <span class="sig-prename descclassname"><span class="pre">folderRoutes.</span></span><span class="sig-name descname"><span class="pre">renameFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderRoutes.renameFolder" title="Link to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Folder/&lt;folder_id&gt;/&lt;commit_id&gt;/rename/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>Renames the folder from the commit</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Renames the folder from the commit. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>folder_id (str): folder you’re renaming</p></li>

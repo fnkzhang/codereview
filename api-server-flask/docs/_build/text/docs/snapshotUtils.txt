@@ -1,2 +1,62 @@
 snapshotUtils module
 ********************
+
+snapshotUtils.createNewSnapshot(proj_id, doc_id, data, commit_id, user_email)
+
+   **Explanation:**
+      Creates a new snapshot attatched to a document on a commit
+
+   **Args:**
+      -proj_id (int): id of the project this is for -doc_id (int): id
+      of the document the snapshot is for -data (int): content of the
+      snapshot -commit_id (int): commit this is happening on
+      -user_email (str): Email of the user
+
+   **Returns:**
+      -snapshot_id (int): id of the newly created document
+
+snapshotUtils.deleteSnapshotUtil(snapshot_id)
+
+   **Explanation:**
+      Deletes a snapshot from the database and buckets entirely. This
+      also deletes associated comments.
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot to delete
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+snapshotUtils.getSnapshotContentUtil(snapshot_id)
+
+   **Explanation:**
+      Gets a snapshot's contents
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot
+
+   **Returns:**
+      -blob (bytes): The contents of the snapshot
+
+snapshotUtils.getSnapshotInfo(snapshot_id)
+
+   **Explanation:**
+      Gets a snapshot's information
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot
+
+   **Returns:**
+      -snapshot (dict): A Snapshot object as a dict
+
+snapshotUtils.getSnapshotProject(snapshot_id)
+
+   **Explanation:**
+      Gets a snapshot's project's id
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot
+
+   **Returns:**
+      -proj_id (int): The id of the project the snapshot belongs to
