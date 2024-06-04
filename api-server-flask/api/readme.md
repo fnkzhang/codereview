@@ -2,6 +2,6 @@
 
 In the codereview/api-server-flask/api/ folder, run 
 
-flask --app flaskApi.py run --debug
+    flask --app flaskApi.py run --debug
 
 It is now running on port 5000.
