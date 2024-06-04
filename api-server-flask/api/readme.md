@@ -1,5 +1,7 @@
 ## How to Setup Cloud SQL
 
+Go to Google Cloud -> SQL and click Create Instance. Select MySql. Give your instance a name and password. Save these for later. 
+
 To work with cloud sql locally, you will need to use cloud-sql-proxy to connect to the cloud sql db from a local port.
 
 follow the tutorial provided by Google: https://cloud.google.com/sql/docs/mysql/connect-auth-proxy
@@ -13,7 +15,7 @@ Place them in codereview/api-server-flask/api/credentials/googlecreds.json
 
 To run the program, you will type:
 
-.\cloud-sql-proxy.exe --address 0.0.0.0 --port 5000 codereview-413200:us-central1:cr-cloudsql-db
+.\cloud-sql-proxy.exe --address 0.0.0.0 --port 5000 (YourProjectID):(YourRegion):(YourDatabaseName)
 
 Now, you can communicated with cloud sql from your port 5000 which is the port our Backend API runs.
 
