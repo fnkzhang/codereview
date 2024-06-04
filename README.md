@@ -31,11 +31,15 @@ pip install -r requirements.txt
 
 Go to https://console.cloud.google.com/welcome/ and click "Create or Select a Project". Then click on "New Project". Give your project a name and click create. Copy your project id.
 
-Find all instances of os.environ["GCLOUD_PROJECT"] = "codereview-413200" and change it to your project id. These are located in codereview/api-server-flask/api/utils/buckets.py and codereview/api-server-flask/api/cloudSql.py
+Create a .env file in codereview/api-server-flask/api/. Create a GCLOUD_PROJECT variable and set it to your project id.
 
-Make sure you have Application Default Credentials set up so you can run the program: https://cloud.google.com/docs/authentication/provide-credentials-adc 
+Go back to Google Cloud and go to APIs and Services -> Credentials. Make a new  OAuth 2.0 Client ID and set the application type to web application. Copy the client id and create a variable CLIENT_ID in .env and set it as the client id.
 
-Place them in codereview/api-server-flask/api/credentials/googlecreds.json
+Get your Application Default Credentials set up: https://cloud.google.com/docs/authentication/provide-credentials-adc 
+
+Place them in codereview/api-server-flask/api/credentials/googlecreds.json and create a variable in .env called GOOGLE_APPLICATION_CREDENTIALS whose value is credentials/googlecreds.json.
+
+
 
 ### How to Setup Cloud SQL
 
@@ -43,7 +47,7 @@ Go to Google Cloud -> SQL and click Create Instance. Select MySql. Give your ins
 
 Go to codereview/api-server-flask/api/cloudSql.py
 
-Change the instance_connection_name, db_user, db_pass, and db_name to your values. Instance connection name has the format (YourProjectID):(YourRegion):(YourDatabaseName).
+Add INSTANCE_CONNECTION_NAME, DB_USER, DB_PASS, and DB_NAME variables to your .env file. Instance connection name has the format (YourProjectID):(YourRegion):(YourDatabaseName). DB_USER will be 'root' unless you made a new user.
 
 To work with cloud sql locally, you will need to use cloud-sql-proxy to connect to the cloud sql db from a local port.
 
@@ -60,7 +64,25 @@ Now, you can communicated with cloud sql from your port 5000 which is the port o
 ## How to Setup Google Buckets
 Go to https://console.cloud.google.com/storage/ and select your project for the app. Click on create bucket.
 
-Give your bucket a name and click create. Change the BUCKET_NAME variable in codereview/api-server-flask/api/utils/buckets.py to your bucket's name.
+Give your bucket a name and click create. Add the BUCKET_NAME variable in .rnv as your bucket's name.
+
+Your final .env file should look something like this
+
+    CLIENT_ID = "some long string of numbers.apps.googleusercontent.com"
+    
+    GCLOUD_PROJECT = "(YourProjectID)"
+    
+    GOOGLE_APPLICATION_CREDENTIALS = "credentials/googlecreds.json"
+    
+    INSTANCE_CONNECTION_NAME = "(YourProjectID):(YourRegion):(YourDatabaseName)"
+    
+    BUCKET_NAME = '(YourBucketName)'
+    
+    DB_USER = "root"
+    
+    DB_PASS = "(YourDBPassword)"
+    
+    DB_NAME = "(YourDBName)"
 
 ## Setting up Github Oath App
 
