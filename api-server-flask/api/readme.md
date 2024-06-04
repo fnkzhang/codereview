@@ -1,4 +1,4 @@
-### How to setup
+## How to Setup Cloud SQL
 
 To work with cloud sql locally, you will need to use cloud-sql-proxy to connect to the cloud sql db from a local port.
 
@@ -8,6 +8,8 @@ Download the cloud sql proxy file given and place it in a folder you can access 
 
 Make sure you have Application Default Credentials set up so you can run the program: https://cloud.google.com/docs/authentication/provide-credentials-adc 
 
+Place them in codereview/api-server-flask/api/credentials/googlecreds.json
+
 
 To run the program, you will type:
 
@@ -15,46 +17,10 @@ To run the program, you will type:
 
 Now, you can communicated with cloud sql from your port 5000 which is the port our Backend API runs.
 
+## How to Setup Google Buckets
+Go to https://console.cloud.google.com/storage/ and select your project for the app. Click on create bucket.
 
+Give your bucket a name and click create. Change the BUCKET_NAME variable in codereview/api-server-flask/api/utils/bucket.py to your bucket's name.
 
+## How to run the flask development server
 
-
-## API Function
-
-For all API calls, you must provide an authentication token from google oauth to get a response from the API.
-
-### '/api/comment'
-#### GET
-
-In the GET call to api/comment, the command will return all comments for the diff_id.
-
-You must pass in the body of the headers:
-
-"credentials": STRING (oauth authentication) 
-"diff_id": INT
-
-The data response will be in json the format:
-{
-  "success": Bool,
-  "reason": String (If Failed),
-  "body": Array of Comment Objects
-}
-
-### POST
-
-In the POST call, the command will create a new comment in the database
-
-You must pass in the body of the headers:
-
-"credentials": STRING (oauth authentication) 
-"diff_id": INT
-"author_id": INT
-"reply_to_id": INT (0 for root comment)
-"content": STRING
-
-The data response will be in json the format:
-{
-  "success": Bool,
-  "reason": String (If Failed),
-  "body": {}
-}
