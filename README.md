@@ -1,4 +1,4 @@
-![image](https://github.com/fnkzhang/codereview/assets/87836307/2547b09d-b402-43e6-9c7b-928510f4579a)## Initialization For Development
+## Initialization For Development
 ### React
 With Node.js installed, move to the react directory folder and perform
 
