@@ -7,9 +7,9 @@ from utils.cacheUtils import cloudStorageCache, publishTopicUpdate
 from dotenv import dotenv_values
 
 BUCKET_NAME = dotenv_values('.env')["BUCKET_NAME"]
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
-os.environ["GCLOUD_PROJECT"] = "codereview-413200"
-CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "googlecreds.json"
+#os.environ["GCLOUD_PROJECT"] = "codereview-413200"
+#CLIENT_ID = "474055387624-orr54rn978klbpdpi967r92cssourj08.apps.googleusercontent.com"
 
 def uploadBlob(blobName, item):
     """
