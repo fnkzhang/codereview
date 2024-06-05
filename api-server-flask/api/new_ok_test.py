@@ -185,35 +185,35 @@ def test_resolveComment(client):
 
     response = client.put("/api/comment/123/resolve")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.put("/api/comment/123/resolve", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
          patch("commentRoutes.getCommentProject", autospec=True, return_value=123):
 
         response = client.put('/api/comment/123/resolve', headers={"Authorization": "oAuthToken"})
         assert response.status_code == 200
-        assert response.json['success'] == False
+        assert response.json["success"] == False
 
         with patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
              patch("commentRoutes.resolveCommentHelperFunction", autospec=True, return_valu = None):
 
             response = client.put('/api/comment/123/resolve', headers={"Authorization": "oAuthToken"})
             assert response.status_code == 200
-            assert response.json['success'] == True
+            assert response.json["success"] == True
 
 def test_editComment(client):
 
     response = client.put("/api/comments/123/edit")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         #response = client.put("/api/comments/123/resolve", headers={"Authorization": "oAuthToken"})
@@ -311,11 +311,11 @@ def test_createCommit(client):
     
     response = client.post("/api/Commit/123/createCommit/")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.post("/api/Commit/123/createCommit/", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         response = client.post("/api/Commit/123/createCommit/", headers={"Authorization": "oAuthToken"})
@@ -339,11 +339,11 @@ def test_commitCommit(client):
     
     response = client.post("/api/Commit/123/commitCommit/")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         #response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"})
@@ -366,11 +366,11 @@ def test_setReviewedCommit(client):
     
     response = client.get("/api/Commit/123/setReviewed/")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.get("/api/Commit/123/setReviewed/", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
@@ -388,11 +388,11 @@ def test_setReviewedCommit(client):
 def test_closeCommit(client):
     response = client.get("/api/Commit/123/close/")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
@@ -409,11 +409,11 @@ def test_closeCommit(client):
 def test_approveCommit(client):
     response = client.get("/api/Commit/123/approve/")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.get("/api/Commit/123/approve/", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
@@ -435,11 +435,11 @@ def test_approveCommit(client):
 def test_deleteWorkingCommit(client):
     response = client.delete("/api/Commit/123/workingCommit/")
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     response = client.delete("/api/Commit/123/workingCommit/", headers={"Authorization": "oAuthToken"})
     assert response.status_code == 200
-    assert response.json['success'] == False
+    assert response.json["success"] == False
 
     with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         SAME_EMAIL = GOOGLE_FAKE_ID_INFO["email"]
@@ -471,43 +471,109 @@ def test_deleteWorkingCommit(client):
                 mock_deleteCommit.return_value = (True, None)
                 response = client.delete("/api/Commit/123/workingCommit/", headers={"Authorization": "oAuthToken"})
                 assert response.status_code == 200
-                assert response.json["success"] == False
+                assert response.json["success"] == True
 
 def test_getCommitFolderTree(client):
-    
-    # Invalid Requests
 
-    # Valid Requests
+    response = client.get("/api/Commit/123/getFolderTree/")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    response = client.get("/api/Commit/123/getFolderTree/", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
+
+    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
+            response = client.get("/api/Commit/123/getFolderTree/", headers={"Authorization": "oAuthToken"})
+            assert response.status_code == 200
+            assert response.json["success"] == False
+
+            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5):
+                with patch("commitRoutes.getCommitTreeWithAddons", autospec=True, return_value="treeDict"):
+                    response = client.get("/api/Commit/123/getFolderTree/", headers={"Authorization": "oAuthToken"})
+                    assert response.status_code == 200
+                    assert response.json["success"] == True
 
 def test_getUserWorkingCommitForProject(client):
     
-    # Invalid Requests
+    response = client.get("/api/Commit/123/workingCommit")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    response = client.get("/api/Commit/123/workingCommit", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
+            response = client.get("/api/Commit/123/workingCommit", headers={"Authorization": "oAuthToken"})
+            assert response.status_code == 200
+            assert response.json["success"] == False
+
+            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5):
+                with patch("commitRoutes.getUserWorkingCommitInProject", autospec=True, return_value=None):
+                    response = client.get("/api/Commit/123/workingCommit", headers={"Authorization": "oAuthToken"})
+                    assert response.status_code == 200
+                    assert response.json["success"] == False
+
+                with patch("commitRoutes.getUserWorkingCommitInProject", autospec=True, return_value="commitDict"):
+                    response = client.get("/api/Commit/123/workingCommit", headers={"Authorization": "oAuthToken"})
+                    assert response.status_code == 200
+                    assert response.json["success"] == True
 
 def test_getAllLatestCommitComments(client):
-    
-    # Invalid Requests
+    response = client.get("/api/Commit/123/getLatestComments/")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    response = client.get("/api/Commit/123/getLatestComments/", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+        response = client.get("/api/Commit/123/getLatestComments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+        with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5):
+            with patch("commitRoutes.getProjectLastCommittedCommit", autospec=True, return_value=None):
+                response = client.get("/api/Commit/123/getLatestComments/", headers={"Authorization": "oAuthToken"})
+                assert response.status_code == 200
+                assert response.json["success"] == False
+
+            with patch("commitRoutes.getProjectLastCommittedCommit", autospec=True, return_value=None):
+                assert response.status_code == 200
+                assert response.json["success"] == False
+
+            with patch("commitRoutes.getProjectLastCommittedCommit", autospec=True, return_value={"commit_id": 456}):
+                with patch("commitRoutes.getAllCommitDocumentSnapshotRelation", autospec=True, return_value={"doc1": 789}):
+                    # difficult to write a unit test for
+                    pass
 
 """
 Unit Tests for documentRoutes.py
 """
 
 def test_getDocument(client):
-    
-    # Invalid Requests
+    response = client.get("/api/Document/123/456/789/")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    response = client.get("/api/Document/123/456/789/", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+        response = client.get("/api/Document/123/456/789/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+        with patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+             patch("documentRoutes.getDocumentInfo", autospec=True, return_value="documentDict"):
+                response = client.get("/api/Document/123/456/789/", headers={"Authorization": "oAuthToken"})
+                assert response.status_code == 200
+                assert response.json["success"] == True
 
 def test_createDocument(client):
     
@@ -685,20 +751,59 @@ Unit Tests for llmRoutes.py
 
 def test_implement_code_changes_from_comment(client):
     
-    # Invalid Requests
+    response = client.post("/api/llm/code-implementation")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    response = client.post("/api/llm/code-implementation", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("llmRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("llmRoutes.get_llm_code_from_suggestion") as mock_get_llm_code_from_suggestion:
+        mock_get_llm_code_from_suggestion.return_value = None
+        response = client.post("/api/llm/code-implementation", headers={"Authorization": "oAuthToken"}, json={})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+        mock_get_llm_code_from_suggestion.return_value = {"success": False}
+        response = client.post("/api/llm/code-implementation", headers={"Authorization": "oAuthToken"}, json={})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+        with patch("llmRoutes.buildStringFromLLMResponse", autospec=True, return_value=None):
+            mock_get_llm_code_from_suggestion.return_value = {"success": True}
+            response = client.post("/api/llm/code-implementation", headers={"Authorization": "oAuthToken"}, json={})
+            assert response.status_code == 200
+            assert response.json["success"] == False
+
+        with patch("llmRoutes.buildStringFromLLMResponse", autospec=True, return_value="buildString"):
+            mock_get_llm_code_from_suggestion.return_value = {"success": True}
+            response = client.post("/api/llm/code-implementation", headers={"Authorization": "oAuthToken"}, json={})
+            assert response.status_code == 200
+            assert response.json["success"] == True
 
 def test_suggest_comment_from_code(client):
     
-    # Invalid Requests
+    response = client.post("/api/llm/comment-suggestion")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    response = client.post("/api/llm/comment-suggestion", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("llmRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("llmRoutes.get_llm_suggestion_from_code") as mock_get_llm_suggestion_from_code:
+        mock_get_llm_suggestion_from_code.return_value = None
+        response = client.post("/api/llm/comment-suggestion", headers={"Authorization": "oAuthToken"}, json={})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
+        mock_get_llm_suggestion_from_code.return_value = "Fake LLM Response"
+        response = client.post("/api/llm/comment-suggestion", headers={"Authorization": "oAuthToken"}, json={})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 """
 Unit Tests for projectRoutes.py
