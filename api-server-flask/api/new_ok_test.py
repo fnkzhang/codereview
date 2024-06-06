@@ -523,33 +523,48 @@ def test_getUserWorkingCommitForProject(client):
                     assert response.json["success"] == True
 
 def test_getAllLatestCommitComments(client):
-    response = client.get("/api/Commit/123/getLatestComments/")
-    assert response.status_code == 200
-    assert response.json["success"] == False
-
-    response = client.get("/api/Commit/123/getLatestComments/", headers={"Authorization": "oAuthToken"})
-    assert response.status_code == 200
-    assert response.json["success"] == False
-
-    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-        response = client.get("/api/Commit/123/getLatestComments/", headers={"Authorization": "oAuthToken"})
+    with patch("commitRoutes.isValidRequest", return_value=False):
+        response = client.get("/api/Commit/1/getLatestComments/")
         assert response.status_code == 200
         assert response.json["success"] == False
 
-        with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5):
-            with patch("commitRoutes.getProjectLastCommittedCommit", autospec=True, return_value=None):
-                response = client.get("/api/Commit/123/getLatestComments/", headers={"Authorization": "oAuthToken"})
-                assert response.status_code == 200
-                assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", return_value=True), \
+         patch("commitRoutes.authenticate", return_value=None):
+        response = client.get("/api/Commit/1/getLatestComments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-            with patch("commitRoutes.getProjectLastCommittedCommit", autospec=True, return_value=None):
-                assert response.status_code == 200
-                assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", return_value=True), \
+         patch("commitRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getUserProjPermissions", return_value=-1):
+        response = client.get("/api/Commit/1/getLatestComments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-            with patch("commitRoutes.getProjectLastCommittedCommit", autospec=True, return_value={"commit_id": 456}):
-                with patch("commitRoutes.getAllCommitDocumentSnapshotRelation", autospec=True, return_value={"doc1": 789}):
-                    # everything past here is difficult to write a unit test for
-                    pass
+    with patch("commitRoutes.isValidRequest", return_value=True), \
+         patch("commitRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getUserProjPermissions", return_value=1), \
+         patch("commitRoutes.getProjectLastCommittedCommit", return_value=None):
+        response = client.get("/api/Commit/1/getLatestComments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("commitRoutes.isValidRequest", return_value=True), \
+         patch("commitRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getUserProjPermissions", return_value=1), \
+         patch("commitRoutes.getProjectLastCommittedCommit", return_value={"commit_id": 1}), \
+         patch("commitRoutes.getAllCommitDocumentSnapshotRelation", return_value={1: 1}), \
+         patch("commitRoutes.engine.connect") as mock_connect:
+        
+        mock_conn = MagicMock()
+        mock_connect.return_value.__enter__.return_value = mock_conn
+        
+        mock_comment_result = [MagicMock(_asdict=lambda: {"comment_id": 1, "snapshot_id": 1, "comment": "Test comment", "is_resolved": False})]
+        mock_conn.execute.return_value = mock_comment_result
+
+        response = client.get("/api/Commit/1/getLatestComments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 """
 Unit Tests for documentRoutes.py
@@ -704,36 +719,154 @@ def test_moveDocument(client):
         assert response.json["success"] == True
 
 def test_getAllDocumentCommittedSnapshots(client):
-    
-    # Invalid Requests
+    with patch("documentRoutes.isValidRequest", return_value=False):
+        response = client.get("/api/Document/123/456/getSnapshotId/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=None):
+        response = client.get("/api/Document/123/456/getSnapshotId/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getUserProjPermissions", return_value=-1):
+        response = client.get("/api/Document/123/456/getSnapshotId/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getUserProjPermissions", return_value=0), \
+         patch("documentRoutes.getAllDocumentCommittedSnapshotsInOrder", return_value=[{"og_commit_id": 1}]), \
+         patch("documentRoutes.getCommitInfo", return_value={"commit_id": 1, "message": "Initial commit"}):
+        response = client.get("/api/Document/123/456/getSnapshotId/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_getAllDocumentCommittedSnapshotsIncludingWorking(client):
-    
-    # Invalid Requests
+    with patch("documentRoutes.isValidRequest", return_value=False):
+        response = client.get("/api/Document/123/456/getSnapshotIdAndWorking/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=None):
+        response = client.get("/api/Document/123/456/getSnapshotIdAndWorking/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getUserProjPermissions", return_value=-1):
+        response = client.get("/api/Document/123/456/getSnapshotIdAndWorking/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getUserProjPermissions", return_value=0), \
+         patch("documentRoutes.getUserWorkingCommitInProject", return_value=None), \
+         patch("documentRoutes.getAllDocumentCommittedSnapshotsInOrder", return_value=[{"og_commit_id": 1}]), \
+         patch("documentRoutes.getCommitInfo", return_value={"commit_id": 1, "message": "Initial commit"}):
+        response = client.get("/api/Document/123/456/getSnapshotIdAndWorking/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_changeDocumentSnapshot(client):
-    
-    # Invalid Requests
+    with patch("documentRoutes.isValidRequest", return_value=False):
+        response = client.post("/api/Document/123/456/789/changeTo/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=None):
+        response = client.post("/api/Document/123/456/789/changeTo/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", side_effect=Exception("document doesn't exist")):
+        response = client.post("/api/Document/123/456/789/changeTo/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", return_value={"associated_proj_id": 1}), \
+         patch("documentRoutes.getUserProjPermissions", return_value=1):
+        response = client.post("/api/Document/123/456/789/changeTo/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", return_value={"associated_proj_id": 1}), \
+         patch("documentRoutes.getUserProjPermissions", return_value=2), \
+         patch("documentRoutes.addSnapshotToCommit", return_value=None):
+        response = client.post("/api/Document/123/456/789/changeTo/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_getAllCommentsForDocument(client):
-    
-    # Invalid Requests
+    with patch("documentRoutes.isValidRequest", return_value=False):
+        response = client.get("/api/Document/123/comments/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=None):
+        response = client.get("/api/Document/123/comments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentProject", return_value=1), \
+         patch("documentRoutes.getUserProjPermissions", return_value=-1):
+        response = client.get("/api/Document/123/comments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentProject", return_value=1), \
+         patch("documentRoutes.getUserProjPermissions", return_value=1), \
+         patch("documentRoutes.getUserWorkingCommitInProject", return_value=None), \
+         patch("documentRoutes.getAllDocumentCommittedSnapshotsInOrder", return_value=[{"snapshot_id": 1}]), \
+         patch("documentRoutes.filterCommentsByPredicate", return_value=[{"comment_id": 1, "snapshot_id": 1, "comment": "Test comment"}]), \
+         patch("documentRoutes.isCommentSeenByUser", return_value=False), \
+         patch("documentRoutes.setCommentAsSeen", return_value=None):
+        response = client.get("/api/Document/123/comments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
+
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentProject", return_value=1), \
+         patch("documentRoutes.getUserProjPermissions", return_value=1), \
+         patch("documentRoutes.getUserWorkingCommitInProject", return_value=None), \
+         patch("documentRoutes.getAllDocumentCommittedSnapshotsInOrder", return_value=[{"snapshot_id": 1}]), \
+         patch("documentRoutes.filterCommentsByPredicate", return_value=None):
+        response = client.get("/api/Document/123/comments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", return_value=True), \
+         patch("documentRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentProject", return_value=1), \
+         patch("documentRoutes.getUserProjPermissions", return_value=1), \
+         patch("documentRoutes.getUserWorkingCommitInProject", return_value={"commit_id": 1}), \
+         patch("documentRoutes.getAllDocumentCommittedSnapshotsInOrderIncludingWorking", return_value=[{"snapshot_id": 1}]), \
+         patch("documentRoutes.filterCommentsByPredicate", return_value=[{"comment_id": 1, "snapshot_id": 1, "comment": "Test comment"}]), \
+         patch("documentRoutes.isCommentSeenByUser", return_value=False), \
+         patch("documentRoutes.setCommentAsSeen", return_value=None):
+        response = client.get("/api/Document/123/comments/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 """
 Unit Tests for folderRoutes.py
@@ -966,12 +1099,41 @@ Unit Tests for snapshotRoutes.py
 """
 
 def test_getSnapshot(client):
-    
-    # Invalid Requests
+    with patch("snapshotRoutes.isValidRequest", return_value=False):
+        response = client.get("/api/Snapshot/123/456/789/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("snapshotRoutes.isValidRequest", return_value=True), \
+         patch("snapshotRoutes.authenticate", return_value=None):
+        response = client.get("/api/Snapshot/123/456/789/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("snapshotRoutes.isValidRequest", return_value=True), \
+         patch("snapshotRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("snapshotRoutes.getUserProjPermissions", return_value=-1):
+        response = client.get("/api/Snapshot/123/456/789/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("snapshotRoutes.isValidRequest", return_value=True), \
+         patch("snapshotRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("snapshotRoutes.getUserProjPermissions", return_value=0), \
+         patch("snapshotRoutes.fetchFromCloudStorage", return_value=b"snapshot_content"), \
+         patch("snapshotRoutes.setSnapshotAsSeen"):
+        response = client.get("/api/Snapshot/123/456/789/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
+
+    with patch("snapshotRoutes.isValidRequest", return_value=True), \
+         patch("snapshotRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("snapshotRoutes.getUserProjPermissions", return_value=0), \
+         patch("snapshotRoutes.fetchFromCloudStorage", return_value=None), \
+         patch("snapshotRoutes.setSnapshotAsSeen"):
+        response = client.get("/api/Snapshot/123/456/789/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_createSnapshot(client):
     
