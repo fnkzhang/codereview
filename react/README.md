@@ -11,7 +11,7 @@ With it, users can import code repositories from GitHub, add and modify files as
 - Code Review Creation
 - Code Review Collaberation
 - Code Review State Management
-- Code Rview Exporting
+- Code Review Exporting
 
 ## Screenshots
 ![Home Page](../screenshots/homepage.png)
