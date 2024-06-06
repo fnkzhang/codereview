@@ -74,7 +74,7 @@ def createNewDocument(document_name, parent_folder, proj_id, data, commit_id, us
     **Explanation:**
         Creates a new document with an initial snapshot
     **Args:**
-        -document_name (int): name of the document
+        -document_name (str): name of the document
         -parent_folder (int): id of the document's parent folder
         -proj_id (int): id of the project this is for
         -data (int): content of the document's first and only snapshot

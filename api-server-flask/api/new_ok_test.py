@@ -548,7 +548,7 @@ def test_getAllLatestCommitComments(client):
 
             with patch("commitRoutes.getProjectLastCommittedCommit", autospec=True, return_value={"commit_id": 456}):
                 with patch("commitRoutes.getAllCommitDocumentSnapshotRelation", autospec=True, return_value={"doc1": 789}):
-                    # difficult to write a unit test for
+                    # everything past here is difficult to write a unit test for
                     pass
 
 """
@@ -576,36 +576,132 @@ def test_getDocument(client):
                 assert response.json["success"] == True
 
 def test_createDocument(client):
+    request_body = {
+        "doc_name": "Test Document",
+        "data": "Test data",
+        "parent_folder": 123
+    }
     
-    # Invalid Requests
+    response = client.post("/api/Document/123/456/", json=request_body)
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True):
+        with patch("documentRoutes.authenticate", autospec=True, return_value=None):
+            response = client.post("/api/Document/123/456/", json=request_body, headers={"Authorization": "oAuthToken"})
+            assert response.status_code == 200
+            assert response.json["success"] == False
 
-    pass
+        with patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+            with patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=1):
+                response = client.post("/api/Document/123/456/", json=request_body, headers={"Authorization": "oAuthToken"})
+                assert response.status_code == 200
+                assert response.json["success"] == False
+
+            with patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=2), \
+                 patch("documentRoutes.createNewDocument", autospec=True, return_value=456):
+                response = client.post("/api/Document/123/456/", json=request_body, headers={"Authorization": "oAuthToken"})
+                assert response.status_code == 200
+                assert response.json["success"] == True
 
 def test_deleteDocument(client):
-    
-    # Invalid Requests
+    response = client.delete("/api/Document/123/456/")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=None):
+            response = client.delete("/api/Document/123/456/", headers={"Authorization": "oAuthToken"})
+            assert response.status_code == 200
+            assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", autospec=True, side_effect=Exception("Fake DB Error")):
+            response = client.delete("/api/Document/123/456/", headers={"Authorization": "oAuthToken"})
+            assert response.status_code == 200
+            assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", autospec=True, return_value={"associated_proj_id": 123}), \
+         patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=1):
+            response = client.delete("/api/Document/123/456/", headers={"Authorization": "oAuthToken"})
+            assert response.status_code == 200
+            assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True):
+        with patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+             patch("documentRoutes.getDocumentInfo", autospec=True, return_value={"associated_proj_id": 123}), \
+             patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=2), \
+             patch("documentRoutes.deleteDocumentFromCommit", autospec=True, return_value=(True, None)):
+            response = client.delete("/api/Document/123/456/", headers={"Authorization": "oAuthToken"})
+            assert response.status_code == 200
+            assert response.json["success"] == True
 
 def test_renameDocument(client):
-    
-    # Invalid Requests
+    request_body = {
+        "doc_name": "New Document Name"
+    }
 
-    # Valid Requests
+    response = client.post("/api/Document/123/456/rename/", json=request_body)
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=None):
+        response = client.post("/api/Document/123/456/rename/", json=request_body, headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", autospec=True, return_value={"associated_proj_id": 123}), \
+         patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=1):
+        response = client.post("/api/Document/123/456/rename/", json=request_body, headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", autospec=True, return_value={"associated_proj_id": 123}), \
+         patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=2), \
+         patch("documentRoutes.renameItem", autospec=True, return_value=(True, None)):
+        response = client.post("/api/Document/123/456/rename/", json=request_body, headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_moveDocument(client):
-    
-    # Invalid Requests
+    request_body = {
+        "parent_folder": 456
+    }
 
-    # Valid Requests
+    response = client.post("/api/Document/123/456/move/", json=request_body)
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-    pass
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=None):
+        response = client.post("/api/Document/123/456/move/", json=request_body, headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", autospec=True, return_value={"associated_proj_id": 123}), \
+         patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=1):
+        response = client.post("/api/Document/123/456/move/", json=request_body, headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("documentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("documentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("documentRoutes.getDocumentInfo", autospec=True, return_value={"associated_proj_id": 123}), \
+         patch("documentRoutes.getUserProjPermissions", autospec=True, return_value=2), \
+         patch("documentRoutes.moveItem", autospec=True, return_value=True):
+        response = client.post("/api/Document/123/456/move/", json=request_body, headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_getAllDocumentCommittedSnapshots(client):
     
@@ -762,6 +858,10 @@ def test_implement_code_changes_from_comment(client):
     with patch("llmRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
          patch("llmRoutes.get_llm_code_from_suggestion") as mock_get_llm_code_from_suggestion:
         mock_get_llm_code_from_suggestion.return_value = None
+        #response = client.post("/api/llm/code-implementation", headers={"Authorization": "oAuthToken"})
+        #assert response.status_code == 200
+        #assert response.json["success"] == False
+
         response = client.post("/api/llm/code-implementation", headers={"Authorization": "oAuthToken"}, json={})
         assert response.status_code == 200
         assert response.json["success"] == False
@@ -796,6 +896,10 @@ def test_suggest_comment_from_code(client):
     with patch("llmRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
          patch("llmRoutes.get_llm_suggestion_from_code") as mock_get_llm_suggestion_from_code:
         mock_get_llm_suggestion_from_code.return_value = None
+        #response = client.post("/api/llm/comment-suggestion", headers={"Authorization": "oAuthToken"})
+        #assert response.status_code == 200
+        #assert response.json["success"] == False
+
         response = client.post("/api/llm/comment-suggestion", headers={"Authorization": "oAuthToken"}, json={})
         assert response.status_code == 200
         assert response.json["success"] == False
@@ -930,7 +1034,7 @@ def test_addUserAdmin(client):
     pass
 
 def test_removeUser(client):
-    
+        
     # Invalid Requests
 
     # Valid Requests
