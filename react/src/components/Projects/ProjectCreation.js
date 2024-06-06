@@ -6,6 +6,19 @@ import { createProject, pullFromGitHub } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * Component for creating a new project, with optional GitHub repository import.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <ProjectCreation isLoggedIn={true} connected={true} setConnected={() => {}} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Indicates if the user is logged in
+ * @param {boolean} props.connected - Indicates if the user is connected to GitHub
+ * @param {function} props.setConnected - Function to set the GitHub connection status
+ */
 export default function ProjectCreation( props ) {
 
   const [projectName, setProjectName] = useState("");
@@ -16,8 +29,11 @@ export default function ProjectCreation( props ) {
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
+  /**
+   * Handles the project creation form submission.
+   */
   const handleCreateProject = async (e) => {
-    e.preventDefault() // Prevent form submission
+    e.preventDefault() // Prevent default form submission
 
     setWorking(true)
 

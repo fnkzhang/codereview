@@ -8,6 +8,19 @@ import { pushToExistingBranch, getCommits } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
 import BackButton from "../Buttons/BackButton";
 
+/**
+ * Component to export a project to GitHub.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <ProjectExport isLoggedIn={true} connected={true} setConnected={() => {}} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ * @param {boolean} props.connected - Whether the user is connected to GitHub
+ * @param {function} props.setConnected - Function to set GitHub connection status
+ */
 export default function ProjectExport( props ) {
 
   const [gitRepo, setGitRepo] = useState("");
@@ -17,9 +30,11 @@ export default function ProjectExport( props ) {
   const [working, setWorking] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
-
   const { project_id } = useParams()
 
+  /**
+   * Fetches commit data for the project.
+   */
   useEffect(() => {
     async function getCommitData() {
         let result = await getCommits(project_id)
@@ -32,8 +47,11 @@ export default function ProjectExport( props ) {
       getCommitData()
 }, [project_id, props.isLoggedIn])
 
+  /**
+   * Handles the export project button click event.
+   */
   const handleExportProject = async (e) => {
-    e.preventDefault() // Prevent form submission
+    e.preventDefault() // Prevent default form submission
   
     setWorking(true)
   
