@@ -66,6 +66,8 @@ export default function ProjectDisplayBox({id, name, author, date}) {
               <span className="block"> {id} </span>
             </h4>
           </div>
+
+          {/* Display Approve / Suggestion numbers */}
           <div className="flex flex-1 text-2xl justify-end h-9 ">
             <h1 className={"align-middle pr-5 " + stateColor}>{reviewState.toString().toUpperCase()}</h1>
             {latestCommitApproveCount !== 0 ? 
@@ -73,13 +75,29 @@ export default function ProjectDisplayBox({id, name, author, date}) {
                 {latestCommitApproveCount}
               </h3> : null}
 
-
             {activeSuggestionCount !== 0 ? 
               <h3 className="bg-[#FFCE83] pl-2 pr-2 rounded-sm rounded-br-[10px]">
                 {activeSuggestionCount}
               </h3> : null}
-
           </div>
+          <Tooltip 
+            className="z-9999" 
+            id={`${id}`}
+            place="right"
+            disableStyleInjection="true"
+            content={
+              <div>
+                {latestCommitApproveCount !== 0 ? 
+                  <h3>
+                    {latestCommitApproveCount} Approvals
+                  </h3> : null}
+                {activeSuggestionCount !== 0 ? 
+                  <h3>
+                    {activeSuggestionCount} Suggestions
+                  </h3> : null}
+              </div>
+            }
+          />
         </div>
         <h4 className="text-textcolor p-1">
           <span className="font-bold">Date Modified: </span>
