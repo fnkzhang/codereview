@@ -25,3 +25,14 @@ With it, users can import code repositories from GitHub, add and modify files as
 - Tailwind CSS
 - Flowbite Component Library
 - Jest
+
+## Project Structure
+codereview/react/
+├── public/
+├── src/
+│   ├── api/
+│   ├── components/
+│   ├── test/
+│   ├── utils/
+├── tailwind.config.json
+└── package.json
