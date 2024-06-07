@@ -22,7 +22,7 @@ jobs:
     - name: Create credentials files
       run: | 
         ls -a
-        echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} >> api-server-flask/api/credentials/googlecreds.json
+        echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} >> credentials/googlecreds.json
         ls -a
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
