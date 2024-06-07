@@ -33,5 +33,5 @@ jobs:
       working-directory: react
 
     - name: Run tests
-      run: npm test
+      run: npm test -- --silent
       working-directory: react
