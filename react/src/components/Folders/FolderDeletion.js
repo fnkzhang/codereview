@@ -5,7 +5,19 @@ import { Button, Label, TextInput } from "flowbite-react";
 import { deleteFolder, getFolderInfo } from "../../api/APIUtils";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * Component for deleting a folder.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <FolderDeletion isLoggedIn={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ */
 export default function FolderDeletion(props) {
+
     const [FolderName, setFolderName] = useState("");
     const [inputFolderName, setInputFolderName] = useState("");
     const [isError, setIsError] = useState(false);
@@ -13,6 +25,9 @@ export default function FolderDeletion(props) {
     const { project_id, commit_id, folder_id } = useParams();
     const navigate = useNavigate();
 
+    /**
+     * Gets the data for the folder that is being deleted.
+     */
     useEffect(() => {
         async function getFolderData() {
             let result = await getFolderInfo(project_id, commit_id, folder_id)
@@ -23,6 +38,9 @@ export default function FolderDeletion(props) {
             getFolderData()
     }, [project_id, commit_id, folder_id, props.isLoggedIn])
 
+    /**
+     * Handles the deletion of the folder.
+     */
     const handleDeleteFolderButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 

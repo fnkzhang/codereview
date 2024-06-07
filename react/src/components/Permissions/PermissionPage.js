@@ -5,34 +5,44 @@ import { Label, TextInput, Button, Dropdown } from "flowbite-react";
 import LoadingSpinner from "../Loading/LoadingSpinner";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * PermissionPage component manages user permissions within a project.
+ * It allows project owners to add, remove, and promote users with different levels of access to the project.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <PermissionPage isLoggedIn={true} userData={{ email: "user@example.com" }}/>
+ * 
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Indicates whether the user is currently logged in.
+ * @param {object} props.userData - User data object containing information about the logged-in user.
+ */
 export default function PermissionPage( props ) {
 
   let [userToAddEmail, setUserToAddEmail] = useState("");
   let [projectName, setProjectName] = useState(null);
   let [projectUsers, setProjectUsers] = useState([]);
   let [projectAuthorEmail, setProjectAuthorEmail] = useState(null)
-
   let [isLoading, setIsLoading] = useState(true)
-  // Todo Checks user permission value to determine if user can do actions / be on this page
-
   let [isError, setIsError] = useState(false);
   let [errorString, setErrorString] = useState("");
-
   let [canRemoveUsers, setCanRemoveUsers] = useState(false);
-
   const {project_id} = useParams();
 
-  // Set Data For Page on Load
+  // TODO Checks user permission value to determine if user can do actions / be on this page
+
+  /**
+   * Gets the project data and current project users.
+   */
   useEffect(() => {
     if (!props.isLoggedIn)
       return;
 
     const getProjectData = async () => {
       let projectData = await getProjectInfo(project_id);
-      //console.log(projectData.author_email, props.userData.email, projectData.author_email === props.userData.email);
       if (projectData.author_email === props.userData.email)
         setCanRemoveUsers(true);
-
 
       setProjectAuthorEmail(projectData.author_email);
       setProjectName(projectData.name);
@@ -42,6 +52,7 @@ export default function PermissionPage( props ) {
       let projectUserResponse = await getAllUsersWithPermissionForProject(project_id)
       setProjectUsers(projectUserResponse)
     }
+
     async function fetchData() {
       try {
         await Promise.all([
@@ -57,7 +68,6 @@ export default function PermissionPage( props ) {
     }
     
     setUserToAddEmail("")
-    // setProjectUsers([])
     setCanRemoveUsers(false)
     setIsError(false)
     setErrorString("")
@@ -66,7 +76,9 @@ export default function PermissionPage( props ) {
 
   }, [project_id, props, isLoading]) 
 
-
+  /**
+   *  Handles adding a user to the project.
+   */
   const handleAddUserEmailToProject = async (e) => {
     e.preventDefault()
     e.target.reset()
@@ -90,6 +102,9 @@ export default function PermissionPage( props ) {
     setIsLoading(true)
   }
 
+  /**
+   * Handles removing a user from the project.
+   */
   const handleRemoveUsersFromProject = async (emailToRemove) => {
     console.log(emailToRemove);
     let result = await removeUserFromProject(project_id, emailToRemove)
@@ -102,6 +117,10 @@ export default function PermissionPage( props ) {
     console.log(result);
     setIsLoading(true)
   }
+
+  /**
+   * Handles promoting a user to the owner of the project.
+   */
   const handlePromoteToOwner = async (ownerEmail, emailToPromote) => {
     console.log(ownerEmail, emailToPromote);
     let result = await promoteEmailToProjectOwner(project_id, ownerEmail, emailToPromote)
@@ -116,6 +135,9 @@ export default function PermissionPage( props ) {
     setIsLoading(true)
   }
 
+  /**
+   * Checks if the provided email is valid.
+   */
   function isValidEmailString(email) {
     console.log(email);
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -125,19 +147,28 @@ export default function PermissionPage( props ) {
     
     return false;
   }
-  
+
+  /**
+   *  Handles down mouse event for button interactions.
+   */
   const handleMouseDown = (e) => {
     let button = e.target;
     button.classList.remove("scale-100")
     button.classList.add("scale-110");
   }
 
+  /**
+   *  Handles up mouse event for button interactions.
+   */
   const handleMouseUp = (e) => {
     let button = e.target;
     button.classList.remove("scale-110");
     button.classList.add("scale-100")
   }
 
+  /**
+   *  Function to display a specific user for a project.
+   */
   function ProjectUserDisplay({projectUsers, isLoading, props}) {
     return (
       <div>
