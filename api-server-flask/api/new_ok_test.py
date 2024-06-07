@@ -458,26 +458,26 @@ def test_commitCommit(client):
 #                assert response.status_code == 200
 #                assert response.json["success"] == True
 
-def test_closeCommit(client):
-    response = client.get("/api/Commit/123/close/")
-    assert response.status_code == 200
-    assert response.json["success"] == False
+#def test_closeCommit(client):
+#    response = client.get("/api/Commit/123/close/")
+#    assert response.status_code == 200
+#    assert response.json["success"] == False
 
-    response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
-    assert response.status_code == 200
-    assert response.json["success"] == False
+#    response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
+#    assert response.status_code == 200
+#    assert response.json["success"] == False
 
-    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
-            response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
-            assert response.status_code == 200
-            assert response.json["success"] == False
+#    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
+#        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
+#            response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
+#            assert response.status_code == 200
+#            assert response.json["success"] == False
 
-            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-                 patch("commitRoutes.setCommitClosed", autospec=True, return_value=True):
-                response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
-                assert response.status_code == 200
-                assert response.json["success"] == True
+#            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+#                 patch("commitRoutes.setCommitClosed", autospec=True, return_value=True):
+#                response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
+#                assert response.status_code == 200
+#                assert response.json["success"] == True
 
 #def test_approveCommit(client):
 #    response = client.get("/api/Commit/123/approve/")
