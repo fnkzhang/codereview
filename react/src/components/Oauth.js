@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback } from "react";
 import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from 'jwt-decode';
 import { Dropdown, Avatar } from 'flowbite-react';
 import getCookie, { deleteCookie } from "../utils/utils";
 import GitHubStatus from "./GitHub/GitHubStatus";
@@ -110,6 +109,7 @@ export default function Oauth( props ){
               "Content-Type": "application/json"
             }
         }
+        console.log(email)
 
         return await fetch('/api/user/isValidUser', headers)
         .then(response => response.json())
@@ -181,7 +181,6 @@ export default function Oauth( props ){
         <GoogleLogin 
             className="bg-background m-1 inline-block p-5"
             onSuccess={credentialResponse => {
-            let decodedResponse = jwtDecode(credentialResponse.credential)
             
             verifyLogin(credentialResponse)
             

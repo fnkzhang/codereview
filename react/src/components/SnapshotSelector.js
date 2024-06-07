@@ -55,7 +55,7 @@ export default function SnapshotSelector( props ) {
         if (props.snapshots.length === 0 || !props.snapshots.some(snapshot => snapshot.snapshot.snapshot_id === Number(right_snapshot_id)))
           grabSnapshots()
         
-    }, [document_id, props.editorReady, project_id, props.setSnapshots, props.snapshots, right_snapshot_id])
+    }, [document_id, props, project_id, right_snapshot_id])
     
     // Set Snapshot Selecter Snapshot Number
     useEffect(() => {
