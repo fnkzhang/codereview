@@ -16,6 +16,14 @@ import FolderCreation from './components/Folders/FolderCreation.js';
 import FolderDeletion from './components/Folders/FolderDeletion.js';
 import PermissionPage from './components/Permissions/PermissionPage.js';
 
+/**
+ * Main App component that sets up routing and authentication for the application.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <App />
+ */
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)

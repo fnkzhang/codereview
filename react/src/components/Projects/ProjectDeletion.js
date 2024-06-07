@@ -5,7 +5,19 @@ import { Button, Label, TextInput } from "flowbite-react";
 import { deleteProject, getProjectInfo } from "../../api/APIUtils";
 import BackButton from "../Buttons/BackButton.js";
 
-export default function ProjectDeletion(props) {
+/**
+ * Component for deleting a project.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <ProjectDeletion isLoggedIn={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Indicates if the user is logged in
+ */
+export default function ProjectDeletion( props ) {
+
     const [projectName, setProjectName] = useState(""); // Actual Project Name to compare
     const [inputProjectName, setInputProjectName] = useState(""); // Handle Input for project name
     const [isError, setIsError] = useState(false);
@@ -13,6 +25,9 @@ export default function ProjectDeletion(props) {
     const { project_id } = useParams();
     const navigate = useNavigate();
 
+    /**
+     * Fetches project data from the API and sets the project name.
+     */
     useEffect(() => {
         async function getProjectData() {
             let result = await getProjectInfo(project_id)
@@ -23,8 +38,11 @@ export default function ProjectDeletion(props) {
             getProjectData()
     }, [project_id, props.isLoggedIn])
 
+    /**
+     * Handles the project deletion form submission.
+     */
     const handleDeleteProjectButtonClick = async (e) => {
-        e.preventDefault() // Prevent form submission
+        e.preventDefault() // Prevent default form submission
 
         setWorking(true)
 

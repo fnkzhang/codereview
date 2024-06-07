@@ -27,12 +27,33 @@ With it, users can import code repositories from GitHub, add and modify files as
 - Jest
 
 ## Project Structure
-codereview/react/
-├── public/
-├── src/
-│   ├── api/
-│   ├── components/
-│   ├── test/
-│   ├── utils/
-├── tailwind.config.json
-└── package.json
+codereview/react/<br>
+├── nginx/ # Nginx Config Files<br>
+├── public/ # Static Files<br>
+├── src/ # Source Files<br>
+│   ├── api/ # API Service Files<br>
+│   ├── components/ # Application Components<br>
+│   ├── test/ # Jest Test Files<br>
+│   ├── utils/ # Utility Files<br>
+│   ├── App.js # Main App Compnent<br>
+│   ├── index.css # Index.html Styling Config<br>
+│   ├── index.js # Google Oauth Setup<br>
+├── tailwind.config.json<br>
+└── package.json<br>
+
+## Running The UI
+
+To ensure that the package build tree is valid, and the packages are correctly installed, use the following command:
+
+    npm install
+
+Before attempting to run the UI in development mode, it is recommended that the Test scripts are run. To run the provided unit tests use the following command:
+
+    npm test
+
+To run the UI in developer mode use the following command:
+
+    npm start
+
+When deploying this project it is recommended not to build the UI natively, and instead utilize docker so it can be more easily supplied to a Google Cloud Run service. For more detailed deployment information, see the [deployment instructions](../README.md).
+

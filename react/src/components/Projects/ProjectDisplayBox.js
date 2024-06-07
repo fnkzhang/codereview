@@ -6,17 +6,31 @@ import { Tooltip } from "react-tooltip";
 import { REVIEW_STATE } from "../../utils/reviewStateMapping";
 import { getColor } from "../../utils/utils";
 
-export default function ProjectDisplayBox({id, name, author, date}) {
-  // Clicking on project will redirect to project page to select documents
-  // Enum For State
+/**
+ * Component to display project information in a box format.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <ProjectDisplayBox id={1} author="JohnDoe" name="MyProject" date="2023-06-01" />
+ *
+ * @param {object} props - Component props
+ * @param {number} props.id - The project ID
+ * @param {string} props.author - The author of the project
+ * @param {string} props.name - The name of the project
+ * @param {string} props.date - The date the project was last modified
+ */
+export default function ProjectDisplayBox( props ) {
+
   const [reviewState, setReviewState] = useState(REVIEW_STATE.CLOSED) 
   const [isLoaded, setIsLoaded] = useState(false)
   const [latestCommitApproveCount, setLatestCommitApproveCount] = useState(0)
   const [activeSuggestionCount, setActiveSuggestionCount] = useState(0)
-
-
   const navigate = useNavigate()
-  // Get Latest Commit State
+
+  /**
+   * Fetches the latest commit state for the project.
+   */
   useEffect(() => {
     async function getLatestCommitState(project_id){
       const latestCommit = await getLatestCommitForProject(project_id)
@@ -32,10 +46,12 @@ export default function ProjectDisplayBox({id, name, author, date}) {
       setIsLoaded(true)
     }
 
-    getLatestCommitState(id)
-  }, [id])
+    getLatestCommitState(props.id)
+  }, [props.id])
 
-  // Get All Active Comments for Commit
+  /**
+   * Fetches all active comments for the latest commit of the project.
+   */
   useEffect(() => {
     async function getAllActiveCommentsForLatestProjectCommit(project_id) {
       let response = await getAllProjectActiveCommentsForLatestCommit(project_id)
@@ -43,27 +59,32 @@ export default function ProjectDisplayBox({id, name, author, date}) {
       setActiveSuggestionCount(response.length)
     }
     getAllActiveCommentsForLatestProjectCommit(id)
-  }, [id])
+  }, [props.id])
+
+  /**
+   * Handles the click event on the project card.
+   */
   const handleProjectClick = async (project_id) => {
     navigate(`/Project/${project_id}/Commit/0`)
   }
+
   if (isLoaded) {
     let stateColor = getColor(reviewState)
     
     return (
       <Card 
         className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"
-        data-tooltip-id={`${id}`}
+        data-tooltip-id={`${props.id}`}
         onClick={() => handleProjectClick(id)}
       >
         <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
-          <span className="font-bold text-xl">{author}/{name}</span>
+          <span className="font-bold text-xl">{props.author}/{props.name}</span>
         </h4>
         <div className="flex">
           <div className="flex-1">
             <h4 className="text-textcolor p-1">
               <span className="font-bold block">Project ID: </span>
-              <span className="block"> {id} </span>
+              <span className="block"> {props.id} </span>
             </h4>
           </div>
           <div className="flex flex-1 text-2xl justify-end h-9 ">
@@ -83,17 +104,17 @@ export default function ProjectDisplayBox({id, name, author, date}) {
         </div>
         <h4 className="text-textcolor p-1">
           <span className="font-bold">Date Modified: </span>
-          <span className="block"> {date} </span>
+          <span className="block"> {props.date} </span>
         </h4>
         <Tooltip 
           className="z-9999" 
-          id={`${id}`}
+          id={`${props.id}`}
           place="bottom"
           disableStyleInjection="true"
           content={
             <div>
               <p>
-                {author}/{name}
+                {props.author}/{props.name}
               </p>
             </div>
           }
