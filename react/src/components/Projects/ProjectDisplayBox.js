@@ -101,24 +101,6 @@ export default function ProjectDisplayBox( props ) {
                 {activeSuggestionCount}
               </h3> : null}
           </div>
-          <Tooltip 
-            className="z-9999" 
-            id={`${id}`}
-            place="right"
-            disableStyleInjection="true"
-            content={
-              <div>
-                {latestCommitApproveCount !== 0 ? 
-                  <h3>
-                    {latestCommitApproveCount} Approvals
-                  </h3> : null}
-                {activeSuggestionCount !== 0 ? 
-                  <h3>
-                    {activeSuggestionCount} Suggestions
-                  </h3> : null}
-              </div>
-            }
-          />
         </div>
         <h4 className="text-textcolor p-1">
           <span className="font-bold">Date Modified: </span>
@@ -134,6 +116,16 @@ export default function ProjectDisplayBox( props ) {
               <p>
                 {props.author}/{props.name}
               </p>
+              <div>
+                {latestCommitApproveCount !== 0 ? 
+                  <h3>
+                    {latestCommitApproveCount} Approvals
+                  </h3> : null}
+                {activeSuggestionCount !== 0 ? 
+                  <h3>
+                    {activeSuggestionCount} Suggestions
+                  </h3> : null}
+              </div>
             </div>
           }
         />
