@@ -58,7 +58,7 @@ export default function ProjectDisplayBox( props ) {
 
       setActiveSuggestionCount(response.length)
     }
-    getAllActiveCommentsForLatestProjectCommit(id)
+    getAllActiveCommentsForLatestProjectCommit(props.id)
   }, [props.id])
 
   /**
@@ -75,7 +75,7 @@ export default function ProjectDisplayBox( props ) {
       <Card 
         className="w-1/4 bg-background transition-all duration-300 hover:bg-alternative p-3 m-3"
         data-tooltip-id={`${props.id}`}
-        onClick={() => handleProjectClick(id)}
+        onClick={() => handleProjectClick(props.id)}
       >
         <h4 className="text-textcolor overflow-hidden whitespace-nowrap text-ellipsis p-1">
           <span className="font-bold text-xl">{props.author}/{props.name}</span>
