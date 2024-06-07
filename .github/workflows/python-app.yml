@@ -19,6 +19,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Create credentials files
+      run: printf ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} >> api-server-flask/api/credentials/googlecreds.json
+           ls -a
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
