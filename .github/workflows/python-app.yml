@@ -24,7 +24,7 @@ jobs:
         ls -a
         echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} >> credentials/googlecreds.json
         ls -a
-        echo credentials/googlecreds.json
+        cat credentials/googlecreds.json
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
