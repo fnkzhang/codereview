@@ -82,4 +82,34 @@ describe("Oauth component", () => {
     expect(getCookie).toHaveBeenCalledWith("cr_id_token");      
   });
 
+  it("Tries to get fetch failed", async () => {
+    
+    global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () =>
+        Promise.resolve({
+          success: false
+        }),
+      })
+    );
+    console.log = jest.fn();
+    
+    await act( async() => {
+      render(
+        <Oauth 
+        isLoggedIn={false}
+        setIsLoggedIn={jest.fn()} 
+        userData={null} 
+        setUserData={jest.fn()} 
+        connected={false} 
+        setConnected={jest.fn()} 
+        />        
+      )
+    });
+    
+    screen.debug()
+    expect(getCookie).toHaveBeenCalledWith("cr_id_token");    
+    expect(console.log).toHaveBeenCalledWith("Failed to validate token");  
+  });
+
 });

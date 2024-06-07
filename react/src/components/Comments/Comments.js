@@ -57,7 +57,7 @@ import LoadingSpinner from '../Loading/LoadingSpinner';
 function Comment ( props ) {
 
   const [isLoaded, setIsLoaded] = useState(false)
-
+  
   /**
    * Handles loading the comment when ready
    */
