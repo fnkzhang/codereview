@@ -435,28 +435,33 @@ def test_commitCommit(client):
         assert response.status_code == 200
         assert response.json["success"] == True
 
-#def test_setReviewedCommit(client):
-    
-#    response = client.get("/api/Commit/123/setReviewed/")
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+def test_setReviewedCommit(client):
+    response = client.get("/api/Commit/123/setReviewed/")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-#    response = client.get("/api/Commit/123/setReviewed/", headers={"Authorization": "oAuthToken"})
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+    response = client.get("/api/Commit/123/setReviewed/", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-#    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-#        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
-#            response = client.get("/api/Commit/123/setReviewed/", headers={"Authorization": "oAuthToken"})
-#            assert response.status_code == 200
-#            assert response.json["success"] == False
+    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=-1):
+        
+        response = client.get("/api/Commit/123/setReviewed/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-#                 patch("commitRoutes.commitACommit", autospec=True, return_value=True), \
-#                 patch("commitRoutes.setCommitReviewed", autospec=True, return_value=True):
-#                response = client.get("/api/Commit/123/setReviewed/", headers={"Authorization": "oAuthToken"})
-#                assert response.status_code == 200
-#                assert response.json["success"] == True
+    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+         patch("commitRoutes.commitACommit", autospec=True, return_value=True), \
+         patch("commitRoutes.setCommitReviewed", autospec=True, return_value=True):
+        
+        response = client.get("/api/Commit/123/setReviewed/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
+
 
 #def test_closeCommit(client):
 #    response = client.get("/api/Commit/123/close/")
@@ -569,7 +574,6 @@ def test_deleteWorkingCommit(client):
 #                    assert response.json["success"] == True
 
 def test_getUserWorkingCommitForProject(client):
-    
     response = client.get("/api/Commit/123/workingCommit")
     assert response.status_code == 200
     assert response.json["success"] == False
@@ -580,17 +584,13 @@ def test_getUserWorkingCommitForProject(client):
 
     with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
         with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
-            response = client.get("/api/Commit/123/workingCommit", headers={"Authorization": "oAuthToken"})
-            assert response.status_code == 200
-            assert response.json["success"] == False
-
             with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5):
                 with patch("commitRoutes.getUserWorkingCommitInProject", autospec=True, return_value=None):
                     response = client.get("/api/Commit/123/workingCommit", headers={"Authorization": "oAuthToken"})
                     assert response.status_code == 200
                     assert response.json["success"] == False
 
-                with patch("commitRoutes.getUserWorkingCommitInProject", autospec=True, return_value="commitDict"):
+                with patch("commitRoutes.getUserWorkingCommitInProject", autospec=True, return_value={"commit_id": 789}):
                     response = client.get("/api/Commit/123/workingCommit", headers={"Authorization": "oAuthToken"})
                     assert response.status_code == 200
                     assert response.json["success"] == True
