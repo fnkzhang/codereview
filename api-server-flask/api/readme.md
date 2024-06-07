@@ -170,7 +170,9 @@ is_folder (bool) : Whether or not the item is a folder or not. True for folder, 
 What version (snapshot) a document was associated with during a specific comment.
 
 doc_id (int) : Id of the document
+
 commit_id (int) : Id of the commit
+
 snapshot_id (int) : Id of the snapshot
 
 ### UserUnseenSnapshot
