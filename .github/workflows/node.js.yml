@@ -20,12 +20,18 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
+    - uses: actions/checkout@v4  # Check out the repository code
+
+    - name: Use Node.js ${{ matrix.node-version }}  # Set up Node.js with the version specified in the matrix
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: cd react
-    - run: npm ci
-    - run: npm test
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: react  # Specify the working directory
+
+    - name: Run tests
+      run: npm test
+      working-directory: react  # Specify the working directory
