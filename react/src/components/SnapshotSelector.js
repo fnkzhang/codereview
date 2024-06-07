@@ -44,9 +44,6 @@ export default function SnapshotSelector( props ) {
     useEffect(() => {
         const grabSnapshots = async () => {
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
-          
-          if (result === undefined)
-            return
 
           if (result.success)
             props.setSnapshots(result.body.reverse())
