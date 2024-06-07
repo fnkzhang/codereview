@@ -2,6 +2,29 @@ import React from "react";
 import GitHubStatus from "./GitHubStatus";
 import { Label, TextInput, Checkbox } from "flowbite-react";
 
+/**
+ * Component for rendering the GitHub import form.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <GitHubImportForm 
+ *    connected={true} 
+ *    setConnected={setConnected} 
+ *    importFromGitHub={true} 
+ *    setImportFromGitHub={setImportFromGitHub} 
+ *    setGitRepo={setGitRepo} 
+ *    setRepoBranch={setRepoBranch} 
+ * />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.connected - Whether the user is connected to GitHub
+ * @param {Function} props.setConnected - Function to set the connection status to GitHub
+ * @param {boolean} props.importFromGitHub - Whether to import project contents from GitHub
+ * @param {Function} props.setImportFromGitHub - Function to toggle importing project contents from GitHub
+ * @param {Function} props.setGitRepo - Function to set the name of the GitHub repository
+ * @param {Function} props.setRepoBranch - Function to set the name of the branch in the GitHub repository
+ */
 export default function GitHubImportForm ( props ) {
 
     if (!props.connected) {

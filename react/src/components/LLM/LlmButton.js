@@ -1,23 +1,49 @@
 import React from "react";
 import { getCodeImplementation } from "../../api/APIUtils";
 
-
-export default function LlmButton( { editorLanguage, editorCode, commentText, checkIfCanGetLLMCode, getHighlightedCode,
-  highlightStartX, highlightStartY, highlightEndX, highlightEndY, updateHighlightedCode } ) {
+/**
+ * Component for creating a suggestion using the LLM model.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <LlmButton
+ *   getHighlightedCode={getHighlightedCode}
+ *   updateHighlightedCode={updateHighlightedCode}
+ *   editorCode={editorCode}
+ *   highlightStartX={highlightStartX}
+ *   highlightStartY={highlightStartY}
+ *   highlightEndX={highlightEndX}
+ *   highlightEndY={highlightEndY}
+ *   commentText={commentText}
+ *   editorLanguage={editorLanguage}
+ * />
+ *
+ * @param {object} props - Component props
+ * @param {Function} props.getHighlightedCode - Function to get highlighted code from the editor
+ * @param {Function} props.updateHighlightedCode - Function to update highlighted code in the editor
+ * @param {string} props.editorCode - Code content in the editor
+ * @param {number} props.highlightStartX - Start column of the highlight
+ * @param {number} props.highlightStartY - Start line number of the highlight
+ * @param {number} props.highlightEndX - End column of the highlight
+ * @param {number} props.highlightEndY - End line number of the highlight
+ * @param {string} props.commentText - Text of the comment associated with the highlighted code
+ * @param {string} props.editorLanguage - Language of the editor content
+ */
+export default function LlmButton( props ) {
   
-  //Todo Display Error Message When LLM Fails
-  // const [isError, setIsError] = useState(false)
+  //TODO Display Error Message When LLM Fails
 
+  /**
+   * Handles creating a suggestion using the LLM model.
+   */
   const handleCreateSuggestion = async () => {
+    let highlightedCode = props.getHighlightedCode(props.highlightStartX, props.highlightStartY, props.highlightEndX, props.highlightEndY)
+    let result = await getCodeImplementation(props.editorCode, highlightedCode,
+      props.highlightStartY, props.highlightEndY, props.commentText, props.editorLanguage)
 
-    let highlightedCode = getHighlightedCode(highlightStartX, highlightStartY, highlightEndX, highlightEndY)
-    let result = await getCodeImplementation(editorCode, highlightedCode,
-      highlightStartY, highlightEndY, commentText, editorLanguage)
-
-    updateHighlightedCode(result, highlightedCode);
+      props.updateHighlightedCode(result, highlightedCode);
   }
-
-  //const DisplayErroMessage()
   
   return (
     <div>
@@ -26,6 +52,5 @@ export default function LlmButton( { editorLanguage, editorCode, commentText, ch
         Create LLM Suggestion
       </button>
     </div>
-
   )
 }

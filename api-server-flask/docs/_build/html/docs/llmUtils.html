@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>llmUtils module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-llmUtils">
+<span id="llmutils-module"></span><h1>llmUtils module<a class="headerlink" href="#module-llmUtils" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="llmUtils.add_few_shot_example">
+<span class="sig-prename descclassname"><span class="pre">llmUtils.</span></span><span class="sig-name descname"><span class="pre">add_few_shot_example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">example_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#llmUtils.add_few_shot_example" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a few_shot_example string to be added to a system prompt</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>example_number (int): Number of the example</p></li>
+<li><p>example_input (str): Example user prompt</p></li>
+<li><p>example_output (str): Example output from the AI</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>few_shot_example (str): a string formatted to a few shot example format</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="llmUtils.get_chat_response">
+<span class="sig-prename descclassname"><span class="pre">llmUtils.</span></span><span class="sig-name descname"><span class="pre">get_chat_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#llmUtils.get_chat_response" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a response from VertexAi given a user prompt and a system prompt</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>user_prompt (str): A user prompt (query a user would ask the AI)</p></li>
+<li><p>system_prompt (str): Guidelines for the AI to follow when responding to the user prompt</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>response (str): VertexAI's response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="llmUtils.get_code_with_line_numbers">
+<span class="sig-prename descclassname"><span class="pre">llmUtils.</span></span><span class="sig-name descname"><span class="pre">get_code_with_line_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#llmUtils.get_code_with_line_numbers" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Adds line numbers before every line in a string</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>code (str): string to add line numbers to</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>codeWithLineNumbers (str): a string with line numbers added before every line</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="llmUtils.get_json_from_llm_response">
+<span class="sig-prename descclassname"><span class="pre">llmUtils.</span></span><span class="sig-name descname"><span class="pre">get_json_from_llm_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#llmUtils.get_json_from_llm_response" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a json object from a string</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>response (str): A string representing a json string</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>json (dict): a dict representing the json string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="llmUtils.get_llm_code_from_suggestion">
+<span class="sig-prename descclassname"><span class="pre">llmUtils.</span></span><span class="sig-name descname"><span class="pre">get_llm_code_from_suggestion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlighted_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggestion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#llmUtils.get_llm_code_from_suggestion" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a code edit from VertexAI given a suggestion</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>code (str): code to edit</p></li>
+<li><p>highlighted_code (str): code that the suggestion refers to</p></li>
+<li><p>start_line (int): line that the code the suggestion refers to starts on</p></li>
+<li><p>end_line (int): line that the code the suggestion refers to ends on</p></li>
+<li><p>suggestion (str): The suggestion</p></li>
+<li><p>language (str): Language the code was written in; e.g: Python, C++, Java</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>response (dict): A dict with the keys &quot;success&quot;, &quot;insertions&quot;, and &quot;deletions&quot;. The &quot;insertions&quot; key maps to a dictionary of line insertions that follow the format of (line number (int)) : &quot;(lines to insert (str))&quot;. The lines are inserted on the line number directly after the line number provided. The &quot;deletions&quot; key maps to a list of line numbers (int) that should be deleted. The &quot;success&quot; key maps to whether or not the response was succesfull</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="llmUtils.get_llm_suggestion_from_code">
+<span class="sig-prename descclassname"><span class="pre">llmUtils.</span></span><span class="sig-name descname"><span class="pre">get_llm_suggestion_from_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#llmUtils.get_llm_suggestion_from_code" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a suggestion from VertexAI given code</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>code (str): code to get suggestions for</p></li>
+<li><p>language (str): Language the code was written in; e.g: Python, C++, Java</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>response (dict): A dict with the key &quot;suggestions&quot; which maps to a list of JSON objects. Each object in the list contains the keys &quot;startLine&quot;, &quot;endLine&quot;, and &quot;suggestion&quot; keys, indicating the highlighted code lines and suggested changes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="llmUtils.init_llm">
+<span class="sig-prename descclassname"><span class="pre">llmUtils.</span></span><span class="sig-name descname"><span class="pre">init_llm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'codereview-413200'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-central1'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#llmUtils.init_llm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/llmUtils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

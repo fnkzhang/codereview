@@ -1,0 +1,153 @@
+githubRoutes module
+*******************
+
+githubRoutes.addGithubToken()
+
+   "POST /api/Github/addToken"
+
+   **Explanation:**
+      This endpoint adds a GitHub token to the user's account. It
+      requires authentication via an Authorization token header.
+
+   **Args:**
+      * request.body (dict):
+           * github_code (str): code
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+githubRoutes.getGithubRepositoryBranches()
+
+   "GET /api/Github/getRepositoryBranches/"
+
+   **Explanation:**
+      Gets a repository's branches if the user has access (user
+      determined by credentials in Authorization header). Requires
+      Github token connection for the user to function.
+
+   **Args:**
+      * request.body (dict):
+           * repository (str): name of repository, includes owner name
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (list): A list of strings representing the branches of
+           the repository.
+
+githubRoutes.getUserGithubStatus()
+
+   "GET /api/Github/userHasGithub/"
+
+   **Explanation:**
+      Checks if user has github connected (user is dictated by
+      credentials given in Authorization header)
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (bool): Indicates whether the user has a GitHub
+           account associated.
+
+githubRoutes.pullToExistingProject(proj_id)
+
+   "POST /api/Github/PullToExistingProject/"
+
+   **Explanation:**
+      Pulls a github repo's contents to an existing project.  The
+      project's next commit will be the github repo's contents.
+      Enforces permissions through credentials given in Authorization
+      header. This function has issues due to the fact that duplicate
+      names are not prevented.
+
+   **Args:**
+      * proj_id (int): id of the project
+
+      * request.body:
+           * repository (str): repository you're pulling from
+
+           * branch (str): the branch you're pulling from
+
+           * name (str): name of the new commit
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (str): List of document ids that received new
+           snapshots as a result of this
+
+githubRoutes.pullToNewProject()
+
+githubRoutes.pushToExistingBranch(proj_id, commit_id)
+
+   "POST /api/Github/<proj_id>/<commit_id>/PushToExisting/"
+
+   **Explanation:**
+      Pushes a commit's files into an existing branch on github.
+      Enforces permissions through credentials given in Authorization
+      header.
+
+   **Args:**
+      * proj_id (int): id of the project
+
+      * commit_id (int): id of the commit
+
+      * request.body:
+           * repository (str): repository you're pushing to
+
+           * branch (str): the branch you're pushing to
+
+           * message (str): commit message for github
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+githubRoutes.pushToNewBranch(proj_id, commit_id)
+
+   "POST /api/Github/<proj_id>/<commit_id>/PushToNewBranch/"
+
+   **Explanation:**
+      Pushes a commit's files into a new branch on github. Enforces
+      permissions through credentials given in Authorization header.
+
+   **Args:**
+      * proj_id (int): id of the project
+
+      * commit_id (int): id of the commit
+
+      * request.body:
+           * repository (str): repository you're pushing to
+
+           * branch (str): the branch you're pushing to
+
+           * oldbranch (str): the name of the branch this branch is
+             built off of
+
+           * message (str): commit message for github
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.

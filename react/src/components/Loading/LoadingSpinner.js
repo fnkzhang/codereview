@@ -1,3 +1,14 @@
+/**
+ * LoadingSpinner component to display a spinning loading indicator.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <LoadingSpinner active={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.active - Whether the loading spinner is active or not
+ */
 export default function LoadingSpinner ( props ) {
   if (props.active) {
     return (

@@ -15,16 +15,25 @@ import models
 @app.route('/api/Snapshot/<snapshot_id>/comment/create', methods=["POST"])
 def createComment(snapshot_id):
     """
-    POST /api/Snapshot/<snapshot_id>/comment/create
+    ``POST /api/Snapshot/<snapshot_id>/comment/create``
 
-    Explanation:
-        Creates a top-level comment on the given snapshot
+    **Explanation:**
+        Creates a top-level comment on the given snapshot. Enforces permissions through credentials given in Authorization header.
 
-    Args:
+    **Args:**
         - snapshot_id (str): The ID of the snapshot.
+        - request.body (dict):
+            - author_email (str): The email of the author of the comment.
+            - reply_to_id (int): The ID of the comment being replied to. Defaults to 0 if not specified.
+            - content (str): The content of the comment.
+            - highlight_start_x (int): The x-coordinate of the start of the highlighted area.
+            - highlight_start_y (int): The y-coordinate of the start of the highlighted area.
+            - highlight_end_x (int): The x-coordinate of the end of the highlighted area.
+            - highlight_end_y (int): The y-coordinate of the end of the highlighted area.
+            - is_resolved (bool): Indicates whether the comment is resolved.
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the comment creation was successful.
             - reason (str): Description of the result of the comment creation.
             - body (dict): Information about the created comment, including its ID, snapshot ID, author email, reply-to ID, content, highlight start and end coordinates, and resolution status.
@@ -77,16 +86,16 @@ def createComment(snapshot_id):
 @app.route('/api/comment/<comment_id>/resolve', methods=["PUT"])
 def resolveComment(comment_id):
     """
-    PUT /api/comment/<comment_id>/resolve
+    ``PUT /api/comment/<comment_id>/resolve``
 
-    Explanation:
-        Resolves a given comment
+    **Explanation:**
+        Resolves a given comment. Enforces permissions through credentials given in Authorization header.
 
-    Args:
+    **Args:**
         - comment_id (str): The ID of the comment to resolve.
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the resolution operation was successful.
             - reason (str): Description of the result of the resolution operation.
 
@@ -118,18 +127,18 @@ def resolveComment(comment_id):
 @app.route('/api/comments/<comment_id>/edit', methods=["PUT"])
 def editComment(comment_id):
     """
-    PUT /api/comments/<comment_id>/edit
+    ``PUT /api/comments/<comment_id>/edit``
 
-    Explanation:
-        Edits a comment
+    **Explanation:**
+        Edits a comment. Enforces permissions through credentials given in Authorization header.
 
-    Args:
+    **Args:**
         - comment_id (str): The ID of the comment to edit.
-        - body
+        - request.body (dict):
             - content (str): new contents of comment
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the edit operation was successful.
             - reason (str): Description of the result of the edit operation.
 
@@ -185,16 +194,16 @@ def editComment(comment_id):
 @app.route('/api/comments/<comment_id>/delete', methods=["DELETE"])
 def deleteComment(comment_id):
     """
-    DELETE /api/comments/<comment_id>/delete
+    ``DELETE /api/comments/<comment_id>/delete``
 
-    Explanation:
-        Deletes a comment
+    **Explanation:**
+        Deletes a comment. Enforces permissions through credentials given in Authorization header.
 
-    Args:
+    **Args:**
         - comment_id (str): The ID of the comment to delete.
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the delete operation was successful.
             - reason (str): Description of the result of the delete operation.
 

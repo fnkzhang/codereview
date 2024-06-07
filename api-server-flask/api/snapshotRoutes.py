@@ -14,7 +14,25 @@ import models
 
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/', methods=["GET"])
 def getSnapshot(proj_id, doc_id, snapshot_id):
-    print("GETTING SNAPSHOT", proj_id, doc_id, snapshot_id)
+    """
+    
+    ``GET /api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/``
+
+    **Explanation:**
+        Gets the contents of a snapshot. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project this is in
+        - doc_id (int): id of the document the snapshot is for
+        - snapshot_id (int): id of the snapshot
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (str): The contents of the snapshot in string format, if unable to be decoded, returns None
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -47,7 +65,26 @@ def getSnapshot(proj_id, doc_id, snapshot_id):
 # Data Passed in body while project and document id passed in url
 @app.route('/api/Snapshot/<proj_id>/<doc_id>/<commit_id>/', methods=["POST"])
 def createSnapshot(proj_id, doc_id, commit_id):
-    print("Creating Snapshot", proj_id, doc_id)
+    """
+    
+    ``POST /api/Snapshot/<proj_id>/<doc_id>/<commit_id>/``
+
+    **Explanation:**
+        Creates a snapshot on a document in a commit. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project this is in
+        - doc_id (int): id of the document the snapshot is for
+        - commit_id (int): id of the commit this is happening on
+        - request.body (dict):
+            - data (str): contents of the snapshot
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): Id of the newly created snapshot
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -83,6 +120,21 @@ def createSnapshot(proj_id, doc_id, commit_id):
 
 @app.route('/api/Snapshot/<snapshot_id>/', methods=["DELETE"])
 def deleteSnapshot(snapshot_id):
+    """
+    ``DELETE /api/Snapshot/<snapshot_id>/``
+
+    **Explanation:**
+        Deletes a snapshot. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - snapshot_id (int): id of the snapshot
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -112,11 +164,25 @@ def deleteSnapshot(snapshot_id):
         "reason": "Successful Delete"
     }
 
-# look into pagination
-# https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/api/#flask_sqlalchemy.SQLAlchemy.paginate
 @app.route('/api/Snapshot/<snapshot_id>/comments/get', methods=["GET"])
 def getCommentsOnSnapshot(snapshot_id):
+    """
+    
+    ``GET /api/Snapshot/<snapshot_id>/comments/get``
 
+    **Explanation:**
+        Gets all comments attatched to the snapshot. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - snapshot_id (int): id of the snapshot
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): list of Comment objects as dicts
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):

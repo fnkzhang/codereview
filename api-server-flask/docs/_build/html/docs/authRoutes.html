@@ -35,12 +35,12 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="authRoutes.authenticator">
 <span class="sig-prename descclassname"><span class="pre">authRoutes.</span></span><span class="sig-name descname"><span class="pre">authenticator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#authRoutes.authenticator" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/user/authenticate</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/user/authenticate</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Authenticates a user and sees if their credentials from google are correct</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Authenticates a user and sees if their credentials from google are correct</p>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the authentication was successful.</p></li>
 <li><p>reason (str): Description of the authentication result.</p></li>
 <li><p>body (dict): User information if authentication was successful, empty dictionary otherwise.</p></li>
@@ -54,12 +54,12 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="authRoutes.checkIsValidUser">
 <span class="sig-prename descclassname"><span class="pre">authRoutes.</span></span><span class="sig-name descname"><span class="pre">checkIsValidUser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#authRoutes.checkIsValidUser" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/user/isValidUser</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/user/isValidUser</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Checks if user exists from authentication given in headers</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Checks if user exists from authentication given in headers</p>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the user is valid.</p></li>
 <li><p>reason (str): Description of the validation result.</p></li>
 <li><p>body (dict): Empty dictionary.</p></li>
@@ -73,12 +73,12 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="authRoutes.signUp">
 <span class="sig-prename descclassname"><span class="pre">authRoutes.</span></span><span class="sig-name descname"><span class="pre">signUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#authRoutes.signUp" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/user/signup</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/user/signup</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Checks a user’s credentials from google, and if they do not exist in our database, gets added</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Checks a user's credentials from google, and if they do not exist in our database, gets added</p>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the signup was successful.</p></li>
 <li><p>reason (str): Description of the signup result.</p></li>
 <li><p>body (dict): User information if signup was successful, empty dictionary otherwise.</p></li>

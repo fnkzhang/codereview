@@ -18,18 +18,18 @@ import models
 @app.route('/api/Document/<proj_id>/<doc_id>/<commit_id>/', methods=["GET"])
 def getDocument(proj_id, doc_id, commit_id):
     """
-    GET /api/Document/<proj_id>/<doc_id>/<commit_id>/
+    ``GET /api/Document/<proj_id>/<doc_id>/<commit_id>/``
 
-    Explanation:
-        Gets the document information in the commit given
+    **Explanation:**
+        Gets the document information in the commit given. Enforces permissions through credentials given in Authorization header.
 
-    Args:
-        - proj_id (str): The project ID.
-        - doc_id (str): The document ID.
-        - commit_id (str): The commit ID.
+    **Args:**
+        - proj_id (int): The project ID.
+        - doc_id (int): The document ID.
+        - commit_id (int): The commit ID.
 
-    Returns:
-        dict: A dictionary containing the following keys:
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the retrieval was successful.
             - reason (str): Description of the result of the retrieval.
             - body (dict): Document information.
@@ -63,21 +63,21 @@ def getDocument(proj_id, doc_id, commit_id):
 @app.route('/api/Document/<proj_id>/<commit_id>/', methods=["POST"])
 def createDocument(proj_id, commit_id):
     """
-    POST /api/Document/<proj_id>/<commit_id>/
+    ``POST /api/Document/<proj_id>/<commit_id>/``
 
-    Explanation:
-        Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data.
+    **Explanation:**
+        Creates a document in the given commit. This will also automatically generate a snapshot for the document with the given data. Enforces permissions through credentials given in Authorization header.
 
-    Args:
-        - proj_id (str): The project ID.
-        - commit_id (str): The commit ID.
+    **Args:**
+        - proj_id (int): The project ID.
+        - commit_id (int): The commit ID.
         - request.body (dict):
             - doc_name (str): name of document
             - data (str): text you want in the document
-            - parent_folder(str): Optional; if not in request will put in root folder
+            - parent_folder(int): Optional; if not in request will put in root folder
 
-    Returns:
-        dict: A dictionary containing the following keys:
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the creation was successful.
             - reason (str): Description of the result of the creation.
             - body (str): ID of the created document.
@@ -116,17 +116,17 @@ def createDocument(proj_id, commit_id):
 @app.route('/api/Document/<doc_id>/<commit_id>/', methods=["DELETE"])
 def deleteDocument(doc_id, commit_id):
     """
-    DELETE /api/Document/<doc_id>/<commit_id>/
+    ``DELETE /api/Document/<doc_id>/<commit_id>/``
 
-    Explanation:
-        Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit
+    **Explanation:**
+        Deletes a document from the given commit. This will also purge any snapshots that originated from that document in that commit. Enforces permissions through credentials given in Authorization header.
 
-    Args:
-        doc_id (str): The document ID.
-        commit_id (str): The commit ID.
+    **Args:**
+        doc_id (int): The document ID.
+        commit_id (int): The commit ID.
 
-    Returns:
-        dict: A dictionary containing the following keys:
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the deletion was successful.
             - reason (str): Description of the result of the deletion.
 
@@ -173,21 +173,22 @@ def deleteDocument(doc_id, commit_id):
 @app.route('/api/Document/<doc_id>/<commit_id>/rename/', methods=["POST"])
 def renameDocument(doc_id, commit_id):
     """
-    POST /api/Document/<doc_id>/<commit_id>/rename/
+    ``POST /api/Document/<doc_id>/<commit_id>/rename/``
 
-    Explanation:
-        renames a document
+    **Explanation:**
+        Renames a document. Enforces permissions through credentials given in Authorization header.
 
-    Args:
-        - doc_id (str): The document ID
-        - commit_id (str): the commit you're changing the name of
+    **Args:**
+        - doc_id (int): The document ID
+        - commit_id (int): the commit you're changing the name of
         - request.body(dict):
             - doc_name (str): new name
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
+
     """
     # Authentication
     headers = request.headers
@@ -226,30 +227,26 @@ def renameDocument(doc_id, commit_id):
         "reason": "Successful Rename"
     }
 
-#requires
-    #credentials in headers
-    #In body:
-    #parent_folder (folder you're moving it to
-#commit id in url is commit you're doing action on blah blah you get the idea
 @app.route('/api/Document/<doc_id>/<commit_id>/move/', methods=["POST"])
 def moveDocument(doc_id, commit_id):
     """
-    POST /api/Document/<doc_id>/<commit_id>/move/
+    ``POST /api/Document/<doc_id>/<commit_id>/move/``
 
-    Explanation:
-        moves a document
+    **Explanation:**
+        Moves a document. Enforces permissions through credentials given in Authorization header.
 
-    Args:
-        - doc_id (str): The document ID
-        - commit_id (str): The commit you're doing action on blah blah you get the idea
+    **Args:**
+        - doc_id (int): The document ID
+        - commit_id (int): The commit you're doing action on
         - request.body (dict):
-            - parent_folder (str): folder you're moving it to
+            - parent_folder (int): folder you're moving it to
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
             - body (str): An empty string representing the body of the response.
+
     """
     inputBody = request.get_json()
     headers = request.headers
@@ -287,9 +284,27 @@ def moveDocument(doc_id, commit_id):
         "body": ""
     }
 
-#we have og_commit_ids for snapshtos so probably display those instead of snapshot 1, 2...github also has garbage as snapshot name so it's fine :)
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotId/', methods=["GET"])
 def getAllDocumentCommittedSnapshots(proj_id, doc_id):
+    """
+    ``GET /api/Document/<proj_id>/<doc_id>/getSnapshotId/``
+
+    **Explanation:**
+        Returns every snapshot associated with this document and committed commits. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): The project id the document is in
+        - doc_id (int): The id of the document
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Whether or not the request succeeded
+            - reason (str): The reason
+            - body (list): A list of dicts of the format 
+                {"snapshot": A Snapshot object in the form of a dict
+                  "commit": A Commit object in the form of a dict, this is the commit that the snapshot above was originally associated with
+                }
+    """
     headers = request.headers
 
     if not isValidRequest(headers, ["Authorization"]):
@@ -320,6 +335,24 @@ import time
 
 @app.route('/api/Document/<proj_id>/<doc_id>/getSnapshotIdAndWorking/', methods=["GET"])
 def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
+    """
+    ``GET /api/Document/<proj_id>/<doc_id>/getSnapshotIdAndWorking/``
+
+    **Explanation:**
+        Returns every snapshot associated with this document and committed commits. Also return the snapshots associated with any working commits of the user sending the request based off the authentication headers. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): The project id the document is in
+        - doc_id (int): The id of the document
+
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Whether or not the request succeeded
+            - reason (str): The reason
+            - body (list): A list of dicts of the format {"snapshot":'information about a snapshot', "commit":'information about the commit the snapshot is originally from'}
+
+    """
     start = time.time()
     headers = request.headers
 
@@ -358,23 +391,24 @@ def getAllDocumentCommittedSnapshotsIncludingWorking(proj_id, doc_id):
 @app.route('/api/Document/<doc_id>/<commit_id>/<snapshot_id>/changeTo/', methods=["POST"])
 def changeDocumentSnapshot(doc_id, commit_id, snapshot_id):
     """
-    POST /api/Document/<doc_id>/<commit_id>/<snapshot_id>/changeTo/
+    ``POST /api/Document/<doc_id>/<commit_id>/<snapshot_id>/changeTo/``
 
-    Explanation:
+    **Explanation:**
         This endpoint changes the document identified by 'doc_id' and 'commit_id' to the snapshot identified by 'snapshot_id'.
         It requires authentication via an Authorization token header.
         Only users with sufficient permissions can change document snapshots.
 
-    Args:
-        - doc_id (str): The identifier of the document.
-        - commit_id (str): The identifier of the commit.
-        - snapshot_id (str): The identifier of the snapshot to change to.
+    **Args:**
+        - doc_id (int): The identifier of the document.
+        - commit_id (int): The identifier of the commit.
+        - snapshot_id (int): The identifier of the snapshot to change to.
 
     Returns:
-        dict: A dictionary containing the following keys
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
             - body (str): An empty string representing the body of the response.
+
     """
     headers = request.headers
 
@@ -410,20 +444,21 @@ def changeDocumentSnapshot(doc_id, commit_id, snapshot_id):
 @app.route('/api/Document/<document_id>/comments/', methods=["GET"])
 def getAllCommentsForDocument(document_id):
     """
-    GET /api/Document/<document_id>/comments/
+    ``GET /api/Document/<document_id>/comments/``
 
-    Explanation:
-        Gets all comments on a document across all committed snapshots
+    **Explanation:**
+        Gets all comments on a document across all committed snapshots. Enforces permissions through credentials given in Authorization header.
 
-    Args:
-        - document_id (str): The identifier of the document.
+    **Args:**
+        - document_id (int): The identifier of the document.
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the operation was successful.
             - reason (str): Description of the success or failure reason.
             - body (list): A list of dictionaries representing comments associated with the document.
                 Each dictionary contains information about a single comment.
+
     """
     # Authentication
     headers = request.headers

@@ -1,0 +1,120 @@
+projectRoutes module
+********************
+
+projectRoutes.createProject()
+
+   "POST /api/Project/createProject/"
+
+   **Explanation:**
+      Creates a project.
+
+   **Args:**
+      * request.body (dict):
+           * project_name (str): The name of the project
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (int): the id of the newly created project
+
+projectRoutes.deleteProject(proj_id)
+
+   "DELETE /api/Project/<proj_id>/"
+
+   **Explanation:**
+      Deletes a project. Enforces permissions through credentials
+      given in Authorization header.
+
+   **Args:**
+      * proj_id (int): id of the project you're deleting
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Whether or not the request succeeded
+
+         * reason (str): If the request failed, the error
+
+projectRoutes.getProject(proj_id)
+
+   "GET /api/Project/<proj_id>/"
+
+   **Explanation:**
+      Gets information about the project of the id. Enforces
+      permissions through credentials given in Authorization header.
+
+   **Args:**
+      * proj_id (int): Id of the project you're getting
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (dict): A Project object in the form of a dict
+
+projectRoutes.getProjectCommittedCommits(proj_id)
+
+   "GET /api/Project/<proj_id>/GetCommits/"
+
+   **Explanation:**
+      Get all of the project's committed commits. Enforces permissions
+      through credentials given in Authorization header.
+
+   **Args:**
+      * proj_id (int): id of the project
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (list): A list of Commit objects as dicts
+
+projectRoutes.getProjectLatestCommit(proj_id)
+
+   "GET /api/Project/<proj_id>/GetLatestCommit/"
+
+   **Explanation:**
+      Get the latest committed commit of the project. Enforces
+      permissions through credentials given in Authorization header.
+
+   **Args:**
+      * proj_id (int): id of the project
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (dict): A Commit object in the form of a dict
+
+projectRoutes.renameProject(proj_id)
+
+   "POST /api/Project/<proj_id>/rename/"
+
+   **Explanation:**
+      Renames a project. Enforces permissions through credentials
+      given in Authorization header.
+
+   **Args:**
+      * proj_id (int): id of the project you're renaming
+
+      * request.body (dict):
+           * proj_name (str): new name for the project
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.

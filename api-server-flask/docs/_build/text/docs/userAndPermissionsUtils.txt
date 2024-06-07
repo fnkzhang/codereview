@@ -1,0 +1,262 @@
+userAndPermissionsUtils module
+******************************
+
+userAndPermissionsUtils.changeProjectOwner(email, proj_id)
+
+   **Explanation:**
+      Changes a project's owner to the given email, and demotes the
+      current project owner to editor with a permission level of 3
+
+   **Args:**
+      -email (str): email of the new owner -proj_id (int): id of the
+      project
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+userAndPermissionsUtils.createNewUser(user_email, name)
+
+   **Explanation:**
+      Creates a new user
+
+   **Args:**
+      -user_email (str): email of the user -name (str): name of the
+      user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.deleteUser(user_email, proj_id)
+
+   **Explanation:**
+      Removes a user from a project
+
+   **Args:**
+      -user_email (str): email of the user -proj_id (int): id of a
+      project
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.getAllUserProjPermissionsForProject(proj_id)
+
+   **Explanation:**
+      Gets the all relations between a given project and users
+
+   **Args:**
+      -proj_id (int): id of the project
+
+   **Returns:**
+      -returnList (list): list of UserProjectRelation objects as dicts
+
+userAndPermissionsUtils.getAllUserProjPermissionsForUser(user_email)
+
+   **Explanation:**
+      Gets the all relations between a given user and their projects
+
+   **Args:**
+      -user_email (str): email of the user
+
+   **Returns:**
+      -returnList (list): list of UserProjectRelation objects as dicts
+
+userAndPermissionsUtils.getUserInfo(user_email)
+
+   **Explanation:**
+      Gets information about a user
+
+   **Args:**
+      -user_email (str): email of the user
+
+   **Returns:**
+      -user (dict): a User object as a dict
+
+userAndPermissionsUtils.getUserProjPermissions(user_email, proj_id)
+
+   **Explanation:**
+      Gets the permissions of the given user on given the project
+
+   **Args:**
+      -user_email (str): email of the user -proj_id (proj_id): id of
+      the project
+
+   **Returns:**
+      -permissions (int): permission level of the user on the project
+
+userAndPermissionsUtils.isCommentSeenByUser2(comment_id, user_email)
+
+   **Explanation:**
+      Returns whether or not the given user had seen the given comment
+
+   **Args:**
+      -comment_id (int): id of the comment that is to be checked
+      -user_email (str): email of the user
+
+   **Returns:**
+      -seen (bool): whether or not the given user had seen the given
+      comment
+
+userAndPermissionsUtils.isSnapshotSeenByUser2(snapshot_id, user_email)
+
+   **Explanation:**
+      Returns whether or not the given user had seen the given
+      snapshot
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot that is to be checked
+      -user_email (str): email of the user
+
+   **Returns:**
+      -seen (bool): whether or not the given user had seen the given
+      snapshot
+
+userAndPermissionsUtils.setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email)
+
+   **Explanation:**
+      Sets all comments and snapshots in a project as seen by a given
+      user
+
+   **Args:**
+      -proj_id (int): id of the project -email (str): email of the
+      user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email)
+
+   **Explanation:**
+      Sets all comments and snapshots in a project as unseen by a
+      given user
+
+   **Args:**
+      -proj_id (int): id of the project -email (str): email of the
+      user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setAllSeenComm(snapshot_id, user_email)
+
+   **Explanation:**
+      Sets all comments for a snapshot as seen for the given user
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot -email (str): email of
+      the user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setAllSeenSnap(doc_id, user_email)
+
+   **Explanation:**
+      Sets all snapshots for a document as seen for the given user
+
+   **Args:**
+      -doc_id (int): id of the document -email (str): email of the
+      user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setAllUnseenComm(snapshot_id, user_email)
+
+   **Explanation:**
+      Sets all comments for a snapshot as unseen for the given user
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot -email (str): email of
+      the user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setAllUnseenSnap(doc_id, user_email)
+
+   **Explanation:**
+      Sets all snapshots for a document as unseen for the given user
+
+   **Args:**
+      -doc_id (int): id of the document -email (str): email of the
+      user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setCommentAsSeen2(comment_id, user_email)
+
+   **Explanation:**
+      Sets a comment as seen by the given user
+
+   **Args:**
+      -comment_id (int): id of the comment -user_email (str): email of
+      the user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setCommentAsUnseen2(comment_id, user_email)
+
+   **Explanation:**
+      Sets a comment as unseen by the given user
+
+   **Args:**
+      -comment_id (int): id of the comment -user_email (str): email of
+      the user
+
+   **Returns:**
+      -seen (bool): Returns True if it succeeded. Returns False if
+      comment was already unseen.
+
+userAndPermissionsUtils.setSnapshotAsSeen2(snapshot_id, user_email)
+
+   **Explanation:**
+      Sets a snapshot as seen by the given user
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot -user_email (str): email
+      of the user
+
+   **Returns:**
+      -True
+
+userAndPermissionsUtils.setSnapshotAsUnseen2(snapshot_id, user_email)
+
+   **Explanation:**
+      Sets a snapshot as unseen by the given user
+
+   **Args:**
+      -snapshot_id (int): id of the snapshot -user_email (str): email
+      of the user
+
+   **Returns:**
+      -seen (bool): Returns True if it succeeded. Returns False if
+      snapshot was already unseen.
+
+userAndPermissionsUtils.setUserProjPermissions(email, proj_id, r, perms)
+
+   **Explanation:**
+      Sets a user's permissions on a project to a specific level along
+      with giving them a role name
+
+   **Args:**
+      -email (str): email of the user -proj_id (int): id of the
+      project -r (str): name of the role -perms (int): level of
+      permissiosn
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+userAndPermissionsUtils.userExists(user_email)
+
+   **Explanation:**
+      Checks whether user exists in database
+
+   **Args:**
+      -user_email (str): email of the user
+
+   **Returns:**
+      -userExists (bool): whether or not the user exists

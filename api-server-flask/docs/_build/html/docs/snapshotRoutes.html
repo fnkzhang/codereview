@@ -35,22 +35,104 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="snapshotRoutes.createSnapshot">
 <span class="sig-prename descclassname"><span class="pre">snapshotRoutes.</span></span><span class="sig-name descname"><span class="pre">createSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotRoutes.createSnapshot" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Snapshot/&lt;proj_id&gt;/&lt;doc_id&gt;/&lt;commit_id&gt;/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a snapshot on a document in a commit. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project this is in</p></li>
+<li><p>doc_id (int): id of the document the snapshot is for</p></li>
+<li><p>commit_id (int): id of the commit this is happening on</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>data (str): contents of the snapshot</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (int): Id of the newly created snapshot</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="snapshotRoutes.deleteSnapshot">
 <span class="sig-prename descclassname"><span class="pre">snapshotRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotRoutes.deleteSnapshot" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/Snapshot/&lt;snapshot_id&gt;/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a snapshot. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>snapshot_id (int): id of the snapshot</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="snapshotRoutes.getCommentsOnSnapshot">
 <span class="sig-prename descclassname"><span class="pre">snapshotRoutes.</span></span><span class="sig-name descname"><span class="pre">getCommentsOnSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotRoutes.getCommentsOnSnapshot" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Snapshot/&lt;snapshot_id&gt;/comments/get</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all comments attatched to the snapshot. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>snapshot_id (int): id of the snapshot</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (list): list of Comment objects as dicts</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="snapshotRoutes.getSnapshot">
 <span class="sig-prename descclassname"><span class="pre">snapshotRoutes.</span></span><span class="sig-name descname"><span class="pre">getSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotRoutes.getSnapshot" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Snapshot/&lt;proj_id&gt;/&lt;doc_id&gt;/&lt;snapshot_id&gt;/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the contents of a snapshot. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project this is in</p></li>
+<li><p>doc_id (int): id of the document the snapshot is for</p></li>
+<li><p>snapshot_id (int): id of the snapshot</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (str): The contents of the snapshot in string format, if unable to be decoded, returns None</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

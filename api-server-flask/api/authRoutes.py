@@ -12,13 +12,13 @@ from utils.userAndPermissionsUtils import *
 @app.route('/api/user/authenticate', methods=["POST"])
 def authenticator():
     """
-    POST /api/user/authenticate
+    ``POST /api/user/authenticate``
 
-    Explanation:
+    **Explanation:**
         Authenticates a user and sees if their credentials from google are correct
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the authentication was successful.
             - reason (str): Description of the authentication result.
             - body (dict): User information if authentication was successful, empty dictionary otherwise.
@@ -43,13 +43,13 @@ def authenticator():
 @app.route('/api/user/signup', methods = ["POST"])
 def signUp():
     """
-    POST /api/user/signup
+    ``POST /api/user/signup``
 
-    Explanation:
+    **Explanation:**
         Checks a user's credentials from google, and if they do not exist in our database, gets added
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the signup was successful.
             - reason (str): Description of the signup result.
             - body (dict): User information if signup was successful, empty dictionary otherwise.
@@ -58,14 +58,15 @@ def signUp():
     idInfo = authenticate()
     if idInfo is None:
         return {
-            "success":False,
+            "success": False,
             "reason": "Failed to Authenticate"
         }
 
     if userExists(idInfo["email"]) == False:
         createNewUser(idInfo["email"], idInfo["name"])
+
     return {
-            "success":True,
+            "success": True,
             "reason": "N/A",
             "body": idInfo
     }
@@ -73,13 +74,13 @@ def signUp():
 @app.route('/api/user/isValidUser', methods=["POST"])
 def checkIsValidUser():
     """
-    POST /api/user/isValidUser
+    ``POST /api/user/isValidUser``
 
-    Explanation:
+    **Explanation:**
         Checks if user exists from authentication given in headers
 
-    Returns:
-        dict: A dictionary containing the following keys
+    **Returns:**
+        A dictionary containing the following keys:
             - success (bool): Indicates whether the user is valid.
             - reason (str): Description of the validation result.
             - body (dict): Empty dictionary.

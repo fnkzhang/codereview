@@ -35,23 +35,23 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="githubRoutes.addGithubToken">
 <span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">addGithubToken</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.addGithubToken" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/Github/addToken</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Github/addToken</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>This endpoint adds a GitHub token to the user’s account.
+<dt><strong>Explanation:</strong></dt><dd><p>This endpoint adds a GitHub token to the user's account.
 It requires authentication via an Authorization token header.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
-<li><p>github_code: code</p></li>
+<li><p>github_code (str): code</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
 </ul>
@@ -64,11 +64,11 @@ It requires authentication via an Authorization token header.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="githubRoutes.getGithubRepositoryBranches">
 <span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">getGithubRepositoryBranches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.getGithubRepositoryBranches" title="Link to this definition">¶</a></dt>
-<dd><p>GET /api/Github/getRepositoryBranches/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Github/getRepositoryBranches/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Gets a repository’s branches if the user has access</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a repository's branches if the user has access (user determined by credentials in Authorization header). Requires Github token connection for the user to function.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
 <li><p>repository (str): name of repository, includes owner name</p></li>
@@ -78,8 +78,8 @@ It requires authentication via an Authorization token header.</p>
 </li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
 <li><p>body (list): A list of strings representing the branches of the repository.</p></li>
@@ -93,12 +93,12 @@ It requires authentication via an Authorization token header.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="githubRoutes.getUserGithubStatus">
 <span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">getUserGithubStatus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.getUserGithubStatus" title="Link to this definition">¶</a></dt>
-<dd><p>GET /api/Github/userHasGithub/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Github/userHasGithub/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Checks if user has github connected</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Checks if user has github connected (user is dictated by credentials given in Authorization header)</p>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
 <li><p>body (bool): Indicates whether the user has a GitHub account associated.</p></li>
@@ -112,32 +112,30 @@ It requires authentication via an Authorization token header.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="githubRoutes.pullToExistingProject">
 <span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">pullToExistingProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.pullToExistingProject" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="githubRoutes.pullToNewProject">
-<span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">pullToNewProject</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.pullToNewProject" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/Github/PullToNewProject/</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Github/PullToExistingProject/</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Pulls a github repo’s contents to a new project. Will not pull files that have content that cannot be decoded.
-The project’s first commit will be the github repo’s contents</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Pulls a github repo's contents to an existing project. 
+The project's next commit will be the github repo's contents. Enforces permissions through credentials given in Authorization header.
+This function has issues due to the fact that duplicate names are not prevented.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project</p></li>
 <li><dl class="simple">
 <dt>request.body:</dt><dd><ul>
-<li><p>repository (str): repository you’re pulling from</p></li>
-<li><p>branch (str): the branch you’re pulling from</p></li>
+<li><p>repository (str): repository you're pulling from</p></li>
+<li><p>branch (str): the branch you're pulling from</p></li>
+<li><p>name (str): name of the new commit</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the operation was successful.</p></li>
 <li><p>reason (str): Description of the success or failure reason.</p></li>
-<li><p>body (str): Identifier of the newly created project if successful.</p></li>
+<li><p>body (str): List of document ids that received new snapshots as a result of this</p></li>
 </ul>
 </dd>
 </dl>
@@ -146,14 +144,74 @@ The project’s first commit will be the github repo’s contents</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="githubRoutes.pullToNewProject">
+<span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">pullToNewProject</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.pullToNewProject" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="githubRoutes.pushToExistingBranch">
 <span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">pushToExistingBranch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.pushToExistingBranch" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Github/&lt;proj_id&gt;/&lt;commit_id&gt;/PushToExisting/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Pushes a commit's files into an existing branch on github. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project</p></li>
+<li><p>commit_id (int): id of the commit</p></li>
+<li><dl class="simple">
+<dt>request.body:</dt><dd><ul>
+<li><p>repository (str): repository you're pushing to</p></li>
+<li><p>branch (str): the branch you're pushing to</p></li>
+<li><p>message (str): commit message for github</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="githubRoutes.pushToNewBranch">
 <span class="sig-prename descclassname"><span class="pre">githubRoutes.</span></span><span class="sig-name descname"><span class="pre">pushToNewBranch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#githubRoutes.pushToNewBranch" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Github/&lt;proj_id&gt;/&lt;commit_id&gt;/PushToNewBranch/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Pushes a commit's files into a new branch on github. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project</p></li>
+<li><p>commit_id (int): id of the commit</p></li>
+<li><dl class="simple">
+<dt>request.body:</dt><dd><ul>
+<li><p>repository (str): repository you're pushing to</p></li>
+<li><p>branch (str): the branch you're pushing to</p></li>
+<li><p>oldbranch (str): the name of the branch this branch is built off of</p></li>
+<li><p>message (str): commit message for github</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

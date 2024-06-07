@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>buckets module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-buckets">
+<span id="buckets-module"></span><h1>buckets module<a class="headerlink" href="#module-buckets" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="buckets.deleteBlob">
+<span class="sig-prename descclassname"><span class="pre">buckets.</span></span><span class="sig-name descname"><span class="pre">deleteBlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blobName</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#buckets.deleteBlob" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a blob in Google Buckets</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>blobName (str): name of the blob</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="buckets.fetchFromCloudStorage">
+<span class="sig-prename descclassname"><span class="pre">buckets.</span></span><span class="sig-name descname"><span class="pre">fetchFromCloudStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blobName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#buckets.fetchFromCloudStorage" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Explanation:</strong></p>
+<p>If cached, returns the blob in cache.
+If uncached, makes a request for the blob in Google Buckets
+and returns the blob.</p>
+<dl class="simple">
+<dt><strong>Args:</strong></dt><dd><p>-blobName (str): Name of the blob to retrieve.</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-blobContents (bytes): Contents of the blob in bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="buckets.getBlob">
+<span class="sig-prename descclassname"><span class="pre">buckets.</span></span><span class="sig-name descname"><span class="pre">getBlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blobName</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#buckets.getBlob" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a blob to Google Buckets</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>blobName (str): name of the blob</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-blobcontents (bytes): Contents of the blob in bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="buckets.publishCloudStorageUpdate">
+<span class="sig-prename descclassname"><span class="pre">buckets.</span></span><span class="sig-name descname"><span class="pre">publishCloudStorageUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blobName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#buckets.publishCloudStorageUpdate" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Explanation:</strong></p>
+<p>Publishes a message with the blobName as the key to indicate that the
+specified blob has been updated. The key is used to delete the blob
+from cache.</p>
+<dl class="simple">
+<dt><strong>Args:</strong></dt><dd><p>-blobName (str): Name of the blob that was updated (created, edited, deleted)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="buckets.uploadBlob">
+<span class="sig-prename descclassname"><span class="pre">buckets.</span></span><span class="sig-name descname"><span class="pre">uploadBlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blobName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#buckets.uploadBlob" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Uploads a blob to Google Buckets</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>blobName (str): name of the blob</p></li>
+<li><p>item (str): blob contents</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/buckets.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

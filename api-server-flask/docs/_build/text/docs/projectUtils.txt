@@ -1,0 +1,97 @@
+projectUtils module
+*******************
+
+projectUtils.createNewProject(proj_name, owner)
+
+   **Explanation:**
+      Creates a new project with an initial committed commit
+
+   **Args:**
+      -proj_name (str): name of the project -owner (str): email of the
+      creator of the project
+
+   **Returns:**
+      -pid (int): id of the newly created project
+
+projectUtils.getAllCommittedProjectCommitsInOrder(proj_id)
+
+   **Explanation:**
+      Gets all of the projects's commited commits in order of when
+      they were committed
+
+   **Args:**
+      -proj_id (int): id of the project
+
+   **Returns:**
+      -listOfCommits (list): list of Commit objects as dicts
+
+projectUtils.getAllProjectCommits(proj_id)
+
+   **Explanation:**
+      Gets all of the projects's commits in order of when they were
+      committed
+
+   **Args:**
+      -proj_id (int): id of the project
+
+   **Returns:**
+      -listOfCommits (list): list of Commit objects as dicts
+
+projectUtils.getProjectInfo(proj_id)
+
+   **Explanation:**
+      Gets a project's information
+
+   **Args:**
+      -proj_id (int): id of the document
+
+   **Returns:**
+      -foundProject (dict): A Project object as a dict
+
+projectUtils.getProjectLastCommittedCommit(proj_id)
+
+   **Explanation:**
+      Gets the projects's latest commited commits
+
+   **Args:**
+      -proj_id (int): id of the project
+
+   **Returns:**
+      -commit (dict): latest Commit object as a dict
+
+projectUtils.getUserWorkingCommitInProject(proj_id, email)
+
+   **Explanation:**
+      Gets a user's working commit for a project
+
+   **Args:**
+      -proj_id (int): id of the project -email (int): user's email
+
+   **Returns:**
+      -commit (dict): the user's working Commit object as a dict
+
+projectUtils.purgeProjectUtil(proj_id)
+
+   **Explanation:**
+      Deletes a project from the database entirely. This also deletes
+      associated commits, documents, folders, snapshots, and comments.
+
+   **Args:**
+      -proj_id (int): id of the project to delete
+
+   **Returns:**
+      -success (bool): success -error message (str): if there was an
+      error, returns the message, if not, returns None
+
+projectUtils.renameProjectUtil(proj_id, proj_name)
+
+   **Explanation:**
+      Renames a project
+
+   **Args:**
+      -project_id (int): id of the project -proj_name (str): new name
+      of the item
+
+   **Returns:**
+      -Success (bool): whether or not it succeeded -Error message
+      (str)

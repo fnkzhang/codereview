@@ -3,8 +3,14 @@ import models
 import threading
 
 def getUserInfo(user_email):
-    
-
+    '''
+    **Explanation:**
+        Gets information about a user
+    **Args:**
+        -user_email (str): email of the user
+    **Returns:**
+        -user (dict): a User object as a dict
+    '''
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)
         result = conn.execute(stmt)
@@ -14,18 +20,30 @@ def getUserInfo(user_email):
             return None
         return user._asdict()
 
-#probably useless function now that userInfo exists but i don't remember wwhat uses it so it sits here
 def userExists(user_email):
-    
-
+    '''
+    **Explanation:**
+        Checks whether user exists in database
+    **Args:**
+        -user_email (str): email of the user
+    **Returns:**
+        -userExists (bool): whether or not the user exists
+    '''
     with engine.connect() as conn:
         stmt = select(models.User).where(models.User.user_email == user_email)
         result = conn.execute(stmt)
         return result.first() != None
 
 def createNewUser(user_email, name):
-    
-
+    '''
+    **Explanation:**
+        Creates a new user
+    **Args:**
+        -user_email (str): email of the user
+        -name (str): name of the user
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         stmt = insert(models.User).values(
             user_email = user_email,
@@ -36,6 +54,15 @@ def createNewUser(user_email, name):
     return True
 
 def deleteUser(user_email, proj_id):
+    '''
+    **Explanation:**
+        Removes a user from a project
+    **Args:**
+        -user_email (str): email of the user
+        -proj_id (int): id of a project
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         relationstmt = delete(models.UserProjectRelation).where(
             models.UserProjectRelation.user_email == user_email).where(
@@ -47,6 +74,15 @@ def deleteUser(user_email, proj_id):
     return True
 
 def getUserProjPermissions(user_email, proj_id):
+    '''
+    **Explanation:**
+        Gets the permissions of the given user on given the project
+    **Args:**
+        -user_email (str): email of the user
+        -proj_id (proj_id): id of the project
+    **Returns:**
+        -permissions (int): permission level of the user on the project
+    '''
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email, models.UserProjectRelation.proj_id == proj_id)
         result = conn.execute(stmt)
@@ -58,8 +94,14 @@ def getUserProjPermissions(user_email, proj_id):
 
 # Find all project relationship models for user email
 def getAllUserProjPermissionsForUser(user_email):
-    
-
+    '''
+    **Explanation:**
+        Gets the all relations between a given user and their projects
+    **Args:**
+        -user_email (str): email of the user
+    **Returns:**
+        -returnList (list): list of UserProjectRelation objects as dicts
+    '''
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.user_email == user_email)
 
@@ -72,8 +114,14 @@ def getAllUserProjPermissionsForUser(user_email):
         return returnList
 # Find all project relationship models for project
 def getAllUserProjPermissionsForProject(proj_id):
-    
-
+    '''
+    **Explanation:**
+        Gets the all relations between a given project and users
+    **Args:**
+        -proj_id (int): id of the project
+    **Returns:**
+        -returnList (list): list of UserProjectRelation objects as dicts
+    '''
     with engine.connect() as conn:
         stmt = select(models.UserProjectRelation).where(models.UserProjectRelation.proj_id == proj_id)
 
@@ -87,6 +135,18 @@ def getAllUserProjPermissionsForProject(proj_id):
 
 
 def setUserProjPermissions(email, proj_id, r, perms):
+    '''
+    **Explanation:**
+        Sets a user's permissions on a project to a specific level along with giving them a role name
+    **Args:**
+        -email (str): email of the user
+        -proj_id (int): id of the project
+        -r (str): name of the role
+        -perms (int): level of permissiosn
+    **Returns:**
+        -success (bool): success
+        -error message (str): if there was an error, returns the message, if not, returns None
+    '''
     try:
         with engine.connect() as conn:
             if(getUserProjPermissions(email, proj_id)) < 0:
@@ -113,13 +173,21 @@ def setUserProjPermissions(email, proj_id, r, perms):
         return False
 
 def changeProjectOwner(email, proj_id):
-    
-
+    '''
+    **Explanation:**
+        Changes a project's owner to the given email, and demotes the current project owner to editor with a permission level of 3
+    **Args:**
+        -email (str): email of the new owner
+        -proj_id (int): id of the project
+    **Returns:**
+        -success (bool): success
+        -error message (str): if there was an error, returns the message, if not, returns None
+    '''
     try:
         with engine.connect() as conn:
             stmt = select(models.Project).where(models.Project.proj_id == proj_id)
             project = conn.execute(stmt).first()
-            setUserProjPermissions(project.author_email, proj_id, "Admin", 3)
+            setUserProjPermissions(project.author_email, proj_id, "Editor", 3)
             setUserProjPermissions(email, proj_id, "Owner", 5)
             stmt = update(models.Project).where(
                     models.Project.proj_id == proj_id
@@ -134,6 +202,15 @@ def changeProjectOwner(email, proj_id):
         return False
     
 def setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email):
+    '''
+    **Explanation:**
+        Sets all comments and snapshots in a project as unseen by a given user
+    **Args:**
+        -proj_id (int): id of the project
+        -email (str): email of the user
+    **Returns:**
+        -True
+    '''
     threads = []
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)
@@ -147,6 +224,15 @@ def setAllCommentsAndSnapshotsAsUnseenByUser(proj_id, user_email):
         return True
 
 def setAllUnseenSnap(doc_id, user_email):
+    '''
+    **Explanation:**
+        Sets all snapshots for a document as unseen for the given user
+    **Args:**
+        -doc_id (int): id of the document
+        -email (str): email of the user
+    **Returns:**
+        -True
+    '''
     threads = []
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
@@ -163,6 +249,15 @@ def setAllUnseenSnap(doc_id, user_email):
     return True
 
 def setAllUnseenComm(snapshot_id, user_email):
+    '''
+    **Explanation:**
+        Sets all comments for a snapshot as unseen for the given user
+    **Args:**
+        -snapshot_id (int): id of the snapshot
+        -email (str): email of the user
+    **Returns:**
+        -True
+    '''
     threads = []
     with engine.connect() as conn:
         stmt = select(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
@@ -176,6 +271,15 @@ def setAllUnseenComm(snapshot_id, user_email):
     return True
 
 def setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email):
+    '''
+    **Explanation:**
+        Sets all comments and snapshots in a project as seen by a given user
+    **Args:**
+        -proj_id (int): id of the project
+        -email (str): email of the user
+    **Returns:**
+        -True
+    '''
     threads = []
     with engine.connect() as conn:
         stmt = select(models.Document).where(models.Document.associated_proj_id == proj_id)
@@ -189,6 +293,15 @@ def setAllCommentsAndSnapshotsAsSeenByUser(proj_id, user_email):
     return True
 
 def setAllSeenSnap(doc_id, user_email):
+    '''
+    **Explanation:**
+        Sets all snapshots for a document as seen for the given user
+    **Args:**
+        -doc_id (int): id of the document
+        -email (str): email of the user
+    **Returns:**
+        -True
+    '''
     threads = []
     with engine.connect() as conn:
         stmt = select(models.Snapshot).where(models.Snapshot.associated_document_id == doc_id)
@@ -205,6 +318,15 @@ def setAllSeenSnap(doc_id, user_email):
     return True
 
 def setAllSeenComm(snapshot_id, user_email):
+    '''
+    **Explanation:**
+        Sets all comments for a snapshot as seen for the given user
+    **Args:**
+        -snapshot_id (int): id of the snapshot
+        -email (str): email of the user
+    **Returns:**
+        -True
+    '''
     threads = []
     with engine.connect() as conn:
         stmt = select(models.Comment).where(models.Comment.snapshot_id == snapshot_id)
@@ -218,6 +340,15 @@ def setAllSeenComm(snapshot_id, user_email):
     return True
 
 def isSnapshotSeenByUser2(snapshot_id, user_email):
+    '''
+    **Explanation:**
+        Returns whether or not the given user had seen the given snapshot
+    **Args:**
+        -snapshot_id (int): id of the snapshot that is to be checked
+        -user_email (str): email of the user
+    **Returns:**
+        -seen (bool): whether or not the given user had seen the given snapshot
+    '''
     with engine.connect() as conn:
         stmt = select(models.UserUnseenSnapshot).where(
                 models.UserUnseenSnapshot.snapshot_id == snapshot_id,
@@ -230,6 +361,15 @@ def isSnapshotSeenByUser2(snapshot_id, user_email):
             return False
 
 def setSnapshotAsUnseen2(snapshot_id, user_email):
+    '''
+    **Explanation:**
+        Sets a snapshot as unseen by the given user
+    **Args:**
+        -snapshot_id (int): id of the snapshot
+        -user_email (str): email of the user
+    **Returns:**
+        -seen (bool): Returns True if it succeeded. Returns False if snapshot was already unseen.
+    '''
     if isSnapshotSeenByUser2(snapshot_id, user_email) == False:
         return False
     with engine.connect() as conn:
@@ -242,6 +382,15 @@ def setSnapshotAsUnseen2(snapshot_id, user_email):
     return True
 
 def setSnapshotAsSeen2(snapshot_id, user_email):
+    '''
+    **Explanation:**
+        Sets a snapshot as seen by the given user
+    **Args:**
+        -snapshot_id (int): id of the snapshot
+        -user_email (str): email of the user
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         stmt = delete(models.UserUnseenSnapshot).where(
                 models.UserUnseenSnapshot.snapshot_id == snapshot_id,
@@ -252,6 +401,15 @@ def setSnapshotAsSeen2(snapshot_id, user_email):
     return True
 
 def isCommentSeenByUser2(comment_id, user_email):
+    '''
+    **Explanation:**
+        Returns whether or not the given user had seen the given comment
+    **Args:**
+        -comment_id (int): id of the comment that is to be checked
+        -user_email (str): email of the user
+    **Returns:**
+        -seen (bool): whether or not the given user had seen the given comment
+    '''
     with engine.connect() as conn:
         stmt = select(models.UserUnseenComment).where(
                 models.UserUnseenComment.comment_id == comment_id,
@@ -264,6 +422,15 @@ def isCommentSeenByUser2(comment_id, user_email):
             return False
 
 def setCommentAsUnseen2(comment_id, user_email):
+    '''
+    **Explanation:**
+        Sets a comment as unseen by the given user
+    **Args:**
+        -comment_id (int): id of the comment
+        -user_email (str): email of the user
+    **Returns:**
+        -seen (bool): Returns True if it succeeded. Returns False if comment was already unseen.
+    '''
     if isCommentSeenByUser2(comment_id, user_email) == True:
         return False
     with engine.connect() as conn:
@@ -276,6 +443,15 @@ def setCommentAsUnseen2(comment_id, user_email):
     return True
 
 def setCommentAsSeen2(comment_id, user_email):
+    '''
+    **Explanation:**
+        Sets a comment as seen by the given user
+    **Args:**
+        -comment_id (int): id of the comment
+        -user_email (str): email of the user
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         stmt = delete(models.UserUnseenComment).where(
                 models.UserUnseenComment.comment_id == comment_id,
