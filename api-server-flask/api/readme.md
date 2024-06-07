@@ -178,6 +178,7 @@ snapshot_id (int) : Id of the snapshot
 If this exists within the database, it means that the user has not seen the specific snapshot. Only populated when the user is added to the project the snapshot is located in.
 
 snapshot_id (int) : Id of the snapshot
+
 user_email (str) : Email of the user
 
 ### UserUnseenComment
@@ -185,4 +186,5 @@ user_email (str) : Email of the user
 If this exists within the database, it means that the user has not seen the specific comment. Only populated when the user is added to the project the comment is located in.
 
 comment_id (int) : Id of the comment
+
 user_email (str) : Email of the user
