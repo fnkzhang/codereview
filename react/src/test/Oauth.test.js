@@ -3,7 +3,7 @@ import { render, act, waitFor, screen } from "@testing-library/react";
 import Oauth from "../components/Oauth.js";
 import getCookie from "../utils/utils";
 import { deleteCookie } from "../utils/utils";
-
+import { Dropdown, Avatar } from 'flowbite-react';
 
 // Import Google Login
 jest.mock('@react-oauth/google', () => ({
@@ -29,9 +29,6 @@ jest.mock("../utils/utils", () => ( {
 
 // Handles Fetch Call response
 
-
-
-
 describe("Oauth component", () => {
   beforeEach(() => {
     global.fetch = jest.fn(() =>
@@ -43,10 +40,6 @@ describe("Oauth component", () => {
         }),
       })
     );
-  });
-
-  afterEach(() => {
-    //jest.resetAllMocks();
   });
 
   it('should render the Google Login button when not logged in', async () => {
@@ -64,22 +57,47 @@ describe("Oauth component", () => {
 
 
   it("Tries to get cookies if not logged in", async () => {
+    getCookie.mockReturnValue("testToken")
+    const setIsLoggedIn = jest.fn();
+    const setUserData = jest.fn();
 
     await act( async() => {
       render(
         <Oauth 
         isLoggedIn={false}
-        setIsLoggedIn={jest.fn()} 
+        setIsLoggedIn={setIsLoggedIn} 
         userData={null} 
-        setUserData={jest.fn()} 
+        setUserData={setUserData} 
         connected={false} 
         setConnected={jest.fn()} 
         />        
       )
     });
-    
-    screen.debug()
     expect(getCookie).toHaveBeenCalledWith("cr_id_token");      
+  });
+
+  it("Tries to get cookies if not logged in and credentialToken is null", async () => {
+    getCookie.mockReturnValue(null)
+    const setIsLoggedIn = jest.fn();
+    const setUserData = jest.fn();
+
+    await act( async() => {
+      render(
+        <Oauth 
+        isLoggedIn={false}
+        setIsLoggedIn={setIsLoggedIn} 
+        userData={null} 
+        setUserData={setUserData} 
+        connected={false} 
+        setConnected={jest.fn()} 
+        />        
+      )
+    });
+
+    expect(getCookie).toHaveBeenCalledWith("cr_id_token");
+    expect(setIsLoggedIn).toHaveBeenCalledWith(false);
+    expect(setUserData).toHaveBeenCalledWith(null);
+    
   });
 
   it("Tries to get fetch failed", async () => {
@@ -106,10 +124,47 @@ describe("Oauth component", () => {
         />        
       )
     });
-    
     screen.debug()
     expect(getCookie).toHaveBeenCalledWith("cr_id_token");    
     expect(console.log).toHaveBeenCalledWith("Failed to validate token");  
+  });
+
+  it("Displays Logged in for OAuth Properly", async () => {
+    getCookie.mockReturnValue("testToken")
+    const setIsLoggedIn = jest.fn();
+    const setUserData = jest.fn();
+
+    global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () =>
+        Promise.resolve({
+          success: true
+        }),
+      })
+    );
+    console.log = jest.fn();
+    
+    const userData = {
+      email: "testEmail@test.com",
+      picture: "testImageUrl",
+
+    }
+
+    await act( async() => {
+      render(
+        <Oauth 
+        isLoggedIn={true}
+        setIsLoggedIn={setIsLoggedIn} 
+        userData={userData} 
+        setUserData={setUserData} 
+        connected={false} 
+        setConnected={jest.fn()} 
+        />        
+      )
+    });
+
+    screen.debug()
+    expect(getCookie).toHaveBeenCalledWith("cr_id_token");
   });
 
 });

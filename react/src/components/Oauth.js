@@ -182,8 +182,6 @@ export default function Oauth( props ){
             className="bg-background m-1 inline-block p-5"
             onSuccess={credentialResponse => {
             let decodedResponse = jwtDecode(credentialResponse.credential)
-            console.log(decodedResponse)
-            console.log(credentialResponse)
             
             verifyLogin(credentialResponse)
             
