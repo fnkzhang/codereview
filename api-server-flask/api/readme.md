@@ -36,7 +36,7 @@ date_created (datetime) : Date the project was created
 
 ### Commit
 
-A representation of batch changes. Changes are private to the author when first created, and must be committed in order for other users to see them.
+A representation of batch changes to a project. Changes are private to the author when first created, and must be committed in order for other users to see them. Users can have one set of private batch changes in a project at a time.
 
 author_email (str) : Author of the changes
 
