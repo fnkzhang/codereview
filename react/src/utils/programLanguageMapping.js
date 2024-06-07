@@ -1,3 +1,9 @@
+/**
+ *  Maps a file extension to a specific programing language.
+ *  Limited to languages supported by the monaco-editor/react package.
+ *  See: https://www.npmjs.com/package/@monaco-editor/react
+ */
+
 export const EXTENSION_TO_LANGUAGE_MAP = {
     "py": "python",
     "js": "javascript",
@@ -8,9 +14,9 @@ export const EXTENSION_TO_LANGUAGE_MAP = {
     "java": "java",
     "cs": "csharp",
     "go": "go",
-    "rb": "ruby", // Not Sure for this one
+    "rb": "ruby",
     "swift": "swift",
     "kt": "kotlin",
     "php": "php",
-    // todo More to add
+    // TODO More to add
 }
