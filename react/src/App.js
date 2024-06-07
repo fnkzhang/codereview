@@ -18,6 +18,8 @@ import PermissionPage from './components/Permissions/PermissionPage.js';
 
 /**
  * Main App component that sets up routing and authentication for the application.
+ * 
+ * This component consists of a header, and the router which allows the user to access each of the application pages.
  *
  * @component
  * @example

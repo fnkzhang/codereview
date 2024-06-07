@@ -6,7 +6,33 @@ import { Dropdown } from "flowbite-react";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 
-export default function SnapshotSelector({ comments, snapshots, setSnapshots, fileExtensionName, canAddSnapshots, editorReady }) { 
+/**
+ * Component for a snapshot selector for the review window to select file version
+ *
+ * @component
+    <SnapshotSelector
+      comments={comments}
+      snapshots={snapshots}
+      setSnapshots={setSnapshots}
+      fileExtensionName={location.state.documentName}
+      canAddSnapshots={location.state.addSnapshots}
+      editorReady={editorReady}
+    />
+ * 
+ * @example
+    <MainWindow isLoggedIn={isLoggedIn} userData={userData}/>
+ *
+ * @param {object} props - Component props
+ * @param {Array} props.comments - Array of all comments for project to display
+ * @param {Array} props.snapshots - Array of snapshot objects
+ * @param {Function} props.setSnapshots - Function to set the snapshots variable
+ * @param {string} props.fileExtensionName - String that is used to call navigate with location so that they have fileExtension name
+ * @param {boolean} props.canAddSnapshots - Boolean determining if a snapshot can be added
+ * @param {boolean} props.editorReady - Boolean determining if the editor is ready or not, any changes will cause reloading snapshots for document
+ * 
+ */
+
+export default function SnapshotSelector( props ) { 
     const [selectedLeftSnapshotIndex, setSelectedLeftSnapshotIndex] = useState(0)
     const [selectedRightSnapshotIndex, setSelectedRightSnapshotIndex] = useState(0)
 
@@ -23,61 +49,61 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
             return
 
           if (result.success)
-            setSnapshots(result.body.reverse())
+            props.setSnapshots(result.body.reverse())
         }
 
-        if (snapshots.length === 0 || !snapshots.some(snapshot => snapshot.snapshot.snapshot_id === Number(right_snapshot_id)))
+        if (props.snapshots.length === 0 || !props.snapshots.some(snapshot => snapshot.snapshot.snapshot_id === Number(right_snapshot_id)))
           grabSnapshots()
         
-    }, [document_id, editorReady, project_id, setSnapshots, snapshots, right_snapshot_id])
+    }, [document_id, props, project_id, right_snapshot_id])
     
     // Set Snapshot Selecter Snapshot Number
     useEffect(() => {
-      if(snapshots.length === 0 || (snapshots[selectedLeftSnapshotIndex].snapshot.snapshot_id === left_snapshot_id &&
-        snapshots[selectedRightSnapshotIndex].snapshot.snapshot_id === right_snapshot_id
+      if(props.snapshots.length === 0 || (props.snapshots[selectedLeftSnapshotIndex].snapshot.snapshot_id === left_snapshot_id &&
+        props.snapshots[selectedRightSnapshotIndex].snapshot.snapshot_id === right_snapshot_id
         ) )
         return
       
-      snapshots.forEach((snapshot, index) => {
+      props.snapshots.forEach((snapshot, index) => {
         const currentSnapshot_id = snapshot.snapshot.snapshot_id.toString()
         if(currentSnapshot_id === left_snapshot_id)
           setSelectedLeftSnapshotIndex(index)
         if(currentSnapshot_id === right_snapshot_id)
           setSelectedRightSnapshotIndex(index)
       });
-    }, [snapshots, left_snapshot_id, right_snapshot_id, selectedLeftSnapshotIndex, selectedRightSnapshotIndex])
+    }, [props.snapshots, left_snapshot_id, right_snapshot_id, selectedLeftSnapshotIndex, selectedRightSnapshotIndex])
 
     async function handleLeftSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedLeftSnapshotIndex(selectedIndex)
       navigate(`/Project/${project_id}/Commit/${commit_id}/Document/${document_id}/${selectedSnapshot}/${right_snapshot_id}`,
-        {state: {documentName: fileExtensionName, addSnapshots: canAddSnapshots}})
+        {state: {documentName: props.fileExtensionName, addSnapshots: props.canAddSnapshots}})
     }
 
     async function handleRightSnapClick(selectedSnapshot, selectedIndex) {
       setSelectedRightSnapshotIndex(selectedIndex)
       navigate(`/Project/${project_id}/Commit/${commit_id}/Document/${document_id}/${left_snapshot_id}/${selectedSnapshot}`,
-        {state: {documentName: fileExtensionName, addSnapshots: canAddSnapshots}})
+        {state: {documentName: props.fileExtensionName, addSnapshots: props.canAddSnapshots}})
     }
 
     function filterComments(snapshot) {
-      if (comments.length > 0)
-        return comments.filter(comment => (comment.snapshot_id === snapshot.snapshot.snapshot_id) && (comment.is_resolved === false)).length
+      if (props.comments.length > 0)
+        return props.comments.filter(comment => (comment.snapshot_id === snapshot.snapshot.snapshot_id) && (comment.is_resolved === false)).length
       
       return 0
     }
 
     function DisplayLeftSnapshots() {
-        if(snapshots.length !== 0) {
+        if(props.snapshots.length !== 0) {
             return (
               <Dropdown 
                 className= "z-9999 bg-background" label={
                   <div className="flex max-w-sm">
                     <div className="flex-1 flex-grow w-full flex-col text-textcolor whitespace-nowrap">
-                      {`${truncateString(snapshots[selectedLeftSnapshotIndex].commit.name, 50)}`}
+                      {`${truncateString(props.snapshots[selectedLeftSnapshotIndex].commit.name, 50)}`}
                     </div>
                   </div>
                 }>
-                {snapshots.map((snapshot, index) => { 
+                {props.snapshots.map((snapshot, index) => { 
                     const value = filterComments(snapshot)
                     let str = ""
                     if (value !== 0)
@@ -128,16 +154,16 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
     }
     
     function DisplayRightSnapshots() {
-      if(snapshots.length !== 0) {
+      if(props.snapshots.length !== 0) {
           return (
             <Dropdown className="z-9999 bg-background" label={
               <div className="flex max-w-sm">
                 <div className="flex-1 flex-grow w-full flex-col text-textcolor whitespace-nowrap">
-                  {`${truncateString(snapshots[selectedRightSnapshotIndex].commit.name, 50)}`}
+                  {`${truncateString(props.snapshots[selectedRightSnapshotIndex].commit.name, 50)}`}
                 </div>
               </div>
             }>
-              {snapshots.map((snapshot, index) => { 
+              {props.snapshots.map((snapshot, index) => { 
                   const value = filterComments(snapshot)
                   let str = ""
                   if (value !== 0)

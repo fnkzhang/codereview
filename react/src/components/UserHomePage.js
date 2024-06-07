@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { addGitHubToken } from "../api/APIUtils";
 
-
 /**
  * Component for a main window that navigates to a specified location.
  *
