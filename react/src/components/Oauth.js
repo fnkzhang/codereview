@@ -39,7 +39,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
     useEffect(() => {
         if (isLoggedIn === false) {
             let credentialToken = getCookie("cr_id_token")
-            if (credentialToken == null) {
+            if (credentialToken === null) {
                 setIsLoggedIn(false)
                 setUserData(null)
                 return
@@ -48,7 +48,6 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
             let credentialObject = {
                 "credential": credentialToken
             }
-            
             verifyLogin(credentialObject)
         }
 

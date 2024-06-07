@@ -9,7 +9,22 @@ import { Tooltip } from "react-tooltip";
 import 'react-tooltip/dist/react-tooltip.css';
 import BackButton from "./Buttons/BackButton.js";
 
-
+/**
+ * Component for a main window that navigates to a specified location.
+ *
+ * @component
+ * Component is displayed when routing to /Project/:project_id/Commit/:commit_id/Document/:document_id/:left_snapshot_id/:right_snapshot_id
+ * As of now document name is obtained through the use of react route state, but can be changed in the future to make API call to grab the data.
+ * This component displays entire review editing window, showing editor, and comments.
+ * 
+ * @example
+    <MainWindow isLoggedIn={isLoggedIn} userData={userData}/>
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Boolean to determine if use is logged in or not.
+ * @param {object} props.useData - Object that holds Google OAuth user data.
+ * 
+ */
 export default function MainWindow( props ) {
 
   const [comments, setComments] =  useState([])
@@ -26,8 +41,10 @@ export default function MainWindow( props ) {
 
   const location = useLocation();
   const navigate = useNavigate();
+
   // Handle Setting Program Language that document uses
   useEffect(() => {
+    // 
     if(!location.state.documentName)
       return
     
@@ -47,8 +64,6 @@ export default function MainWindow( props ) {
 
     if (response === null)
       return
-
-    console.log(response);
 
     navigate(`/Project/${project_id}/Commit/${commit_id}/Document/${document_id}/${left_snapshot_id}/${response}`,
       {state: {documentName: location.state.documentName, addSnapshots: location.state.addSnapshots}})
@@ -86,6 +101,7 @@ export default function MainWindow( props ) {
     )
   }
 
+  // Main Render
   if (props.isLoggedIn) {
     return(
       <section>
@@ -121,12 +137,14 @@ export default function MainWindow( props ) {
 
     )
   }
-  
-  return(
-    <div>
-      <div className="m-20 text-center text-textcolor text-2xl">
-        You must Log in to view this page.
+  else {
+    return(
+      <div>
+        <div className="m-20 text-center text-textcolor text-2xl">
+          You must Log in to view this page.
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+
 }

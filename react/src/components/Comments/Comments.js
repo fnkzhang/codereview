@@ -135,7 +135,7 @@ function Comment ( props ) {
     <div className="flex items-center justify-center mt-2">
       <button
         className="border border-alternative border-1 px-2 py-1 w-full transition duration-300 hover:bg-altBackground rounded"
-        onClick={() => commentLineJump(props.snapshotID, props.highlightStartX, props.highlightStartY, props.highlightEndX, props.highlightEndY)}>
+        onClick={() => props.commentLineJump(props.snapshotID, props.highlightStartX, props.highlightStartY, props.highlightEndX, props.highlightEndY)}>
         Jump to Line
       </button>
     </div>)

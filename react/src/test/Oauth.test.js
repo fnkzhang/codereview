@@ -1,56 +1,85 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, act, waitFor, screen } from "@testing-library/react";
 import Oauth from "../components/Oauth.js";
-import getCookie from "../utils/utils.js";
-import { deleteCookie } from "../utils/utils.js";
-
-import {GoogleOAuthProvider} from '@react-oauth/google';
+import getCookie from "../utils/utils";
+import { deleteCookie } from "../utils/utils";
 
 
-jest.mock("@react-oauth/google", () => {
-  return {
-    GoogleOAuthProvider: jest.fn(({children}) => <div>{children}</div>)
-  }
-})
-
-jest.mock('../utils/utils', () => ({
-  getCookie: jest.fn(() => 'testToken'), // Mock the getCookie function
-  deleteCookie: jest.fn(),
+// Import Google Login
+jest.mock('@react-oauth/google', () => ({
+  GoogleLogin: ({ onSuccess, onError }) => (
+    <button onClick={() => onSuccess({ credential: 'mockCredential' })}>Mock Google Login</button>
+  ),
 }));
 
-const MockGoogleOAuthProvider = ({ children }) => {
-  return (
-    <GoogleOAuthProvider clientId="">
-      {children}
-    </GoogleOAuthProvider>
-  );
-};
+
+// Mocking Import
+jest.mock('jwt-decode', () => () => ({
+  email: "test@example.com",
+  picture: "testPictureUrl"
+}));
+
+// Mocking Util function imports
+jest.mock("../utils/utils", () => ( {
+  __esModule: true, // This property makes it clear that we're mocking an ES6 module
+  default: jest.fn(() => "HELLO"), // Mock the default export (getCookie)
+  deleteCookie: jest.fn() // Mock the named export (deleteCookie)
+}));
+
+
+// Handles Fetch Call response
+
+
+
 
 describe("Oauth component", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () =>
+        Promise.resolve({
+          success: true,
+          body: { email: "test@example.com", picture: "testPictureUrl" },
+        }),
+      })
+    );
+  });
+
   afterEach(() => {
-    jest.clearAllMocks();
+    //jest.resetAllMocks();
   });
 
-  it("renders without crashing", () => {
+  it('should render the Google Login button when not logged in', async () => {
     render(
-      <MockGoogleOAuthProvider>
-        <Oauth />
-      </MockGoogleOAuthProvider>
-    );
+    <Oauth isLoggedIn={false} 
+      setIsLoggedIn={jest.fn()} 
+      userData={null} 
+      setUserData={jest.fn()} 
+      connected={false} 
+      setConnected={jest.fn()} 
+    />);
+
+    expect(screen.getByText('Mock Google Login')).toBeInTheDocument();
   });
 
-  it("Tries to get cookies if not logged in", () => {
-    const isLoggedIn = false;
 
-    render(
-      <MockGoogleOAuthProvider>
-        <Oauth isLoggedIn={isLoggedIn}/>
-      </MockGoogleOAuthProvider>
-    );
+  it("Tries to get cookies if not logged in", async () => {
 
-    waitFor(() => {
-      expect(getCookie).hasBeenCalled();
-    })
+    await act( async() => {
+      render(
+        <Oauth 
+        isLoggedIn={false}
+        setIsLoggedIn={jest.fn()} 
+        userData={null} 
+        setUserData={jest.fn()} 
+        connected={false} 
+        setConnected={jest.fn()} 
+        />        
+      )
+    });
+    
+    screen.debug()
+    expect(getCookie).toHaveBeenCalledWith("cr_id_token");      
   });
 
 });

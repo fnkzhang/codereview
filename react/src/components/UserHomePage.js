@@ -3,16 +3,34 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { addGitHubToken } from "../api/APIUtils";
 
+
+/**
+ * Component for a main window that navigates to a specified location.
+ *
+ * @component
+ * This component is loaded on route '/' and is meant to hold summary data for the user along with a list of reviews that they have access to
+ * 
+ * 
+ * @example
+    <UserHomePage isLoggedIn={isLoggedIn} userData={userData}/>
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Boolean to determine if use is logged in or not.
+ * @param {object} props.useData - Object that holds Google OAuth user data.
+ * 
+ */
+
 export default function UserHomePage( props ) {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
+  // Handles github related 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const code = queryParams.get('code');
 
+  // Adds token to use if it a github code exists
   useEffect(() => {
-
     async function sendToken() {
       let result = await addGitHubToken(code)
 
@@ -73,12 +91,14 @@ export default function UserHomePage( props ) {
       </div>
     )
   }
-
-  return (
-    <div>
-      <div className="m-20 text-center text-textcolor text-2xl">
-        You must Log in to view this page.
+  else {
+    return (
+      <div>
+        <div className="m-20 text-center text-textcolor text-2xl">
+          You must Log in to view this page.
+        </div>
       </div>
-    </div>
-  )
+    )    
+  }
+
 }
