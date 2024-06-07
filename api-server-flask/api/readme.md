@@ -92,6 +92,97 @@ is_reviewed (bool) : Whether or not the document has been reviewed
 
 ### Snapshot
 
+Representation of a version of a document. Id is associated with a blob on Google Buckets which contains the contents of the snapshot. Multiple snapshots can be associated with the same document, but for each specific commit, there is a 1-1 relationship between a document and a snapshot.
 
+snapshot_id (int) : Id of the snapshot
 
+associated_doc_id (int) : Id of the document the snapshot is associated with
 
+og_commit_id (int) : Original commit the snapshot was created on
+
+date_created (datetime) : Date the snapshot was created
+
+[Should be deleted] date_modified (datetime) : Date the snapshot was modified
+
+### Comment
+
+Representation of a comment. Comments are associated with specific snapshots, and are also associated with a specific location on that snapshot. They're basically Google Docs comments. Comments can also be resolved, signifying that the issue described in the comment is no longer relevant.
+
+author_email (str) : Creator of the comment
+
+comment_id (int) : Id of the comment
+
+snapshot_id (int) : Id of the snapshot the comment is associated with
+
+content (str) : The content of the comment
+
+reply_to_id (id) : Id of the comment that this comment is replying to; if a top level comment, the value is 0
+
+date_created (datetime) : Date the comment was created
+
+[Unfunctional] date_modified (datetime) : Date the comment was modified
+
+highlight_start_x (int) : The row that the location the comment is referring to starts on
+
+highlight_start_y = (int) : The column that the location the comment is referring to starts on
+
+highlight_end_x = (int) : The row that the location the comment is referring to ends on
+
+highlight_end_y = (int) : The column that the location the comment is referring to ends on
+
+is_resolved (bool) : Whether or not the comment is resolved
+
+### UserProjRelation
+
+The relation betweeen a user and a project. The permissions value dictates what actions a user can make on a project. Note that currently the frontend does not utilize any of these, and only uses permission levels 3 and 5.
+
+user_email (str) : The user in the relationship
+
+proj_id (int) : The project in the relationship
+
+role (str) : The role the user has in the project. This is mostly decorative
+
+permissions (int) : The level of permissions a user has in a project.
+
+   - 0 : Viewing. The user can view the project
+   - 1 : Commenting. The user can make comments
+   - 2 : Editor. The user can edit documents directly
+   - 3 : Sharing Privileges. The user can share the project with other users
+   - 4 : Nothing!
+   - 5 : Owner. The user can delete the project.
+
+### ItemCommitLocation
+
+Where an item (folder or document) is located within a commit. This allows tracking of the movement and renaming of items across different commits.
+
+item_id (int) : Id of the item
+
+parent_folder (int) : The folder the item is located in in the commit
+
+commit_id (int) : The commit this location takes place in
+
+name (str) : The name of the item in the commit
+
+is_folder (bool) : Whether or not the item is a folder or not. True for folder, False for document.
+
+### CommitDocumentSnapshotRelation
+
+What version (snapshot) a document was associated with during a specific comment.
+
+doc_id (int) : Id of the document
+commit_id (int) : Id of the commit
+snapshot_id (int) : Id of the snapshot
+
+### UserUnseenSnapshot
+
+If this exists within the database, it means that the user has not seen the specific snapshot. Only populated when the user is added to the project the snapshot is located in.
+
+snapshot_id (int) : Id of the snapshot
+user_email (str) : Email of the user
+
+### UserUnseenComment
+
+If this exists within the database, it means that the user has not seen the specific comment. Only populated when the user is added to the project the comment is located in.
+
+comment_id (int) : Id of the comment
+user_email (str) : Email of the user
