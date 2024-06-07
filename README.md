@@ -46,7 +46,7 @@ Get your Application Default Credentials set up: https://cloud.google.com/docs/a
 
 Place them in codereview/api-server-flask/api/credentials/googlecreds.json and create a variable in .env called GOOGLE_APPLICATION_CREDENTIALS whose value is credentials/googlecreds.json.
 
-## Setting up Google OAuth 
+### Setting up Google OAuth 
 
 In order to utilize Google's OAuth services, you will need to obtain the credentials from your Google project.
 
@@ -99,6 +99,9 @@ Your final .env file should look something like this
     DB_PASS = "(YourDBPassword)"
     
     DB_NAME = "(YourDBName)"
+### Setting up Google Gemini
+
+Follow instructions at this link https://cloud.google.com/vertex-ai/docs/start/cloud-environment
 
 ## Setting up Github Oath App
 
