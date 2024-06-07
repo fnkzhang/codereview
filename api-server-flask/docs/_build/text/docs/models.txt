@@ -1,0 +1,194 @@
+models module
+*************
+
+class models.Base(**kwargs: Any)
+
+   Bases: "DeclarativeBase"
+
+   metadata: ClassVar[MetaData] = MetaData()
+
+      Refers to the "_schema.MetaData" collection that will be used
+      for new "_schema.Table" objects.
+
+      See also: *orm_declarative_metadata*
+
+   registry: ClassVar[_RegistryType] = <sqlalchemy.orm.decl_api.registry object>
+
+      Refers to the "_orm.registry" in use where new "_orm.Mapper"
+      objects will be associated.
+
+class models.Comment(**kwargs)
+
+   Bases: "Base"
+
+   author_email
+
+   comment_id
+
+   content
+
+   date_created
+
+   date_modified
+
+   highlight_end_x
+
+   highlight_end_y
+
+   highlight_start_x
+
+   highlight_start_y
+
+   is_resolved
+
+   reply_to_id
+
+   snapshot_id
+
+class models.Commit(**kwargs)
+
+   Bases: "Base"
+
+   approved_count
+
+   author_email
+
+   commit_id
+
+   date_committed
+
+   date_created
+
+   is_approved
+
+   last_commit
+
+   name
+
+   proj_id
+
+   root_folder
+
+   state
+
+class models.CommitDocumentSnapshotRelation(**kwargs)
+
+   Bases: "Base"
+
+   commit_id
+
+   doc_id
+
+   snapshot_id
+
+class models.Document(**kwargs)
+
+   Bases: "Base"
+
+   associated_proj_id
+
+   date_created
+
+   date_modified
+
+   doc_id
+
+   is_reviewed
+
+   og_commit_id
+
+class models.Folder(**kwargs)
+
+   Bases: "Base"
+
+   associated_proj_id
+
+   date_created
+
+   date_modified
+
+   folder_id
+
+   og_commit_id
+
+class models.ItemCommitLocation(**kwargs)
+
+   Bases: "Base"
+
+   commit_id
+
+   is_folder
+
+   item_id
+
+   name
+
+   parent_folder
+
+class models.Project(**kwargs)
+
+   Bases: "Base"
+
+   author_email
+
+   date_created
+
+   date_modified
+
+   name
+
+   proj_id
+
+class models.Snapshot(**kwargs)
+
+   Bases: "Base"
+
+   associated_document_id
+
+   date_created
+
+   date_modified
+
+   og_commit_id
+
+   snapshot_id
+
+class models.User(**kwargs)
+
+   Bases: "Base"
+
+   date_joined
+
+   github_token
+
+   name
+
+   user_email
+
+class models.UserProjectRelation(**kwargs)
+
+   Bases: "Base"
+
+   permissions
+
+   proj_id
+
+   role
+
+   user_email
+
+class models.UserUnseenComment(**kwargs)
+
+   Bases: "Base"
+
+   comment_id
+
+   user_email
+
+class models.UserUnseenSnapshot(**kwargs)
+
+   Bases: "Base"
+
+   snapshot_id
+
+   user_email

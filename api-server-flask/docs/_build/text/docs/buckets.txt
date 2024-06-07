@@ -1,0 +1,62 @@
+buckets module
+**************
+
+buckets.deleteBlob(blobName)
+
+   **Explanation:**
+      Deletes a blob in Google Buckets
+
+   **Args:**
+      * blobName (str): name of the blob
+
+   **Returns:**
+      -True
+
+buckets.fetchFromCloudStorage(blobName: str)
+
+   **Explanation:**
+
+   If cached, returns the blob in cache. If uncached, makes a request
+   for the blob in Google Buckets and returns the blob.
+
+   **Args:**
+      -blobName (str): Name of the blob to retrieve.
+
+   **Returns:**
+      -blobContents (bytes): Contents of the blob in bytes
+
+buckets.getBlob(blobName)
+
+   **Explanation:**
+      Gets a blob to Google Buckets
+
+   **Args:**
+      * blobName (str): name of the blob
+
+   **Returns:**
+      -blobcontents (bytes): Contents of the blob in bytes
+
+buckets.publishCloudStorageUpdate(blobName: str)
+
+   **Explanation:**
+
+   Publishes a message with the blobName as the key to indicate that
+   the specified blob has been updated. The key is used to delete the
+   blob from cache.
+
+   **Args:**
+      -blobName (str): Name of the blob that was updated (created,
+      edited, deleted)
+
+buckets.uploadBlob(blobName, item)
+
+   **Explanation:**
+      Uploads a blob to Google Buckets
+
+   **Args:**
+      * blobName (str): name of the blob
+
+      * item (str): blob contents
+
+   **Returns:**
+      -True

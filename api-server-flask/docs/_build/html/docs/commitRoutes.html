@@ -33,69 +33,270 @@
   <section id="module-commitRoutes">
 <span id="commitroutes-module"></span><h1>commitRoutes module<a class="headerlink" href="#module-commitRoutes" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="commitRoutes.bulkAddToCommit">
-<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">bulkAddToCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst_commit_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.bulkAddToCommit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="commitRoutes.bulkDeleteFromCommit">
-<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">bulkDeleteFromCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.bulkDeleteFromCommit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="commitRoutes.checkIfNewerCommitExists">
-<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">checkIfNewerCommitExists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.checkIfNewerCommitExists" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="commitRoutes.approveCommit">
+<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">approveCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.approveCommit" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;commit_id&gt;/approve/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets the commit as approved. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>commit_id (int): id of the commit</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (int): the id of the commit</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.closeCommit">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">closeCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.closeCommit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;commit_id&gt;/close/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets the commit as closed. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>commit_id (int): id of the commit</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (int): the id of the commit</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.commitCommit">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">commitCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.commitCommit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Commit/&lt;commit_id&gt;/commitCommit/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Commits a commit. Also sets the commit as open. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>commit_id (int): id of the commit</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>name (str): what the user is naming the newly committed commit</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (int): the id of the commit</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.createCommit">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">createCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.createCommit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Commit/&lt;proj_id&gt;/createCommit/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a working commit. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int)): the id of the project the commit is for</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>last_commit (int): Optional; the committed this new commit will be based off of, if not provided will be empty</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (int): The id of the newly created commit</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.deleteWorkingCommit">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteWorkingCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.deleteWorkingCommit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/Commit/&lt;proj_id&gt;/workingCommit/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes the working commit of the user (derived from credentials in authorization). Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (proj_id): id of the project the commit is getting deleted</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="commitRoutes.getCommitDiffCareAboutLast">
-<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">getCommitDiffCareAboutLast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.getCommitDiffCareAboutLast" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="commitRoutes.getCommitDifferences">
-<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">getCommitDifferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.getCommitDifferences" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="commitRoutes.getAllLatestCommitComments">
+<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllLatestCommitComments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.getAllLatestCommitComments" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;proj_id&gt;/getLatestComments/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all comments associated with snapshots that are associated with the latest committed commit of the project. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (list): A list of unresolved Comment objects in the form of dicts</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.getCommitDocumentSnapshotPairs">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">getCommitDocumentSnapshotPairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.getCommitDocumentSnapshotPairs" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;commit_id&gt;/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all the snapshots associated with the documents in a commit. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>commit_id (int): id of the commit</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (dict): A dict with the keys of documents ids mapping to their snapshot ids</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.getCommitFolderTree">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">getCommitFolderTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.getCommitFolderTree" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;commit_id&gt;/getFolderTree/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all the items in a commit in a tree structure. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>commit_id (int): id of the commit</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (dict): The top level of the dict is a Folder object represented as a dict. It has the added key of &quot;contents&quot;, which maps to another dict, which has 2 keys of &quot;folders&quot; and &quot;documents&quot;. These keys map to lists of dicts of their respective items within the folder. Both item dicts have the &quot;seenSnapshots&quot; and &quot;seenComments&quot; key added, which represent whether or not the user has seen all snapshots/comments for that document. The folders also have the &quot;contents&quot; key added, which map to their own contents.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.getCommitInformation">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">getCommitInformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.getCommitInformation" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;commit_id&gt;/info/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets information about a commit. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>commit_id (int): id of the commit</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (dict): A Commit object in the form of a dict</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commitRoutes.getUserWorkingCommitForProject">
 <span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">getUserWorkingCommitForProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.getUserWorkingCommitForProject" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;proj_id&gt;/workingCommit</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets information about the user's (derived from credentials in Authorization headers) working commit. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (dict): A Commit object in the form of a dict</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commitRoutes.setReviewedCommit">
+<span class="sig-prename descclassname"><span class="pre">commitRoutes.</span></span><span class="sig-name descname"><span class="pre">setReviewedCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commitRoutes.setReviewedCommit" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Commit/&lt;commit_id&gt;/setReviewed/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets a commit as reviewed. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>commit_id (int): id of the commit</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (int): the id of the commit</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

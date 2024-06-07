@@ -35,16 +35,30 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="commentRoutes.createComment">
 <span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">createComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.createComment" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/Snapshot/&lt;snapshot_id&gt;/comment/create</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Snapshot/&lt;snapshot_id&gt;/comment/create</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Creates a top-level comment on the given snapshot</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a top-level comment on the given snapshot. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>snapshot_id (str): The ID of the snapshot.</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>author_email (str): The email of the author of the comment.</p></li>
+<li><p>reply_to_id (int): The ID of the comment being replied to. Defaults to 0 if not specified.</p></li>
+<li><p>content (str): The content of the comment.</p></li>
+<li><p>highlight_start_x (int): The x-coordinate of the start of the highlighted area.</p></li>
+<li><p>highlight_start_y (int): The y-coordinate of the start of the highlighted area.</p></li>
+<li><p>highlight_end_x (int): The x-coordinate of the end of the highlighted area.</p></li>
+<li><p>highlight_end_y (int): The y-coordinate of the end of the highlighted area.</p></li>
+<li><p>is_resolved (bool): Indicates whether the comment is resolved.</p></li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the comment creation was successful.</p></li>
 <li><p>reason (str): Description of the result of the comment creation.</p></li>
 <li><p>body (dict): Information about the created comment, including its ID, snapshot ID, author email, reply-to ID, content, highlight start and end coordinates, and resolution status.</p></li>
@@ -58,16 +72,16 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="commentRoutes.deleteComment">
 <span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.deleteComment" title="Link to this definition">¶</a></dt>
-<dd><p>DELETE /api/comments/&lt;comment_id&gt;/delete</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/comments/&lt;comment_id&gt;/delete</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Deletes a comment</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a comment. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>comment_id (str): The ID of the comment to delete.</p></li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the delete operation was successful.</p></li>
 <li><p>reason (str): Description of the result of the delete operation.</p></li>
 </ul>
@@ -80,14 +94,14 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="commentRoutes.editComment">
 <span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">editComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.editComment" title="Link to this definition">¶</a></dt>
-<dd><p>PUT /api/comments/&lt;comment_id&gt;/edit</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">PUT</span> <span class="pre">/api/comments/&lt;comment_id&gt;/edit</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Edits a comment</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Edits a comment. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>comment_id (str): The ID of the comment to edit.</p></li>
 <li><dl class="simple">
-<dt>body</dt><dd><ul>
+<dt>request.body (dict):</dt><dd><ul>
 <li><p>content (str): new contents of comment</p></li>
 </ul>
 </dd>
@@ -95,8 +109,8 @@
 </li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the edit operation was successful.</p></li>
 <li><p>reason (str): Description of the result of the edit operation.</p></li>
 </ul>
@@ -109,16 +123,16 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="commentRoutes.resolveComment">
 <span class="sig-prename descclassname"><span class="pre">commentRoutes.</span></span><span class="sig-name descname"><span class="pre">resolveComment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commentRoutes.resolveComment" title="Link to this definition">¶</a></dt>
-<dd><p>PUT /api/comment/&lt;comment_id&gt;/resolve</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">PUT</span> <span class="pre">/api/comment/&lt;comment_id&gt;/resolve</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Resolves a given comment</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Resolves a given comment. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
-<dt>Args:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
 <li><p>comment_id (str): The ID of the comment to resolve.</p></li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
 <li><p>success (bool): Indicates whether the resolution operation was successful.</p></li>
 <li><p>reason (str): Description of the result of the resolution operation.</p></li>
 </ul>

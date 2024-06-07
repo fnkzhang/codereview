@@ -17,6 +17,22 @@ import models
 
 @app.route('/api/Commit/<commit_id>/info/', methods = ["GET"])
 def getCommitInformation(commit_id):
+    """
+    ``GET /api/Commit/<commit_id>/info/``
+
+    **Explanation:**
+        Gets information about a commit. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - commit_id (int): id of the commit
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): A Commit object in the form of a dict
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -47,6 +63,22 @@ def getCommitInformation(commit_id):
 #gets a dict with the keys of documents mapping to their snapshot in the commit
 @app.route('/api/Commit/<commit_id>/', methods = ["GET"])
 def getCommitDocumentSnapshotPairs(commit_id):
+    """
+    ``GET /api/Commit/<commit_id>/``
+
+    **Explanation:**
+        Gets all the snapshots associated with the documents in a commit. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - commit_id (int): id of the commit
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): A dict with the keys of documents ids mapping to their snapshot ids
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -78,6 +110,24 @@ def getCommitDocumentSnapshotPairs(commit_id):
 #will fail if user already has a working non-committed commit
 @app.route('/api/Commit/<proj_id>/createCommit/', methods = ["POST"])
 def createCommit(proj_id):
+    """
+    ``POST /api/Commit/<proj_id>/createCommit/``
+
+    **Explanation:**
+        Creates a working commit. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int)): the id of the project the commit is for
+        - request.body (dict):
+            - last_commit (int): Optional; the committed this new commit will be based off of, if not provided will be empty
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): The id of the newly created commit
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -114,155 +164,28 @@ def createCommit(proj_id):
         "body": commit_id
     }
 
-#checks if there are commits newer than the user's current working commit
-@app.route('/api/Commit/<proj_id>/checkIfNewer/', methods = ["GET"])
-def checkIfNewerCommitExists(proj_id):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    body = request.get_json()
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    workingCommit = getUserWorkingCommitInProject(proj_id, idInfo["email"])
-    if workingCommit == None:
-        return {"success": False, "reason":"no working commit", "body":{}}
-    newestCommit = getProjectLastCommittedCommit(proj_id)
-    success = datetime.fromisoformat(workingCommit["date_created"]) > datetime.fromisoformat(newestCommit["date_committed"])
-    return {"success": True, "reason":"", "body":success}
-
-@app.route('/api/Commit/<commit_id1>/<commit_id2>/getDiff', methods = ["GET"])
-def getCommitDifferences(commit_id1, commit_id2):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    body = request.get_json()
-    proj_id = getCommitInfo(commit_id1)["proj_id"]
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    commit1Uniques, commit2Uniques = getCommitLocationDifferencesUtil(commit_id1, commit_id2)
-    commit1snaps, commit2snaps = getCommitDiffSnapshotsUtil(commit_id1, commit_id2)
-    return {"success":True, "reason":"", "body": {"commit1UniqueItems":commit1Uniques, "commit2UniqueItems":commit2Uniques, "snapshotDiffs": {"commit1":commit1snaps, "commit2":commit2snaps}}}
-
-
-#will also compare commit_id2 snapshots to commit_id1's last commit and remove those
-@app.route('/api/Commit/<commit_id1>/<commit_id2>/getDiff', methods = ["GET"])
-def getCommitDiffCareAboutLast(commit_id1, commit_id2):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    body = request.get_json()
-    proj_id = getCommitInfo(commit_id1)["proj_id"]
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    commit1Uniques, commit2Uniques = getCommitLocationDifferencesUtil(commit_id1, commit_id2)
-    commit1snaps, commit2snaps = getCommitNewerSnapshotsUtil(commit_id1, commit_id2)
-    return {"success":True, "reason":"", "body": {"commit1UniqueItems":commit1Uniques, "commit2UniqueItems":commit2Uniques, "snapshotDiffs": {"commit1":commit1snaps, "commit2":commit2snaps}}}
-
-#mainly to add stuff from other commits during merge
-#can also be used to update location/snapshots from them ig
-#likely used with getcommitdifferences to get uniques from a commit
-#will update dst commit creation time so it doesn't conflict with the same src commit?
-
-#will copy location and names from src commit if new, pending change->will keep name & location if only updating snapshot
-#in body requires a list labeled "items"
-    #list of item_ids to add to the commit, both folders and documents
-    #documents will have the snapshot that is in the src commit
-#send empty dict/list if there are no updates/creations/deletions
-@app.route('/api/Commit/<dst_commit_id>/<src_commit_id>/bulkAdd/', methods = ["POST"])
-def bulkAddToCommit(dst_commit_id, src_commit_id):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    body = request.get_json()
-    proj_id = getCommitInfo(dst_commit_id)["proj_id"]
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
-        return {"success": False, "reason":"Working Commit Already Exists For User", "body":{}}
-    itemsIds = body["items"]
-    for itemId in itemsIds:
-        item = getItemCommitLocation(itemId, src_commit_id)
-        createItemCommitLocation(itemId, dst_commit_id, item["parent_folder"], item["is_folder"])
-        if item["is_folder"] == False:
-            commitDocSnap = getCommitDocumentSnapshot(itemId, src_commit_id)
-            addSnapshotToCommit(commitDocSnap["snapshot_id"], itemId, dst_commit_id)
-    return {"success":True, "reason":""}
-
-#put ids of things to delete in "items"
-@app.route('/api/Commit/<commit_id>/bulkDelete/', methods = ["DELETE"])
-def bulkDeleteFromCommit(commit_id):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    body = request.get_json()
-    proj_id = getCommitInfo(commit_id)["proj_id"]
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 2):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    if getUserWorkingCommitInProject(proj_id, idInfo["email"]) != None:
-        return {"success": False, "reason":"Working Commit Already Exists For User", "body":{}}
-    itemsIds = body["items"]
-    for itemId in itemsIds:
-        item = getItemCommitLocation(itemId, commit_id)
-        if item["is_folder"] == False:
-            deleteDocumentFromCommit(itemId, commit_id)
-        else:
-            deleteFolderFromCommit(itemId, commit_id)
-    return {"success":True, "reason":""}
-
 #no checks will just commit
 #in body: requires commit name in "name"
 @app.route('/api/Commit/<commit_id>/commitCommit/', methods = ["POST"])
 def commitCommit(commit_id):
+    """
+    ``POST /api/Commit/<commit_id>/commitCommit/``
+
+    **Explanation:**
+        Commits a commit. Also sets the commit as open. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - commit_id (int): id of the commit
+        - request.body (dict):
+            - name (str): what the user is naming the newly committed commit
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): the id of the commit
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -297,6 +220,23 @@ def commitCommit(commit_id):
 
 @app.route('/api/Commit/<commit_id>/setReviewed/', methods=["GET"])
 def setReviewedCommit(commit_id):
+    """
+    
+    ``GET /api/Commit/<commit_id>/setReviewed/``
+
+    **Explanation:**
+        Sets a commit as reviewed. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - commit_id (int): id of the commit
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): the id of the commit
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -329,6 +269,23 @@ def setReviewedCommit(commit_id):
 
 @app.route('/api/Commit/<commit_id>/close/', methods=["GET"])
 def closeCommit(commit_id):
+    """
+    
+    ``GET /api/Commit/<commit_id>/close/``
+
+    **Explanation:**
+        Sets the commit as closed. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - commit_id (int): id of the commit
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): the id of the commit
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -360,6 +317,23 @@ def closeCommit(commit_id):
 
 @app.route('/api/Commit/<commit_id>/approve/', methods=["GET"])
 def approveCommit(commit_id):
+    """
+    
+    ``GET /api/Commit/<commit_id>/approve/``
+
+    **Explanation:**
+        Sets the commit as approved. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - commit_id (int): id of the commit
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): the id of the commit
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -401,6 +375,22 @@ def approveCommit(commit_id):
 #probably used if someone is halfway through a commit and wants to kill it
 @app.route('/api/Commit/<proj_id>/workingCommit/', methods=["DELETE"])
 def deleteWorkingCommit(proj_id):
+    """
+    
+    ``DELETE /api/Commit/<proj_id>/workingCommit/``
+
+    **Explanation:**
+        Deletes the working commit of the user (derived from credentials in authorization). Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (proj_id): id of the project the commit is getting deleted
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -438,6 +428,22 @@ def deleteWorkingCommit(proj_id):
 
 @app.route('/api/Commit/<commit_id>/getFolderTree/',methods=["GET"])
 def getCommitFolderTree(commit_id):
+    """
+    ``GET /api/Commit/<commit_id>/getFolderTree/``
+
+    **Explanation:**
+        Gets all the items in a commit in a tree structure. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - commit_id (int): id of the commit
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): The top level of the dict is a Folder object represented as a dict. It has the added key of "contents", which maps to another dict, which has 2 keys of "folders" and "documents". These keys map to lists of dicts of their respective items within the folder. Both item dicts have the "seenSnapshots" and "seenComments" key added, which represent whether or not the user has seen all snapshots/comments for that document. The folders also have the "contents" key added, which map to their own contents. 
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -464,6 +470,23 @@ def getCommitFolderTree(commit_id):
 
 @app.route('/api/Commit/<proj_id>/workingCommit', methods = ["GET"])
 def getUserWorkingCommitForProject(proj_id):
+    """
+    
+    ``GET /api/Commit/<proj_id>/workingCommit``
+
+    **Explanation:**
+        Gets information about the user's (derived from credentials in Authorization headers) working commit. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): A Commit object in the form of a dict
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -497,6 +520,23 @@ def getUserWorkingCommitForProject(proj_id):
 
 @app.route('/api/Commit/<proj_id>/getLatestComments/', methods=["GET"])
 def getAllLatestCommitComments(proj_id):
+    """
+    
+    ``GET /api/Commit/<proj_id>/getLatestComments/``
+
+    **Explanation:**
+        Gets all comments associated with snapshots that are associated with the latest committed commit of the project. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): A list of unresolved Comment objects in the form of dicts
+
+    """
     headers = request.headers
 
     if not isValidRequest(headers, ["Authorization"]):
@@ -530,5 +570,3 @@ def getAllLatestCommitComments(proj_id):
                 allcomments.append(comment._asdict())         
         
     return {"success": True, "reason":"", "body": allcomments}
-
-

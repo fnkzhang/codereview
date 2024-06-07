@@ -1,0 +1,39 @@
+commitDocSnapUtils module
+*************************
+
+commitDocSnapUtils.createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id)
+
+   **Explanation:**
+      Creates a relationship between a snapshot and a document on a
+      given commit
+
+   **Args:**
+      -doc_id (int): id of the document -commit_id (int): id of the
+      commit -snapshot_id (int): id of the snapshot
+
+   **Returns:**
+      -True
+
+commitDocSnapUtils.getAllCommitDocumentSnapshotRelation(commit_id)
+
+   **Explanation:**
+      Gets all document snapshot relationships for a commit
+
+   **Args:**
+      -commit_id (int): id of the commit
+
+   **Returns:**
+      -relations (dict): A dict with document ids as the keys, which
+      map to their related snapshots' id
+
+commitDocSnapUtils.getCommitDocumentSnapshot(doc_id, commit_id)
+
+   **Explanation:**
+      Gets the snapshot id of a document in a commit
+
+   **Args:**
+      -doc_id (int): id of the document -commit_id (int): id of the
+      commit
+
+   **Returns:**
+      -snapshot_id (int): id of the related snapshot

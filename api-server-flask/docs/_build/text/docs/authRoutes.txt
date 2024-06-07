@@ -1,0 +1,53 @@
+authRoutes module
+*****************
+
+authRoutes.authenticator()
+
+   "POST /api/user/authenticate"
+
+   **Explanation:**
+      Authenticates a user and sees if their credentials from google
+      are correct
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the authentication was
+           successful.
+
+         * reason (str): Description of the authentication result.
+
+         * body (dict): User information if authentication was
+           successful, empty dictionary otherwise.
+
+authRoutes.checkIsValidUser()
+
+   "POST /api/user/isValidUser"
+
+   **Explanation:**
+      Checks if user exists from authentication given in headers
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the user is valid.
+
+         * reason (str): Description of the validation result.
+
+         * body (dict): Empty dictionary.
+
+authRoutes.signUp()
+
+   "POST /api/user/signup"
+
+   **Explanation:**
+      Checks a user's credentials from google, and if they do not
+      exist in our database, gets added
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the signup was
+           successful.
+
+         * reason (str): Description of the signup result.
+
+         * body (dict): User information if signup was successful,
+           empty dictionary otherwise.

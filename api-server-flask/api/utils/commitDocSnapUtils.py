@@ -5,7 +5,15 @@ import models
 
 
 def getCommitDocumentSnapshot(doc_id, commit_id):
-
+    '''
+    **Explanation:**
+        Gets the snapshot id of a document in a commit
+    **Args:**
+        -doc_id (int): id of the document
+        -commit_id (int): id of the commit
+    **Returns:**
+        -snapshot_id (int): id of the related snapshot
+    '''
     with engine.connect() as conn:
         stmt = select(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.commit_id == commit_id, models.CommitDocumentSnapshotRelation.doc_id == doc_id)
         result = conn.execute(stmt)
@@ -16,7 +24,16 @@ def getCommitDocumentSnapshot(doc_id, commit_id):
         return relation.snapshot_id
 
 def createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id):
-
+    '''
+    **Explanation:**
+        Creates a relationship between a snapshot and a document on a given commit
+    **Args:**
+        -doc_id (int): id of the document
+        -commit_id (int): id of the commit
+        -snapshot_id (int): id of the snapshot
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
         if snap == None:
@@ -36,7 +53,14 @@ def createCommitDocumentSnapshot(doc_id, commit_id, snapshot_id):
     return True
 
 def getAllCommitDocumentSnapshotRelation(commit_id):
-
+    '''
+    **Explanation:**
+        Gets all document snapshot relationships for a commit
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        -relations (dict): A dict with document ids as the keys, which map to their related snapshots' id 
+    '''
     with engine.connect() as conn:
         stmt = select(models.CommitDocumentSnapshotRelation).where(models.CommitDocumentSnapshotRelation.commit_id == commit_id)
         foundRelations = conn.execute(stmt)

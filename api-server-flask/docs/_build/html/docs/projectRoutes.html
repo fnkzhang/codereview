@@ -35,32 +35,151 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="projectRoutes.createProject">
 <span class="sig-prename descclassname"><span class="pre">projectRoutes.</span></span><span class="sig-name descname"><span class="pre">createProject</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#projectRoutes.createProject" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Project/createProject/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a project.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>project_name (str): The name of the project</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (int): the id of the newly created project</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="projectRoutes.deleteProject">
 <span class="sig-prename descclassname"><span class="pre">projectRoutes.</span></span><span class="sig-name descname"><span class="pre">deleteProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectRoutes.deleteProject" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/Project/&lt;proj_id&gt;/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a project. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project you're deleting</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Whether or not the request succeeded</p></li>
+<li><p>reason (str): If the request failed, the error</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="projectRoutes.getProject">
 <span class="sig-prename descclassname"><span class="pre">projectRoutes.</span></span><span class="sig-name descname"><span class="pre">getProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectRoutes.getProject" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Project/&lt;proj_id&gt;/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets information about the project of the id. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): Id of the project you're getting</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (dict): A Project object in the form of a dict</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="projectRoutes.getProjectCommittedCommits">
 <span class="sig-prename descclassname"><span class="pre">projectRoutes.</span></span><span class="sig-name descname"><span class="pre">getProjectCommittedCommits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectRoutes.getProjectCommittedCommits" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Project/&lt;proj_id&gt;/GetCommits/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Get all of the project's committed commits. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (list): A list of Commit objects as dicts</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="projectRoutes.getProjectDocuments">
-<span class="sig-prename descclassname"><span class="pre">projectRoutes.</span></span><span class="sig-name descname"><span class="pre">getProjectDocuments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectRoutes.getProjectDocuments" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="projectRoutes.getProjectLatestCommit">
+<span class="sig-prename descclassname"><span class="pre">projectRoutes.</span></span><span class="sig-name descname"><span class="pre">getProjectLatestCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectRoutes.getProjectLatestCommit" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Project/&lt;proj_id&gt;/GetLatestCommit/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Get the latest committed commit of the project. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project</p></li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (dict): A Commit object in the form of a dict</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="projectRoutes.renameProject">
 <span class="sig-prename descclassname"><span class="pre">projectRoutes.</span></span><span class="sig-name descname"><span class="pre">renameProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectRoutes.renameProject" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Project/&lt;proj_id&gt;/rename/</span></code></p>
+<dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Renames a project. Enforces permissions through credentials given in Authorization header.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><p>proj_id (int): id of the project you're renaming</p></li>
+<li><dl class="simple">
+<dt>request.body (dict):</dt><dd><ul>
+<li><p>proj_name (str): new name for the project</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><dl class="simple">
+<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

@@ -14,6 +14,22 @@ import models
 
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
 def getProject(proj_id):
+    """
+    ``GET /api/Project/<proj_id>/``
+
+    **Explanation:**
+        Gets information about the project of the id. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): Id of the project you're getting
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): A Project object in the form of a dict
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -47,6 +63,23 @@ def getProject(proj_id):
 #put project name in body in "project_name"
 @app.route('/api/Project/createProject/', methods = ["POST"])
 def createProject():
+    """
+    ``POST /api/Project/createProject/``
+
+    **Explanation:**
+        Creates a project.
+
+    **Args:**
+        - request.body (dict):
+            - project_name (str): The name of the project
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): the id of the newly created project
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -72,6 +105,21 @@ def createProject():
 
 @app.route('/api/Project/<proj_id>/', methods=["DELETE"])
 def deleteProject(proj_id):
+    """
+    ``DELETE /api/Project/<proj_id>/``
+
+    **Explanation:**
+        Deletes a project. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project you're deleting
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Whether or not the request succeeded
+            - reason (str): If the request failed, the error
+
+    """
     # Authentication
     headers = request.headers
     
@@ -105,6 +153,23 @@ def deleteProject(proj_id):
 #body: put new name in "proj_name"
 @app.route('/api/Project/<proj_id>/rename/', methods=["POST"])
 def renameProject(proj_id):
+    """
+    ``POST /api/Project/<proj_id>/rename/``
+
+    **Explanation:**
+        Renames a project. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project you're renaming
+        - request.body (dict):
+            - proj_name (str): new name for the project
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+
+    """
     # Authentication
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -144,6 +209,22 @@ def renameProject(proj_id):
 
 @app.route('/api/Project/<proj_id>/GetCommits/', methods = ["GET"])
 def getProjectCommittedCommits(proj_id):
+    """
+    ``GET /api/Project/<proj_id>/GetCommits/``
+
+    **Explanation:**
+        Get all of the project's committed commits. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): A list of Commit objects as dicts
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -173,6 +254,22 @@ def getProjectCommittedCommits(proj_id):
 
 @app.route('/api/Project/<proj_id>/GetLatestCommit/', methods = ["GET"])
 def getProjectLatestCommit(proj_id):
+    """
+    ``GET /api/Project/<proj_id>/GetLatestCommit/``
+
+    **Explanation:**
+        Get the latest committed commit of the project. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): id of the project
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): A Commit object in the form of a dict
+
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -203,31 +300,3 @@ def getProjectLatestCommit(proj_id):
         "reason": "",
         "body": latestCommit
     }
-#discontinued for now
-@app.route('/api/Project/<proj_id>/GetDocuments/', methods = ["GET"])
-def getProjectDocuments(proj_id):
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-
-    arrayOfDocuments = getAllProjectDocuments(proj_id)
-    return {
-        "success": True,
-        "reason": "",
-        "body": arrayOfDocuments
-    }
-

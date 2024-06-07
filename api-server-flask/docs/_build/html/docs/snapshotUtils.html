@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>snapshotUtils module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-snapshotUtils">
+<span id="snapshotutils-module"></span><h1>snapshotUtils module<a class="headerlink" href="#module-snapshotUtils" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="snapshotUtils.createNewSnapshot">
+<span class="sig-prename descclassname"><span class="pre">snapshotUtils.</span></span><span class="sig-name descname"><span class="pre">createNewSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotUtils.createNewSnapshot" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a new snapshot attatched to a document on a commit</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project this is for
+-doc_id (int): id of the document the snapshot is for
+-data (int): content of the snapshot
+-commit_id (int): commit this is happening on 
+-user_email (str): Email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-snapshot_id (int): id of the newly created document</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="snapshotUtils.deleteSnapshotUtil">
+<span class="sig-prename descclassname"><span class="pre">snapshotUtils.</span></span><span class="sig-name descname"><span class="pre">deleteSnapshotUtil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotUtils.deleteSnapshotUtil" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a snapshot from the database and buckets entirely. This also deletes associated comments.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot to delete</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-success (bool): success
+-error message (str): if there was an error, returns the message, if not, returns None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="snapshotUtils.getSnapshotContentUtil">
+<span class="sig-prename descclassname"><span class="pre">snapshotUtils.</span></span><span class="sig-name descname"><span class="pre">getSnapshotContentUtil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotUtils.getSnapshotContentUtil" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a snapshot's contents</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-blob (bytes): The contents of the snapshot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="snapshotUtils.getSnapshotInfo">
+<span class="sig-prename descclassname"><span class="pre">snapshotUtils.</span></span><span class="sig-name descname"><span class="pre">getSnapshotInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotUtils.getSnapshotInfo" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a snapshot's information</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-snapshot (dict): A Snapshot object as a dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="snapshotUtils.getSnapshotProject">
+<span class="sig-prename descclassname"><span class="pre">snapshotUtils.</span></span><span class="sig-name descname"><span class="pre">getSnapshotProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#snapshotUtils.getSnapshotProject" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a snapshot's project's id</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-proj_id (int): The id of the project the snapshot belongs to</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/snapshotUtils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -35,12 +35,13 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="llmRoutes.implement_code_changes_from_comment">
 <span class="sig-prename descclassname"><span class="pre">llmRoutes.</span></span><span class="sig-name descname"><span class="pre">implement_code_changes_from_comment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#llmRoutes.implement_code_changes_from_comment" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/llm/code-implementation</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/llm/code-implementation</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Implements code changes based on the provided comment using LLM.</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Implements code changes based on the provided comment using LLM.</p>
 </dd>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>request.body (dict): A dictionary containing the following keys:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>request.body (dict): A dictionary containing the following keys:</dt><dd><ul>
 <li><p>code (str): The original code.</p></li>
 <li><p>highlightedCode (str): The highlighted code.</p></li>
 <li><p>startLine (int): The starting line of the code snippet.</p></li>
@@ -50,15 +51,20 @@
 </ul>
 </dd>
 </dl>
+</li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>dict: A dictionary containing the following keys:</dt><dd><ul>
 <li><p>success (bool): Indicates whether the implementation was successful.</p></li>
 <li><p>reason (str): Description of the result of the implementation.</p></li>
 <li><p>body (str): The implemented code changes.</p></li>
 </ul>
 </dd>
 </dl>
+</li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -66,26 +72,32 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="llmRoutes.suggest_comment_from_code">
 <span class="sig-prename descclassname"><span class="pre">llmRoutes.</span></span><span class="sig-name descname"><span class="pre">suggest_comment_from_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#llmRoutes.suggest_comment_from_code" title="Link to this definition">¶</a></dt>
-<dd><p>POST /api/llm/comment-suggestion</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/llm/comment-suggestion</span></code></p>
 <dl class="simple">
-<dt>Explanation:</dt><dd><p>Generates a comment suggestion based on the provided code using LLM.</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Generates a comment suggestion based on the provided code using LLM.</p>
 </dd>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>request.body (dict): A dictionary containing the following keys:</dt><dd><ul class="simple">
+<dt><strong>Args:</strong></dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>request.body (dict): A dictionary containing the following keys:</dt><dd><ul>
 <li><p>code (str): The original code.</p></li>
 <li><p>language (str): The programming language of the code.</p></li>
 </ul>
 </dd>
 </dl>
+</li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>dict: A dictionary containing the following keys:</dt><dd><ul class="simple">
+<dt><strong>Returns:</strong></dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>dict: A dictionary containing the following keys:</dt><dd><ul>
 <li><p>success (bool): Indicates whether the suggestion generation was successful.</p></li>
 <li><p>reason (str): Description of the result of the suggestion generation.</p></li>
 <li><p>body (str): The generated comment suggestion.</p></li>
 </ul>
 </dd>
 </dl>
+</li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

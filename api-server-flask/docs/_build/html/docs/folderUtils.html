@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>folderUtils module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-folderUtils">
+<span id="folderutils-module"></span><h1>folderUtils module<a class="headerlink" href="#module-folderUtils" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.addItemToCorrectTypeList">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">addItemToCorrectTypeList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folders</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrayOfDocuments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.addItemToCorrectTypeList" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Adds the given item to either the folders or arrayOfDocuments lists depending on its type</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-item (dict): A dict representation of a ItemCommitLocation object
+-folders (list): a list to add folders to
+-arrayOfDocuments (list): a list to add documents to
+-commit_id (int): id of the commit</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.appendFolderTreeToList">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">appendFolderTreeToList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folderlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.appendFolderTreeToList" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the folder tree of the folder given and appends it to the given list</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folderlist (list): list to append the tree to
+-folder_id (int): id of the folder to get the tree of
+-commit_id (int): id of the commit this takes place in</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><ul class="simple">
+<li><p>tree (dict): The top level of the dict is a Folder object represented as a dict. It has the added key of &quot;contents&quot;, which maps to another dict, which has 2 keys of &quot;folders&quot; and &quot;documents&quot;. These keys map to lists of dicts of their respective items within the folder. The folders also have the &quot;contents&quot; key added, which map to their own contents.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.createNewFolder">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">createNewFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.createNewFolder" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a new folder for a commit in a project</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_name (int): name of the folder
+-parent_folder (int): id of the folder's parent folder
+-proj_id (int): id of the project this is for
+-commit_id (int): commit this is happening on</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-folder_id (int): id of the newly created folder</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.deleteFolderFromCommit">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">deleteFolderFromCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.deleteFolderFromCommit" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a folder from a commit. The folder will persist in other existing commits. Will also recursively delete all folder contents</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_id (int): id of the folder to delete
+-commit_id (int): id of the commit to delete from</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-success (bool): success
+-error message (str): if there was an error, returns the message, if not, returns None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.getAllFolderContents">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">getAllFolderContents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.getAllFolderContents" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all contents of a folder in a commit</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_id (int): id of the folder
+-commit_id (int): id of the commit</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-contents (dict): A dict with 2 keys of &quot;folders&quot; and &quot;documents&quot;, which map to lists of the respective items that are in the folder given</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.getFolderInfo">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">getFolderInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.getFolderInfo" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a folder's information from a specific commit</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_id (int): id of the folder
+-commit_id (int): id of the commit</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-folder (dict): A Folder object as a dict with ItemCommitLocation object &quot;parent_folder&quot; and &quot;name&quot; fields added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.getFolderInfoViaLocation">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">getFolderInfoViaLocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.getFolderInfoViaLocation" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a folder's information from a specific commit using the name and parent folder instead of id</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-name (str): name of the folder
+-parent_folder (int): id of the folder's parent folder
+-commit_id (int): id of the commit</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-folder (dict): A Folder object as a dict with ItemCommitLocation object &quot;parent_folder&quot; and &quot;name&quot; fields added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.getFolderPath">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">getFolderPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.getFolderPath" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the given folder's path in the commit as a string; e.g: Folder2 resides in Folder1, which resides in the roote folder would be Folder1/Folder2/</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_id (folder): id of the folder
+-commit_id (int): id of the commit</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-folderPath (str): The folder's path as a string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.getFolderPathsFromList">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">getFolderPathsFromList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_folders</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.getFolderPathsFromList" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all of the folders in the list as paths; e.g: if folder2 is in folder1, which is in the root folder of the commit, the path would be folder1/folder2/</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_id (int): id of the current folder in the list being added
+-current_path (str): current path of the folder
+-list_of_folders: a list of all the folders as a tree in the order of breadth first search</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-folderIDToPath (dict): dict with folder ids mapping to their path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.getFolderTree">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">getFolderTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.getFolderTree" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all contents of a folder in a tree structure</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_id (int): id of the folder
+-commit_id (int): id of the commit this is happening in</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><ul class="simple">
+<li><p>tree (dict): The top level of the dict is a Folder object represented as a dict. It has the added key of &quot;contents&quot;, which maps to another dict, which has 2 keys of &quot;folders&quot; and &quot;documents&quot;. These keys map to lists of dicts of their respective items within the folder. The folders also have the &quot;contents&quot; key added, which map to their own contents.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="folderUtils.purgeFolderUtil">
+<span class="sig-prename descclassname"><span class="pre">folderUtils.</span></span><span class="sig-name descname"><span class="pre">purgeFolderUtil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#folderUtils.purgeFolderUtil" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a folder from the database entirely.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-folder_id (int): id of the folder to delete</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-success (bool): success
+-error message (str): if there was an error, returns the message, if not, returns None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/folderUtils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

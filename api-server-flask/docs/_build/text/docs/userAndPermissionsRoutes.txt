@@ -1,0 +1,112 @@
+userAndPermissionsRoutes module
+*******************************
+
+userAndPermissionsRoutes.addUser(proj_id)
+
+   "POST /api/Project/<proj_id>/addUser/"
+
+   **Explanation:**
+      Adds a user to a project with the given permission level. Will
+      update the permission level if they are already on the project.
+      Enforces permissions through credentials given in Authorization
+      header. User's permissions must be higher than or equal the
+      level they are giving
+
+   **Args:**
+      * proj_id (int): the id of the project
+
+      * request.body (dict):
+           * email (str): email of the user being added
+
+           * role (str): name of the role they're being given
+
+           * permissions (int): level of permissions they're being
+             given
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+userAndPermissionsRoutes.getAllUserProjects()
+
+   "GET /api/User/Project/"
+
+   **Explanation:**
+      Gets all projects the user has access to
+
+   **Args:**
+      Requires credentials of the user in the Authorization header
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (list): List of the projects as dicts
+
+userAndPermissionsRoutes.getUsersWithAccessToProject(proj_id)
+
+   "GET /api/Project/<proj_id>/Users/"
+
+   **Explanation:**
+      Gets all users that have access to the project
+
+   **Args:**
+      * proj_id (int): the id of the project
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (list): List of the users as dicts
+
+userAndPermissionsRoutes.removeUser(proj_id)
+
+   "DELETE /api/Project/<proj_id>/removeUser/"
+
+   **Explanation:**
+      Removes a user from the project. Enforces permissions through
+      credentials given in Authorization header.
+
+   **Args:**
+      * proj_id (int): the id of the project
+
+      * request.body (dict):
+           * email (str): email of the user being added
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+userAndPermissionsRoutes.transferProjectOwnership(proj_id)
+
+   "POST /api/Project/<proj_id>/transferOwnership/"
+
+   **Explanation:**
+      Transfers ownership to the given user. Enforces permissions
+      through credentials given in Authorization header. User must be
+      owner already
+
+   **Args:**
+      * proj_id (int): the id of the project
+
+      * request.body (dict):
+           * email (str): email of the user being added
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.

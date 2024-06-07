@@ -11,7 +11,16 @@ import models
 from reviewStateEnums import reviewStateEnum
 
 def getCommitInfo(commit_id):
+    '''
+    **Explanation:**
+        Returns a Commit object as a dict
 
+    **Args:**
+        -commit_id (int): id of the commit
+
+    **Returns:**
+        -commit (dict): Commit as a dict
+    '''
     with engine.connect() as conn:
         stmt = select(models.Commit).where(models.Commit.commit_id == commit_id)
         foundCommit = conn.execute(stmt).first()
@@ -20,8 +29,16 @@ def getCommitInfo(commit_id):
         return foundCommit._asdict()
 
 def createNewCommit(proj_id, email, last_commit):
-    print("COMMIT_CREATED!!!", last_commit)
-
+    '''
+    **Explanation:**
+        Creates a new working commit for the given user
+    **Args:**
+        -proj_id (int): id of the project this is for
+        -email (str): Email of the user
+        -last_commit (int or None): id of the commit the new commit will be based off of
+    **Returns:**
+        -commit_id (int): id of the newly created commit
+    '''
     commit_id = createID()
     if last_commit != None:
         print(last_commit)
@@ -51,7 +68,16 @@ def createNewCommit(proj_id, email, last_commit):
     return commit_id
 
 def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
-
+    '''
+    **Explanation:**
+        Creates a new working commit for the given user
+    **Args:**
+        -proj_id (int): id of the project this is for
+        -email (str): Email of the user
+        -last_commit (int or None): id of the commit the new commit will be based off of
+    **Returns:**
+        -commit_id (int): id of the newly created commit
+    '''
     with engine.connect() as conn:
         snap = getCommitDocumentSnapshot(doc_id, commit_id)
         if snap == None:
@@ -76,7 +102,15 @@ def addSnapshotToCommit(snapshot_id, doc_id, commit_id):
     return True
 
 def commitACommit(commit_id, name):
-
+    '''
+    **Explanation:**
+        Commits a working commit
+    **Args:**
+        -commit_id (int): id of the working commit
+        -name (str): New name for the commit
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         getCommit = select(models.Commit).where(
             models.Commit.commit_id == commit_id
@@ -105,14 +139,20 @@ def commitACommit(commit_id, name):
     return True
 
 def deleteCommit(commit_id):
-
+    '''
+    **Explanation:**
+        Deletes a commit. This should generally be only used for working commits, and using it on committed commits could cause undefined behavior if other commits in the project will still exist after
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        -success (bool): success
+        -error message (str): if there was an error, returns the message, if not, returns None
+    '''
     try:
         with engine.connect() as conn:
-            print("start commit deletion", commit_id)
             stmt = delete(models.ItemCommitLocation).where(
                     models.ItemCommitLocation.commit_id == commit_id
             )
-            print("delete location")
             conn.execute(stmt)
             threads = []
             stmt = select(models.Document).where(
@@ -126,7 +166,6 @@ def deleteCommit(commit_id):
                     models.Snapshot.og_commit_id == commit_id)
             snaps = conn.execute(stmt)
             for snap in snaps:
-                print("start snapdelete in commit", snap.snapshot_id)
                 thread = threading.Thread(target=deleteSnapshotUtil, kwargs={'snapshot_id':snap.snapshot_id})
                 thread.start()
                 threads.append(thread)
@@ -135,7 +174,6 @@ def deleteCommit(commit_id):
             folds = conn.execute(stmt)
             for fold in folds:
                 purgeFolderUtil(fold.folder_id)
-            print("folderdead")
             stmt = delete(models.Commit).where(
                     models.Commit.commit_id == commit_id
             )
@@ -154,7 +192,15 @@ def deleteCommit(commit_id):
         return False, e
 
 def setCommitOpen(commit_id):
-
+    '''
+    **Explanation:**
+        Sets a commit's state to open
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        -success (bool): success
+        -error message (str): if there was an error, returns the message, if not, returns None
+    '''
     try:
 
         with engine.connect() as conn:
@@ -171,7 +217,15 @@ def setCommitOpen(commit_id):
         return False
 
 def setCommitClosed(commit_id):
-
+    '''
+    **Explanation:**
+        Sets a commit's state to closed
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        -success (bool): success
+        -error message (str): if there was an error, returns the message, if not, returns None
+    '''
     try:
 
         with engine.connect() as conn:
@@ -188,7 +242,15 @@ def setCommitClosed(commit_id):
         return False
 
 def setCommitReviewed(commit_id):
-
+    '''
+    **Explanation:**
+        Sets a commit's state to reviewed
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        -success (bool): success
+        -error message (str): if there was an error, returns the message, if not, returns None
+    '''
     try:
 
         with engine.connect() as conn:
@@ -205,7 +267,15 @@ def setCommitReviewed(commit_id):
         return False
 
 def setCommitApproved(commit_id):
-
+    '''
+    **Explanation:**
+        Sets a commit's state to approved
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        -success (bool): success
+        -error message (str): if there was an error, returns the message, if not, returns None
+    '''
     try:
         with engine.connect() as conn:
             stmt = update(models.Commit).where(
@@ -222,122 +292,51 @@ def setCommitApproved(commit_id):
         print("Error: ", e)
         return False
 
-# def unsetCommitApproved(commit_id):
-#     try:
-#         with engine.connect() as conn:
-#             stmt = update(models.Commit).where(
-#                 models.Commit.commit_id == commit_id).values(
-#                 is_approved = True,
-#                 approved_count = models.Commit.approved_count - 1
-#             )
-
-#             conn.execute(stmt)
-#             conn.commit()
-#             return True
-#     except Exception as e:
-#         print("Error: ", e)
-#         return False
-
-def removeItemFromCommit(item_id, commit_id):
-
-    with engine.connect() as conn:
-        stmt = delete(models.ItemCommitLocation).where(
-                models.ItemCommitLocation.item_id == item_id).where(
-                models.ItemCommitLocation.commit_id == commit_id
-        )
-        conn.execute(stmt)
-        conn.commit()
-    return True
-
-#does not care about last_commit
-def getCommitSharedItemIdsUtil(commit_id1, commit_id2):
-    commit1Items = getAllCommitItemIds(commit_id1)
-    commit2Items = getAllCommitItemIds(commit_id2)
-    sharedIds = []
-    for itemId in commit1Items:
-        if itemId in commit2Items:
-            sharedIds.append(itemId)
-    return sharedIds
-
-def getCommitNewerSnapshotsUtil(commit_id1, commit_id2):
-    shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
-    commit1snaps = {}
-    commit2snaps = {}
-    last_commit = getCommitInfo(commit_id1)["last_commit"]
-    for itemId in shared:
-        item = getItemCommitLocation(itemId, commit_id1)
-        if item["is_folder"] == False:
-            commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
-            commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
-            lastcommitsnap = getCommitDocumentSnapshot(itemId, last_commit)
-            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"] and lastcommitsnap["snapshot_id"] != commit2snap["snapshot_id"]:
-                commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
-                commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
-    return commit1snaps, commit2snaps
-
-def getCommitDiffSnapshotsUtil(commit_id1, commit_id2):
-    shared = getCommitSharedItemIdsUtil(commit_id1, commit_id2)
-    commit1snaps = {}
-    commit2snaps = {}
-    for itemId in shared:
-        item = getItemCommitLocation(itemId, commit_id1)
-        if item["is_folder"] == False:
-            commit1snap = getCommitDocumentSnapshot(itemId, commit_id1)
-            commit2snap = getCommitDocumentSnapshot(itemId, commit_id2)
-            if commit1snap["snapshot_id"] != commit2snap["snapshot_id"]:
-                commit1snaps[commit1snap["doc_id"]] = commit1snap["snapshot_id"]
-                commit2snaps[commit2snap["doc_id"]] = commit2snap["snapshot_id"]
-    return commit1snaps, commit2snaps
-
-def getCommitLocationDifferencesUtil(commit_id1, commit_id2):
-    commit1Items = getAllCommitItemIds(commit_id1)
-    commit2Items = getAllCommitItemIds(commit_id2)
-    commit1Uniques = []
-    commit2Uniques = []
-    for itemId in commit1Items:
-        if itemId not in commit2Items:
-            item = getItemCommitLocation(itemId)
-            if item["is_folder"] == True:
-                commit1Uniques.append(getFolderInfo(item, commit_id1))
-            else: 
-                commit1Uniques.append(getDocumentInfo(item, commit_id1))
-    for itemId in commit2Items:
-        if itemId not in commit1Items:
-            item = getItemCommitLocation(itemId)
-            if item["is_folder"] == True:
-                commit2Uniques.append(getFolderInfo(item, commit_id2))
-            else:
-                commit2Uniques.append(getDocumentInfo(item, commit_id2))
-    return commit1Uniques, commit2Uniques
-
-def getAllCommitItemIdsOfType(commit_id, is_folder):
-    items = getAllCommitItems(commit_id)
-    rv = []
-    for item in items:
-        if item["is_folder"] == is_folder:
-            rv.append(item["item_id"])
-    return rv
 
 def getAllCommitItemsOfType(commit_id, is_folder):
+    '''
+    **Explanation:**
+        Gets all items from the commit that are either documents or folders, determined by the argument "is_folder"
+    **Args:**
+        -commit_id (int): id of the commit
+        -is_folder (int): Whether or not the items returned are folders or documents (True for folder, False for document)
+    **Returns:**
+        -itemlist (list): list of the items of the commit that match the condition as dicts
+    '''
     items = getAllCommitItems(commit_id)
     rv = []
     threads = []
     for item in items:
         if item["is_folder"] == is_folder:
-            thread = threading.Thread(target=appendInfo, kwargs={"rv":rv, "item":item, "commit_id":commit_id, "is_folder":is_folder})
+            thread = threading.Thread(target=addItemInfoToList, kwargs={"rv":rv, "item":item, "commit_id":commit_id, "is_folder":is_folder})
             thread.start()
             threads.append(thread)
     for thread in threads:
         thread.join()
     return rv
-def appendInfo(rv, item, commit_id, is_folder):
+def addItemInfoToList(rv, item, commit_id, is_folder):
+    '''
+    **Explanation:**
+        Adds an item to list, getting the relevant folder/document information
+    **Args:**
+        -rv (list): the list to add the item to
+        -commit_id (int): id of the commit
+        -is_folder (int): Whether or not the item is a folder or document (True for folder, False for document)
+    '''
     if is_folder == True:
         rv.append(getFolderInfo(item["item_id"], commit_id))
     else:
         rv.append(getDocumentInfo(item["item_id"], commit_id))
         
 def getAllCommitItems(commit_id):
-
+    '''
+    **Explanation:**
+        Gets all items from a commit
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        -itemlist (list): list of the items of the commit
+    '''
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(
                 models.ItemCommitLocation.commit_id == commit_id
@@ -348,53 +347,73 @@ def getAllCommitItems(commit_id):
             itemArray.append(row._asdict())
         return itemArray
 
-def getAllCommitItemIds(commit_id):
-
-    with engine.connect() as conn:
-        stmt = select(models.ItemCommitLocation).where(
-                models.ItemCommitLocation.commit_id == commit_id
-        )
-        results = conn.execute(stmt)
-        itemArray = []
-        for row in results:
-            itemArray.append(row.item_id)
-        return itemArray
-
 def getCommitTree(commit_id):
+    '''
+    **Explanation:**
+        Gets all items from the commit in a tree structure
+    **Args:**
+        -commit_id (int): id of the commit
+    **Returns:**
+        - tree (dict): The top level of the dict is a Folder object represented as a dict. It has the added key of "contents", which maps to another dict, which has 2 keys of "folders" and "documents". These keys map to lists of dicts of their respective items within the folder. The folders also have the "contents" key added, which map to their own contents. 
+    '''
     root_folder = getCommitInfo(commit_id)["root_folder"]
     return getFolderTree(root_folder, commit_id)
-import time
 
 def getCommitTreeWithAddons(commit_id, email):
-    start = time.time()
+    '''
+    **Explanation:**
+        Gets all items from the commit in a tree structure with along with whether or not there are newly seen snapshots/comments in the folder/document
+    **Args:**
+        -commit_id (int): id of the commit
+        -email (str): email of the user for the seen values
+    **Returns:**
+        - tree (dict): The top level of the dict is a Folder object represented as a dict. It has the added key of "contents", which maps to another dict, which has 2 keys of "folders" and "documents". These keys map to lists of dicts of their respective items within the folder. Both item dicts have the "seenSnapshots" and "seenComments" key added, which represent whether or not the user has seen all snapshots/comments for that document. The folders also have the "contents" key added, which map to their own contents. 
+    '''
     tree = getCommitTree(commit_id)
-    treetime = time.time()
     docsnap = getAllCommitDocumentSnapshotRelation(commit_id)
-    dstime = time.time()
     addToTree(tree, docsnap, email)
-    combine = time.time()
-    print("tree:", treetime-start, " dstime:", dstime-treetime, " combine:", combine-dstime)
     return tree
 
 def addToTree(tree, docsnap, email):
+    '''
+    **Explanation:**
+        Adds the seenSnapshot and seenComment values to a folder and its contents, and recurses for any child folders
+    **Args:**
+        -tree (dict): A tree like the one returned in getCommitTree
+        -docsnap (dict): A dict with document ids as keys, which map to the snapshots related to them in a commit
+        -email (str): email of the user for the seen values
+    **Returns:**
+        - tree (dict): The top level of the dict is a Folder object represented as a dict. It has the added key of "contents", which maps to another dict, which has 2 keys of "folders" and "documents". These keys map to lists of dicts of their respective items within the folder. Both item dicts have the "seenSnapshots" and "seenComments" key added, which represent whether or not the user has seen all snapshots/comments for that document. The folders also have the "contents" key added, which map to their own contents. 
+    '''
     threads = []
     tree["seenSnapshot"] = True
     tree["seenComments"] = True
-    with engine.connect() as conn:
-        for item in tree["content"]["folders"]:
-            thread = threading.Thread(target=addToTree, kwargs={'tree':item, 'docsnap':docsnap, 'email':email})
-            thread.start()
-            threads.append(thread)
-            #addToTree(item, docsnap, email)
-        for item in tree["content"]["documents"]:
-            thread = threading.Thread(target=addSeenAndUnresolved, kwargs={'item':item, 'docsnap':docsnap, 'email':email, 'tree':tree})
-            thread.start()
-            threads.append(thread)
+    for item in tree["content"]["folders"]:
+        thread = threading.Thread(target=addToTree, kwargs={'tree':item, 'docsnap':docsnap, 'email':email})
+        thread.start()
+        threads.append(thread)
+        #addToTree(item, docsnap, email)
+    for item in tree["content"]["documents"]:
+        thread = threading.Thread(target=addSeenAndUnresolved, kwargs={'item':item, 'docsnap':docsnap, 'email':email, 'tree':tree})
+        thread.start()
+        threads.append(thread)
     for thread in threads:
         thread.join()
     return True
 
 def addSeenAndUnresolved(item, docsnap, email, tree):
+    '''
+    **Explanation:**
+        Adds the seenSnapshot and seenComment values to an item and its parent folder
+    **Args:**
+        -item (dict): Dict of the item, located in the tree variable's ["content"]["documents]
+        -docsnap (dict): A dict with document ids as keys, which map to the snapshots related to them in a commit
+        -email (str): email of the user for the seen values
+        -tree (dict): A tree like the one returned in getCommitTree. Top level represents the parent folder of the document
+
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         item["seenSnapshot"] = isSnapshotSeenByUser(docsnap[item["doc_id"]], email)
         item["seenComments"] = isSnapshotAllCommentSeenByUser(docsnap[item["doc_id"]], email)
@@ -411,6 +430,15 @@ def addSeenAndUnresolved(item, docsnap, email, tree):
     return True
 
 def getCommitFoldersAsPaths(commit_id):
+    '''
+    **Explanation:**
+        Gets all of the folders in the commit as paths; e.g: if folder2 is in folder1, which is in the root folder of the commit, the path would be folder1/folder2/
+    **Args:**
+        -commit_id (int): id of the commit
+
+    **Returns:**
+        -folderIDToPath (dict): dict with folder ids mapping to their paths
+    '''
     project = getCommitInfo(commit_id)
     folders = getAllCommitItemsOfType(commit_id, True)
     folderIDToPath = {}

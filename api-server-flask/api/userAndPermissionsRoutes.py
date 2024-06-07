@@ -12,6 +12,22 @@ from utils.projectUtils import *
 # Array can contain -1 value indicating missing references
 @app.route('/api/User/Project/', methods = ["GET"])
 def getAllUserProjects():
+    """
+    
+    ``GET /api/User/Project/``
+
+    **Explanation:**
+        Gets all projects the user has access to
+
+    **Args:**
+        Requires credentials of the user in the Authorization header
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): List of the projects as dicts
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -40,12 +56,30 @@ def getAllUserProjects():
         }
 
 #needs sections in body
-    #credentials (of user that already has access to project)
     #email (user to add to project)
     #role (role name)
     #permissions (integer that represents perms)
 @app.route('/api/Project/<proj_id>/addUser/', methods=["POST"])
 def addUser(proj_id):
+    """
+    ``POST /api/Project/<proj_id>/addUser/``
+
+    **Explanation:**
+        Adds a user to a project with the given permission level. Will update the permission level if they are already on the project. Enforces permissions through credentials given in Authorization header. User's permissions must be higher than or equal the level they are giving
+
+    **Args:**
+        - proj_id (int): the id of the project
+        - request.body (dict):
+            - email (str): email of the user being added
+            - role (str): name of the role they're being given
+            - permissions (int): level of permissions they're being given
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -59,6 +93,11 @@ def addUser(proj_id):
         return {
             "success":False,
             "reason": "Failed to Authenticate"
+        }
+    if getUserInfo(inputBody["email"] == None):
+        return {
+            "success":False,
+            "reason": "Not a valid user"
         }
     permissions = getUserProjPermissions(idInfo["email"], proj_id)
     if(permissions < 3 or inputBody["permissions"] > getUserProjPermissions(idInfo["email"], proj_id)):
@@ -69,13 +108,29 @@ def addUser(proj_id):
         return {"success": False, "reason":"Invalid Permission Level", "body":{}}
     if inputBody["email"] == idInfo["email"]:
         return {"success": False, "reason":"Can't give yourself perms", "body":{}}
-    return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A", "body": {}}
+    return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A"}
 
 #needs sections in body
-    #credentials (of user that already has access to project)
     #email (user to make owner)
 @app.route('/api/Project/<proj_id>/transferOwnership/', methods=["POST"])
 def transferProjectOwnership(proj_id):
+    """
+    ``POST /api/Project/<proj_id>/transferOwnership/``
+
+    **Explanation:**
+        Transfers ownership to the given user. Enforces permissions through credentials given in Authorization header. User must be owner already
+    
+    **Args:**
+        - proj_id (int): the id of the project
+        - request.body (dict):
+            - email (str): email of the user being added
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -90,55 +145,35 @@ def transferProjectOwnership(proj_id):
             "success":False,
             "reason": "Failed to Authenticate"
         }
-
+    if getUserInfo(inputBody["email"]) == None:
+        return {
+            "success":False,
+            "reason": "Invalid User"
+        }
     if(getUserProjPermissions(idInfo["email"], proj_id) < 5):
         return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    return {"success": changeProjectOwner(inputBody["email"], proj_id), "reason":"N/A", "body": {}}
-
-#copies all permissions from one project to this one
-@app.route('/api/Project/<old_proj_id>/<new_proj_id>/importPermissions/', methods = ["POST"])
-def importPermissions(old_proj_id, new_proj_id):
-    inputBody = request.get_json()
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-    permissions = getUserProjPermissions(idInfo["email"], old_proj_id)
-    if(permissions < 3):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-    projowner = getProjectInfo(new_proj_id)["author_email"]
-    projpermissions = getAllUserProjPermissionsForProject(old_proj_id)
-    addedUsers = []
-    for permission in projpermissions:
-        if permission["permissions"] == 5 and permission["user_email"] != projowner:
-            setUserProjPermissions(permission["user_email"], new_proj_id, "Editor", 3)
-        else:
-            setUserProjPermissions(permission["user_email"], new_proj_id, permission["role"], permission["permissions"])
-        addedUsers.append(permission["user_email"])
-    return {"success": True, "reason":"", "body":addedUsers}
-
-#just addUser but you don't need to be a valid user lol, test function remove later
-#still needs:
-    #email (user to add to project)
-    #role (role name)
-    #permissions( integer that represents perms, so far anything greater than 0 is everything)
-@app.route('/api/Project/<proj_id>/addUserAdmin/', methods=["POST"])
-def addUserAdmin(proj_id):
-    inputBody = request.get_json()
-    return {"success": setUserProjPermissions(inputBody["email"], proj_id, inputBody["role"], inputBody["permissions"]), "reason":"N/A", "body": {}}
+    return {"success": changeProjectOwner(inputBody["email"], proj_id), "reason":"N/A"}
 
 #have email in body in "email"
 @app.route('/api/Project/<proj_id>/removeUser/', methods=["DELETE"])
 def removeUser(proj_id):
+    """
+    ``DELETE /api/Project/<proj_id>/removeUser/``
+
+    **Explanation:**
+        Removes a user from the project. Enforces permissions through credentials given in Authorization header.
+
+    **Args:**
+        - proj_id (int): the id of the project
+        - request.body (dict):
+            - email (str): email of the user being added
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+
+    """
     inputBody = request.get_json()
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
@@ -172,6 +207,21 @@ def removeUser(proj_id):
 
 @app.route('/api/Project/<proj_id>/Users/', methods=["GET"])
 def getUsersWithAccessToProject(proj_id):
+    """
+    ``GET /api/Project/<proj_id>/Users/``
+
+    **Explanation:**
+        Gets all users that have access to the project
+
+    **Args:**
+        - proj_id (int): the id of the project
+
+    **Returns:**
+        A dictionary containing the following keys:
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): List of the users as dicts
+    """
     headers = request.headers
     if not isValidRequest(headers, ["Authorization"]):
         return {
@@ -214,6 +264,7 @@ def getUsersWithAccessToProject(proj_id):
                     returnDict["github_token"] = None
                 else:
                     returnDict = userSearchResult._asdict()
+                    returnDict.pop("github_token")
                 returnDict["userRole"] = userRole
                 returnDict["userPermissionLevel"] = userPermissionLevel
                 userDataList.append(returnDict)
