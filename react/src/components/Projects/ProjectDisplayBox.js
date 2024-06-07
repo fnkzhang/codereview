@@ -103,7 +103,7 @@ export default function ProjectDisplayBox( props ) {
           </div>
           <Tooltip 
             className="z-9999" 
-            id={`${id}`}
+            id={`${props.id}`}
             place="right"
             disableStyleInjection="true"
             content={

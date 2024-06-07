@@ -10,6 +10,21 @@ import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./Buttons/BackButton"
 import { REVIEW_STATE } from "../utils/reviewStateMapping"
 
+/**
+ * Component for displaying details for a specific project
+ *
+ * @component
+
+ * 
+ * @example
+    <ProjectPage isLoggedIn={isLoggedIn} userData={userData}/>
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Boolean to determine if use is logged in or not.
+ * @param {object} props.useData - Object that holds Google OAuth user data.
+ * 
+ */
+
 // Display Documents For Project
 export default function ProjectPage( props ) {
 
@@ -30,7 +45,7 @@ export default function ProjectPage( props ) {
 
   const [userPermissionLevel, setUserPermissionLevel] = useState(0);
 
-  // Grab Documents if logged in and userdata
+  // Grab Documents if logged in and userData exists, sets the appropriate states
   useEffect(() => {
 
     async function grabProjectData() {
@@ -74,8 +89,8 @@ export default function ProjectPage( props ) {
 
   }, [project_id, loading, props.isLoggedIn, creatingCommit])
 
+  // Sets up folder tree stack for folders on the page
   useEffect(() => {
-
     function findCommit (x) {
       let foundCommit = null
       for (let i = 0; i < commits.length; i++) {
@@ -128,12 +143,13 @@ export default function ProjectPage( props ) {
 
   }, [commit, setCommit, commits, setCommits, commit_id, commitLoading, loading, props.isLoggedIn, navigate, project_id])
 
+  // Stops commit loading
   useEffect(() => {
     if (commitLoading && (folderStack !== null) && (folderStack[0].commit_id === commit.commit_id))
       setCommitLoading(false)
   }, [folderStack, commitLoading, setCommitLoading, commit])
   
-  // Get Latest Commit Prob optimize later
+  // Get Latest Commit
   useEffect(() => {
     async function getLatestCommitState(project_id){
       const latestCommit = await getLatestCommitForProject(project_id)
@@ -180,6 +196,7 @@ export default function ProjectPage( props ) {
 
   }, [props.userData, project_id, props.isLoggedIn])
 
+  // Component to display all folder boxes
   function FolderDisplayBox({id, name, folder}) {
 
     function handleFolderClick () {
@@ -244,6 +261,7 @@ export default function ProjectPage( props ) {
     )
   }
 
+  // Component to display all document boxes
   function DocumentDisplayBox({id, name, date, seenComments, seenSnapshot}) {
     let str1 = ""
     let str2 = ""
@@ -347,6 +365,7 @@ export default function ProjectPage( props ) {
     )
   }
 
+  // Helper function to sort by name
   function sortByName(a, b) {
     // Convert both names to lowercase to ensure case-insensitive comparison
     const nameA = a.name.toLowerCase();
@@ -361,6 +380,7 @@ export default function ProjectPage( props ) {
     return 0; // names are equal
   }
 
+  // Displays all folders with folder display box
   function DisplayFolderBox() {
     let currentFolder = folderStack[folderStack.length - 1]
     if(currentFolder.content.folders.length !== 0) {
@@ -385,6 +405,7 @@ export default function ProjectPage( props ) {
     }
   }
 
+  // Displays all document with document display box
   function DisplayDocumentBox() {
     let currentFolder = folderStack[folderStack.length - 1]
     if(currentFolder.content.documents.length !== 0) {
@@ -713,7 +734,7 @@ export default function ProjectPage( props ) {
   for (let i = 1; i < folderStack.length; i++) {
     path += `${folderStack[i].name}/`
   }
-
+  
   return (
     <div>
       <h3 className="whitespace-nowrap font-bold text-textcolor text-2xl m-2">{`${projectOwnerEmail}/${projectName}`}</h3>

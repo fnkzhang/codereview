@@ -5,7 +5,33 @@ import { Dropdown, Avatar } from 'flowbite-react';
 import getCookie, { deleteCookie } from "../utils/utils";
 import GitHubStatus from "./GitHub/GitHubStatus";
 
-export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserData, connected, setConnected} ){
+
+
+/**
+ * Google OAuth component to handle user login
+ *
+ * @component
+ * 
+ * @example
+    <Oauth
+      isLoggedIn={isLoggedIn}
+      setIsLoggedIn={setIsLoggedIn}
+      userData={userData}
+      setUserData={setUserData}
+      connected={connected}
+      setConnected={setConnected}
+    />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Boolean to determine if use is logged in or not
+ * @param {Function} props.setIsLoggedIn - State function to set isLoggedIn
+ * @param {object} props.useData - Object holding Google OAuth user data
+ * @param {Function} props.setUserData - State function to set setUserData
+ * @param {boolean} props.connected - Boolean determining if OAuth is connected
+ * @param {Function} props.setConnected - State function to set connected
+ * 
+ */
+export default function Oauth( props ){
 
     const verifyLogin = useCallback(async (credentialResponse) => {
         let oAuthToken = credentialResponse.credential
@@ -27,21 +53,21 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
                 return
             }
             
-            setUserData(data.body)
-            setIsLoggedIn(true)
+            props.setUserData(data.body)
+            props.setIsLoggedIn(true)
             // Save to Cookie
             document.cookie = `cr_id_token=${credentialResponse.credential}; domain=; path=/`;
         })
         .catch(e => console.log(e))
-    }, [setIsLoggedIn, setUserData])
+    }, [props])
 
     // Check If the user token is valid
     useEffect(() => {
-        if (isLoggedIn === false) {
+        if (props.isLoggedIn === false) {
             let credentialToken = getCookie("cr_id_token")
             if (credentialToken === null) {
-                setIsLoggedIn(false)
-                setUserData(null)
+              props.setIsLoggedIn(false)
+                props.setUserData(null)
                 return
             }
 
@@ -52,25 +78,25 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
         }
 
 
-    }, [verifyLogin, isLoggedIn, setIsLoggedIn, setUserData])
+    }, [props, verifyLogin])
 
     // Check if user is valid when userData is returned
     useEffect(() => {
-        if(userData === null)
+        if(props.userData === null)
             return
 
         const x = async () => {
             // Signup user if they are not in database
-            let result = await checkIfUserExists(userData["email"])
+            let result = await checkIfUserExists(props.userData["email"])
 
             if(!result) {
                 console.log("Signing up user because they do not exist in database")
-                signupUser(userData["email"])            
+                signupUser(props.userData["email"])            
             }
         }
         x()
 
-    }, [userData])
+    }, [props.userData])
 
     async function checkIfUserExists(email) {
         let credential = getCookie("cr_id_token")
@@ -116,7 +142,7 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
 
     function displayProfileImage() {
         return (<Avatar
-          img={userData.picture}
+          img={props.userData.picture}
           alt="?"
           className='w-10 h-10 rounded-sm ml-2'/>
         )
@@ -124,12 +150,12 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
 
     function handleLogout() {
         deleteCookie("cr_id_token")
-        setConnected(false)
-        setIsLoggedIn(false)
+        props.setConnected(false)
+        props.setIsLoggedIn(false)
     }
     
 
-    if (isLoggedIn) {
+    if (props.isLoggedIn) {
       return (
         <div className="flex">
         <Dropdown
@@ -140,8 +166,8 @@ export default function Oauth( { isLoggedIn, setIsLoggedIn, userData, setUserDat
           <Dropdown.Item className="bg-background" onClick={handleLogout}>Logout</Dropdown.Item>
           <Dropdown.Item className="bg-background">
             <GitHubStatus
-              connected={connected}
-              setConnected={setConnected}
+              connected={props.connected}
+              setConnected={props.setConnected}
             />
           </Dropdown.Item>
         </Dropdown>
