@@ -3,8 +3,7 @@ import { useNavigate, useParams } from "react-router"
 import { Card, Dropdown } from "flowbite-react"
 import { getAllSnapshotsFromDocument, getAllUsersWithPermissionForProject, getProjectInfo, getFolderTree,
   getCommits, createCommit, approveCommit, setCommitReviewed, 
-  getLatestCommitForProject,
-  setCommitClosed} from "../api/APIUtils"
+  getLatestCommitForProject, setCommitClosed} from "../api/APIUtils"
 import { IsUserAllowedToShare } from "../utils/permissionChecker"
 import CommitDropdown from "./Commits/CommitDropdown"
 import BackButton from "./Buttons/BackButton"
