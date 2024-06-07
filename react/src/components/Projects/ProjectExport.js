@@ -41,6 +41,7 @@ export default function ProjectExport( props ) {
         result = result.body.filter((commit) => commit.date_committed !== null).reverse()
         setCommits(result)
         setCommit(result[0])
+        console.log(result[0])
     }
 
     if (props.isLoggedIn)
@@ -129,13 +130,13 @@ export default function ProjectExport( props ) {
               setCommit={setCommit}
             />
             <div className="mb-3 block">
-              <Label className="text-2xl" value="Repository Name"/>
+              <Label className="text-2xl" htmlFor="repo-name" value="Repository Name"/>
             </div>
-            <TextInput className="text-black shadow-white" placeholder="Name of Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow required/>
+            <TextInput className="text-black shadow-white" id="repo-name" placeholder="Name of Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow required/>
             <div className="mb-3 block">
-              <Label className="text-2xl" value="Branch Name"/>
+              <Label className="text-2xl" htmlFor="branch-name" value="Branch Name"/>
             </div>
-            <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow required/>
+            <TextInput className="text-black shadow-white" id="branch-name" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow required/>
           </div>
 
           {isError ? (<p className="text-red-600 text-xl">Error: Could Not Export Project</p>) : null}
