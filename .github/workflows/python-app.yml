@@ -22,7 +22,7 @@ jobs:
     - name: Create credentials files
       run: | 
         ls -a
-        echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} >> credentials/googlecreds.json
+        echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" >> credentials/googlecreds.json
         ls -a
         cat credentials/googlecreds.json
     - name: Set up Python 3.10
