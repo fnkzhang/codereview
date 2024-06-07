@@ -68,7 +68,7 @@ function CommentModule ( props ) {
     if (commentsLoading === true) {
       fetchData()
     }
-  }, [commentsLoading, props.leftSnapshotId, props.rightSnapshotId, document_id, props.setComments])
+  }, [commentsLoading, props.leftSnapshotId, props.rightSnapshotId, document_id, props.setComments, props])
 
   /**
    * Updates the Comment field when the user edits it
