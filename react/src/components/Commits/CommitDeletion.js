@@ -5,14 +5,29 @@ import { Button, Label, TextInput } from "flowbite-react";
 import { deleteCommit } from "../../api/APIUtils";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * Component for deleting a commit.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <CommitDeletion isLoggedIn={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ */
 export default function CommitDeletion(props) {
-    const commitName = "User Working Commit" // Actual Commit Name to compare
+
+    const commitName = "User Working Commit" // True Commit Name to compare
     const [inputCommitName, setInputCommitName] = useState(""); // Handle Input for commit name
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
     const { project_id, commit_id } = useParams();
     const navigate = useNavigate();
 
+    /**
+     * Handles the click event to delete a commit.
+     */
     const handleDeleteCommitButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 
