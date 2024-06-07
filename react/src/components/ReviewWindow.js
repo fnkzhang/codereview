@@ -51,7 +51,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
     }
 
     fetchData()
-  }, [document_id, left_snapshot_id, right_snapshot_id, project_id, setEditorReady, location.state])
+  }, [project_id, document_id, left_snapshot_id, right_snapshot_id, setEditorReady, location.state])
 
   // 
   useEffect(() => {
@@ -116,7 +116,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
     }
 
     getCommitState(commit_id)
-  }, [commitState])
+  }, [commit_id, commitState])
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 

@@ -5,16 +5,28 @@ import { useNavigate, useParams } from "react-router";
 import { createFolder } from "../../api/APIUtils";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * Component for creating a new folder.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <FolderCreation isLoggedIn={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ */
 export default function FolderCreation( props ) {
 
   const [folderName, setFolderName] = useState("");
   const [working, setWorking] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
-
   const {project_id, commit_id, parent_folder_id} = useParams();
 
-
+  /**
+   * Handles the creation of a new folder.
+   */
   const handleCreateFolder = async (e) =>  {
     e.preventDefault() // Prevent form submission
 

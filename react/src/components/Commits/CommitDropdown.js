@@ -2,6 +2,20 @@ import React from "react";
 import { Dropdown } from "flowbite-react";
 import { truncateString, getColor } from "../../utils/utils";
 
+/**
+ * Component for rendering a dropdown menu of commits.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <CommitDropdown commits={commits} commit={selectedCommit} setCommit={setSelectedCommit} />
+ *
+ * @param {object} props - Component props
+ * @param {array} props.commits - List of commits to display in the dropdown
+ * @param {object} props.commit - Currently selected commit
+ * @param {function} props.setCommit - Function to set the currently selected commit
+ * @param {function} props.setCommitLoading - Function to set loading state for setting the commit
+ */
 export default function CommitDropdown( props ) {
 
   if(props.commits.length !== 0) {

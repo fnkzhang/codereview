@@ -18,6 +18,10 @@ export default function SnapshotSelector({ comments, snapshots, setSnapshots, fi
     useEffect(() => {
         const grabSnapshots = async () => {
           let result = await getAllSnapshotsFromDocument(project_id, document_id)
+          
+          if (result === undefined)
+            return
+
           if (result.success)
             setSnapshots(result.body.reverse())
         }

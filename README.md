@@ -46,7 +46,16 @@ Get your Application Default Credentials set up: https://cloud.google.com/docs/a
 
 Place them in codereview/api-server-flask/api/credentials/googlecreds.json and create a variable in .env called GOOGLE_APPLICATION_CREDENTIALS whose value is credentials/googlecreds.json.
 
+## Setting up Google OAuth 
 
+In order to utilize Google's OAuth services, you will need to obtain the credentials from your Google project.
+
+1. Go to your Google project page.
+2. On the left select API's and Services and then select the credentials sections.
+3. You will then create a new credential and select OAuth Client ID.
+4. Select Web Application for application type, and set a desired name.
+5. Add the URL's that will be allowed to connect to the services such as your localhost url, and your cloud deployment url.
+6. Replace the .flaskenv variables for client secret and id, and you should now be able to authenticate, login, and signup using Google OAuth.
 
 ### How to Setup Cloud SQL
 

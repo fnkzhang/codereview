@@ -5,7 +5,19 @@ import { Button, Label, TextInput } from "flowbite-react";
 import { deleteDocument, getDocumentInfo } from "../../api/APIUtils";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * Component for deleting a document.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <DocumentDeletion isLoggedIn={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ */
 export default function DcoumentDeletion(props) {
+
     const [documentName, setDocumentName] = useState("");
     const [inputDocumentName, setInputDocumentName] = useState("");
     const [isError, setIsError] = useState(false);
@@ -13,6 +25,9 @@ export default function DcoumentDeletion(props) {
     const { project_id, commit_id, document_id } = useParams();
     const navigate = useNavigate();
 
+    /**
+     * Gets the data for the document that is being deleted.
+     */
     useEffect(() => {
         async function getDocumentData() {
             let result = await getDocumentInfo(project_id, commit_id, document_id)
@@ -23,6 +38,9 @@ export default function DcoumentDeletion(props) {
             getDocumentData()
     }, [project_id, commit_id, document_id, props.isLoggedIn])
 
+    /**
+     * Handles the deletion of the document.
+     */
     const handleDeleteDocumentButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 

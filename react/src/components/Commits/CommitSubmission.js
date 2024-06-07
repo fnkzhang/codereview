@@ -5,13 +5,28 @@ import { Button, Label, TextInput } from "flowbite-react";
 import { submitCommit } from "../../api/APIUtils";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * Component for submitting a commit.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <CommitSubmission isLoggedIn={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ */
 export default function CommitSubmission(props) {
+
     const [commitName, setCommitName] = useState(""); // Handle Input for commit name
     const [isError, setIsError] = useState(false);
     const [working, setWorking] = useState(false);
     const { project_id, commit_id } = useParams();
     const navigate = useNavigate();
 
+    /**
+     * Handles the submission of the users working commit.
+     */
     const handleSubmitCommitButtonClick = async (e) => {
         e.preventDefault() // Prevent form submission
 

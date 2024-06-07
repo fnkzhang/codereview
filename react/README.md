@@ -1,70 +1,59 @@
-# Getting Started with Create React App
+# Code Review UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Description
+This react project provides an intuitive way to interact with, and uitlize the functionality implemented by the Flask Backend.
 
-## Available Scripts
+With it, users can import code repositories from GitHub, add and modify files as necessary throughout the code review, and finally export the modified project back to GitHub.
 
-In the project directory, you can run:
+## Features
+- Google Oauth Authentication
+- GitHub Account Connection and Integration
+- Code Review Creation
+- Code Review Collaberation
+- Code Review State Management
+- Code Review Exporting
 
-### `npm start`
+## Screenshots
+![Home Page](../screenshots/homepage.png)
+![Project Page](../screenshots/commitpage.png)
+![Edit Page](../screenshots/editpage.png)
+![Export Page](../screenshots/exportpage.png)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Technologies Used
+- React
+- React Router
+- Tailwind CSS
+- Flowbite Component Library
+- Jest
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project Structure
+codereview/react/<br>
+├── nginx/ # Nginx Config Files<br>
+├── public/ # Static Files<br>
+├── src/ # Source Files<br>
+│   ├── api/ # API Service Files<br>
+│   ├── components/ # Application Components<br>
+│   ├── test/ # Jest Test Files<br>
+│   ├── utils/ # Utility Files<br>
+│   ├── App.js # Main App Compnent<br>
+│   ├── index.css # Index.html Styling Config<br>
+│   ├── index.js # Google Oauth Setup<br>
+├── tailwind.config.json<br>
+└── package.json<br>
 
-### `npm test`
+## Running The UI
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+To ensure that the package build tree is valid, and the packages are correctly installed, use the following command:
 
-### `npm run build`
+    npm install
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Before attempting to run the UI in development mode, it is recommended that the Test scripts are run. To run the provided unit tests use the following command:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    npm test
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+To run the UI in developer mode use the following command:
 
-### `npm run eject`
+    npm start
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+When deploying this project it is recommended not to build the UI natively, and instead utilize docker so it can be more easily supplied to a Google Cloud Run service. For more detailed deployment information, see the [deployment instructions](../README.md).
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

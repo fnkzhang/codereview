@@ -5,6 +5,17 @@ import { useNavigate, useParams } from "react-router";
 import { createDocument } from "../../api/APIUtils";
 import BackButton from "../Buttons/BackButton.js";
 
+/**
+ * Component for creating a new document.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <DocumentCreation isLoggedIn={true} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ */
 export default function DocumentCreation( props ) {
 
   const [documentName, setDocumentName] = useState("");
@@ -13,10 +24,11 @@ export default function DocumentCreation( props ) {
   const [isUploadedFile, setIsUploadedFile] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
-
   const {project_id, commit_id, parent_folder_id} = useParams();
 
-
+  /**
+   * Handles the creation of a new document.
+   */
   const handleCreateDocument = async (e) =>  {
     e.preventDefault() // Prevent form submission
 
@@ -36,7 +48,9 @@ export default function DocumentCreation( props ) {
     }
   }
 
-
+  /**
+   * Handles file upload and sets the document data.
+   */
   const handleFileUpload = async (e) => {
     let fileText;
 
