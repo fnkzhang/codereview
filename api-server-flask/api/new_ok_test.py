@@ -119,145 +119,134 @@ Unit Tests for commentRoutes.py
 """
 
 def test_createComment(client):
-
-    response = client.post("/api/Snapshot/123/comment/create")
-    assert response.status_code == 200
-    assert response.json["success"] == False
-
-    response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
-    assert response.status_code == 200
-    assert response.json["success"] == False
-
-    with patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-        #response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
-        #assert response.status_code == 200
-        #assert response.json["success"] == False
-
-        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, json={})
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
         assert response.status_code == 200
         assert response.json["success"] == False
 
-        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, 
-                               json={
-                                   "author_email": "fake-email@fake-domain.com",
-                                   "reply_to_id": 0,
-                                   "content": "This is a comment",
-                                   "highlight_start_x": 1,
-                                   "highlight_start_y": 1,
-                                   "highlight_end_x": 1,
-                                   "highlight_end_y": 1,
-                                   "is_resolved": False
-                                   })
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=None):
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"})
         assert response.status_code == 200
         assert response.json["success"] == False
 
-        with patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-             patch("commentRoutes.createNewComment", autospec=True, return_value=123):
-            SAME_EMAIL = GOOGLE_FAKE_ID_INFO["email"]
-            DIFFERENT_EMAIL = "fake-email-2@fake-domain.com"
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commentRoutes.getSnapshotProject", autospec=True, return_value=456), \
+         patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=-1):
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, json={
+            "author_email": "author@example.com",
+            "reply_to_id": 0,
+            "content": "This is a comment.",
+            "highlight_start_x": 0,
+            "highlight_start_y": 0,
+            "highlight_end_x": 100,
+            "highlight_end_y": 100,
+            "is_resolved": False
+        })
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-            response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"},
-                                   json={
-                                       "author_email": DIFFERENT_EMAIL,
-                                       "reply_to_id": 0,
-                                       "content": "This is a comment",
-                                       "highlight_start_x": 1,
-                                       "highlight_start_y": 1,
-                                       "highlight_end_x": 1,
-                                       "highlight_end_y": 1,
-                                       "is_resolved": False
-                                       })
-            
-            #body = get_request_body(response)
-            #assert body["author_email"] == GOOGLE_FAKE_ID_INFO["email"]
-            #assert response.status_code == 200
-            #assert response.json["success"] == False
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commentRoutes.getSnapshotProject", autospec=True, return_value=456), \
+         patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+         patch("commentRoutes.createNewComment", autospec=True, return_value=789):
+        response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"}, json={
+            "author_email": "author@example.com",
+            "reply_to_id": 0,
+            "content": "This is a comment.",
+            "highlight_start_x": 0,
+            "highlight_start_y": 0,
+            "highlight_end_x": 100,
+            "highlight_end_y": 100,
+            "is_resolved": False
+        })
 
-            response = client.post("/api/Snapshot/123/comment/create", headers={"Authorization": "oAuthToken"},
-                                   json={
-                                       "author_email": SAME_EMAIL,
-                                       "reply_to_id": 0,
-                                       "content": "This is a comment",
-                                       "highlight_start_x": 1,
-                                       "highlight_start_y": 1,
-                                       "highlight_end_x": 1,
-                                       "highlight_end_y": 1,
-                                       "is_resolved": False
-                                       })
-            assert response.status_code == 200
-            assert response.json["success"] == True
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_resolveComment(client):
-
-    response = client.put("/api/comment/123/resolve")
-    assert response.status_code == 200
-    assert response.json["success"] == False
-
-    response = client.put("/api/comment/123/resolve", headers={"Authorization": "oAuthToken"})
-    assert response.status_code == 200
-    assert response.json["success"] == False
-
-    with patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
-         patch("commentRoutes.getCommentProject", autospec=True, return_value=123):
-
-        response = client.put('/api/comment/123/resolve', headers={"Authorization": "oAuthToken"})
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.put("/api/comment/123/resolve", headers={"Authorization": "oAuthToken"})
         assert response.status_code == 200
         assert response.json["success"] == False
 
-        with patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-             patch("commentRoutes.resolveCommentHelperFunction", autospec=True, return_valu = None):
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=None):
+        response = client.put("/api/comment/123/resolve", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-            response = client.put('/api/comment/123/resolve', headers={"Authorization": "oAuthToken"})
-            assert response.status_code == 200
-            assert response.json["success"] == True
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commentRoutes.getCommentProject", autospec=True, return_value=456), \
+         patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=-1):
+        response = client.put("/api/comment/123/resolve", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commentRoutes.getCommentProject", autospec=True, return_value=456), \
+         patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+         patch("commentRoutes.resolveCommentHelperFunction", autospec=True):
+        response = client.put("/api/comment/123/resolve", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_editComment(client):
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "new content"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    response = client.put("/api/comments/123/edit")
-    assert response.status_code == 200
-    assert response.json["success"] == False
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=None):
+        response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "new content"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"})
-    assert response.status_code == 200
-    assert response.json["success"] == False
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.getCommentProject", autospec=True, return_value=456), \
+         patch("commentRoutes.getCommentInfo", autospec=True, return_value={"author_email": GOOGLE_FAKE_ID_INFO["email"]}), \
+         patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=0):
+        response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "new content"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    with patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-        #response = client.put("/api/comments/123/resolve", headers={"Authorization": "oAuthToken"})
-        #assert response.status_code == 200
-        #assert response.json["success"] == False
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commentRoutes.getCommentProject", autospec=True, return_value=456), \
+         patch("commentRoutes.getCommentInfo", autospec=True, return_value={"author_email": GOOGLE_FAKE_ID_INFO["email"]}), \
+         patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=1), \
+         patch("commentRoutes.Session", autospec=True) as mock_session:
+        
+        mock_session.side_effect = Exception("Database Error")
+        
+        response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "new content"})
+        
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-        with patch("commentRoutes.getCommentProject", autospec=True, return_value=123):
-            response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "This is an edited comment."})
-            assert response.status_code == 200
-            assert response.json["success"] == False
-
-            DIFFERENT_EMAIL = "fake-email-2@fake-domain.com"
-            with patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-                 patch("commentRoutes.getCommentInfo", autospec=True, return_value={"author_email": DIFFERENT_EMAIL}):
-
-                response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "This is an edited comment."})
-                assert response.status_code == 200
-                assert response.json["success"] == False
-
-            with patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-                 patch("commentRoutes.getCommentInfo", autospec=True, return_value={"author_email": GOOGLE_FAKE_ID_INFO["email"]}):
-                    
-                    with patch("commentRoutes.Session", autospec=True) as mock_session_class:
-                        mock_session = MagicMock()
-                        mock_session_class.return_value = mock_session
-                        mock_query = mock_session.query.return_value
-                        mock_update = mock_query.filter_by.return_value.update
-                        mock_commit = mock_session.commit
-
-                        mock_session_class.side_effect = Exception("Fake DB Error")
-                        response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "Updated content"})
-                        assert response.status_code == 200
-                        assert response.json["success"] == False
-
-                        mock_session_class.side_effect = None
-                        response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "Updated content"})
-                        assert response.status_code == 200
-                        assert response.json["success"] == True
+    with patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commentRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commentRoutes.getCommentProject", autospec=True, return_value=456), \
+         patch("commentRoutes.getCommentInfo", autospec=True, return_value={"author_email": GOOGLE_FAKE_ID_INFO["email"]}), \
+         patch("commentRoutes.getUserProjPermissions", autospec=True, return_value=1), \
+         patch("commentRoutes.Session", autospec=True) as mock_session:
+        
+        # Mocking SQLAlchemy session and query
+        mock_query = mock_session.return_value.__enter__.return_value.query.return_value
+        mock_update = mock_query.filter_by.return_value.update
+        
+        response = client.put("/api/comments/123/edit", headers={"Authorization": "oAuthToken"}, json={"content": "new content"})
+        
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_deleteComment(client):
 
@@ -416,31 +405,35 @@ def test_createCommit(client):
         assert response.json["success"] == True
 
 def test_commitCommit(client):
-    
-    response = client.post("/api/Commit/123/commitCommit/")
-    assert response.status_code == 200
-    assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", return_value=False):
+        response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"}, json={"name": "New Commit"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+        assert response.json["reason"] == "Invalid Token Provided"
 
-    response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"})
-    assert response.status_code == 200
-    assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", return_value=True), \
+         patch("commitRoutes.authenticate", return_value=None):
+        response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"}, json={"name": "New Commit"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-        #response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"})
-        #assert response.status_code == 200
-        #assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", return_value=True), \
+         patch("commitRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", return_value={"proj_id": 456}), \
+         patch("commitRoutes.getUserProjPermissions", return_value=1):
+        response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"}, json={"name": "New Commit"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
-            response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"}, json={"name":"Commit Name"})
-            assert response.status_code == 200
-            assert response.json["success"] == False
-
-            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-                 patch("commitRoutes.commitACommit", autospec=True, return_value=True), \
-                 patch("commitRoutes.setCommitOpen", autospec=True, return_value=None):
-                response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"}, json={"name":"Commit Name"})
-                assert response.status_code == 200
-                assert response.json["success"] == True
+    with patch("commitRoutes.isValidRequest", return_value=True), \
+         patch("commitRoutes.authenticate", return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", return_value={"proj_id": 456}), \
+         patch("commitRoutes.getUserProjPermissions", return_value=2), \
+         patch("commitRoutes.commitACommit", return_value=123), \
+         patch("commitRoutes.setCommitOpen") as mock_set_commit_open:
+        response = client.post("/api/Commit/123/commitCommit/", headers={"Authorization": "oAuthToken"}, json={"name": "New Commit"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_setReviewedCommit(client):
     
