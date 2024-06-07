@@ -23,8 +23,8 @@ jobs:
       run: | 
         ls -a
         echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" >> credentials/googlecreds.json
-        ls -a
-        cat credentials/googlecreds.json
+        echo "${{ secrets.GHUB_OATH_CREDENTIALS }}" >> credentials/github_oath_credentials.json
+        echo "${{ secrets.ENV }}" >> .env
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
