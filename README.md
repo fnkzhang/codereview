@@ -115,7 +115,7 @@ Create a github_oath_credentials.json, a json file of format
     
 and place it in api-server-flask/api/credentials.
 
-In codereview/react/src/components/GitHub/GitHubStatus.js, set the variable GitHub_Client_ID to your client-d
+In codereview/react/src/components/GitHub/GitHubStatus.js, set the variable GitHub_Client_ID to your client-id
 
 ## Building Docker Containers and Deploying to Google Cloud
 Go here to install docker for your machine: https://docs.docker.com/engine/install/
