@@ -6,6 +6,7 @@ and allows for comments on highlighted sections of text. Reviewers can propose t
 author can either accept or reject on top of making comment suggestions.
 
 ## Initialization For Development
+
 ### React
 With Node.js installed, move to the react directory folder and perform
 

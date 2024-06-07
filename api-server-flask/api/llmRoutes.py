@@ -34,6 +34,20 @@ def implement_code_changes_from_comment():
             - body (str): The implemented code changes.
 
     """
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided",
+        }
+
+    if authenticate() is None:
+        return {
+            "success": False,
+            "reason": "Failed to Authenticate",
+        }
+
     data = request.get_json()
     code = data.get("code")
     highlighted_code=data.get("highlightedCode")
@@ -96,6 +110,20 @@ def suggest_comment_from_code():
             - body (str): The generated comment suggestion.
 
     """
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided",
+        }
+
+    if authenticate() is None:
+        return {
+            "success": False,
+            "reason": "Failed to Authenticate",
+        }
+
     data = request.get_json()
     code = data.get("code")
     language = data.get("language")

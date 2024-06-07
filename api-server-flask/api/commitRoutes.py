@@ -570,5 +570,3 @@ def getAllLatestCommitComments(proj_id):
                 allcomments.append(comment._asdict())         
         
     return {"success": True, "reason":"", "body": allcomments}
-
-
