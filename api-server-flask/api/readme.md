@@ -10,7 +10,7 @@ It is now running on port 5000.
 
 ### User
 
-A representation of a user. Users can make projects, add and edit documents, and create comments.
+A representation of a user. Users can make projects, add and edit documents, and create comments. Users are created via the signUp route by sending a Google account's credentials, which then uses the Google account's information for our own user data.
 
 user_email (str) : A user's email address
 
