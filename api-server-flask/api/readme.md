@@ -10,7 +10,7 @@ It is now running on port 5000.
 
 ### User
 
-A representation of a user.
+A representation of a user. Users can make projects, add and edit documents, and create comments. Users are created via the signUp route by sending a Google account's credentials, which then uses the Google account's information for our own user data.
 
 user_email (str) : A user's email address
 
@@ -22,7 +22,7 @@ github_token (str) : Github token associated with user
 
 ### Project
 
-A collection of associated files, similar to a Github repository.
+A collection of associated files, similar to a Github repository. Projects can have batch changes created on them, which will allow users to see the evolution of the project over time. When a project is deleted, all associated commits, documents, folders, snapshots, and comments will be deleted.
 
 proj_id (int) : Id of the project
 
@@ -36,7 +36,7 @@ date_created (datetime) : Date the project was created
 
 ### Commit
 
-A representation of batch changes. Changes are private to the author when first created, and must be committed in order for other users to see them.
+A representation of versions of a project, which allow for batch changes to the project. Commits are private to the author when first created, and must be committed in order for other users to see them. Users can have one set of private batch changes in a project at a time. Each commit contains a set of items (folders and documents) which shows the version of the project during that commit. These items can exist through multiple commits, but can have different locations, names, and for documents, contents, on each commit. When a project is first made, a commit is automatically created and committed. The contents of this commit can either be empty, if you just make an empty project, or have the contents of a Github repository, if imported. Each commit has a root folder, which is the top level folder for all the files. This root folder will generally be the same folder throughout the entire project, unless an entirely new commit with no parent is created after the initial commit.
 
 author_email (str) : Author of the changes
 
@@ -62,7 +62,7 @@ approved_count (int) : The amount of reviewers that have approved of the batch c
 
 ### Folder
 
-Representation of a folder item in a filesystem. Can contain other items, such as documents and folders.
+Representation of a folder item in a filesystem. Can contain other items, such as documents and folders. In order to determine what folders items belong to in each, they have a parent_folder variable in ItemCommitLocation. All folders outside of root folders must exist in another folder to be accessed properly.
 
 folder_id (int) : Id of the folder
 
@@ -76,7 +76,7 @@ date_created (datetime) : Date the folder was created
 
 ### Document
 
-Representation of a document item in a filesystem. Documents can have different associated snapshots on different commits, which allow for version control.
+Representation of a document item in a filesystem. Documents can have different associated snapshots on different commits, which allow for version control. Documents must exist within a folder to be accessed properly.
 
 doc_id (int) : Id of the document
 
@@ -92,7 +92,7 @@ is_reviewed (bool) : Whether or not the document has been reviewed
 
 ### Snapshot
 
-Representation of a version of a document. Id is associated with a blob on Google Buckets which contains the contents of the snapshot. Multiple snapshots can be associated with the same document, but for each specific commit, there is a 1-1 relationship between a document and a snapshot.
+Representation of a version of a document. These are what actually are connected to the contents found in uploaded or imported files. Id is associated with a blob on Google Buckets which contains the contents of the snapshot. Multiple snapshots can be associated with the same document, but for each specific commit, there is a 1-1 relationship between a document and a snapshot. Snapshots can generally be made only on a user's working (or private) commit, and when a snapshot is created, it overrides the previous snapshot relation between the document and the commit. 
 
 snapshot_id (int) : Id of the snapshot
 
@@ -106,7 +106,7 @@ date_created (datetime) : Date the snapshot was created
 
 ### Comment
 
-Representation of a comment. Comments are associated with specific snapshots, and are also associated with a specific location on that snapshot. They're basically Google Docs comments. Comments can also be resolved, signifying that the issue described in the comment is no longer relevant.
+Representation of a comment. Comments are associated with specific snapshots, and are also associated with a specific location on that snapshot. They're basically Google Docs comments. Comments can also be resolved, signifying that the issue described in the comment is no longer relevant. Each comment also tracks its author, which allows for users to resolve comments properly. Comments, through the frontend, can also be used to create an LLM suggestion.
 
 author_email (str) : Creator of the comment
 
@@ -134,7 +134,7 @@ is_resolved (bool) : Whether or not the comment is resolved
 
 ### UserProjRelation
 
-The relation betweeen a user and a project. The permissions value dictates what actions a user can make on a project. Note that currently the frontend does not utilize any of these, and only uses permission levels 3 and 5.
+The relation betweeen a user and a project. The permissions value dictates what actions a user can make on a project. Note that currently the frontend does not utilize any of these, and only uses permission levels 3 and 5. In most routes, the relation between the user and project is checked so that only users with valid permissions can enact the route action.
 
 user_email (str) : The user in the relationship
 
@@ -153,7 +153,7 @@ permissions (int) : The level of permissions a user has in a project.
 
 ### ItemCommitLocation
 
-Where an item (folder or document) is located within a commit. This allows tracking of the movement and renaming of items across different commits.
+Where an item (folder or document) is located within a commit. This allows tracking of the movement and renaming of items across different commits. If an ItemCommitLocation does not exist for an item on a commit, it is treated as if it does not exist on a commit.
 
 item_id (int) : Id of the item
 
@@ -167,7 +167,7 @@ is_folder (bool) : Whether or not the item is a folder or not. True for folder, 
 
 ### CommitDocumentSnapshotRelation
 
-What version (snapshot) a document was associated with during a specific comment.
+What version (snapshot) a document was associated with during a specific commit. These are used to access the correct snapshots of documents. A CommitDocumentSnapshotRelation must exist for every document that has an ItemCommitLocation. 
 
 doc_id (int) : Id of the document
 
@@ -177,7 +177,7 @@ snapshot_id (int) : Id of the snapshot
 
 ### UserUnseenSnapshot
 
-If this exists within the database, it means that the user has not seen the specific snapshot. Only populated when the user is added to the project the snapshot is located in.
+If this exists within the database, it means that the user has not seen the specific snapshot. Only populated when the user is added to the project the snapshot is located in. When a new snapshot is created, a UserUnseenSnapshot for that snapshot is created for every user that has permissions for project. When a new user is added, a UserUnseenSnapshot is created for every snapshot for them.
 
 snapshot_id (int) : Id of the snapshot
 
@@ -185,7 +185,7 @@ user_email (str) : Email of the user
 
 ### UserUnseenComment
 
-If this exists within the database, it means that the user has not seen the specific comment. Only populated when the user is added to the project the comment is located in.
+If this exists within the database, it means that the user has not seen the specific comment. Only populated when the user is added to the project the comment is located in. When a new comment is created, a UserUnseenComment for that comment is created for every user that has permissions for project. When a new user is added, a UserUnseenComment is created for every comment for them.
 
 comment_id (int) : Id of the comment
 

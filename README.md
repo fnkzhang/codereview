@@ -135,7 +135,7 @@
 
     Once you are ready, clicking on export will push all your changes into the Github repository branch.
     **Note** It will take some time to finish exporting, the page will redirect you back home after it is done exporting.
-    
+
 ## Initialization For Development
 
 ### React
@@ -177,7 +177,7 @@
 
     Place them in codereview/api-server-flask/api/credentials/googlecreds.json and create a variable in .env called GOOGLE_APPLICATION_CREDENTIALS whose value is credentials/googlecreds.json.
 
-## Setting up Google OAuth 
+### Setting up Google OAuth 
 
     In order to utilize Google's OAuth services, you will need to obtain the credentials from your Google project.
 
@@ -207,6 +207,10 @@
         .\cloud-sql-proxy.exe --address 0.0.0.0 --port 5000 (YourProjectID):(YourRegion):(YourDatabaseName)
 
     Now, you can communicated with cloud sql from your port 5000 which is the port our Backend API runs.
+
+### Setting up Google Gemini
+
+    Follow instructions at this link https://cloud.google.com/vertex-ai/docs/start/cloud-environment
 
 ### How to Setup Google Buckets
     Go to https://console.cloud.google.com/storage/ and select your project for the app. Click on create bucket.
@@ -246,7 +250,7 @@
         
     and place it in api-server-flask/api/credentials.
 
-    In codereview/react/src/components/GitHub/GitHubStatus.js, set the variable GitHub_Client_ID to your client-d
+In codereview/react/src/components/GitHub/GitHubStatus.js, set the variable GitHub_Client_ID to your client-id
 
 ## Building Docker Containers and Deploying to Google Cloud
     Go here to install docker for your machine: https://docs.docker.com/engine/install/

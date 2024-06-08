@@ -463,52 +463,69 @@ def test_setReviewedCommit(client):
         assert response.json["success"] == True
 
 
-#def test_closeCommit(client):
-#    response = client.get("/api/Commit/123/close/")
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+def test_closeCommit(client):
+    response = client.get("/api/Commit/123/close/")
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-#    response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+    response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
+    assert response.status_code == 200
+    assert response.json["success"] == False
 
-#    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-#        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
-#            response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
-#            assert response.status_code == 200
-#            assert response.json["success"] == False
+    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=-1):
+        
+        response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
-#                 patch("commitRoutes.setCommitClosed", autospec=True, return_value=True):
-#                response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
-#                assert response.status_code == 200
-#                assert response.json["success"] == True
+    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+         patch("commitRoutes.setCommitClosed", autospec=True, return_value=True):
+        
+        response = client.get("/api/Commit/123/close/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
-#def test_approveCommit(client):
-#    response = client.get("/api/Commit/123/approve/")
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+def test_approveCommit(client):
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.get("/api/Commit/1/approve/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#    response = client.get("/api/Commit/123/approve/", headers={"Authorization": "oAuthToken"})
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commitRoutes.authenticate", autospec=True, return_value=None):
+        response = client.get("/api/Commit/1/approve/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-#        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
-#            response = client.get("/api/Commit/123/approve/", headers={"Authorization": "oAuthToken"})
-#            assert response.status_code == 200
-#            assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 123}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=-1):
+        response = client.get("/api/Commit/1/approve/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5):
-#                with patch("commitRoutes.setCommitApproved", autospec=True, return_value=False):
-#                    response = client.get("/api/Commit/123/approve/", headers={"Authorization": "oAuthToken"})
-#                    assert response.status_code == 200
-#                    assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 123}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+         patch("commitRoutes.setCommitApproved", autospec=True, return_value=False):
+        response = client.get("/api/Commit/1/approve/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#                with patch("commitRoutes.setCommitApproved", autospec=True, return_value=True):
-#                    response = client.get("/api/Commit/123/approve/", headers={"Authorization": "oAuthToken"})
-#                    assert response.status_code == 200
-#                    assert response.json["success"] == True
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 123}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+         patch("commitRoutes.setCommitApproved", autospec=True, return_value=True):
+        response = client.get("/api/Commit/1/approve/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_deleteWorkingCommit(client):
     response = client.delete("/api/Commit/123/workingCommit/")
@@ -551,27 +568,34 @@ def test_deleteWorkingCommit(client):
                 assert response.status_code == 200
                 assert response.json["success"] == True
 
-#def test_getCommitFolderTree(client):
+def test_getCommitFolderTree(client):
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.get("/api/Commit/1/getFolderTree/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#    response = client.get("/api/Commit/123/getFolderTree/")
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commitRoutes.authenticate", autospec=True, return_value=None):
+        response = client.get("/api/Commit/1/getFolderTree/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#    response = client.get("/api/Commit/123/getFolderTree/", headers={"Authorization": "oAuthToken"})
-#    assert response.status_code == 200
-#    assert response.json["success"] == False
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 123}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=-1):
+        response = client.get("/api/Commit/1/getFolderTree/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-#    with patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO):
-#        with patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 456}):
-#            response = client.get("/api/Commit/123/getFolderTree/", headers={"Authorization": "oAuthToken"})
-#            assert response.status_code == 200
-#            assert response.json["success"] == False
-
-#            with patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=5):
-#                with patch("commitRoutes.getCommitTreeWithAddons", autospec=True, return_value="treeDict"):
-#                    response = client.get("/api/Commit/123/getFolderTree/", headers={"Authorization": "oAuthToken"})
-#                    assert response.status_code == 200
-#                    assert response.json["success"] == True
+    with patch("commitRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("commitRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("commitRoutes.getCommitInfo", autospec=True, return_value={"proj_id": 123}), \
+         patch("commitRoutes.getUserProjPermissions", autospec=True, return_value=0), \
+         patch("commitRoutes.getCommitTreeWithAddons", autospec=True, return_value={"folders": [], "documents": []}):
+        response = client.get("/api/Commit/1/getFolderTree/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_getUserWorkingCommitForProject(client):
     response = client.get("/api/Commit/123/workingCommit")
@@ -1138,58 +1162,72 @@ Unit Tests for githubRoutesRoutes.py
 """
 
 def test_getUserGithubStatus(client):
-    
-    # Invalid Requests
+    with patch("githubRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.get("/api/Github/userHasGithub/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("githubRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("githubRoutes.authenticate", autospec=True, return_value=None):
+        response = client.get("/api/Github/userHasGithub/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("githubRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("githubRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("githubRoutes.getUserInfo", autospec=True, return_value=None):
+        response = client.get("/api/Github/userHasGithub/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("githubRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("githubRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("githubRoutes.getUserInfo", autospec=True, return_value={"email": "user@example.com", "github_token": None}):
+        response = client.get("/api/Github/userHasGithub/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success:"] == True
+
+    with patch("githubRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("githubRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("githubRoutes.getUserInfo", autospec=True, return_value={"email": "user@example.com", "github_token": "githubToken"}), \
+         patch("githubRoutes.Github", autospec=True):
+        response = client.get("/api/Github/userHasGithub/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success:"] == True
 
 def test_addGithubToken(client):
     
-    # Invalid Requests
-
-    # Valid Requests
+    # needs unit testing
 
     pass
 
 def test_getGithubRepositoryBranches(client):
     
-    # Invalid Requests
-
-    # Valid Requests
+    # needs unit testing
 
     pass
 
 def test_pullToNewProject(client):
     
-    # Invalid Requests
-
-    # Valid Requests
+    # needs unit testing
 
     pass
 
 def test_pullToExistingProject(client):
     
-    # Invalid Requests
-
-    # Valid Requests
+    # needs unit testing
 
     pass
 
 def test_pushToNewBranch(client):
     
-    # Invalid Requests
-
-    # Valid Requests
+    # needs unit testing
 
     pass
 
 def test_pushToExistingBranch(client):
     
-    # Invalid Requests
-
-    # Valid Requests
+    # needs unit testing
 
     pass
 
@@ -1616,49 +1654,112 @@ Unit Tests for userAndPermissionsRoutes.py
 """
 
 def test_getAllUserProjects(client):
-    
-    # Invalid Requests
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.get("/api/User/Project/")
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=None):
+        response = client.get("/api/User/Project/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getAllUserProjPermissionsForUser", autospec=True, return_value=-1):
+        response = client.get("/api/User/Project/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["projects"] == None
+
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getAllUserProjPermissionsForUser", autospec=True, return_value=[{"proj_id": 1}, {"proj_id": 2}]), \
+         patch("userAndPermissionsRoutes.getProjectInfo", autospec=True, side_effect=[{"project_id": 1, "name": "Project 1"}, {"project_id": 2, "name": "Project 2"}]):
+        response = client.get("/api/User/Project/", headers={"Authorization": "oAuthToken"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_addUser(client):
     
-    # Invalid Requests
-
-    # Valid Requests
+    # needs unit testing
 
     pass
 
 def test_transferProjectOwnership(client):
-    
-    # Invalid Requests
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.post("/api/Project/1/transferOwnership/", json={"email": "newowner@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=None):
+        response = client.post("/api/Project/1/transferOwnership/", headers={"Authorization": "oAuthToken"}, json={"email": "newowner@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getUserInfo", autospec=True, return_value=None):
+        response = client.post("/api/Project/1/transferOwnership/", headers={"Authorization": "oAuthToken"}, json={"email": "nonexistent@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-def test_addUserAdmin(client):
-    
-    # Invalid Requests
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getUserInfo", autospec=True, return_value={"email": "currentowner@example.com"}), \
+         patch("userAndPermissionsRoutes.getUserProjPermissions", autospec=True, return_value=3):
+        response = client.post("/api/Project/1/transferOwnership/", headers={"Authorization": "oAuthToken"}, json={"email": "newowner@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
-
-    pass
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getUserInfo", autospec=True, return_value={"email": "currentowner@example.com"}), \
+         patch("userAndPermissionsRoutes.getUserProjPermissions", autospec=True, return_value=5), \
+         patch("userAndPermissionsRoutes.changeProjectOwner", autospec=True, return_value=True):
+        response = client.post("/api/Project/1/transferOwnership/", headers={"Authorization": "oAuthToken"}, json={"email": "newowner@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_removeUser(client):
-        
-    # Invalid Requests
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=False):
+        response = client.delete("/api/Project/1/removeUser/", json={"email": "user@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    # Valid Requests
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=None):
+        response = client.delete("/api/Project/1/removeUser/", headers={"Authorization": "oAuthToken"}, json={"email": "user@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
 
-    pass
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getUserProjPermissions", autospec=True, return_value=2):
+        response = client.delete("/api/Project/1/removeUser/", headers={"Authorization": "oAuthToken"}, json={"email": "user@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getUserProjPermissions", autospec=True, return_value=3), \
+         patch("userAndPermissionsRoutes.getUserProjPermissions", autospec=True, return_value=5):
+        response = client.delete("/api/Project/1/removeUser/", headers={"Authorization": "oAuthToken"}, json={"email": "user@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == False
+
+    with patch("userAndPermissionsRoutes.isValidRequest", autospec=True, return_value=True), \
+         patch("userAndPermissionsRoutes.authenticate", autospec=True, return_value=GOOGLE_FAKE_ID_INFO), \
+         patch("userAndPermissionsRoutes.getUserProjPermissions", autospec=True, return_value=3), \
+         patch("userAndPermissionsRoutes.getUserProjPermissions", autospec=True, return_value=4), \
+         patch("userAndPermissionsRoutes.deleteUser", autospec=True):
+        response = client.delete("/api/Project/1/removeUser/", headers={"Authorization": "oAuthToken"}, json={"email": "user@example.com"})
+        assert response.status_code == 200
+        assert response.json["success"] == True
 
 def test_getUsersWithAccessToProject(client):
-    
-    # Invalid Requests
 
-    # Valid Requests
+    # needs unit testing
 
     pass
