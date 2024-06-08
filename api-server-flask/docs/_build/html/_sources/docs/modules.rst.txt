@@ -19,4 +19,5 @@ api
    projectRoutes
    reviewStateEnums
    snapshotRoutes
+   testRoutes
    userAndPermissionsRoutes

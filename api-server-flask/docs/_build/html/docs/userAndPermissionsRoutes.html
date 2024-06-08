@@ -35,16 +35,17 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="userAndPermissionsRoutes.addUser">
 <span class="sig-prename descclassname"><span class="pre">userAndPermissionsRoutes.</span></span><span class="sig-name descname"><span class="pre">addUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsRoutes.addUser" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Project/&lt;proj_id&gt;/addUser/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Adds a user to a project with the given permission level. Will update the permission level if they are already on the project. Enforces permissions through credentials given in Authorization header. User's permissions must be higher than or equal the level they are giving</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
+<li><p>proj_id (int): the id of the project</p></li>
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
+<li><p>email (str): email of the user being added</p></li>
+<li><p>role (str): name of the role they're being given</p></li>
+<li><p>permissions (int): level of permissions they're being given</p></li>
 </ul>
 </dd>
 </dl>
@@ -53,40 +54,8 @@
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
 <dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
-</ul>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="userAndPermissionsRoutes.addUserAdmin">
-<span class="sig-prename descclassname"><span class="pre">userAndPermissionsRoutes.</span></span><span class="sig-name descname"><span class="pre">addUserAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsRoutes.addUserAdmin" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
-<dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
-</dd>
-<dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
-<li><dl class="simple">
-<dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-<dt><strong>Returns:</strong></dt><dd><dl class="simple">
-<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
 </ul>
 </dd>
 </dl>
@@ -97,27 +66,17 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="userAndPermissionsRoutes.getAllUserProjects">
 <span class="sig-prename descclassname"><span class="pre">userAndPermissionsRoutes.</span></span><span class="sig-name descname"><span class="pre">getAllUserProjects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsRoutes.getAllUserProjects" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/User/Project/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all projects the user has access to</p>
 </dd>
-<dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
-<li><dl class="simple">
-<dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
+<dt><strong>Args:</strong></dt><dd><p>Requires credentials of the user in the Authorization header</p>
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
 <dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (list): List of the projects as dicts</p></li>
 </ul>
 </dd>
 </dl>
@@ -128,58 +87,19 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="userAndPermissionsRoutes.getUsersWithAccessToProject">
 <span class="sig-prename descclassname"><span class="pre">userAndPermissionsRoutes.</span></span><span class="sig-name descname"><span class="pre">getUsersWithAccessToProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsRoutes.getUsersWithAccessToProject" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/Project/&lt;proj_id&gt;/Users/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all users that have access to the project</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
-<li><dl class="simple">
-<dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
-</ul>
-</dd>
-</dl>
-</li>
+<li><p>proj_id (int): the id of the project</p></li>
 </ul>
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
 <dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
-</ul>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="userAndPermissionsRoutes.importPermissions">
-<span class="sig-prename descclassname"><span class="pre">userAndPermissionsRoutes.</span></span><span class="sig-name descname"><span class="pre">importPermissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsRoutes.importPermissions" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
-<dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
-</dd>
-<dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
-<li><dl class="simple">
-<dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-<dt><strong>Returns:</strong></dt><dd><dl class="simple">
-<dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
+<li><p>body (list): List of the users as dicts</p></li>
 </ul>
 </dd>
 </dl>
@@ -190,16 +110,15 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="userAndPermissionsRoutes.removeUser">
 <span class="sig-prename descclassname"><span class="pre">userAndPermissionsRoutes.</span></span><span class="sig-name descname"><span class="pre">removeUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsRoutes.removeUser" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/Project/&lt;proj_id&gt;/removeUser/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Removes a user from the project. Enforces permissions through credentials given in Authorization header.</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
+<li><p>proj_id (int): the id of the project</p></li>
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
+<li><p>email (str): email of the user being added</p></li>
 </ul>
 </dd>
 </dl>
@@ -208,9 +127,8 @@
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
 <dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
 </ul>
 </dd>
 </dl>
@@ -221,16 +139,15 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="userAndPermissionsRoutes.transferProjectOwnership">
 <span class="sig-prename descclassname"><span class="pre">userAndPermissionsRoutes.</span></span><span class="sig-name descname"><span class="pre">transferProjectOwnership</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsRoutes.transferProjectOwnership" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: Documentation</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;POST/GET/UPDATE/DELETE&gt;</span> <span class="pre">/api</span></code></p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/Project/&lt;proj_id&gt;/transferOwnership/</span></code></p>
 <dl class="simple">
-<dt><strong>Explanation:</strong></dt><dd><p>&lt;insert_explanation_here&gt;</p>
+<dt><strong>Explanation:</strong></dt><dd><p>Transfers ownership to the given user. Enforces permissions through credentials given in Authorization header. User must be owner already</p>
 </dd>
 <dt><strong>Args:</strong></dt><dd><ul class="simple">
-<li><p>route_params (&lt;param_type&gt;): description</p></li>
+<li><p>proj_id (int): the id of the project</p></li>
 <li><dl class="simple">
 <dt>request.body (dict):</dt><dd><ul>
-<li><p>body_params (&lt;param_type&gt;): description</p></li>
+<li><p>email (str): email of the user being added</p></li>
 </ul>
 </dd>
 </dl>
@@ -239,9 +156,8 @@
 </dd>
 <dt><strong>Returns:</strong></dt><dd><dl class="simple">
 <dt>A dictionary containing the following keys:</dt><dd><ul class="simple">
-<li><p>success (bool): description</p></li>
-<li><p>reason (str): description</p></li>
-<li><p>body (&lt;body_type&gt;): &lt;body_contents&gt;</p></li>
+<li><p>success (bool): Indicates whether the operation was successful.</p></li>
+<li><p>reason (str): Description of the success or failure reason.</p></li>
 </ul>
 </dd>
 </dl>

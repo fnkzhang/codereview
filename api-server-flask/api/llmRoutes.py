@@ -8,29 +8,6 @@ from utils.llmUtils import *
 init_llm()
 
 
-@app.route('/api/fake-route', methods=["POST"])
-def fake_route():
-    """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
-
-    **Explanation:**
-        <insert_explanation_here>
-
-    **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
-
-    **Returns:**
-        A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
-    """
-    pass
-
 # EXAMPLE:
 # curl -X POST http://127.0.0.1:5000/api/llm/code-implementation -H 'Content-Type: application/json' -d '{"code": "def aTwo(num):\n    return num+2;\n\nprint(aTwo(2))", "highlighted_code": "def aTwo(num):\n    return num+2;", "startLine": 1, "endLine": 2, "comment": "change the function to snake case, add type hints, remove the unnecessary semicolon, and create a more meaningful function name that accurately describes the behavior of the function.", "language": "Python"}'
 @app.route("/api/llm/code-implementation", methods=["POST"])
@@ -57,6 +34,20 @@ def implement_code_changes_from_comment():
             - body (str): The implemented code changes.
 
     """
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided",
+        }
+
+    if authenticate() is None:
+        return {
+            "success": False,
+            "reason": "Failed to Authenticate",
+        }
+
     data = request.get_json()
     code = data.get("code")
     highlighted_code=data.get("highlightedCode")
@@ -119,6 +110,20 @@ def suggest_comment_from_code():
             - body (str): The generated comment suggestion.
 
     """
+    headers = request.headers
+
+    if not isValidRequest(headers, ["Authorization"]):
+        return {
+            "success": False,
+            "reason": "Invalid Token Provided",
+        }
+
+    if authenticate() is None:
+        return {
+            "success": False,
+            "reason": "Failed to Authenticate",
+        }
+
     data = request.get_json()
     code = data.get("code")
     language = data.get("language")

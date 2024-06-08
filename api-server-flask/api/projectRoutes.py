@@ -15,23 +15,19 @@ import models
 @app.route('/api/Project/<proj_id>/', methods = ["GET"])
 def getProject(proj_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``GET /api/Project/<proj_id>/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Gets information about the project of the id. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): Id of the project you're getting
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): A Project object in the form of a dict
 
     """
     headers = request.headers
@@ -68,23 +64,20 @@ def getProject(proj_id):
 @app.route('/api/Project/createProject/', methods = ["POST"])
 def createProject():
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``POST /api/Project/createProject/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Creates a project.
 
     **Args:**
-        - route_params (<param_type>): description
         - request.body (dict):
-            - body_params (<param_type>): description
+            - project_name (str): The name of the project
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (int): the id of the newly created project
 
     """
     headers = request.headers
@@ -113,23 +106,18 @@ def createProject():
 @app.route('/api/Project/<proj_id>/', methods=["DELETE"])
 def deleteProject(proj_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``DELETE /api/Project/<proj_id>/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Deletes a project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project you're deleting
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Whether or not the request succeeded
+            - reason (str): If the request failed, the error
 
     """
     # Authentication
@@ -166,23 +154,20 @@ def deleteProject(proj_id):
 @app.route('/api/Project/<proj_id>/rename/', methods=["POST"])
 def renameProject(proj_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``POST /api/Project/<proj_id>/rename/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Renames a project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
-        - route_params (<param_type>): description
+        - proj_id (int): id of the project you're renaming
         - request.body (dict):
-            - body_params (<param_type>): description
+            - proj_name (str): new name for the project
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
 
     """
     # Authentication
@@ -225,23 +210,19 @@ def renameProject(proj_id):
 @app.route('/api/Project/<proj_id>/GetCommits/', methods = ["GET"])
 def getProjectCommittedCommits(proj_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``GET /api/Project/<proj_id>/GetCommits/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Get all of the project's committed commits. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (list): A list of Commit objects as dicts
 
     """
     headers = request.headers
@@ -274,23 +255,19 @@ def getProjectCommittedCommits(proj_id):
 @app.route('/api/Project/<proj_id>/GetLatestCommit/', methods = ["GET"])
 def getProjectLatestCommit(proj_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``GET /api/Project/<proj_id>/GetLatestCommit/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Get the latest committed commit of the project. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (dict): A Commit object in the form of a dict
 
     """
     headers = request.headers
@@ -323,51 +300,3 @@ def getProjectLatestCommit(proj_id):
         "reason": "",
         "body": latestCommit
     }
-#discontinued for now
-@app.route('/api/Project/<proj_id>/GetDocuments/', methods = ["GET"])
-def getProjectDocuments(proj_id):
-    """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
-
-    **Explanation:**
-        <insert_explanation_here>
-
-    **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
-
-    **Returns:**
-        A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
-
-    """
-    headers = request.headers
-    if not isValidRequest(headers, ["Authorization"]):
-        return {
-                "success":False,
-                "reason": "Invalid Token Provided"
-        }
-
-    idInfo = authenticate()
-    if idInfo is None:
-        return {
-            "success":False,
-            "reason": "Failed to Authenticate"
-        }
-
-    if(getUserProjPermissions(idInfo["email"], proj_id) < 0):
-        return {"success": False, "reason":"Invalid Permissions", "body":{}}
-
-
-    arrayOfDocuments = getAllProjectDocuments(proj_id)
-    return {
-        "success": True,
-        "reason": "",
-        "body": arrayOfDocuments
-    }
-

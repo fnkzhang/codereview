@@ -5,8 +5,37 @@ import React, { useState, useRef, useEffect} from 'react';
 import { useParams, useLocation } from 'react-router';
 import { REVIEW_STATE } from "../utils/reviewStateMapping";
 
-export default function ReviewWindow({ comments, setComments, userData, hasUpdatedCode,
-   setHasUpdatedCode, setDataToUpload, editorReady, setEditorReady, editorLanguage}) {
+
+/**
+ * Component for a review window that displays the editors and the difference between the code
+ *
+ * @component
+ * 
+ * @example
+  <ReviewWindow
+    comments={comments}
+    setComments={setComments}
+    userData={props.userData}
+    latestSnapshotData={snapshots[snapshots.length - 1]}
+    editorReady={editorReady}
+    setEditorReady={setEditorReady}
+    setHasUpdatedCode={setHasUpdatedCode}
+    setDataToUpload={setDataToUpload}
+    editorLanguage={editorLanguage}
+    />
+ *
+ * @param {object} props - Component props
+ * @param {Array} props.comments - Array of all comments for project to display
+ * @param {Function} props.setComments - Function to set value of comments
+ * @param {object} props.userData - Object that holds user data
+ * @param {object} props.latestSnapshotData - Object that holds data for newest snapshot version
+ * @param {boolean} props.editorReady - Boolean to determine if the editor is ready to display 
+ * @param {Function} props.setEditorReady - Function to set editor ready
+ * @param {boolean} props.setHasUpdatedCode - Boolean to see if user as edited code in editor
+ * @param {Function} props.setDataToUpload - Function to set the code that will be uploaded
+ * @param {string} props.editorLanguage - String that holds the editor's language
+ */
+export default function ReviewWindow( props ) {
   const monacoRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -32,7 +61,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
   // Get Code for the 2 editors
   useEffect(() => {
     const fetchData = async () => {
-      setEditorReady(false)
+      props.setEditorReady(false)
       setEditorLoading(true)
       try {
         const [left_doc, right_doc] = await Promise.all([
@@ -51,7 +80,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
     }
 
     fetchData()
-  }, [document_id, left_snapshot_id, right_snapshot_id, project_id, setEditorReady, location.state])
+  }, [project_id, document_id, left_snapshot_id, right_snapshot_id, props.setEditorReady, location.state])
 
   // 
   useEffect(() => {
@@ -71,7 +100,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
       originalEditor.onDidChangeCursorSelection(handleSelectionChange(originalEditor, left_snapshot_id));
       modifiedEditor.onDidChangeCursorSelection(handleSelectionChange(modifiedEditor, right_snapshot_id));
     }
-  }, [ editorRef, left_snapshot_id, right_snapshot_id, editorReady, initialUpdatedCode, setDataToUpload ])
+  }, [ editorRef, left_snapshot_id, right_snapshot_id, props.editorReady, initialUpdatedCode, props.setDataToUpload ])
 
 
   // Handle Code Edit Detection For New Snapshot Creation
@@ -84,10 +113,10 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
 
       if(initialUpdatedCode !== updatedCode) {
         console.log("Code Not Same as Initial")
-        setHasUpdatedCode(true)
-        setDataToUpload(updatedCode)
+        props.setHasUpdatedCode(true)
+        props.setDataToUpload(updatedCode)
       } else {
-        setHasUpdatedCode(false)
+        props.setHasUpdatedCode(false)
       }
       
       return 
@@ -95,10 +124,10 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
 
     console.log("Code Not Same as Initial")
     // No matching length and is different
-    setHasUpdatedCode(true)
-    setDataToUpload(updatedCode)
+    props.setHasUpdatedCode(true)
+    props.setDataToUpload(updatedCode)
 
-  }, [updatedCode, initialUpdatedCode, setDataToUpload, setHasUpdatedCode])
+  }, [updatedCode, initialUpdatedCode, props.setDataToUpload, props.setHasUpdatedCode])
 
   // Set Set Commit State
   useEffect(() => {
@@ -116,7 +145,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
     }
 
     getCommitState(commit_id)
-  }, [commitState])
+  }, [commit_id, commitState])
 
   function lineJump(snapshotID, highlightStartX, highlightStartY, highlightEndX, highlightEndY) {
 
@@ -200,10 +229,10 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
               rightSnapshotId={Number(right_snapshot_id)}
               start={currentHighlightStart}
               end={currentHighlightEnd}
-              comments={comments}
-              setComments={setComments}
-              userData={userData}
-              editorLanguage={editorLanguage}
+              comments={props.comments}
+              setComments={props.setComments}
+              userData={props.userData}
+              editorLanguage={props.editorLanguage}
               editorCode={updatedCode}
               checkIfCanGetLLMCode={checkIfCanGetLLMCode}
               getHighlightedCode={getHighlightedCode}
@@ -224,8 +253,8 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
             className="Monaco-editor"
             original={initialCode}
             modified={updatedCode}
-            originalLanguage={editorLanguage}
-            modifiedLanguage={editorLanguage}
+            originalLanguage={props.editorLanguage}
+            modifiedLanguage={props.editorLanguage}
             onMount={(editor, monaco) => {
               // Set Value Because Editor Changes length of the Document after mounting
               setCode(editor.getModifiedEditor().getValue())
@@ -249,7 +278,7 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
 
               editor.onDidUpdateDiff(onChangeHandler);
 
-              setEditorReady(true)
+              props.setEditorReady(true)
             }}
           />
         </div>
@@ -261,12 +290,12 @@ export default function ReviewWindow({ comments, setComments, userData, hasUpdat
             rightSnapshotId={Number(right_snapshot_id)}
             start={currentHighlightStart}
             end={currentHighlightEnd}
-            comments={comments}
-            setComments={setComments}
-            userData={userData}
-            editorLanguage={editorLanguage}
+            comments={props.comments}
+            setComments={props.setComments}
+            userData={props.userData}
+            editorLanguage={props.editorLanguage}
             editorCode={updatedCode}
-            hasUpdatedCode={hasUpdatedCode}
+            hasUpdatedCode={props.hasUpdatedCode}
             checkIfCanGetLLMCode={checkIfCanGetLLMCode}
             getHighlightedCode={getHighlightedCode}
             updateHighlightedCode={updateHighlightedCode}

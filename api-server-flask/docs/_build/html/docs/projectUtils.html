@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>projectUtils module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-projectUtils">
+<span id="projectutils-module"></span><h1>projectUtils module<a class="headerlink" href="#module-projectUtils" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.createNewProject">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">createNewProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.createNewProject" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a new project with an initial committed commit</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_name (str): name of the project
+-owner (str): email of the creator of the project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-pid (int): id of the newly created project</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.getAllCommittedProjectCommitsInOrder">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">getAllCommittedProjectCommitsInOrder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.getAllCommittedProjectCommitsInOrder" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all of the projects's commited commits in order of when they were committed</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-listOfCommits (list): list of Commit objects as dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.getAllProjectCommits">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">getAllProjectCommits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.getAllProjectCommits" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets all of the projects's commits in order of when they were committed</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-listOfCommits (list): list of Commit objects as dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.getProjectInfo">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">getProjectInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.getProjectInfo" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a project's information</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the document</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-foundProject (dict): A Project object as a dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.getProjectLastCommittedCommit">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">getProjectLastCommittedCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.getProjectLastCommittedCommit" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the projects's latest commited commits</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-commit (dict): latest Commit object as a dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.getUserWorkingCommitInProject">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">getUserWorkingCommitInProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.getUserWorkingCommitInProject" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets a user's working commit for a project</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project
+-email (int): user's email</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-commit (dict): the user's working Commit object as a dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.purgeProjectUtil">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">purgeProjectUtil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.purgeProjectUtil" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Deletes a project from the database entirely. This also deletes associated commits, documents, folders, snapshots, and comments.</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project to delete</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-success (bool): success
+-error message (str): if there was an error, returns the message, if not, returns None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="projectUtils.renameProjectUtil">
+<span class="sig-prename descclassname"><span class="pre">projectUtils.</span></span><span class="sig-name descname"><span class="pre">renameProjectUtil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projectUtils.renameProjectUtil" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Renames a project</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-project_id (int): id of the project
+-proj_name (str): new name of the item</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-Success (bool): whether or not it succeeded
+-Error message (str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/projectUtils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

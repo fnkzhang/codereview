@@ -8,6 +8,19 @@ import { pushToExistingBranch, getCommits } from "../../api/APIUtils";
 import { useNavigate } from "react-router";
 import BackButton from "../Buttons/BackButton";
 
+/**
+ * Component to export a project to GitHub.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * <ProjectExport isLoggedIn={true} connected={true} setConnected={() => {}} />
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isLoggedIn - Whether the user is logged in
+ * @param {boolean} props.connected - Whether the user is connected to GitHub
+ * @param {function} props.setConnected - Function to set GitHub connection status
+ */
 export default function ProjectExport( props ) {
 
   const [gitRepo, setGitRepo] = useState("");
@@ -17,23 +30,29 @@ export default function ProjectExport( props ) {
   const [working, setWorking] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
-
   const { project_id } = useParams()
 
+  /**
+   * Fetches commit data for the project.
+   */
   useEffect(() => {
     async function getCommitData() {
         let result = await getCommits(project_id)
         result = result.body.filter((commit) => commit.date_committed !== null).reverse()
         setCommits(result)
         setCommit(result[0])
+        console.log(result[0])
     }
 
     if (props.isLoggedIn)
       getCommitData()
 }, [project_id, props.isLoggedIn])
 
+  /**
+   * Handles the export project button click event.
+   */
   const handleExportProject = async (e) => {
-    e.preventDefault() // Prevent form submission
+    e.preventDefault() // Prevent default form submission
   
     setWorking(true)
   
@@ -111,13 +130,13 @@ export default function ProjectExport( props ) {
               setCommit={setCommit}
             />
             <div className="mb-3 block">
-              <Label className="text-2xl" value="Repository Name"/>
+              <Label className="text-2xl" htmlFor="repo-name" value="Repository Name"/>
             </div>
-            <TextInput className="text-black shadow-white" placeholder="Name of Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow required/>
+            <TextInput className="text-black shadow-white" id="repo-name" placeholder="Name of Repository" sizing="lg" onChange={(e) => setGitRepo(e.target.value)} shadow required/>
             <div className="mb-3 block">
-              <Label className="text-2xl" value="Branch Name"/>
+              <Label className="text-2xl" htmlFor="branch-name" value="Branch Name"/>
             </div>
-            <TextInput className="text-black shadow-white" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow required/>
+            <TextInput className="text-black shadow-white" id="branch-name" placeholder="Name of Branch" sizing="lg" onChange={(e) => setRepoBranch(e.target.value)} shadow required/>
           </div>
 
           {isError ? (<p className="text-red-600 text-xl">Error: Could Not Export Project</p>) : null}

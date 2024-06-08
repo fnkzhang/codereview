@@ -19,6 +19,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../api'))
+sys.path.insert(0, os.path.abspath('../api/utils'))
 
 extensions = ['sphinx.ext.autosummary']
 

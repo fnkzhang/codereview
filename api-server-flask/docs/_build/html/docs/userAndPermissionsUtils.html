@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>userAndPermissionsUtils module &#8212; codereview 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-userAndPermissionsUtils">
+<span id="userandpermissionsutils-module"></span><h1>userAndPermissionsUtils module<a class="headerlink" href="#module-userAndPermissionsUtils" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.changeProjectOwner">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">changeProjectOwner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.changeProjectOwner" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Changes a project's owner to the given email, and demotes the current project owner to editor with a permission level of 3</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-email (str): email of the new owner
+-proj_id (int): id of the project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-success (bool): success
+-error message (str): if there was an error, returns the message, if not, returns None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.createNewUser">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">createNewUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.createNewUser" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Creates a new user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-user_email (str): email of the user
+-name (str): name of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.deleteUser">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">deleteUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.deleteUser" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Removes a user from a project</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-user_email (str): email of the user
+-proj_id (int): id of a project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.getAllUserProjPermissionsForProject">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">getAllUserProjPermissionsForProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.getAllUserProjPermissionsForProject" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the all relations between a given project and users</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-returnList (list): list of UserProjectRelation objects as dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.getAllUserProjPermissionsForUser">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">getAllUserProjPermissionsForUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.getAllUserProjPermissionsForUser" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the all relations between a given user and their projects</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-returnList (list): list of UserProjectRelation objects as dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.getUserInfo">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">getUserInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.getUserInfo" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets information about a user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-user (dict): a User object as a dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.getUserProjPermissions">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">getUserProjPermissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.getUserProjPermissions" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Gets the permissions of the given user on given the project</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-user_email (str): email of the user
+-proj_id (proj_id): id of the project</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-permissions (int): permission level of the user on the project</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.isCommentSeenByUser2">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">isCommentSeenByUser2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.isCommentSeenByUser2" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Returns whether or not the given user had seen the given comment</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-comment_id (int): id of the comment that is to be checked
+-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-seen (bool): whether or not the given user had seen the given comment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.isSnapshotSeenByUser2">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">isSnapshotSeenByUser2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.isSnapshotSeenByUser2" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Returns whether or not the given user had seen the given snapshot</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot that is to be checked
+-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-seen (bool): whether or not the given user had seen the given snapshot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setAllCommentsAndSnapshotsAsSeenByUser">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setAllCommentsAndSnapshotsAsSeenByUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setAllCommentsAndSnapshotsAsSeenByUser" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets all comments and snapshots in a project as seen by a given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project
+-email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setAllCommentsAndSnapshotsAsUnseenByUser">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setAllCommentsAndSnapshotsAsUnseenByUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setAllCommentsAndSnapshotsAsUnseenByUser" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets all comments and snapshots in a project as unseen by a given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-proj_id (int): id of the project
+-email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setAllSeenComm">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setAllSeenComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setAllSeenComm" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets all comments for a snapshot as seen for the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot
+-email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setAllSeenSnap">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setAllSeenSnap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setAllSeenSnap" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets all snapshots for a document as seen for the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-doc_id (int): id of the document
+-email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setAllUnseenComm">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setAllUnseenComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setAllUnseenComm" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets all comments for a snapshot as unseen for the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot
+-email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setAllUnseenSnap">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setAllUnseenSnap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setAllUnseenSnap" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets all snapshots for a document as unseen for the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-doc_id (int): id of the document
+-email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setCommentAsSeen2">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setCommentAsSeen2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setCommentAsSeen2" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets a comment as seen by the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-comment_id (int): id of the comment
+-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setCommentAsUnseen2">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setCommentAsUnseen2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setCommentAsUnseen2" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets a comment as unseen by the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-comment_id (int): id of the comment
+-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-seen (bool): Returns True if it succeeded. Returns False if comment was already unseen.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setSnapshotAsSeen2">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setSnapshotAsSeen2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setSnapshotAsSeen2" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets a snapshot as seen by the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot
+-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setSnapshotAsUnseen2">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setSnapshotAsUnseen2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setSnapshotAsUnseen2" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets a snapshot as unseen by the given user</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-snapshot_id (int): id of the snapshot
+-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-seen (bool): Returns True if it succeeded. Returns False if snapshot was already unseen.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.setUserProjPermissions">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">setUserProjPermissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.setUserProjPermissions" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Sets a user's permissions on a project to a specific level along with giving them a role name</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-email (str): email of the user
+-proj_id (int): id of the project
+-r (str): name of the role
+-perms (int): level of permissiosn</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-success (bool): success
+-error message (str): if there was an error, returns the message, if not, returns None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userAndPermissionsUtils.userExists">
+<span class="sig-prename descclassname"><span class="pre">userAndPermissionsUtils.</span></span><span class="sig-name descname"><span class="pre">userExists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_email</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#userAndPermissionsUtils.userExists" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Explanation:</strong></dt><dd><p>Checks whether user exists in database</p>
+</dd>
+<dt><strong>Args:</strong></dt><dd><p>-user_email (str): email of the user</p>
+</dd>
+<dt><strong>Returns:</strong></dt><dd><p>-userExists (bool): whether or not the user exists</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">codereview</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Luke Brenner, Simon Huang, Frank Zhang, Hai Nguyen.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/docs/userAndPermissionsUtils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

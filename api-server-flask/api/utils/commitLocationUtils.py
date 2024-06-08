@@ -4,7 +4,15 @@ from utils.miscUtils import *
 import models
 
 def getItemCommitLocation(item_id, commit_id):
-
+    '''
+    **Explanation:**
+        Gets the location of an item in a commit
+    **Args:**
+        -item_id (int): id of the item
+        -commit_id (int): id of the commit
+    **Returns:**
+        -location (dict): A ItemCommitLocation object as a dict
+    '''
     with engine.connect() as conn:
         stmt = select(models.ItemCommitLocation).where(models.ItemCommitLocation.commit_id == commit_id, models.ItemCommitLocation.item_id == item_id)
         result = conn.execute(stmt)
@@ -14,7 +22,18 @@ def getItemCommitLocation(item_id, commit_id):
         return relation._asdict()
 
 def createItemCommitLocation(item_id, commit_id, name, parent_folder, is_folder):
-
+    '''
+    **Explanation:**
+        Creates a location for an item on a given commit
+    **Args:**
+        -item_id (int): id of the item
+        -commit_id (int): id of the commit
+        -name (str): name of the item
+        -parent_folder (int): id of the parent folder that the item resides in
+        -is_folder (bool): whether or not the item is a folder or document
+    **Returns:**
+        -True
+    '''
     with engine.connect() as conn:
         if getItemCommitLocation(item_id, commit_id) == None:
             stmt = insert(models.ItemCommitLocation).values(
@@ -35,6 +54,16 @@ def createItemCommitLocation(item_id, commit_id, name, parent_folder, is_folder)
         conn.commit()
     return True
 def rebuildPathToPrevCommit(item_id, commit_id, last_commit):
+    '''
+    **Explanation:**
+        Rebuilds a link between a separated item to an existing item on the commit given data from a previous commit
+    **Args:**
+        -item_id (int): id of the item
+        -commit_id (int): id of the commit the rebuilding is happening on
+        -last_commit (int): id of the commit the rebuild is based off of
+    **Returns:**
+        -True
+    '''
     item = getItemCommitLocation(item_id, commit_id)
     threads = []
     while item == None:
@@ -52,7 +81,17 @@ def rebuildPathToPrevCommit(item_id, commit_id, last_commit):
     return True
 
 def renameItem(item_id, item_name, commit_id):
-
+    '''
+    **Explanation:**
+        Renames an item in a commit
+    **Args:**
+        -item_id (int): id of the item
+        -item_name (str): new name of the item
+        -commit_id (int): id of the commit
+    **Returns:**
+        -Success (bool): whether or not it succeeded
+        -Error message (str)
+    '''
     try:
         with engine.connect() as conn:
             stmt = (update(models.ItemCommitLocation)
@@ -67,7 +106,17 @@ def renameItem(item_id, item_name, commit_id):
         return False, e
 
 def moveItem(item_id, parent_folder, commit_id):
-
+    '''
+    **Explanation:**
+        Moves an item in a commit
+    **Args:**
+        -item_id (int): id of the item
+        -parent_folder (int): Id of the folder the item is to reside in
+        -commit_id (int): id of the commit
+    **Returns:**
+        -Success (bool): whether or not it succeeded
+        -Error message (str)
+    '''
     try:
         with engine.connect() as conn:
             stmt = (update(models.ItemCommitLocation)

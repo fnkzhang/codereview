@@ -1,0 +1,92 @@
+snapshotRoutes module
+*********************
+
+snapshotRoutes.createSnapshot(proj_id, doc_id, commit_id)
+
+   "POST /api/Snapshot/<proj_id>/<doc_id>/<commit_id>/"
+
+   **Explanation:**
+      Creates a snapshot on a document in a commit. Enforces
+      permissions through credentials given in Authorization header.
+
+   **Args:**
+      * proj_id (int): id of the project this is in
+
+      * doc_id (int): id of the document the snapshot is for
+
+      * commit_id (int): id of the commit this is happening on
+
+      * request.body (dict):
+           * data (str): contents of the snapshot
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (int): Id of the newly created snapshot
+
+snapshotRoutes.deleteSnapshot(snapshot_id)
+
+   "DELETE /api/Snapshot/<snapshot_id>/"
+
+   **Explanation:**
+      Deletes a snapshot. Enforces permissions through credentials
+      given in Authorization header.
+
+   **Args:**
+      * snapshot_id (int): id of the snapshot
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+snapshotRoutes.getCommentsOnSnapshot(snapshot_id)
+
+   "GET /api/Snapshot/<snapshot_id>/comments/get"
+
+   **Explanation:**
+      Gets all comments attatched to the snapshot. Enforces
+      permissions through credentials given in Authorization header.
+
+   **Args:**
+      * snapshot_id (int): id of the snapshot
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (list): list of Comment objects as dicts
+
+snapshotRoutes.getSnapshot(proj_id, doc_id, snapshot_id)
+
+   "GET /api/Snapshot/<proj_id>/<doc_id>/<snapshot_id>/"
+
+   **Explanation:**
+      Gets the contents of a snapshot. Enforces permissions through
+      credentials given in Authorization header.
+
+   **Args:**
+      * proj_id (int): id of the project this is in
+
+      * doc_id (int): id of the document the snapshot is for
+
+      * snapshot_id (int): id of the snapshot
+
+   **Returns:**
+      A dictionary containing the following keys:
+         * success (bool): Indicates whether the operation was
+           successful.
+
+         * reason (str): Description of the success or failure reason.
+
+         * body (str): The contents of the snapshot in string format,
+           if unable to be decoded, returns None

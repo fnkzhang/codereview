@@ -1,0 +1,7 @@
+testRoutes module
+=================
+
+.. automodule:: testRoutes
+   :members:
+   :undoc-members:
+   :show-inheritance:

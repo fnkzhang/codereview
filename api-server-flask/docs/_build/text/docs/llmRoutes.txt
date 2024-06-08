@@ -1,0 +1,60 @@
+llmRoutes module
+****************
+
+llmRoutes.implement_code_changes_from_comment()
+
+   "POST /api/llm/code-implementation"
+
+   **Explanation:**
+      Implements code changes based on the provided comment using LLM.
+
+   **Args:**
+      * request.body (dict): A dictionary containing the following
+        keys:
+           * code (str): The original code.
+
+           * highlightedCode (str): The highlighted code.
+
+           * startLine (int): The starting line of the code snippet.
+
+           * endLine (int): The ending line of the code snippet.
+
+           * comment (str): The comment containing the code
+             suggestion.
+
+           * language (str): The programming language of the code.
+
+   **Returns:**
+      * dict: A dictionary containing the following keys:
+           * success (bool): Indicates whether the implementation was
+             successful.
+
+           * reason (str): Description of the result of the
+             implementation.
+
+           * body (str): The implemented code changes.
+
+llmRoutes.suggest_comment_from_code()
+
+   "POST /api/llm/comment-suggestion"
+
+   **Explanation:**
+      Generates a comment suggestion based on the provided code using
+      LLM.
+
+   **Args:**
+      * request.body (dict): A dictionary containing the following
+        keys:
+           * code (str): The original code.
+
+           * language (str): The programming language of the code.
+
+   **Returns:**
+      * dict: A dictionary containing the following keys:
+           * success (bool): Indicates whether the suggestion
+             generation was successful.
+
+           * reason (str): Description of the result of the suggestion
+             generation.
+
+           * body (str): The generated comment suggestion.

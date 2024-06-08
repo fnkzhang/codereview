@@ -21,7 +21,7 @@ def getUserGithubStatus():
     ``GET /api/Github/userHasGithub/``
 
     **Explanation:**
-        Checks if user has github connected
+        Checks if user has github connected (user is dictated by credentials given in Authorization header)
 
     **Returns:**
         A dictionary containing the following keys:
@@ -108,7 +108,7 @@ def getGithubRepositoryBranches():
     ``GET /api/Github/getRepositoryBranches/``
 
     **Explanation:**
-        Gets a repository's branches if the user has access
+        Gets a repository's branches if the user has access (user determined by credentials in Authorization header). Requires Github token connection for the user to function.
 
     **Args:**
         - request.body (dict):
@@ -156,7 +156,7 @@ def pullToNewProject():
     ``POST /api/Github/PullToNewProject/``
 
     **Explanation:**
-        Pulls a github repo's contents to a new project. Will not pull files that have content that cannot be decoded.
+        Pulls a github repo's contents to a new project.
         The project's first commit will be the github repo's contents
 
     **Args:**
@@ -245,23 +245,25 @@ def pullToNewProject():
 @app.route('/api/Github/<proj_id>/PullToExistingProject/', methods=["POST"])
 def pullToExistingProject(proj_id):
     """
-    TODO: Documentation
     
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``POST /api/Github/PullToExistingProject/``
 
     **Explanation:**
-        <insert_explanation_here>
-
+        Pulls a github repo's contents to an existing project. 
+        The project's next commit will be the github repo's contents. Enforces permissions through credentials given in Authorization header.
+        This function has issues due to the fact that duplicate names are not prevented.
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project
+        - request.body:
+            - repository (str): repository you're pulling from
+            - branch (str): the branch you're pulling from
+            - name (str): name of the new commit
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
+            - body (str): List of document ids that received new snapshots as a result of this
 
     """
     headers = request.headers
@@ -302,10 +304,8 @@ def pullToExistingProject(proj_id):
     contents = repo.get_contents("", body["branch"])
     updated_files = []
     docs_to_delete = [document['doc_id'] for document in documents]
-    print(docs_to_delete)
     folders_to_delete = [folder['folder_id'] for folder in folders]
     folders_to_delete.remove(commit["root_folder"])
-    print("____________________________________________________")
     threads = []
     while contents:
         file_content = contents.pop(0)
@@ -369,23 +369,24 @@ def pullToExistingProject(proj_id):
 @app.route('/api/Github/<proj_id>/<commit_id>/PushToNewBranch/', methods=["POST"])
 def pushToNewBranch(proj_id, commit_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``POST /api/Github/<proj_id>/<commit_id>/PushToNewBranch/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Pushes a commit's files into a new branch on github. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project
+        - commit_id (int): id of the commit
+        - request.body:
+            - repository (str): repository you're pushing to
+            - branch (str): the branch you're pushing to
+            - oldbranch (str): the name of the branch this branch is built off of
+            - message (str): commit message for github
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
 
     """
     headers = request.headers
@@ -419,7 +420,6 @@ def pushToNewBranch(proj_id, commit_id):
         return {"success":False,
                 "reason": "branch already exists"}
     repo = g2.get_repo(body["repository"])
-    updated_files = []
     folderIDToPath = getCommitFoldersAsPaths(commit_id)
     body = request.get_json()
     documentSnapshots = getAllCommitDocumentSnapshotRelation(commit_id)
@@ -452,7 +452,7 @@ def pushToNewBranch(proj_id, commit_id):
     allcomments = assembleGithubComments(documentSnapshots, commit_id)
     for comment in allcomments:
         commit.create_comment(body=comment)
-    return {"success":True, "reason":"", "body":updated_files}
+    return {"success":True, "reason":""}
 
 #put repository including owner name in "repository", ex: billingtonbill12/testrepo
 #put branchname in "branch"
@@ -460,23 +460,23 @@ def pushToNewBranch(proj_id, commit_id):
 @app.route('/api/Github/<proj_id>/<commit_id>/PushToExisting/', methods=["POST"])
 def pushToExistingBranch(proj_id, commit_id):
     """
-    TODO: Documentation
-    
-    ``<POST/GET/UPDATE/DELETE> /api``
+    ``POST /api/Github/<proj_id>/<commit_id>/PushToExisting/``
 
     **Explanation:**
-        <insert_explanation_here>
+        Pushes a commit's files into an existing branch on github. Enforces permissions through credentials given in Authorization header.
 
     **Args:**
-        - route_params (<param_type>): description
-        - request.body (dict):
-            - body_params (<param_type>): description
+        - proj_id (int): id of the project
+        - commit_id (int): id of the commit
+        - request.body:
+            - repository (str): repository you're pushing to
+            - branch (str): the branch you're pushing to
+            - message (str): commit message for github
 
     **Returns:**
         A dictionary containing the following keys:
-            - success (bool): description
-            - reason (str): description
-            - body (<body_type>): <body_contents>
+            - success (bool): Indicates whether the operation was successful.
+            - reason (str): Description of the success or failure reason.
 
     """
     headers = request.headers
@@ -507,7 +507,6 @@ def pushToExistingBranch(proj_id, commit_id):
         return {"success":False,
                 "reason": "branch does not exist"}
     repo = g2.get_repo(body["repository"])
-    updated_files = []
     start = time.time()
     folderIDToPath = getCommitFoldersAsPaths(commit_id)
     getpaths = time.time()
@@ -548,6 +547,6 @@ def pushToExistingBranch(proj_id, commit_id):
     allcomments = assembleGithubComments(documentSnapshots, commit_id)
     for comment in allcomments:
         commit.create_comment(body=comment)
-    return {"success":True, "reason":"", "body":updated_files}
+    return {"success":True, "reason":""}
 
 

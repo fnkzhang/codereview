@@ -1,0 +1,6 @@
+flaskApi module
+***************
+
+flaskApi.afterRequest(response)
+
+flaskApi.defaultRoute()
