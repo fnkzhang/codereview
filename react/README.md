@@ -43,6 +43,47 @@ codereview/react/<br>
 
 To understand what pages contain what components, begin with the App.js file. This file is the root component of the application, and manages the state of the user, and their GitHub connection status.
 
+Breifly these are the pages within the project:
+
+    / 
+        # Home page to view all open projects (reviews)
+
+    /Project/Create 
+        # Page to create new projects
+
+    /Project/Delete/:project_id 
+        # Page to delete a specific project
+
+    /Project/:project_id/Share 
+        # Page to share a reivew with other reviewers
+
+    /Project/:project_id/Commit/:commit_id 
+        # Page to view a given commit for a project
+
+    /Project/:project_id/Commit/Delete/:commit_id 
+        # Page to delete the working commit
+
+    /Project/:project_id/Commit/Submit/:commit_id 
+        # Page to submit the working commit
+
+    /Project/Export/:project_id 
+        # Page to export the project to GitHub
+
+    /Project/:project_id/Commit/:commit_id/:parent_folder_id/Document/Create 
+        # Page to create a new document within the working commit
+
+    /Project/:project_id/Commit/:commit_id/Document/Delete/:document_id 
+        # Page to delete a document within the working commit
+
+    /Project/:project_id/Commit/:commit_id/:parent_folder_id/Folder/Create 
+        # Page to make a new folder within the working commit
+
+    /Project/:project_id/Commit/:commit_id/Folder/Delete/:folder_id" 
+        # Page to delete a folder within the working commit
+
+    Project/:project_id/Commit/:commit_id/Document/:document_id/:left_snapshot_id/:right_snapshot_id" 
+        # Page to view a particular diff between two versions of a file
+
 Additionally, explanations of how the components operate and what they intend to do can be found in each source file in JSDoc notation.
 
 ## Running The React Project
