@@ -29,7 +29,7 @@ Preferably, you will want to import your code from Github and to do so, you will
 
 The github repository should be in the format of:
 
-<Github Username>/<Repository Name>
+"Github Username"/"Repository Name"
 
 The branch name should match the branch you want to start a review for.
 
