@@ -126,6 +126,11 @@ To create a comment, simply enter your text into the input field at the bottom o
 
 It is **preferred** that you also highlight in the editor the section of code that your comment pertains to.
 
+### Create LLM Suggestion
+The code review app utilizes Gemini as the LLM to translate a commented suggestion into usable code. LLMs do not have deterministic behavior, so some potential points of failure may come from overly complex suggestions (multiple refactoring changes, referencing dependencies from outside files) or vague suggestions (like “improve the code”). Generally, Gemini is capable of refactoring variable names, changing loops while keeping them valid, fixing code syntax errors, and other single changes.
+
+The main bottleneck for this feature comes from the output response length, which is limited to 8K output tokens for the latest Gemini 1.5 pro model. Assuming the input code is large (1K+ lines of code) and Gemini needs to construct a response with the maximum token length, users may expect to wait approximately a minute. The code review app tries to reduce this wait time by prompting Gemini to provide a diff of the changes, which will reduce the number of output tokens required and cut down the wait time for the same input to about 10 seconds. However, if the number of modifications would exceed 8K tokens, Gemini will either: generate as many modifications as it can without exceeding the limit, generate until the response gets truncated, or immediately error out.
+
 ### How To Export Project To Github
 
 Once you are ready to push your changes to Github, as the author, enter the review and click on the **Export Project** button.
@@ -178,7 +183,7 @@ Get your Application Default Credentials set up: https://cloud.google.com/docs/a
 
 Place them in codereview/api-server-flask/api/credentials/googlecreds.json and create a variable in .env called GOOGLE_APPLICATION_CREDENTIALS whose value is credentials/googlecreds.json.
 
-### Setting up Google OAuth 
+### Setting up Google OAuth
 
 In order to utilize Google's OAuth services, you will need to obtain the credentials from your Google project.
 
